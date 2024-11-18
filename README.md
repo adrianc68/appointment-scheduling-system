@@ -94,30 +94,51 @@
 | Enable Client   | - The system administrator selects a client from the client table and clicks the "View Details" button  <br>- The system displays the "Edit Client" window  <br>- The administrator clicks the "Enable Client" button  <br>- The system checks that the client is not currently enabled in the database and, if valid, changes the client's status to ENABLED and displays a success message. If not, it displays an error message.                       |
 | Delete Client   | - The system administrator clicks the "View Details" button for a client  <br>- The system displays the "Edit Client" window  <br>- The administrator clicks the "Delete" button  <br>- The system displays a confirmation window and requests the ADMINISTRATOR's password  <br>- The administrator provides the password and clicks the "Delete" button  <br>- The system deletes the selected client from the database and displays a success message. |
 
+### Functional Requirements
+
+- The system should allow selecting a time range and block that slot for at least 2 minutes before the appointment is canceled. The selected time range should have a maximum duration of 3 hours.
+- The system should only allow scheduling a maximum of one appointment per user.
+- The system must notify the administrator, client or assistant within 10-15 seconds when an appointment is created, finalized or canceled.
+- The system must send automated reminders (via email or SMS) to users (clients, assistants, or administrators) about upcoming appointments at predefined intervals (30 minutes before the appointment).
+- The system should keep a record of all past appointments and their statuses (completed or canceled) and allow users to view their appointment history.
+- The system should allow clients to cancel appointments before the appointment is started.
+- The system should automatically detect scheduling conflicts and prevent them (like race condition).
+- The system must allow up to 10 minutes of overlap between appointments.
+
+### Constraints
+
+| ID    | Constraint                                                                                                                                                 |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CON-1 | Users must interact with the system through a web browser in different platforms (Windows, OSX, and Linux and different devices like computers or mobiles) |
+| CON-2 | Code must be hosted on a proprietary Git-based platform like Github                                                                                        |
+
+### Concerns
+
+| 
+
 ### Quality Attributes
 
-Requirements:
+1. The system must be operational and accessible during working hours, including weekends (availability).
+2. The system must support data encryption (especially for passwords and bank account information) to protect against unauthorized access (security).
+3. The system must be capable of adding new features within a maximum of 2 months (flexibility, adaptability).
+4. The system should support multiple languages for a diverse user base, depending on the geographic region (internationalization, usability).
+5. The system must support at least 10,000 users concurrently querying the prices of services and should be capable of handling up to 15,000 without decreasing average latency by more than 20%. (Performance)
+6. The system must allow integration with external system, such as messaging and email services. (Interoperability)
+7. The system must support integration testing independently of external systems (Testability)
+8. The system must validate user credentials against an Identity User Service, and once logged in, the user can only access the actions they are authorized to perform. (Security)
+9. The system must be integrad with a continuous deployment pipeline to automatically deploy new changes to production after successful testing. (Reliability)
 
-1. The system should not allow login into multiple accounts at the same time
-2. The system should allow selecting a time range and block that slot for at least 2 minutes before the appointment is canceled. The selected time range should have a maximum duration of 3 hours.
-3. The system should only allow scheduling a maximum of one appointment per user.
-4. The system must support at least 20,000 users concurrently querying the prices of services.
-6. The system must validate user credentials against an Identity User Service, and once logged in, the user can only access the actions they are authorized to perform.
-7. The system must be capable of adding new features within a maximum of 2 months.
-8. The system must support the integration testing independently of external systems.
-9. The system must be operational and accessible during working hours, including weekends.
-10. The system must support data encryption (especially for passwords and bank account information) to protect against unauthorized access.
-11. The system must allow integration with external systems, such as messaging and email services.
-12. The system must notify the administrator, client or assistant within 10-15 seconds when an appointment is created, finalized or canceled.
-13. The system must send automated reminders (via email or SMS) to users (clients, assistants or administrators) about upcoming appointments at predefined intervals (30 minutes before the appointment).
-14. The system should keep a record of all past appointments and their statuses (completed or canceled) and allow users to view their appointment history.
-15. The system should allow clients to cancel appointments before the appointment is started
-16. The system should support multiple languages for a diverse user base, depending on the geographic region.
-17. The system should automatically detect scheduling conflicts and prevent them (like race condition).
-
-| ID  | Quality Attribute | Scenario | Associated Use Case |
-| --- | ----------------- | -------- | ------------------- |
-|     |                   |          |                     |
-
+| ID  | Quality Attribute               | Scenario                                                                                                                                                                                            | Associated Use Case |
+| --- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| 1   | Availability                    | The system must be operational and accessible during working hours, including weekends, with an uptime of 99.5% or higher.                                                                          |                     |
+| 2   | Security                        | The system must use strong data encryption protocols for sensitive information, such as passwords and bank account details, to protect against unauthorized access and breaches.                    |                     |
+| 3   | Flexibility, Adaptability       | The system must support the addition of new features within a maximum of 2 months, including development, testing and deployment phases.                                                            |                     |
+| 4   | Internationalization, usability | The system should support multiple languages to accommodate a diverse user base, with localization depending on the geographic region of users.                                                     |                     |
+| 5   | Performance                     | The system must support at least 10,000 users concurrently querying the prices of services and should be capable of handling up to 15,000 without decreasing average latency by more than 20%.      |                     |
+| 6   | Interaoperability               | The system must support integration with external system, such as messaging and email services ensuring communication is reliable and occurs within 10 seconds of triggered events.                 |                     |
+| 7   | Testability                     | The system must support integration testing independently of external systems by using stubs                                                                                                        |                     |
+| 8   | Security                        | The system must validate user credentials against an Identity User Service, ensuring that once logged in, users can only access the actions and data they are authorized to use or view             |                     |
+| 9   | Reliability                     | The system must ensure automated, seamless deployment of new features and bug fixes to production, with a maximum of downtime of 5 minutes per deployment and no rollback incidents in 95% of cases |                     |
+		
 
 
