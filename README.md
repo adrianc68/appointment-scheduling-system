@@ -215,7 +215,7 @@ In Greenfield system within mature domains, the design concepts that must be sel
 | Mobile Application              | A mobile application allows **clients and assistants** to interact with the system on the go, enhancing **availability** by ensuring access anywhere and anytime, even when they are away from a desktop.<br><br>                                                                                                                                                                                                                                                                                                                                     | CON-1, CON-3, <br>QA-1         |
 | Rich Internet Application (RIA) | Provides a more interactive and responsive experience than traditional web apps, with reduced dependency on the server. RIAs can be easily updated because the logic and interface are managed centrally on the server, but the rich client-side interactivity allows for a smoother experience. Modifications on the client side can be done independently of the server-side changes, improving **modifiability**. Once loaded, an RIA can work with minimal server communication, improving the performance and responsiveness of the application. | CON-2, QA-6, QA-3              |
 | Service Application             | A service application (API Layer) encapsulates core functionality and ensures **reliability** through modular design. This separation reduces the chance of failure in one part affecting the whole system. It supports **scalability** and **reuse** of services for multiple clients like mobile, web, and CLI. It does not provide a user interface but rather expose services that are consumed by other applications.                                                                                                                            | CON-1, CON-3, QA-9             |
-| 3 tier                          | Provides a simple, well-established separation of concerns between presentation, business logic, and data layers, which enhances reliability, scalability, maintainability, and cost-effectiveness without introducing unnecessary complexity.                                                                                                                                                                                                                                                                                                        | CON-1, CON-3, QA-9, QA-3, QA-6 |
+| 3 tier                          | Provides a simple, well-established separation of concerns between presentation, business logic, and data layers, which enhances **reliability**, **scalability**, **maintainability**, and cost-effectiveness without introducing unnecessary complexity.                                                                                                                                                                                                                                                                                            | CON-1, CON-3, QA-9, QA-3, QA-6 |
 
 
 **Discarded Alternatives**
@@ -225,7 +225,7 @@ In Greenfield system within mature domains, the design concepts that must be sel
 | Web Application | Typically, web applications are less interactive and rely heavily on page reloads for updates, which can make the user experience feel slower and less responsive. Standard web apps can suffer from performance issues, particularly when dealing with high-frequency updates or large amounts of data. Each user interaction may require a round-trip to the server, leading to latency and slower user experience. |
 | 4 tier          | Introduces an additional layer that increases operational complexity and overhead, suitable for complex systems with advanced routing, traffic management, or microservices needs.                                                                                                                                                                                                                                    |
 
-The following figures represent the reference architecture and deployment pattern that i have used as the foundation for gathering design concepts and making design decisions
+The following figures represent the reference architecture and deployment pattern that I have used as the foundation for gathering design concepts and making design decisions
 
 **3-tier deployment pattern**
 
@@ -233,6 +233,7 @@ The following figures represent the reference architecture and deployment patter
 
 
 **Rich Internet Application (RIA)**
+
 ![](images/any/richinterneapplicationreferencearc.png)
 
 **Service Application** 
@@ -244,3 +245,50 @@ The following figures represent the reference architecture and deployment patter
 ![](images/any/mobileclientappreferencearch.png)
 
 #### Step 5: Instantiate Architectural Elements, Allocate Responsibilities, and Define Interfaces
+
+
+**Module view**
+
+![](images/any/module_view.png)
+
+| Element                  | Responsibility                                                                                                                                                                                                            | Properties |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| User Workstation         |                                                                                                                                                                                                                           |            |
+| Presentation             | This layer contains modules that control user interaction and use case control flow.                                                                                                                                      |            |
+| Business Logic           | This layer contains modules that perform business logic operations that can be executed locally on the client side.                                                                                                       |            |
+| Data                     | This layer contains modules that are responsible for communication                                                                                                                                                        |            |
+| Cross-Cutting            | This layer includes modules with functionality that goes across different layers                                                                                                                                          |            |
+| UI Components            | These modules render the user interface and receive user inputs                                                                                                                                                           |            |
+| UI Process Components    | These modules are responsible for control flow of all the system use cases (including navigation between screens)                                                                                                         |            |
+| Business Components      | These modules either implement business operations that can be performed locally or expose business functionality from the server side                                                                                    |            |
+| Business Entities        | These entities make up the domain model. They may be less detailed than those on the server side.                                                                                                                         |            |
+| Communication Components | These modules consume the services provided by the application running on the server side.                                                                                                                                |            |
+| ---                      | ---                                                                                                                                                                                                                       | ---        |
+| Application Server       |                                                                                                                                                                                                                           |            |
+| Services                 | This layer contains modules that expose services that are consumed by the clients                                                                                                                                         |            |
+| Business Logic           | This layer contains modules that perform business logic operations that require processing on the server side.                                                                                                            |            |
+| Data                     | This layer contains modules that are responsible for data persistence and communication with the database server                                                                                                          |            |
+| Service Interface        | These module expose services that are consumed by the clients                                                                                                                                                             |            |
+| Business Components      | These modules implement business operations                                                                                                                                                                               |            |
+| Business Entities        | These entities make up the domain model                                                                                                                                                                                   |            |
+| DB Access Components     | The module is responsible for persistence of business entities (objects) into the relational database. It performs object-oriented to relational mapping and shields the rest of the application from persistence details |            |
+
+
+Allocation view
+
+![](images/any/allocation_view.png)
+
+
+The responsibilities of the elements are summarized in the following table:
+
+| Element            | Responsibility                                                                       |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| User Workstation   | The user's Mobile or Computer, which hosts the client side logic of the application  |
+| Application Server | The server that hosts serevr side logic of the application an also servers web pages |
+| Database Server    | The server that hosts the legacy database.                                           |
+Also, information about relationships between some elements in the diagram that is worth recording is summarized in the following table:
+
+| Relationship                                    | Description                                                                                            |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Between Application Server and Database Server  | Communication with the database will be done using any protocol in the stack of tcp/ip                 |
+| Between User Workstation and Application Server | Communication with the Application Server will be done using http(s) protocol to secure communication. |
