@@ -33,7 +33,7 @@
 
 
 ## Proposed Methodology or Methods:
-- `Attribute-Driven Development`
+- `Attribute-Driven Design
 ### Methodology Activities:
 - `Pending`
 
@@ -113,6 +113,8 @@
 | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | CON-1 | Users must interact with the system through a web browser in different platforms (Windows, OSX, and Linux and different devices like computers or mobiles) |
 | CON-2 | Code must be hosted on a proprietary Git-based platform like Github                                                                                        |
+| CON-3 | Future support for mobile clients like IOS and Android                                                                                                     |
+| CON-4 | A minimum of 50 simultaneous users must be supported                                                                                                       |
 
 ### Concerns
 
@@ -128,7 +130,7 @@
 2. The system must support data encryption (especially for passwords and bank account information) to protect against unauthorized access (security).
 3. The system must be capable of adding new features within a maximum of 2 months (modifiability).
 4. The system should support multiple languages for a diverse user base, depending on the geographic region (internationalization, usability).
-5. The system must support at least 10,000 users concurrently querying the prices of services and should be capable of handling up to 15,000 without decreasing average latency by more than 20%. (Performance)
+5. The system must support at least 500 users concurrently querying the prices of services and should be capable of handling up to 1,000 without decreasing average latency by more than 20%. (Performance)
 6. The system must allow integration with external system, such as messaging and email services. (Interoperability)
 7. The system must support integration testing independently of external systems (Testability)
 8. The system must validate user credentials against an Identity User Service, and once logged in, the user can only access the actions they are authorized to perform. (Security)
@@ -142,7 +144,7 @@ Quality Attribute Scenarios
 | 2   | Security          | The system must use strong data encryption protocols for sensitive information, such as passwords and bank account details, to protect against unauthorized access and breaches.                    | ---                 |
 | 3   | Modifiability     | The system must support the addition of new features within a maximum of 2 months, including development, testing and deployment phases.                                                            | All                 |
 | 4   | Usability         | The system should support multiple languages to accommodate a diverse user base, with localization depending on the geographic region of users.                                                     | All                 |
-| 5   | Performance       | The system must support at least 10,000 users concurrently querying the prices of services and should be capable of handling up to 15,000 without decreasing average latency by more than 20%.      | ---                 |
+| 5   | Performance       | The system must support at least 500 users concurrently querying the prices of services and should be capable of handling up to 1,000 without decreasing average latency by more than 20%.          | ---                 |
 | 6   | Interoperability  | The system must support integration with external system, such as messaging and email services ensuring communication is reliable and occurs within 10 seconds of triggered events.                 | All                 |
 | 7   | Testability       | The system must support integration testing independently of external systems by using stubs                                                                                                        | All                 |
 | 8   | Security          | The system must validate user credentials against an Identity User Service, ensuring that once logged in, users can only access the actions and data they are authorized to use or view             | All                 |
@@ -157,25 +159,88 @@ The objective of starting an Attribute-Driven Design process is to establish a s
 
 **Task**: Identify which requirement will be considered as architectural drivers.
 
+
+| Scenario ID           | Importance to the Customer | Difficulty of Implementation |
+| --------------------- | -------------------------- | ---------------------------- |
+| QA-1 Availability     | High                       | High                         |
+| QA-9 Reliability      | High                       | High                         |
+| QA-6 Interoperability | High                       | Medium                       |
+| QA-3 Modifiability    | High                       | Medium                       |
+| QA-2, QA-8 Security   | High                       | Medium                       |
+| QA-5 Performance      | Medium                     | High                         |
+| QA-7 Testability      | Medium                     | Medium                       |
+| QA-4 Usability        | Low                        | Medium                       |
+
 | Category                        | Details                                                                                                                                                                                                                                                                                                                                                             |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Design purpose                  | The purpose of the design activity is to make initial decisions to support the construction of the system from scratch.                                                                                                                                                                                                                                             |
 | Primary functional requirements | CE-1 Register client — It establishes a basis for other use cases<br>CC-1 Register assistant — It establishes a basis for other use cases<br>CD-1 Register service — It establishes a basis for other use cases<br>CB-1 Assign availability time slot — It establishes a basis for other use cases<br>CA-1 Schedule appointment — It supports the core business<br> |
+|                                 | From this list, QA-1, QA-9, QA-6, QA-3 are selected as primary drivers.                                                                                                                                                                                                                                                                                             |
+| Constraints                     | All of the previously constraints are included as drivers                                                                                                                                                                                                                                                                                                           |
+| Architectural concerns          | All of the previously concerns associated with the system are included as drivers                                                                                                                                                                                                                                                                                   |
 
-| Scenario ID           | Importance to the Customer | Difficulty of Implementation |
-| --------------------- | -------------------------- | ---------------------------- |
-| QA-1 Availability     | High                       |                              |
-| QA-2, QA-8 Security   | High                       |                              |
-| QA-3 Modifiability    | High                       |                              |
-| QA-9 Reliability      | High                       |                              |
-| QA-6 Interoperability | High                       |                              |
-| QA-5 Performance      | Medium                     |                              |
-| QA-7 Testability      | Medium                     |                              |
-| QA-4 Usability        | Low                        |                              |
-|                       |                            |                              |
-|                       |                            |                              |
-|                       |                            |                              |
-|                       |                            |                              |
-|                       |                            |                              |
-|                       |                            |                              |
+### Iteration 1: Establishing an Overall System Structure
+#### Step 2: Establishing Iteration Goal by Selecting Drivers
 
+The iteration goal is to establish an initial overall structure for the system considering the drivers that influence the general structure of the system:
+* QA-9 Reliability
+* QA-1 Availability
+* QA-2, QA-8 Security
+* CON-1 Users must interact with the system through a web browser in different platforms (Windows, OSX, and Linux and different devices like computers or mobiles)
+* CRN-2 Avoid introducing technical debt
+* CRN-1 Establishing an overall system architecture
+
+
+![](images/any/context_diagram.png)
+#### Step 3: Choose Elements of the System to Refine
+
+The iteration goal is to achieve the architectural concern CRN-1 and refine the entire Appointment Scheduling System. In this case, refinement is performed through decomposition.
+
+#### Step 4: Choose One or More Design Concepts That Satisfy the Selected Drivers
+
+
+![](images/any/designconcepts.png)
+
+In Greenfield system within mature domains, the design concepts that must be selected include reference architecture and deployment patterns and externally developed components. The table below represents design concepts along with their candidates:
+
+| Design concepts                 | Candidates                                                                                                                  |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Reference architectures         | -Mobile applications<br>-Web Applications<br>-Service Application<br>-Rich Internet Application<br>-Rich Client Application |
+| Deployment Patterns             | -4 tier<br>-3 tier<br>-2 tier                                                                                               |
+| Externally Developed Components | ---                                                                                                                         |
+
+
+| Design Decision                 | Rationale                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Reference                      |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| Mobile Application              | A mobile application allows **clients and assistants** to interact with the system on the go, enhancing **availability** by ensuring access anywhere and anytime, even when they are away from a desktop.<br><br>                                                                                                                                                                                                                                                                                                                                     | CON-1, CON-3, <br>QA-1         |
+| Rich Internet Application (RIA) | Provides a more interactive and responsive experience than traditional web apps, with reduced dependency on the server. RIAs can be easily updated because the logic and interface are managed centrally on the server, but the rich client-side interactivity allows for a smoother experience. Modifications on the client side can be done independently of the server-side changes, improving **modifiability**. Once loaded, an RIA can work with minimal server communication, improving the performance and responsiveness of the application. | CON-2, QA-6, QA-3              |
+| Service Application             | A service application (API Layer) encapsulates core functionality and ensures **reliability** through modular design. This separation reduces the chance of failure in one part affecting the whole system. It supports **scalability** and **reuse** of services for multiple clients like mobile, web, and CLI. It does not provide a user interface but rather expose services that are consumed by other applications.                                                                                                                            | CON-1, CON-3, QA-9             |
+| 3 tier                          | Provides a simple, well-established separation of concerns between presentation, business logic, and data layers, which enhances reliability, scalability, maintainability, and cost-effectiveness without introducing unnecessary complexity.                                                                                                                                                                                                                                                                                                        | CON-1, CON-3, QA-9, QA-3, QA-6 |
+
+
+**Discarded Alternatives**
+
+| Design Decision | Rationale                                                                                                                                                                                                                                                                                                                                                                                                             |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Web Application | Typically, web applications are less interactive and rely heavily on page reloads for updates, which can make the user experience feel slower and less responsive. Standard web apps can suffer from performance issues, particularly when dealing with high-frequency updates or large amounts of data. Each user interaction may require a round-trip to the server, leading to latency and slower user experience. |
+| 4 tier          | Introduces an additional layer that increases operational complexity and overhead, suitable for complex systems with advanced routing, traffic management, or microservices needs.                                                                                                                                                                                                                                    |
+
+The following figures represent the reference architecture and deployment pattern that i have used as the foundation for gathering design concepts and making design decisions
+
+**3-tier deployment pattern**
+
+![](images/any/reference_architecture.png)
+
+
+**Rich Internet Application (RIA)**
+![](images/any/richinterneapplicationreferencearc.png)
+
+**Service Application** 
+
+![](images/any/serviceapplicationreferencearc.png)
+
+**Mobile Client Application**
+
+![](images/any/mobileclientappreferencearch.png)
+
+#### Step 5: Instantiate Architectural Elements, Allocate Responsibilities, and Define Interfaces
