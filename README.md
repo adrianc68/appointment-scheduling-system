@@ -11,29 +11,33 @@
 ## System Features:
 
 ### Client Module:
-1. `Register client`
-2. `Delete client`
-3. `Disable client`
-4. `Enable client`
+1. `CE-1 Register client`
+2. `CE-2 Delete client`
+4. `CE-3 Enable client`
+5. `CE-4 Disable client`
 ### Schedule Module:
-1. `Schedule appointment`
-2. `Edit appointment`
-3. `Cancel appointment`
-4. `Finalize appointment`
-### Availability Module:
-1. `Add availability time slot`
-2. `Edit availability time slot`
-3. `Delete availability time slot`
+1. `CA-1 Schedule appointment`
+2. `CA-2 Edit appointment`
+3. `CA-3 Cancel appointment`
+4. `CA-4 Finalize appointment`
+### Appointment Availability Module:
+1. `CB-1 Add availability time slot`
+2. `CB-2 Edit availability time slot`
+3. `CB-3 Delete availability time slot`
 ### Service Module:
-1. `Register service`
-2. `Edit service`
-3. `Disable service`
-4. `Enable service`
-5. `Delete service`
-
+1. `CD-1 Register service`
+2. `CD-2 Disable service`
+4. `CD-3 Enable service`
+5. `CD-4 Delete service`
+3. `CD-5 Edit service`
+### Assistant Module:
+1. `CC-1 Register assistant`
+2. `CC-2 Edit assistant`
+3. `CC-3 Disable assistant`
+4. `CC-4 Enable assistant`
 
 ## Proposed Methodology or Methods:
-- `Attribute-Driven Design
+- `Attribute-Driven Design`
 ### Methodology Activities:
 - `Pending`
 
@@ -114,7 +118,7 @@
 | CON-1 | Users must interact with the system through a web browser in different platforms (Windows, OSX, and Linux and different devices like computers or mobiles) |
 | CON-2 | Code must be hosted on a proprietary Git-based platform like Github                                                                                        |
 | CON-3 | Future support for mobile clients like IOS and Android                                                                                                     |
-| CON-4 | A minimum of 50 simultaneous users must be supported                                                                                                       |
+| CON-4 | Race condition problems must be avoided during high user traffic or parallel processing.                                                                   |
 
 ### Concerns
 
@@ -138,17 +142,18 @@
 
 Quality Attribute Scenarios
 
-| ID  | Quality Attribute | Scenario                                                                                                                                                                                            | Associated Use Case |
-| --- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
-| 1   | Availability      | The system must be operational and accessible during working hours, including weekends, with an uptime of 99.5% or higher.                                                                          | All                 |
-| 2   | Security          | The system must use strong data encryption protocols for sensitive information, such as passwords and bank account details, to protect against unauthorized access and breaches.                    | ---                 |
-| 3   | Modifiability     | The system must support the addition of new features within a maximum of 2 months, including development, testing and deployment phases.                                                            | All                 |
-| 4   | Usability         | The system should support multiple languages to accommodate a diverse user base, with localization depending on the geographic region of users.                                                     | All                 |
-| 5   | Performance       | The system must support at least 500 users concurrently querying the prices of services and should be capable of handling up to 1,000 without decreasing average latency by more than 20%.          | ---                 |
-| 6   | Interoperability  | The system must support integration with external system, such as messaging and email services ensuring communication is reliable and occurs within 10 seconds of triggered events.                 | All                 |
-| 7   | Testability       | The system must support integration testing independently of external systems by using stubs                                                                                                        | All                 |
-| 8   | Security          | The system must validate user credentials against an Identity User Service, ensuring that once logged in, users can only access the actions and data they are authorized to use or view             | All                 |
-| 9   | Reliability       | The system must ensure automated, seamless deployment of new features and bug fixes to production, with a maximum of downtime of 5 minutes per deployment and no rollback incidents in 95% of cases | All                 |
+| ID  | Quality Attribute | Scenario                                                                                                                                                                                                                       | Associated Use Case          |
+| --- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------- |
+| 1   | Availability      | The system must be operational and accessible during working hours, including weekends, with an uptime of 99.5% or higher.                                                                                                     | All                          |
+| 2   | Security          | The system must use strong data encryption protocols for sensitive information, such as passwords and bank account details, to protect against unauthorized access and breaches.                                               | ---                          |
+| 3   | Modifiability     | The system must support the addition of new features within a maximum of 2 months, including development, testing and deployment phases.                                                                                       | All                          |
+| 4   | Usability         | The system should support multiple languages to accommodate a diverse user base, with localization depending on the geographic region of users.                                                                                | All                          |
+| 5   | Performance       | The system must support at least 500 users concurrently querying the prices of services and should be capable of handling up to 1,000 without decreasing average latency by more than 20%.                                     | ---                          |
+| 6   | Interoperability  | The system must support integration with external system, such as messaging and email services ensuring communication is reliable and occurs within 10 seconds of triggered events.                                            | All                          |
+| 7   | Testability       | The system must support integration testing independently of external systems by using stubs                                                                                                                                   | All                          |
+| 8   | Security          | The system must validate user credentials against an Identity User Service, ensuring that once logged in, users can only access the actions and data they are authorized to use or view                                        | All                          |
+| 9   | Reliability       | The system must ensure automated, seamless deployment of new features and bug fixes to production, with a maximum of downtime of 5 minutes per deployment and no rollback incidents in 95% of cases                            | All                          |
+| 10  | Reliability       | The system must ensure that race conditions are avoided during concurrent transactions, ensuring that multiple users or processes can access and modify shared data without leading to inconsistent states or data corruption. | CA-1, CA-2, CB-1, CB-2, CB-3 |
 
 
 ## Attribute-Driven Design (ADD)
@@ -160,16 +165,16 @@ The objective of starting an Attribute-Driven Design process is to establish a s
 **Task**: Identify which requirement will be considered as architectural drivers.
 
 
-| Scenario ID           | Importance to the Customer | Difficulty of Implementation |
-| --------------------- | -------------------------- | ---------------------------- |
-| QA-1 Availability     | High                       | High                         |
-| QA-9 Reliability      | High                       | High                         |
-| QA-6 Interoperability | High                       | Medium                       |
-| QA-3 Modifiability    | High                       | Medium                       |
-| QA-2, QA-8 Security   | High                       | Medium                       |
-| QA-5 Performance      | Medium                     | High                         |
-| QA-7 Testability      | Medium                     | Medium                       |
-| QA-4 Usability        | Low                        | Medium                       |
+| Scenario ID             | Importance to the Customer | Difficulty of Implementation |
+| ----------------------- | -------------------------- | ---------------------------- |
+| QA-1 Availability       | High                       | High                         |
+| QA-9, QA-10 Reliability | High                       | High                         |
+| QA-6 Interoperability   | High                       | Medium                       |
+| QA-3 Modifiability      | High                       | Medium                       |
+| QA-2, QA-8 Security     | High                       | Medium                       |
+| QA-5 Performance        | Medium                     | High                         |
+| QA-7 Testability        | Medium                     | Medium                       |
+| QA-4 Usability          | Low                        | Medium                       |
 
 | Category                        | Details                                                                                                                                                                                                                                                                                                                                                             |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -183,7 +188,7 @@ The objective of starting an Attribute-Driven Design process is to establish a s
 #### Step 2: Establishing Iteration Goal by Selecting Drivers
 
 The iteration goal is to establish an initial overall structure for the system considering the drivers that influence the general structure of the system:
-* QA-9 Reliability
+* QA-9, QA-10 Reliability
 * QA-1 Availability
 * QA-2, QA-8 Security
 * CON-1 Users must interact with the system through a web browser in different platforms (Windows, OSX, and Linux and different devices like computers or mobiles)
@@ -246,6 +251,23 @@ The following figures represent the reference architecture and deployment patter
 
 #### Step 5: Instantiate Architectural Elements, Allocate Responsibilities, and Define Interfaces
 
+The instantiation design decisions considered and made are summarized in the following table:
+
+| Design Decision and Location                                                         | Rationale                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Use Angular to implement the front-end component for Web Browsers                    | Angular is selected because the team has experience with this framework and because it supports the development of responsive front-ends. This is necessary to support **CON**-1<br><br>Discarded alternatives are:<br>-React: While React provides a flexible and fast rendering engine, it does not provide as many built-in features as Angular, which would require the team to integrate additional tools for routing, state management, and form handling, potentially complicating maintainability and increasing development time<br>-Vue.js: Although Vue.js is easier to integrate and offers simplicity, it is not as widely adopted in enterprise-scale projects as Angular. This could pose challenges in terms of long-term support, available resources, and scalability for the project. It may also lead to potential issues with cohesion and maintainability in larger teams or projects.                                                                                                                                                                 |
+| Use Swift for the Mobile Application (IOS)                                           | Swift is selected for iOS app development due to its strong performance, modern syntax, and security features. It provides a native and highly optimized experience for iOS users. It is necessary to support **CON-3**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Use Android (Java/Kotlin) for Mobile Application Development                         | Android is selected due to its wide user base and flexibility in supporting different device types. With Java/Kotlin, the team can leverage a large ecosystem, ensuring scalability and maintainability. This is necessary to support **CON-3**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Host the code on a proprietary Git-based platform (GitHub)                           | GitHub is selected due to its industry-standard status, support for Git workflows, integration with CI/CD pipelines, and its broad ecosystem of tools that facilitate collaboration, version control, and code reviews. It supports **CON-2** by providing **interoperability** with development tools and services.<br><br>Discarded alternatives: GitLab (while it offers similar features, GitHub has a larger user base and integrations with other platforms).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Implement Concurrency Control Mechanisms to Avoid Race Conditions                    | To ensure **reliability**, the system will implement mechanisms like **optimistic concurrency control**, **pessimistic locking**, or **transactional consistency** to prevent race conditions during concurrent data modifications. These mechanisms will ensure that multiple users or processes can access and modify shared data safely, without causing inconsistent or corrupted states. It is necessary to support **QA-10** and **CON-4**<br>  <br>Discarded alternatives: Not using any concurrency control (which would lead to unpredictable behavior and data corruption in high-load scenarios).<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Use C# for Application Server                                                        | C# is selected for the application server because it is well-suited for building **scalable, high-performance web applications**. It has a strong ecosystem with **ASP.NET Core**, which offers robust support for building REST APIs and can handle high numbers of concurrent connections. **C#** supports **asynchronous programming** for high scalability and **reliability** (QA-10) by enabling the application to handle multiple requests without blocking threads.  <br>Additionally, the **.NET** ecosystem provides excellent tooling for continuous integration and testing, improving **modifiability** (QA-3).                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Use a relational database                                                            | A relational database is selected due to its ability to enforce **data consistency** and its **maturity** in handling complex queries. Relational databases (RDBMS) ensure **data integrity**, and they are well-suited for structured data where relationships between tables are critical. They also offer **transactional support** to handle large amounts of data reliably. The database choice supports **QA-9** (reliability) by ensuring that the application maintains data consistency even in the face of failures.  <br>  <br>Discarded alternatives:  <br>- **NoSQL databases**: While NoSQL databases provide flexibility, they lack the strict consistency guarantees and transactional support required by the system, which could lead to data inconsistency in critical business processes.                                                                                                                                                                                                                                                                |
+| Use Docker containers for deployment                                                 | Because the application has to be moved across environments (QA-7), deploying the application as a set of container images is preferred.<br><br>Virtual Machines are discarded because they are considerably larger than container images and requires more resources  than containers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Define and expose REST APIs to the front-end and document them using Swagger/OpenAPI | REST APIs are chosen to facilitate communication between the front-end and the back-end. These APIs provide a standardized way for the front-end (Angular, Swift, or Android clients) to interact with the business logic and data layers. The use of **Swagger/OpenAPI** ensures that these APIs are well-documented and easily understandable by both developers and automated tools.<br><br>The documentation provides clarity and reduces ambiguity during development, contributing to better **modifiability** (QA-3) and **interoperability** (QA-7). Additionally, it helps improve **testability** (QA-7) by enabling automated API tests.<br><br>**Discarded alternatives:** SOAP: While SOAP provides a more rigid protocol for communication, it is less flexible and has more overhead than RESTful APIs. GraphQL: While GraphQL offers fine-grained data fetching, it can lead to more complex queries and requires more effort to implement and maintain. This would increase development time and complexity, which is not necessary for the current system. |
+| Use TLS (HTTPs) to encrypt data in transit                                           | TLS (Transport Layer Security) is selected to ensure the confidentiality and integrity of data exchanged between the front-end and back-end, as well as any communication with external systems. By encrypting data in transit, TLS prevents man-in-the-middle (MITM) attacks and eavesdropping on sensitive information, such as user credentials or payment details. This choice supports **Security** (QA-2) and ensures compliance with industry standards for data protection.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Encrypt confidential data in database with symmetric encryption                      | Confidential data, such as user passwords, financial records, and other personally identifiable information, is encrypted within the database to protect it in the event of a data breach. Using encryption ensures that even if unauthorized access occurs, sensitive data remains unreadable. This supports **Security** (QA-2).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+
+#### Step 6: Sketch Views and Record Design Decisions
 
 **Module view**
 
@@ -263,11 +285,10 @@ The following figures represent the reference architecture and deployment patter
 | Business Components      | These modules either implement business operations that can be performed locally or expose business functionality from the server side                                                                                    |            |
 | Business Entities        | These entities make up the domain model. They may be less detailed than those on the server side.                                                                                                                         |            |
 | Communication Components | These modules consume the services provided by the application running on the server side.                                                                                                                                |            |
-| ---                      | ---                                                                                                                                                                                                                       | ---        |
 | Application Server       |                                                                                                                                                                                                                           |            |
 | Services                 | This layer contains modules that expose services that are consumed by the clients                                                                                                                                         |            |
 | Business Logic           | This layer contains modules that perform business logic operations that require processing on the server side.                                                                                                            |            |
-| Data                     | This layer contains modules that are responsible for data persistence and communication with the database server                                                                                                          |            |
+| Data                     | This layer contains modules that are responsible for data persistence and communication with the database server and external system like email and messaging communication                                               |            |
 | Service Interface        | These module expose services that are consumed by the clients                                                                                                                                                             |            |
 | Business Components      | These modules implement business operations                                                                                                                                                                               |            |
 | Business Entities        | These entities make up the domain model                                                                                                                                                                                   |            |
@@ -286,9 +307,32 @@ The responsibilities of the elements are summarized in the following table:
 | User Workstation   | The user's Mobile or Computer, which hosts the client side logic of the application  |
 | Application Server | The server that hosts serevr side logic of the application an also servers web pages |
 | Database Server    | The server that hosts the legacy database.                                           |
+
 Also, information about relationships between some elements in the diagram that is worth recording is summarized in the following table:
 
 | Relationship                                    | Description                                                                                            |
 | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | Between Application Server and Database Server  | Communication with the database will be done using any protocol in the stack of tcp/ip                 |
 | Between User Workstation and Application Server | Communication with the Application Server will be done using http(s) protocol to secure communication. |
+#### Step 7: Perform Analysis of Current Design and Review Iteration Goal and Achievement of Design Purpose
+
+| Not Addressed | Partially Addressed                                                       | Addressed | Design Decisiones Made During Iteration                                                                                                                                                                                                              |
+| ------------- | ------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|               | Client, Schedule, Appointment Availability, Service and Assistant Modules |           | Selected reference architecture establishes the modules that will support this functionality.                                                                                                                                                        |
+|               |                                                                           | CON-1     | The framework Angular will run on the client web browser.                                                                                                                                                                                            |
+|               |                                                                           | CON-2     | The project will be hosted in a Git-based platform (Github).                                                                                                                                                                                         |
+|               |                                                                           | CON-3     | The application will run in native in IOS and Android using a layered architecture.                                                                                                                                                                  |
+|               | CON-4                                                                     |           | Initial measures were considered, but further measures are needed.                                                                                                                                                                                   |
+|               |                                                                           | CRN-1     | Establishing an overall initial system architecture was the goal of this iteration.                                                                                                                                                                  |
+|               | CRN-2                                                                     |           | Technologies that have been considered up to this point take into account the knowledge of the developers.                                                                                                                                           |
+| CRN-3         |                                                                           |           | No relevant decisions were made.                                                                                                                                                                                                                     |
+|               | QA-1<br>                                                                  |           |                                                                                                                                                                                                                                                      |
+|               |                                                                           | QA-2      | The measures selected align with industry standards and safeguard sensitive information                                                                                                                                                              |
+|               | QA-3                                                                      |           | The client-server style separates concerns, allowing independent development of client and server components. REST APIs and layered architecture further isolate system parts, making updates and changes easier. But further iterations can be done |
+| QA-4          |                                                                           |           | No relevant decisions were made.                                                                                                                                                                                                                     |
+| QA-5          |                                                                           |           | No relevant decisions were made.                                                                                                                                                                                                                     |
+|               | QA-6                                                                      |           | Initial overall system architecture were considered, but further measures are needed.                                                                                                                                                                |
+|               | QA-7                                                                      |           | A measure has been selected to contribute to achieving testability by ensuring consistent and reproducible test environments. However, further measures are needed.                                                                                  |
+|               |                                                                           | QA-8      | The measures selected align with industry standards and safeguard sensitive information                                                                                                                                                              |
+|               | QA-9                                                                      |           | A measure has been selected to contribute. However, further measures are needed.                                                                                                                                                                     |
+|               | QA-10                                                                     |           | Techniques were identified, but further details are needed.                                                                                                                                                                                          |
