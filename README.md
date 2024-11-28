@@ -77,7 +77,7 @@
 
 ![](images/prototypes/agendar_cita.png)
 
-
+![](images/prototypes/detalles_de_cita.png)
 
 
 | Use Case                                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
