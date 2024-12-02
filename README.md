@@ -15,12 +15,14 @@
 2. `CE-2 Delete client`
 4. `CE-3 Enable client`
 5. `CE-4 Disable client`
-### Schedule Module:
+### Appointment Schedule Module:
 1. `CA-1 Schedule appointment (Client-self)`
 2. `CA-2 Edit appointment`
-3. `CA-3 Cancel appointment`
+3. `CA-3 Cancel appointment (Staff-assisted)`
 4. `CA-4 Finalize appointment`
 5. `CA-5 Schedule appointment (Staff-assisted)`
+6. `CA-6 Confirm appointment`
+7. `CA-7 Cancel appointment (Client-self)`
 ### Appointment Availability Module:
 1. `CB-1 Add availability time slot`
 2. `CB-2 Edit availability time slot`
