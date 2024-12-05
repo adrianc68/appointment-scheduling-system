@@ -49,18 +49,42 @@
 
 ## Requirements
 
-### Use Cases
+### Use Case Model
 
 
 ![](images/any/usecasemodel.png)
 
 ![](images/any/package.png)
 
+### State machine
+
+#### Appointment states
+
 ![](images/any/appointment%20states%20diagram.png)
 
+#### Client states
 
+![](images/any/client%20states%20diagram.png)
+
+#### Services states
+
+![](images/any/service%20states%20diagram.png)
+
+#### Assistant states
+
+![](images/any/assistant%20states%20diagram.png)
+
+
+### UML Components 
+
+#### Component Architecture
+
+![](images/any/Component%20Architecture.png)
+
+#### Interface Responsibility Diagram
 
 ![](images/any/Interface%20Responsibility%20Diagram.png)
+
 
 
 ### Use Case Descriptions
@@ -178,6 +202,8 @@
 | Use case description | NF-1: The System displays the "Editar cita" window with APPOINTMENT information.<br>NF-2: The Staff provides the new information and presses the button "Aceptar" (AF-1)<br>NF-3: The System shows a confirmation window and requests the STAFF's password  <br>NF-4: The Staff enters the STAFF's password and presses the "Confirm" button.<br>NF-5: The System validates information (AF-2), checks SERVICES and CLIENT availability (AF-3, AF-4, AF-5) and update APPOINTMENT (EX-1, EX-2)<br>NF-6: The use case ends here.                                                                                                                                                                                                                                                                                      |
 | Alternative Flows    | **AF-1: The Staff cancels the operation:** <br>AF-1.1: The System closes the window.<br>AF-1.2: The use case ends here.<br>**AF-2: The Client has provided invalid data:**<br>AF-2.1: The System notifies the Client has provided invalid data and prompts them to send valid data.<br>AF-2.2: The use case flow returns to NF-2<br>**AF-3: The SERVICE has been disabled or deleted.**<br>AF-3.1: The System notifies the Client that the SERVICE has been disabled or deleted and removes SERVICE from selected SERVICES in the "Editar Cita" window.<br>**AF-4: The ASSISTANT has been disabled or deleted.**<br>AF-4.1: The System notifies the Client that the ASSISTANT has been disabled or deleted and removes any SERVICE assigned to the ASSISTANT from the selected SERVICES in the "Editar cita" window. |
 | Exception            | **EX-1: No internet connection**<br>EX-1.1: The System displays an error message prompting the user to check their network connection and try again.<br>EX-1.2: The use case ends here.<br>**EX-2: Error to execute operation**<br>EX-2.1: The System encounters an internal error (e.g., database failure, server timeout) and notifies the user of the issue, offering to retry the operation.<br>EX-2.2: The use case ends here.                                                                                                                                                                                                                                                                                                                                                                                  |
+
+
 
 ![](images/prototypes/citas_vista_admn.png)
 
