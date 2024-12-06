@@ -95,6 +95,52 @@
 
 ![](images/any/systeminterface%20IScheduleAppointmentStaffAssisted.png)
 
+
+#### IAssignAvailabilityTimeSlot
+
+![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)
+#### IEditAppointment
+
+![](images/any/systeminterface%20IEditAppointment.png)
+
+#### IFinalizeAppointment
++finalizeAppointment
+#### ICancelAppointment
++cancelAppointment
+#### ICancelAppoitmentStaffAssisted
++cancelAppointment
+#### IAddAvailabilityTimeSlot
++addAvailabilityTimeSlot
+#### IDeleteAvailabilityTimeSlot
++deleteAvailabilityTimeSlot
+#### IEditAvailabilityTimeSlot
++editAvailabilityTimeSlot
+#### IEditService
++editService()
+#### IDeleteService
++deleteService()
+#### IEnableService
++changeServiceStatusType()
+#### IDisableService
++changeServiceStatusType()
+#### IRegisterService
++registerService()
+#### IRegisterAssistant
++registerAssistant()
+#### IEditAssistant
++editAssistant()
+#### IDisableAssistant
++changeAssistantStatusType()
+#### IEnableAssistant
++changeAssistantStatusType()
+#### IDisableClient
++changeClientStatusType()
+#### IEnableClient
++changeClientStatusType()
+#### IRegisterClient
++registerclient()
+
+
 ### Business Interfaces
 
 #### ISchedulerMgt
@@ -113,6 +159,9 @@
 
 
 ![](images/any/businessinterface%20IAssistantMgt.png)
+
+
+
 
 
 ### Collaboration Diagram for System and Business Interfaces
@@ -141,6 +190,24 @@
 ##### scheduleAppointmentAsStaff()
 
 ![](images/any/interaction%20scheduleAppointmentAsStaff().png)
+
+### Availability time slots
+
+#### isAssistantAvailable()
+
+![](images/any/interaction%20isAssistantAvailable().png)
+
+#### isAvailabilityTimeSlotAvailable()
+
+![](images/any/interaction%20isAvailabilityTimeSlotAvailable().png)
+
+#### registerAvailabilityTimeSlot()
+
+![](images/any/interaction%20registerAvailabilityTimeSlot().png)
+
+
+
+
 
 
 
