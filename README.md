@@ -60,20 +60,17 @@
 
 #### Appointment states
 
-![](images/any/appointment%20states%20diagram.png)
-
+![](images/any/states%20diagram%20appointment.png)
 #### Client states
 
-![](images/any/client%20states%20diagram.png)
+![](images/any/states%20diagram%20client.png)
 
 #### Services states
 
-![](images/any/service%20states%20diagram.png)
-
+![](images/any/states%20diagram%20service.png)
 #### Assistant states
 
-![](images/any/assistant%20states%20diagram.png)
-
+![](images/any/states%20diagram%20assistant.png)
 
 ### UML Components 
 
@@ -85,93 +82,31 @@
 
 ![](images/any/Interface%20Responsibility%20Diagram.png)
 
-### System Interfaces
-
-#### IScheduleAppointmentClientSelf
-
-![](images/any/systemInterface%20IScheduleAppointmentClientSelf.png)
-
-#### IScheduleAppointmentStaffAssisted
-
-![](images/any/systeminterface%20IScheduleAppointmentStaffAssisted.png)
-
-
-#### IAssignAvailabilityTimeSlot
-
-![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)
-#### IEditAppointment
-
-![](images/any/systeminterface%20IEditAppointment.png)
-
-#### IFinalizeAppointment
-+finalizeAppointment
-#### ICancelAppointment
-+cancelAppointment
-#### ICancelAppoitmentStaffAssisted
-+cancelAppointment
-#### IAddAvailabilityTimeSlot
-+addAvailabilityTimeSlot
-#### IDeleteAvailabilityTimeSlot
-+deleteAvailabilityTimeSlot
-#### IEditAvailabilityTimeSlot
-+editAvailabilityTimeSlot
-#### IEditService
-+editService()
-#### IDeleteService
-+deleteService()
-#### IEnableService
-+changeServiceStatusType()
-#### IDisableService
-+changeServiceStatusType()
-#### IRegisterService
-+registerService()
-#### IRegisterAssistant
-+registerAssistant()
-#### IEditAssistant
-+editAssistant()
-#### IDisableAssistant
-+changeAssistantStatusType()
-#### IEnableAssistant
-+changeAssistantStatusType()
-#### IDisableClient
-+changeClientStatusType()
-#### IEnableClient
-+changeClientStatusType()
-#### IRegisterClient
-+registerclient()
-
-
 ### Business Interfaces
 
 #### ISchedulerMgt
 
 ![](images/any/businessinterface%20ISchedulerMgt.png)
-
 #### IClientMgt
 
 ![](images/any/businessinterface%20IClientMgt.png)
-
 #### IServiceMgt
 
 ![](images/any/businessinterface%20IServiceMgt.png)
-
 #### IAssistantMgt
 
-
 ![](images/any/businessinterface%20IAssistantMgt.png)
+### System Interfaces
 
+#### IScheduleAppointmentClientSelf
 
-
-
-
-### Collaboration Diagram for System and Business Interfaces
-
-#### Appointments
-
+![](images/any/systemInterface%20IScheduleAppointmentClientSelf.png)
 ##### scheduleAppointmentAsClient()
 
 ![](images/any/interaction%20scheduleAppointmentAsClient().png)
+#### IScheduleAppointmentStaffAssisted
 
+![](images/any/systeminterface%20IScheduleAppointmentStaffAssisted.png)
 ##### getAppointmentDetails()
 
 ![](images/any/interaction%20getAppointmentDetails().png)
@@ -183,15 +118,17 @@
 ##### getAppointments()
 
 ![](images/any/interaction%20getAppointments().png)
-##### getAvailableService()
+
+##### getAvailableServices()
 
 ![](images/any/interaction%20getAvailableServices().png)
 
 ##### scheduleAppointmentAsStaff()
 
 ![](images/any/interaction%20scheduleAppointmentAsStaff().png)
+#### IAssignAvailabilityTimeSlot
 
-### Availability time slots
+![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)
 
 #### isAssistantAvailable()
 
@@ -211,6 +148,64 @@
 
 
 
+
+#### IEditAppointment
+
+![](images/any/systeminterface%20IEditAppointment.png)
+#### IFinalizeAppointment
+
+![](images/any/systeminterface%20IFinalizeAppointment.png)
+#### ICancelAppointmentClientSelf
+
+![](images/any/systeminterface%20ICancelAppointmentClientSelf.png)
+#### ICancelAppointmentStaffAssisted
+
+![](images/any/systeminterface%20ICancelAppointmentStaffAssited.png)
+#### IAddAvailabilityTimeSlot
+
+![](images/any/systeminterface%20IAddAvailabilityTimeSlot.png)
+#### IDeleteAvailabilityTimeSlot
+
+![](images/any/systeminterface%20IDeleteAvailabilityTimeSlot.png)
+#### IEditAvailabilityTimeSlot
+
+![](images/any/systeminterface%20IEditAvailabilityTimeSlot.png)
+#### IEnableService
+
+![](images/any/systeminterface%20IEnableService.png)
+#### IDisableService
+
+![](images/any/systeminterface%20IDisableService.png)
+#### IEditService
+
+![](images/any/systeminterface%20IEditService.png)
+#### IDeleteService
+
+![](images/any/systeminterface%20IDeleteService.png)
+#### IRegisterService
+
+![](images/any/systeminterface%20IRegisterService.png)
+#### IRegisterAssistant
+
+![](images/any/systeminterface%20IRegisterAssistant.png)
+#### IEditAssistant
+
+![](images/any/systeminterface%20IEditAssistant.png)
+#### IDisableAssistant
+
+![](images/any/systeminterface%20IDisableAssistant.png)
+#### IEnableAssistant
+
+![](images/any/systeminterface%20IEnableAssistant.png)
+#### IDisableClient
+
+![](images/any/systeminterface%20IDisableClient.png)
+#### IEnableClient
+
+![](images/any/systeminterface%20IEnableClient.png)
+#### IRegisterClient
+
+![](images/any/systeminterface%20IRegisterClient.png)
 
 ### Use Case Descriptions
 
