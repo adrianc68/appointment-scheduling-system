@@ -114,74 +114,86 @@
 ##### changeAppointmentStatus()
 
 ![](images/any/interaction%20changeAppointmentStatus().png)
-
 ##### getAppointments()
 
 ![](images/any/interaction%20getAppointments().png)
-
 ##### getAvailableServices()
 
 ![](images/any/interaction%20getAvailableServices().png)
-
 ##### scheduleAppointmentAsStaff()
 
 ![](images/any/interaction%20scheduleAppointmentAsStaff().png)
 #### IAssignAvailabilityTimeSlot
 
 ![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)
-
 #### isAssistantAvailable()
 
 ![](images/any/interaction%20isAssistantAvailable().png)
-
 #### isAvailabilityTimeSlotAvailable()
 
 ![](images/any/interaction%20isAvailabilityTimeSlotAvailable().png)
-
 #### registerAvailabilityTimeSlot()
 
 ![](images/any/interaction%20registerAvailabilityTimeSlot().png)
 
-
-
-
-
-
-
-
 #### IEditAppointment
 
 ![](images/any/systeminterface%20IEditAppointment.png)
+
+![](images/any/interaction%20editAppointment().png)
+
 #### IFinalizeAppointment
 
 ![](images/any/systeminterface%20IFinalizeAppointment.png)
+
+![](images/any/interaction%20finalizeAppointment().png)
+
 #### ICancelAppointmentClientSelf
 
 ![](images/any/systeminterface%20ICancelAppointmentClientSelf.png)
+
+![](images/any/interaction%20cancelAppointmentClientSelf().png)
 #### ICancelAppointmentStaffAssisted
 
 ![](images/any/systeminterface%20ICancelAppointmentStaffAssited.png)
+
+![](images/any/interaction%20cancelAppointmentStaffAssisted().png)
 #### IAddAvailabilityTimeSlot
 
 ![](images/any/systeminterface%20IAddAvailabilityTimeSlot.png)
+
+![](images/any/interaction%20registerAvailabilityTimeSlot().png)
 #### IDeleteAvailabilityTimeSlot
 
 ![](images/any/systeminterface%20IDeleteAvailabilityTimeSlot.png)
+
+![](images/any/interaction%20deleteAvailabilityTimeSlot.png)
 #### IEditAvailabilityTimeSlot
 
 ![](images/any/systeminterface%20IEditAvailabilityTimeSlot.png)
+
+![](images/any/interaction%20editAvailabilityTimeSlot().png)
 #### IEnableService
 
 ![](images/any/systeminterface%20IEnableService.png)
+
+![](images/any/interaction%20enableService().png)
 #### IDisableService
 
 ![](images/any/systeminterface%20IDisableService.png)
+
+
+![](images/any/interaction%20disableService().png)
 #### IEditService
 
 ![](images/any/systeminterface%20IEditService.png)
+
+![](images/any/interaction%20editService().png)
 #### IDeleteService
 
 ![](images/any/systeminterface%20IDeleteService.png)
+
+![](images/any/interaction%20deleteService().png)
 #### IRegisterService
 
 ![](images/any/systeminterface%20IRegisterService.png)
@@ -194,15 +206,28 @@
 #### IDisableAssistant
 
 ![](images/any/systeminterface%20IDisableAssistant.png)
+
+![](images/any/interaction%20disableAssistant().png)
+
 #### IEnableAssistant
 
 ![](images/any/systeminterface%20IEnableAssistant.png)
+
+![](images/any/interaction%20enableAssistant().png)
+
 #### IDisableClient
 
 ![](images/any/systeminterface%20IDisableClient.png)
+
+![](images/any/interaction%20disableClient().png)
+
 #### IEnableClient
 
 ![](images/any/systeminterface%20IEnableClient.png)
+
+![](images/any/interaction%20enableClient().png)
+
+
 #### IRegisterClient
 
 ![](images/any/systeminterface%20IRegisterClient.png)
