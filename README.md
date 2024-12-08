@@ -111,9 +111,9 @@
 
 ![](images/any/interaction%20getAppointmentDetails().png)
 
-##### changeAppointmentStatus()
+##### confirmAppointment()
 
-![](images/any/interaction%20changeAppointmentStatus().png)
+![](images/any/interaction%20confirmAppointment().png)
 ##### getAppointments()
 
 ![](images/any/interaction%20getAppointments().png)
@@ -126,22 +126,14 @@
 #### IAssignAvailabilityTimeSlot
 
 ![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)
-#### isAssistantAvailable()
-
-![](images/any/interaction%20isAssistantAvailable().png)
-#### isAvailabilityTimeSlotAvailable()
-
-![](images/any/interaction%20isAvailabilityTimeSlotAvailable().png)
 #### registerAvailabilityTimeSlot()
 
 ![](images/any/interaction%20registerAvailabilityTimeSlot().png)
-
 #### IEditAppointment
 
 ![](images/any/systeminterface%20IEditAppointment.png)
 
 ![](images/any/interaction%20editAppointment().png)
-
 #### IFinalizeAppointment
 
 ![](images/any/systeminterface%20IFinalizeAppointment.png)
@@ -158,9 +150,9 @@
 ![](images/any/systeminterface%20ICancelAppointmentStaffAssited.png)
 
 ![](images/any/interaction%20cancelAppointmentStaffAssisted().png)
-#### IAddAvailabilityTimeSlot
 
-![](images/any/systeminterface%20IAddAvailabilityTimeSlot.png)
+#### IAssignAvailabilityTimeSlot
+![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)
 
 ![](images/any/interaction%20registerAvailabilityTimeSlot().png)
 #### IDeleteAvailabilityTimeSlot
