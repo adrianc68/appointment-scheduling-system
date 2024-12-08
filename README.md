@@ -72,162 +72,6 @@
 
 ![](images/any/states%20diagram%20assistant.png)
 
-### UML Components 
-
-#### Component Architecture
-
-![](images/any/Component%20Architecture.png)
-
-#### Interface Responsibility Diagram
-
-![](images/any/Interface%20Responsibility%20Diagram.png)
-
-### Business Interfaces
-
-#### ISchedulerMgt
-
-![](images/any/businessinterface%20ISchedulerMgt.png)
-#### IClientMgt
-
-![](images/any/businessinterface%20IClientMgt.png)
-#### IServiceMgt
-
-![](images/any/businessinterface%20IServiceMgt.png)
-#### IAssistantMgt
-
-![](images/any/businessinterface%20IAssistantMgt.png)
-### System Interfaces
-
-#### IScheduleAppointmentClientSelf
-
-![](images/any/systemInterface%20IScheduleAppointmentClientSelf.png)
-##### scheduleAppointmentAsClient()
-
-![](images/any/interaction%20scheduleAppointmentAsClient().png)
-#### IScheduleAppointmentStaffAssisted
-
-![](images/any/systeminterface%20IScheduleAppointmentStaffAssisted.png)
-##### getAppointmentDetails()
-
-![](images/any/interaction%20getAppointmentDetails().png)
-
-##### confirmAppointment()
-
-![](images/any/interaction%20confirmAppointment().png)
-##### getAppointments()
-
-![](images/any/interaction%20getAppointments().png)
-##### getAvailableServices()
-
-![](images/any/interaction%20getAvailableServices().png)
-##### scheduleAppointmentAsStaff()
-
-![](images/any/interaction%20scheduleAppointmentAsStaff().png)
-#### IAssignAvailabilityTimeSlot
-
-![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)
-#### registerAvailabilityTimeSlot()
-
-![](images/any/interaction%20registerAvailabilityTimeSlot().png)
-#### IEditAppointment
-
-![](images/any/systeminterface%20IEditAppointment.png)
-
-![](images/any/interaction%20editAppointment().png)
-#### IFinalizeAppointment
-
-![](images/any/systeminterface%20IFinalizeAppointment.png)
-
-![](images/any/interaction%20finalizeAppointment().png)
-
-#### ICancelAppointmentClientSelf
-
-![](images/any/systeminterface%20ICancelAppointmentClientSelf.png)
-
-![](images/any/interaction%20cancelAppointmentClientSelf().png)
-#### ICancelAppointmentStaffAssisted
-
-![](images/any/systeminterface%20ICancelAppointmentStaffAssited.png)
-
-![](images/any/interaction%20cancelAppointmentStaffAssisted().png)
-
-#### IAssignAvailabilityTimeSlot
-![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)
-
-![](images/any/interaction%20registerAvailabilityTimeSlot().png)
-#### IDeleteAvailabilityTimeSlot
-
-![](images/any/systeminterface%20IDeleteAvailabilityTimeSlot.png)
-
-![](images/any/interaction%20deleteAvailabilityTimeSlot.png)
-#### IEditAvailabilityTimeSlot
-
-![](images/any/systeminterface%20IEditAvailabilityTimeSlot.png)
-
-![](images/any/interaction%20editAvailabilityTimeSlot().png)
-#### IEnableService
-
-![](images/any/systeminterface%20IEnableService.png)
-
-![](images/any/interaction%20enableService().png)
-#### IDisableService
-
-![](images/any/systeminterface%20IDisableService.png)
-
-
-![](images/any/interaction%20disableService().png)
-#### IEditService
-
-![](images/any/systeminterface%20IEditService.png)
-
-![](images/any/interaction%20editService().png)
-#### IDeleteService
-
-![](images/any/systeminterface%20IDeleteService.png)
-
-![](images/any/interaction%20deleteService().png)
-#### IRegisterService
-
-![](images/any/systeminterface%20IRegisterService.png)
-
-![](images/any/interaction%20registerService().png)
-#### IRegisterAssistant
-
-![](images/any/systeminterface%20IRegisterAssistant.png)
-
-![](images/any/interaction%20registerAssistant().png)
-
-#### IEditAssistant
-
-![](images/any/systeminterface%20IEditAssistant.png)
-
-![](images/any/interaction%20editAssistant().png)
-#### IDisableAssistant
-
-![](images/any/systeminterface%20IDisableAssistant.png)
-
-![](images/any/interaction%20disableAssistant().png)
-#### IEnableAssistant
-
-![](images/any/systeminterface%20IEnableAssistant.png)
-
-![](images/any/interaction%20enableAssistant().png)
-#### IDisableClient
-
-![](images/any/systeminterface%20IDisableClient.png)
-
-![](images/any/interaction%20disableClient().png)
-#### IEnableClient
-
-![](images/any/systeminterface%20IEnableClient.png)
-
-![](images/any/interaction%20enableClient().png)
-#### IRegisterClient
-
-![](images/any/systeminterface%20IRegisterClient.png)
-
-
-![](images/any/interaction%20registerClient().png)
 ### Use Case Descriptions
 
 #### Agenda Module
@@ -866,8 +710,83 @@ The following table summarizes the design decisions.
 | Select Domain-Decomposition for Component-Based Software | Domain decomposition is selected as the primary approach for defining the system’s components because the core functionality is centered around CRUD operations that share related business behavior. By organizing components based on business domains, each module can encapsulate related logic, making the system more maintainable and scalable. This also enables better isolation of concerns, allowing each domain to evolve independently while still maintaining clear boundaries between the components. Domain decomposition provides a natural mapping to the system’s use cases. |
 
 #### Step 5. Instantiate Architectural Elements, Allocate Responsibilities and Define Interfaces
+
+
+
+
+
 #### Step 6. Sketch Views and Record Design Decisions
+
+### UML Components 
+
+#### Component Architecture
+
+![](images/any/Component%20Architecture.png)
+
+#### Interface Responsibility Diagram
+
+![](images/any/Interface%20Responsibility%20Diagram.png)
+
+| Business Interface | Diagram                                               |
+| ------------------ | ----------------------------------------------------- |
+| ISchedulerMgt      | ![](images/any/businessinterface%20ISchedulerMgt.png) |
+| IClientMgt         | ![](images/any/businessinterface%20IClientMgt.png)    |
+| IServiceMgt        | ![](images/any/businessinterface%20IServiceMgt.png)   |
+| IAssistantMgt      | ![](images/any/businessinterface%20IAssistantMgt.png) |
+
+| System Interfaces and Collaboration Diagrams | Diagram                                                                 |
+| -------------------------------------------- | ----------------------------------------------------------------------- |
+| IScheduleAppointmentClientSelf               | ![](images/any/systemInterface%20IScheduleAppointmentClientSelf.png)    |
+| scheduleAppointmentAsClient()<br>            | ![](images/any/interaction%20scheduleAppointmentAsClient().png)         |
+| IScheduleAppointmentStaffAssisted            | ![](images/any/systeminterface%20IScheduleAppointmentStaffAssisted.png) |
+| getAppointmentDetails()                      | ![](images/any/interaction%20getAppointmentDetails().png)               |
+| confirmAppointment()                         | ![](images/any/interaction%20confirmAppointment().png)                  |
+| getAppointments()                            | ![](images/any/interaction%20getAppointments().png)                     |
+| getAvailableServices()                       | ![](images/any/interaction%20getAvailableServices().png)                |
+| scheduleAppointmentAsStaff()                 | ![](images/any/interaction%20scheduleAppointmentAsStaff().png)          |
+| IAssignAvailabilityTimeSlot                  | ![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)       |
+| registerAvailabilityTimeSlot()               | ![](images/any/interaction%20registerAvailabilityTimeSlot().png)        |
+| IEditAppointment                             | ![](images/any/systeminterface%20IEditAppointment.png)                  |
+| editAppointment()                            | ![](images/any/interaction%20editAppointment().png)                     |
+| IFinalizeAppointment                         | ![](images/any/systeminterface%20IFinalizeAppointment.png)              |
+| finalizeAppointment()                        | ![](images/any/interaction%20finalizeAppointment().png)<br>             |
+| ICancelAppointmentClientSelf                 | ![](images/any/systeminterface%20ICancelAppointmentClientSelf.png)      |
+| cancelAppointmentClientSelf()                | ![](images/any/interaction%20cancelAppointmentClientSelf().png)         |
+| ICancelAppointmentStaffAssisted              | ![](images/any/systeminterface%20ICancelAppointmentStaffAssited.png)    |
+| cancelAppointmentStaffAssisted()             | ![](images/any/interaction%20cancelAppointmentStaffAssisted().png)      |
+| IAssignAvailabilityTimeSlot                  | ![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)       |
+| registerAvailabilityTimeSlot()               | ![](images/any/interaction%20registerAvailabilityTimeSlot().png)        |
+| IDeleteAvailabilityTimeSlot                  | ![](images/any/systeminterface%20IDeleteAvailabilityTimeSlot.png)       |
+| deleteAvailabilityTimeSlot()                 | ![](images/any/interaction%20deleteAvailabilityTimeSlot.png)            |
+| IEditAvailabilityTimeSlot                    | ![](images/any/systeminterface%20IEditAvailabilityTimeSlot.png)         |
+| editAvailabilityTimeSlot()                   | ![](images/any/interaction%20editAvailabilityTimeSlot().png)            |
+| IEnableService                               | ![](images/any/systeminterface%20IEnableService.png)                    |
+| enableService()                              | ![](images/any/interaction%20enableService().png)                       |
+| IDisableService                              | ![](images/any/systeminterface%20IDisableService.png)                   |
+| disableService()                             | ![](images/any/interaction%20disableService().png)                      |
+| IEditService                                 | ![](images/any/systeminterface%20IEditService.png)                      |
+| editService()                                | ![](images/any/interaction%20editService().png)                         |
+| IDeleteService                               | ![](images/any/systeminterface%20IDeleteService.png)                    |
+| deleteService()                              | ![](images/any/interaction%20deleteService().png)                       |
+| IRegisterService                             | ![](images/any/systeminterface%20IRegisterService.png)                  |
+| registerService()                            | ![](images/any/interaction%20registerService().png)                     |
+| IRegisterAssistant                           | ![](images/any/systeminterface%20IRegisterAssistant.png)                |
+| registerAssistant()                          | ![](images/any/interaction%20registerAssistant().png)                   |
+| IEditAssistant                               | ![](images/any/systeminterface%20IEditAssistant.png)                    |
+| editAssistant()                              | ![](images/any/interaction%20editAssistant().png)                       |
+| IDisableAssistant                            | ![](images/any/systeminterface%20IDisableAssistant.png)                 |
+| dissableAssistant()                          | ![](images/any/interaction%20disableAssistant().png)                    |
+| IEnableAssistant                             | ![](images/any/systeminterface%20IEnableAssistant.png)                  |
+| enableAssistant()                            | ![](images/any/interaction%20enableAssistant().png)                     |
+| IDisableClient                               | ![](images/any/systeminterface%20IDisableClient.png)                    |
+| disableClient()                              | ![](images/any/interaction%20disableClient().png)                       |
+| IEnableClient                                | ![](images/any/systeminterface%20IEnableClient.png)                     |
+| enableClient()                               | ![](images/any/interaction%20enableClient().png)                        |
+| IRegisterClient                              | ![](images/any/systeminterface%20IRegisterClient.png)                   |
+| registerClient()                             | ![](images/any/interaction%20registerClient().png)                      |
+
+
+
+
 #### Step 7. Perform Analysis of the Current Design and Review the Iteration Goal and Achievement of Design Purpose
 
-
-a
