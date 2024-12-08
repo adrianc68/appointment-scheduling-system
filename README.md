@@ -197,41 +197,45 @@
 #### IRegisterService
 
 ![](images/any/systeminterface%20IRegisterService.png)
+
+![](images/any/interaction%20registerService().png)
 #### IRegisterAssistant
 
 ![](images/any/systeminterface%20IRegisterAssistant.png)
+
+![](images/any/interaction%20registerAssistant().png)
+
 #### IEditAssistant
 
 ![](images/any/systeminterface%20IEditAssistant.png)
+
+![](images/any/interaction%20editAssistant().png)
 #### IDisableAssistant
 
 ![](images/any/systeminterface%20IDisableAssistant.png)
 
 ![](images/any/interaction%20disableAssistant().png)
-
 #### IEnableAssistant
 
 ![](images/any/systeminterface%20IEnableAssistant.png)
 
 ![](images/any/interaction%20enableAssistant().png)
-
 #### IDisableClient
 
 ![](images/any/systeminterface%20IDisableClient.png)
 
 ![](images/any/interaction%20disableClient().png)
-
 #### IEnableClient
 
 ![](images/any/systeminterface%20IEnableClient.png)
 
 ![](images/any/interaction%20enableClient().png)
-
-
 #### IRegisterClient
 
 ![](images/any/systeminterface%20IRegisterClient.png)
 
+
+![](images/any/interaction%20registerClient().png)
 ### Use Case Descriptions
 
 #### Agenda Module
