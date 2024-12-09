@@ -620,7 +620,7 @@ The instantiation design decisions considered and made are summarized in the fol
 
 **Module view**
 
-![](images/any/module_view.png)
+![](images/any/module%20view.png)
 
 | Element                  | Responsibility                                                                                                                                                                                                            |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -717,13 +717,11 @@ The following table summarizes the design decisions.
 
 #### Step 6. Sketch Views and Record Design Decisions
 
-### UML Components 
-
-#### Component Architecture
+##### Component Architecture
 
 ![](images/any/Component%20Architecture.png)
 
-#### Interface Responsibility Diagram
+##### Interface Responsibility Diagram
 
 ![](images/any/Interface%20Responsibility%20Diagram.png)
 
@@ -784,9 +782,11 @@ The following table summarizes the design decisions.
 | enableClient()                               | ![](images/any/interaction%20enableClient().png)                        |
 | IRegisterClient                              | ![](images/any/systeminterface%20IRegisterClient.png)                   |
 | registerClient()                             | ![](images/any/interaction%20registerClient().png)                      |
+![](images/any/server%20side%20module%20view%20allocation.png)
 
+Initial elements allocation is in process...
 
-
+consider to implement well-known patterns such as Idempotent Receiver and Replay Protection to ensure that duplicate messages are not processed, or that repeated processing has no effect on the result.
 
 #### Step 7. Perform Analysis of the Current Design and Review the Iteration Goal and Achievement of Design Purpose
 
