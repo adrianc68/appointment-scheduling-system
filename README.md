@@ -719,11 +719,12 @@ The following table summarizes the design decisions.
 
 ##### Component Architecture
 
-![](images/any/Component%20Architecture.png)
+![](images/any/Component%20Architecture%20Refined.png)
 
 ##### Interface Responsibility Diagram
 
-![](images/any/Interface%20Responsibility%20Diagram.png)
+![](images/any/Interface%20Responsibility%20Diagram%20refined.png)
+
 
 | Business Interface | Diagram                                               |
 | ------------------ | ----------------------------------------------------- |
@@ -782,11 +783,16 @@ The following table summarizes the design decisions.
 | enableClient()                               | ![](images/any/interaction%20enableClient().png)                        |
 | IRegisterClient                              | ![](images/any/systeminterface%20IRegisterClient.png)                   |
 | registerClient()                             | ![](images/any/interaction%20registerClient().png)                      |
+
+
 ![](images/any/server%20side%20module%20view%20allocation.png)
 
 Initial elements allocation is in process...
 
-consider to implement well-known patterns such as Idempotent Receiver and Replay Protection to ensure that duplicate messages are not processed, or that repeated processing has no effect on the result.
+
+* Consider implementing an Idempotent Receiver and Replay Protection to ensure that duplicate messages are not processed.
+* The Observer Pattern is being applied. Some diagrams need to be updated.
+
 
 #### Step 7. Perform Analysis of the Current Design and Review the Iteration Goal and Achievement of Design Purpose
 
