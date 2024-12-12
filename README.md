@@ -54,8 +54,7 @@
 
 ![](images/any/usecasemodel.png)
 
-![](images/any/package.png)
-
+![](images/any/package%20diagram.png)
 ### State machine
 
 #### Appointment states
@@ -441,6 +440,18 @@
 | Alternative Flows    | **AF-1: The Administrator cancels the operation**<br>AF-1.1: The System close the window.<br>AF-1.2: The use use case ends here.                                                                                                                                                                                                                                                                                                    |
 | Exception            | **EX-1: No internet connection**<br>EX-1.1: The System displays an error message prompting the user to check their network connection and try again.<br>EX-1.2: The use case ends here.<br>**EX-2: Error to execute operation**<br>EX-2.1: The System encounters an internal error (e.g., database failure, server timeout) and notifies the user of the issue, offering to retry the operation.<br>EX-2.2: The use case ends here. |
 
+| Use-case field       | Description                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Use case name        | CE-5 Edit Client                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Actors               | Administrator                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Use case overview    | The Administrator updates the client's information                                                                                                                                                                                                                                                                                                                                                                                  |
+| Preconditions        | PRE-01: A CLIENT must be registered.                                                                                                                                                                                                                                                                                                                                                                                                |
+| Postcondition        | POST-01: A CLIENT is successfully updated.                                                                                                                                                                                                                                                                                                                                                                                          |
+| Trigger              | The Administrator presses the button "Editar cliente" in the "Clientes" window.                                                                                                                                                                                                                                                                                                                                                     |
+| Use case description | NF-1: The System displays the "Editar cliente" window.<br>NF-2: The Administrator provides the information and presses the button "Editar" (AF-1)<br>NF-3: The System validates the information (AF-2), register a new CLIENT in the database and displays a successful message (EX-1, EX-2)<br>NF-4: The use case ends here.                                                                                                       |
+| Alternative Flows    | **AF-1: The Administrator cancels the operation**<br>AF-1.1: The System close the window.<br>AF-1.2: The use use case ends here.<br>**AF-2 The data are invalid:**<br>AF-2.1: The System notifies the Administrator has provided invalid data and prompts him to send valid data.<br>AF-2.2: The use case flow returns to NF-2.                                                                                                     |
+| Exception            | **EX-1: No internet connection**<br>EX-1.1: The System displays an error message prompting the user to check their network connection and try again.<br>EX-1.2: The use case ends here.<br>**EX-2: Error to execute operation**<br>EX-2.1: The System encounters an internal error (e.g., database failure, server timeout) and notifies the user of the issue, offering to retry the operation.<br>EX-2.2: The use case ends here. |
+
 
 ![](images/prototypes/clientes_vista_admon.png)
 
@@ -708,11 +719,18 @@ The following table summarizes the design decisions.
 | Design Decision and Location                             | Rational and Assumptions                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Select Domain-Decomposition for Component-Based Software | Domain decomposition is selected as the primary approach for defining the system’s components because the core functionality is centered around CRUD operations that share related business behavior. By organizing components based on business domains, each module can encapsulate related logic, making the system more maintainable and scalable. This also enables better isolation of concerns, allowing each domain to evolve independently while still maintaining clear boundaries between the components. Domain decomposition provides a natural mapping to the system’s use cases. |
+| Select Repository Pattern                                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Select Observer Pattern                                  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 #### Step 5. Instantiate Architectural Elements, Allocate Responsibilities and Define Interfaces
 
+The instantiation design decisions considered and made are summarized in the following table:
 
-
+| Design Decision and Location                                   | Rational and Assumptions |
+| -------------------------------------------------------------- | ------------------------ |
+| Locate System Interfaces into Services Interfaces              |                          |
+| Locaate Business Interfaces into Business Interfaces           |                          |
+| Create an Application Facade to coordinate business components |                          |
 
 
 #### Step 6. Sketch Views and Record Design Decisions
@@ -792,6 +810,7 @@ Initial elements allocation is in process...
 
 * Consider implementing an Idempotent Receiver and Replay Protection to ensure that duplicate messages are not processed.
 * The Observer Pattern is being applied. Some diagrams need to be updated.
+* "Apply communication between components using a notification system (app, email or messaging)."
 
 
 #### Step 7. Perform Analysis of the Current Design and Review the Iteration Goal and Achievement of Design Purpose
