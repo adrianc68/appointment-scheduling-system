@@ -1,18 +1,28 @@
-var builder = WebApplication.CreateBuilder(args);
+using CrossCutting.OperationManagement;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<EnvironmentVariableMgr>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+var envManager = app.Services.GetRequiredService<EnvironmentVariableMgr>();
+var port = envManager.Get("SERVER_PORT", "8000");
 
-// app.UseHttpsRedirection();
+
+
+// // Configure the HTTP request pipeline.
+// if (app.Environment.IsDevelopment())
+// {
+//     app.MapOpenApi();
+// }
+
+// // app.UseHttpsRedirection();
+
+
+
+
+
 
 
 var summaries = new[]
@@ -35,7 +45,7 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast");
 
-app.Run("http://0.0.0.0:5120");
+app.Run($"http://0.0.0.0:{port}");
 
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
