@@ -23,7 +23,7 @@ var port = envManager.Get("SERVER_PORT", "8000");
 
 var summaries = new[]
 {
-    "Freezing", "Testing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+    "Freezing", "Testing", "Testing2" ,"Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
 
