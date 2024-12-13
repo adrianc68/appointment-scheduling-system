@@ -1,7 +1,7 @@
 using System;
 using DotNetEnv;
 
-namespace CrossCutting.OperationManagement
+namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement
 {
     public class EnvironmentVariableMgr
     {

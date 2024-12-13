@@ -1,4 +1,4 @@
-using CrossCutting.OperationManagement;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
