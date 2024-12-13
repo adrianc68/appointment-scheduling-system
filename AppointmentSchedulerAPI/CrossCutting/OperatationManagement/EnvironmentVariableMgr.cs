@@ -12,7 +12,7 @@ namespace CrossCutting.OperationManagement
 
         public string Get(string key, string? defaultValue = null)
         {
-            return Environment.GetEnvironmentVariable(key) ?? defaultValue;
+            return Environment.GetEnvironmentVariable(key) ?? defaultValue ?? string.Empty;
         }
     }
 }
