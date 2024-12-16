@@ -1,7 +1,7 @@
 using System;
 using DotNetEnv;
 
-namespace CrossCutting.OperationManagement
+namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement
 {
     public class EnvironmentVariableMgr
     {
@@ -12,7 +12,7 @@ namespace CrossCutting.OperationManagement
 
         public string Get(string key, string? defaultValue = null)
         {
-            return Environment.GetEnvironmentVariable(key) ?? defaultValue;
+            return Environment.GetEnvironmentVariable(key) ?? defaultValue ?? string.Empty;
         }
     }
 }
