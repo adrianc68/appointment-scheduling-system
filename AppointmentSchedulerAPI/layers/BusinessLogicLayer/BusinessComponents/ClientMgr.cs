@@ -9,7 +9,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
     public class ClientMgr : IClientMgt
     {
-        public bool ChangeClientStatusType(ClientStatusType status)
+        public bool ChangeClientStatusType(int idClient, ClientStatusType status)
         {
             throw new NotImplementedException();
         }
