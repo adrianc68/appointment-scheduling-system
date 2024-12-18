@@ -1,35 +1,50 @@
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement.ExceptionHandlerService;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService
 {
     public class HttpResponseService : IHttpResponseService
     {
-        private readonly ILogger<HttpResponseService> logger;
+        private readonly IExceptionHandlerService exceptionHandlerService;
 
-        public HttpResponseService(ILogger<HttpResponseService> logger)
+
+        public HttpResponseService(IExceptionHandlerService exceptionHandlerService)
         {
-            this.logger = logger;
+            this.exceptionHandlerService = exceptionHandlerService;
         }
 
         public IActionResult OkResponse<T>(T data, string version, string message = "Successful Request")
         {
-            var payload = new ApiResponse<T>(StatusCodes.Status200OK, "OK", data, version);
+            var payload = new ApiResponse<T>(StatusCodes.Status200OK, "OK", version, data);
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status200OK };
         }
-        public IActionResult InternalServerErrorResponse(string error, string version, string? customMessage = null)
+        public IActionResult InternalServerErrorResponse(Exception exception, string version, string? customMessage = null)
         {
-            var identifier = Guid.NewGuid().ToString();
-            var errorData = new
+            string identifier = exceptionHandlerService.HandleException(exception, version);
+
+            ErrorDetails errorData = new ErrorDetails
             {
-                error = "Internal Server Error",
-                message = "Please contact an administrator and provide the identifier.",
-                details = customMessage,
-                identifier
+                Error = MessageCodeType.SERVER_ERROR,
+                Message = "Please contact an administrator and provide the identifier.",
+                Details = customMessage,
+                Identifier = identifier
             };
-            logger.LogError("Error Identifier: {Identifier}, Error: {Error}", identifier, error);
-            var payload = new ApiResponse<object>(StatusCodes.Status500InternalServerError, "Internal Server Error", errorData, version);
+            var payload = new ApiResponse<object>(StatusCodes.Status500InternalServerError, "Internal Server Error", version, errorData);
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status500InternalServerError };
+        }
+
+        public IActionResult BadRequest(string version, string message = "Bad request")
+        {
+            var payload = new ApiResponse<object>(StatusCodes.Status400BadRequest, message, version);
+            return new ObjectResult(payload) { StatusCode = StatusCodes.Status400BadRequest };
+        }
+
+        public IActionResult Unauthorized(string version, string message = "Unauthorized")
+        {
+            var payload = new ApiResponse<object>(StatusCodes.Status401Unauthorized, message, version);
+            return new ObjectResult(payload) { StatusCode = StatusCodes.Status401Unauthorized };
         }
     }
 }

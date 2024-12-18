@@ -1,3 +1,4 @@
+using System.Text;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AssistantInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ClientInterfaces;
@@ -7,7 +8,12 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement.ExceptionHandlerService;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authentication;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,31 +23,8 @@ builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1, 0);
     options.AssumeDefaultVersionWhenUnspecified = true;
-    options.ReportApiVersions = true; 
+    options.ReportApiVersions = true;
 });
-
-
-
-builder.Services.AddOpenApi();
-builder.Services.AddSingleton<EnvironmentVariableMgr>();
-
-builder.Services.AddScoped<ISchedulerMgt, SchedulerMgr>();
-builder.Services.AddScoped<IClientMgt, ClientMgr>();
-builder.Services.AddScoped<IAssistantMgt, AssistantMgr>();
-builder.Services.AddScoped<IServiceMgt, ServiceMgr>();
-
-
-builder.Services.AddScoped<ISchedulingInterfaces, AppointmentSchedulingSystemFacade>();
-builder.Services.AddScoped<IServiceInterfaces, AppointmentSchedulingSystemFacade>();
-builder.Services.AddScoped<IAssistantInterfaces, AppointmentSchedulingSystemFacade>();
-builder.Services.AddScoped<IClientInterfaces, AppointmentSchedulingSystemFacade>();
-
-builder.Services.AddScoped<IHttpResponseService, HttpResponseService>();
-
-
-
-
-builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -54,9 +37,52 @@ builder.Services.AddSwaggerGen(options =>
 
 });
 
+var envManager = new EnvironmentVariableService();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = envManager.Get("JWT_ISSUER"),
+        ValidAudience = envManager.Get("JWT_AUDIENCE"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(envManager.Get("JWT_SECRET_KEY")))
+    };
+});
 
+builder.Services.AddOpenApi();
+builder.Services.AddSingleton<EnvironmentVariableService>();
+
+builder.Services.AddScoped<ISchedulerMgt, SchedulerMgr>();
+builder.Services.AddScoped<IClientMgt, ClientMgr>();
+builder.Services.AddScoped<IAssistantMgt, AssistantMgr>();
+builder.Services.AddScoped<IServiceMgt, ServiceMgr>();
+
+builder.Services.AddScoped<ISchedulingInterfaces, AppointmentSchedulingSystemFacade>();
+builder.Services.AddScoped<IServiceInterfaces, AppointmentSchedulingSystemFacade>();
+builder.Services.AddScoped<IAssistantInterfaces, AppointmentSchedulingSystemFacade>();
+builder.Services.AddScoped<IClientInterfaces, AppointmentSchedulingSystemFacade>();
+
+builder.Services.AddScoped<IExceptionHandlerService, ExceptionHandlerService>();
+builder.Services.AddScoped<IHttpResponseService, HttpResponseService>();
+
+builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtTokenResult>>(provider =>
+{
+    return new JwtAuthenticationService(
+        envManager.Get("JWT_ISSUER"),
+        envManager.Get("JWT_AUDIENCE"),
+        envManager.Get("JWT_SECRET_KEY")
+    );
+});
+
+builder.Services.AddControllers();
 var app = builder.Build();
-
 
 app.Use(async (context, next) =>
 {
@@ -65,23 +91,17 @@ app.Use(async (context, next) =>
     await next.Invoke();
 });
 
-
-
-
-
-
-var envManager = app.Services.GetRequiredService<EnvironmentVariableMgr>();
 var port = envManager.Get("SERVER_PORT", "8000");
 
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger(); 
+    app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
 
-        options.RoutePrefix = string.Empty; 
+        options.RoutePrefix = string.Empty;
     });
 }
 
