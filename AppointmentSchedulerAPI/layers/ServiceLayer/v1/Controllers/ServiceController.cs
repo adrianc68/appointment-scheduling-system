@@ -1,5 +1,7 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
@@ -26,6 +28,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = UserRoleConstants.ASSISTANT + "," + UserRoleConstants.ADMINISTRATOR)]
         public IActionResult GetAllServices()
         {
             var services = new List<string> { "Service 1", "Service 2", "Service 3", "Service 4", "Service 5" };
@@ -33,8 +36,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 services = services
             };
-            // return httpResponseService.OkResponse(data, ApiVersionEnum.V1);
-            return httpResponseService.InternalServerErrorResponse(new Exception("test"), ApiVersionEnum.V1);
+            return httpResponseService.OkResponse(data, ApiVersionEnum.V1);
+            // return httpResponseService.InternalServerErrorResponse(new Exception("test"), ApiVersionEnum.V1);
         }
 
 

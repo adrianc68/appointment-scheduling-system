@@ -84,6 +84,11 @@ builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtToke
 builder.Services.AddControllers();
 var app = builder.Build();
 
+app.UseMiddleware<HttpResponseAuthorizationMiddleware>(); 
+app.UseAuthorization();
+app.UseAuthentication();
+
+
 app.Use(async (context, next) =>
 {
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
