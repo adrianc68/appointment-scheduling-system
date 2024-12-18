@@ -33,7 +33,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 services = services
             };
-            return httpResponseService.OkResponse(data, ApiVersionEnum.V1);
+            // return httpResponseService.OkResponse(data, ApiVersionEnum.V1);
+            return httpResponseService.InternalServerErrorResponse(new Exception("test"), ApiVersionEnum.V1);
         }
 
 
