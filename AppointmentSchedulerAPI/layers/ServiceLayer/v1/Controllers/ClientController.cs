@@ -18,6 +18,38 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
+        // public IActionResult DisableClient()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult EnableClient()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult DeleteClient()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult GetClientStatusType()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+
+        // public IActionResult RegisterClient()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult EditClient()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+
 
     }
 }

@@ -28,7 +28,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = UserRoleConstants.ASSISTANT + "," + UserRoleConstants.ADMINISTRATOR)]
+        // [Authorize(Roles = UserRoleConstants.ASSISTANT + "," + UserRoleConstants.ADMINISTRATOR)]
         public IActionResult GetAllServices()
         {
             var services = new List<string> { "Service 1", "Service 2", "Service 3", "Service 4", "Service 5" };
@@ -39,6 +39,31 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(data, ApiVersionEnum.V1);
             // return httpResponseService.InternalServerErrorResponse(new Exception("test"), ApiVersionEnum.V1);
         }
+
+        // public IActionResult DisableService()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult EnableService()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult DeleteService()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult RegisterService()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult EditService()
+        // {
+        //     throw new NotImplementedException();
+        // }
 
 
     }

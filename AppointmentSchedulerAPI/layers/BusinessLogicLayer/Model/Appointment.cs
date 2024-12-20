@@ -1,5 +1,6 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
+
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
 {
     public class Appointment

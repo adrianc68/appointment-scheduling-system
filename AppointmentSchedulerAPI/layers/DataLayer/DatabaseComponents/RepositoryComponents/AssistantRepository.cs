@@ -1,19 +1,16 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
-
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
+namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryComponents
 {
-    public class AssistantMgr : IAssistantMgt
+    public class AssistantRepository : IAssistantRepository
     {
-        private readonly IAssistantRepository assistantRepository;
-
-        public AssistantMgr(IAssistantRepository assistantRepository)
-        {
-            this.assistantRepository = assistantRepository;
-        }
+        // private readonly Model.AppointmentDbContext context;
+        // public AssistantRepository(Model.AppointmentDbContext context)
+        // {
+        //     this.context = context;
+        // }
 
         public bool ChangeAssistantStatus(int idAssistant, AssistantStatusType status)
         {
@@ -37,7 +34,23 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public bool RegisterAssistant(Assistant assistant)
         {
-            assistantRepository.RegisterAssistant(assistant);
+
+            try
+            {
+
+                // var userAccount = new Model.UserAccount
+                // {
+                //     Email = "test@hotmail.com",
+                //     Password = "hellowolrd",
+                //     Username = "Testing",
+                // };
+
+                // context.UserAccounts.Add(userAccount);
+            }
+            catch (System.Exception e)
+            {
+                Console.WriteLine(e);
+            }
             throw new NotImplementedException();
         }
 

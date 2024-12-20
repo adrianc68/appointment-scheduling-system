@@ -1,15 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
-
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
+namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryComponents
 {
-    public class ClientMgr : IClientMgt
+    public class ClientRepository : IClientRepository
     {
+        // private readonly Model.AppointmentDbContext context;
+
+        // public ClientRepository(Model.AppointmentDbContext context)
+        // {
+        //     this.context = context;
+        // }
+
         public bool ChangeClientStatusType(int idClient, ClientStatusType status)
         {
             throw new NotImplementedException();

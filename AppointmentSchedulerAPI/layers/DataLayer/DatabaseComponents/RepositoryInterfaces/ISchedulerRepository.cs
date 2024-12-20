@@ -1,12 +1,11 @@
-using System.Collections.Generic;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
 
 
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
+namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces
 {
-    public interface ISchedulerMgt
+    public interface ISchedulerRepository
     {
         bool AreServicesAvailable(List<int> services, DateTimeRange range);
         bool BlockTimeRange(DateTimeRange range);

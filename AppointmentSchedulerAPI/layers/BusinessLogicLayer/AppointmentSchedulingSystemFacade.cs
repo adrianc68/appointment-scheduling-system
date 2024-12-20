@@ -6,6 +6,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
+
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 {
     public class AppointmentSchedulingSystemFacade : ISchedulingInterfaces, IServiceInterfaces, IClientInterfaces, IAssistantInterfaces
@@ -125,7 +126,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
         public bool RegisterAssistant(Assistant assistant)
         {
-            throw new NotImplementedException();
+            assistantMgr.RegisterAssistant(new Assistant());
+            return true;
         }
 
         public bool RegisterAvailabilityTimeSlot(DateTimeRange range, int idAssistant)

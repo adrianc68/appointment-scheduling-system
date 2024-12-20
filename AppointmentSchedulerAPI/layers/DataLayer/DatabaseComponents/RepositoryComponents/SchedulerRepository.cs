@@ -1,13 +1,18 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
-
-
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
+namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryComponents
 {
-    public class SchedulerMgr : ISchedulerMgt
+    public class SchedulerRepository : ISchedulerRepository
     {
+        // private readonly Model.AppointmentDbContext context;
+
+        // public SchedulerRepository(Model.AppointmentDbContext context)
+        // {
+        //     this.context = context;
+        // }
+
         public bool AreServicesAvailable(List<int> services, DateTimeRange range)
         {
             throw new NotImplementedException();

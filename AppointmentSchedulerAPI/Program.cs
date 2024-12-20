@@ -11,12 +11,25 @@ using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement.ExceptionHandlerService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authentication;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;
+using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
+using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryComponents;
+using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddDbContext<AppointmentDbContext>((provider, options) =>
+{
+    var envService = provider.GetRequiredService<EnvironmentVariableService>();
+    var connectionString = envService.Get("DEFAULT_DB_CONNECTION");
+    options.UseNpgsql(connectionString);
+});
 
 
 builder.Services.AddApiVersioning(options =>
@@ -69,6 +82,11 @@ builder.Services.AddScoped<IServiceInterfaces, AppointmentSchedulingSystemFacade
 builder.Services.AddScoped<IAssistantInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IClientInterfaces, AppointmentSchedulingSystemFacade>();
 
+builder.Services.AddScoped<ISchedulerRepository, SchedulerRepository>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<IAssistantRepository, AssistantRepository>();
+
 builder.Services.AddScoped<IExceptionHandlerService, ExceptionHandlerService>();
 builder.Services.AddScoped<IHttpResponseService, HttpResponseService>();
 
@@ -84,7 +102,8 @@ builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtToke
 builder.Services.AddControllers();
 var app = builder.Build();
 
-app.UseMiddleware<HttpResponseAuthorizationMiddleware>(); 
+// $$$>> This middlewares causes problems with authorization! Fix it 
+// app.UseMiddleware<HttpResponseAuthorizationMiddleware>(); 
 app.UseAuthorization();
 app.UseAuthentication();
 
