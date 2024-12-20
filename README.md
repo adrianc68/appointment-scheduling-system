@@ -743,6 +743,9 @@ The instantiation design decisions considered and made are summarized in the fol
 
 ![](images/any/Interface%20Responsibility%20Diagram%20refined.png)
 
+![](images/any/server%20side%20module%20view%20allocation.png)
+![](images/any/physical%20data%20model.png)
+
 
 | Business Interface | Diagram                                               |
 | ------------------ | ----------------------------------------------------- |
@@ -803,7 +806,7 @@ The instantiation design decisions considered and made are summarized in the fol
 | registerClient()                             | ![](images/any/interaction%20registerClient().png)                      |
 
 
-![](images/any/server%20side%20module%20view%20allocation.png)
+
 
 Initial elements allocation is in process...
 

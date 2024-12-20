@@ -39,6 +39,7 @@ jobs:
 
   
   # test:
+  # Create env file <<         run: | echo "${{ secrets.ENV_FILE }}" > .env and execute docker compose
   #   runs-on: ubuntu-latest
   #   needs: build 
   #   steps:
