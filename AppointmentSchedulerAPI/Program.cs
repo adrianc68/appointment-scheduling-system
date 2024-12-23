@@ -28,7 +28,14 @@ builder.Services.AddDbContext<AppointmentDbContext>((provider, options) =>
 {
     var envService = provider.GetRequiredService<EnvironmentVariableService>();
     var connectionString = envService.Get("DEFAULT_DB_CONNECTION");
-    options.UseNpgsql(connectionString);
+    options.UseNpgsql(connectionString, o => 
+    {
+        o.MapEnum<RoleType>("RoleType");
+        o.MapEnum<AssistantStatusType>("AssistantStatusType");
+        o.MapEnum<ClientStatusType>("ClientStatusType");
+        o.MapEnum<AppointmentStatusType>("AppointmentStatusType");
+        o.MapEnum<ServiceStatusType>("ServiceStatusType");
+    });
 });
 
 
@@ -116,7 +123,6 @@ app.Use(async (context, next) =>
 });
 
 var port = envManager.Get("SERVER_PORT", "8000");
-
 
 if (app.Environment.IsDevelopment())
 {

@@ -19,5 +19,5 @@ public partial class AvailabilityTimeSlot
 
     public int IdAssistant { get; set; }
 
-    public virtual Assistant IdAssistantNavigation { get; set; } = null!;
+    public virtual Assistant Assistant { get; set; } = null!;
 }

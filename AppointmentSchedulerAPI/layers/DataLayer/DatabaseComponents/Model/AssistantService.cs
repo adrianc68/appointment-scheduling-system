@@ -9,7 +9,7 @@ public partial class AssistantService
 
     public int? IdService { get; set; }
 
-    public virtual Assistant? IdAssistantNavigation { get; set; }
+    public virtual Assistant? Assistant { get; set; }
 
-    public virtual Service? IdServiceNavigation { get; set; }
+    public virtual Service? Service { get; set; }
 }

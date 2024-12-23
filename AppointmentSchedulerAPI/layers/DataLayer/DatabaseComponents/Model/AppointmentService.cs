@@ -9,7 +9,7 @@ public partial class AppointmentService
 
     public int? IdAppointment { get; set; }
 
-    public virtual Appointment? IdAppointmentNavigation { get; set; }
+    public virtual Appointment? Appointment { get; set; }
 
-    public virtual Service? IdServiceNavigation { get; set; }
+    public virtual Service? Service { get; set; }
 }

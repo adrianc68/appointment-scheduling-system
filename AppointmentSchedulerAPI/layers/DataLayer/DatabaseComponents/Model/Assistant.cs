@@ -10,10 +10,10 @@ public partial class Assistant
     public int IdUser { get; set; }
 
     public int Id { get; set; }
+    public AssistantStatusType Status { get; set; }
 
     public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
-
-    public virtual ICollection<AvailabilityTimeSlot> AvailabilityTimeSlots { get; set; } = new List<AvailabilityTimeSlot>();
-
-    public virtual UserAccount IdUserNavigation { get; set; } = null!;
+    public ICollection<AssistantService> AssistantServices { get; set; } = new List<AssistantService>();
+    public ICollection<AvailabilityTimeSlot> AvailabilityTimeSlots { get; set; } = new List<AvailabilityTimeSlot>();
+    public virtual UserAccount UserAccount { get; set; } = null!;
 }

@@ -15,8 +15,9 @@ public partial class UserAccount
 
     public int Id { get; set; }
 
-    // public string? Role {get; set;}
-    public virtual ICollection<Assistant> Assistants { get; set; } = new List<Assistant>();
+    public RoleType Role {get; set;}
 
-    public virtual ICollection<Client> Clients { get; set; } = new List<Client>();
+    public virtual UserInformation? UserInformation { get; set; }
+    public virtual Assistant? Assistant { get; set; }
+    public virtual Client? Client { get; set; }
 }
