@@ -5,11 +5,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 
 public partial class Assistant
 {
-    public Guid? Uuid { get; set; }
-
-    public int IdUser { get; set; }
-
-    public int Id { get; set; }
+    public int IdUserAccount { get; set; }
     public AssistantStatusType Status { get; set; }
 
     public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();

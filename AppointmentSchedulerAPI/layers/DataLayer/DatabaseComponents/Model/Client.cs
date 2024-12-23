@@ -2,11 +2,7 @@
 {
     public partial class Client
     {
-        public Guid? Uuid { get; set; }
-
-        public int IdUser { get; set; }
-
-        public int Id { get; set; }
+        public int IdUserAccount { get; set; }
         public ClientStatusType Status { get; set; }
 
         public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();

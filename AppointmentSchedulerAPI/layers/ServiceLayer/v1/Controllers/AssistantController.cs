@@ -51,23 +51,21 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
                 // var userAccount = new UserAccount
                 // {
-                //     Email = "test@example.com",
+                //     Email = "test2@example.com",
                 //     Password = "securepassword",
-                //     Username = "testuser",
-                //     Role = RoleType.ADMINISTRATOR
+                //     Username = "testuser34",
+                //     Role = RoleType.ASSISTANT
                 // };
 
-                // // Agregar el UserAccount a la base de datos
                 // db.UserAccounts.Add(userAccount);
                 // await db.SaveChangesAsync();
 
-                // // Crear un nuevo UserInformation relacionado con el UserAccount creado
                 // var userInformation = new UserInformation
                 // {
-                //     Name = "Test User",
+                //     Name = "Assistant User",
                 //     PhoneNumber = "123456789",
                 //     Filepath = null,
-                //     IdUser = userAccount.Id // Establecer la clave foránea
+                //     IdUser = userAccount.Id 
                 // };
 
                 // db.UserInformations.Add(userInformation);
@@ -75,21 +73,22 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
                 // var assistant = new DataLayer.DatabaseComponents.Model.Assistant
                 // {
-                //     IdUser = userAccount.Id,
-                //     Uuid = Guid.NewGuid(),
+                //     IdUserAccount = userAccount.Id,
                 //     Status = AssistantStatusType.ENABLED
                 // };
 
                 // var client = new DataLayer.DatabaseComponents.Model.Client
                 // {
-                //     IdUser = userAccount.Id,
-                //     Uuid = Guid.NewGuid(),
+                //     IdUserAccount = userAccount.Id,
                 //     Status = ClientStatusType.ENABLED
                 // };
 
+                // db.Assistants.Add(assistant);
+                // await db.SaveChangesAsync();
 
 
-                // db.Clients.Add(client);
+
+                // db.Cients.Add(client);
                 // await db.SaveChangesAsync();
 
                 // var userData = await db.UserAccounts

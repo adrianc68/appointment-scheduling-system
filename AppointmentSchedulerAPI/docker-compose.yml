@@ -20,6 +20,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: appointment_scheduler_api
+    env_file:
+      - .env
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
     environment:

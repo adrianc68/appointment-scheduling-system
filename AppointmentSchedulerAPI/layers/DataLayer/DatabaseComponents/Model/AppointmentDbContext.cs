@@ -28,13 +28,11 @@ public partial class AppointmentDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
-            // .HasPostgresEnum("AppointmentStatusType", new[] { "SCHEDULED", "CONFIRMED", "CANCELED", "FINISHED" })
             .HasPostgresEnum<AppointmentStatusType>("AppointmentStatusType")
             .HasPostgresEnum<ClientStatusType>("ClientStatusType")
             .HasPostgresEnum<AssistantStatusType>("AssistantType")
             .HasPostgresEnum<RoleType>("RoleType")
             .HasPostgresEnum<ServiceStatusType>("ServiceStatusType");
-        // .HasPostgresEnum("ServiceStatusType", new[] { "ENABLED", "DISABLED", "DELETED" });
 
         modelBuilder.Entity<UserAccount>(entity =>
         {
@@ -50,6 +48,8 @@ public partial class AppointmentDbContext : DbContext
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .HasColumnName("email");
+            entity.Property(e => e.Uuid)
+                .HasColumnName("uuid");
             entity.Property(e => e.Password)
                 .HasMaxLength(50)
                 .HasColumnName("password");
@@ -77,7 +77,7 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnName("name");
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(15)
-                .HasColumnName("phoneNumber");
+                .HasColumnName("phone_number");
 
             entity.HasOne(ui => ui.UserAccount)
             .WithOne(ua => ua.UserInformation)
@@ -89,22 +89,17 @@ public partial class AppointmentDbContext : DbContext
         modelBuilder.Entity<Assistant>(entity =>
         {
             entity.ToTable("Assistant");
-            entity.HasKey(e => e.Id);
+            entity.HasKey(e => e.IdUserAccount);
 
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("nextval(('\"assistant_id_seq\"'::text)::regclass)")
-                .HasColumnName("id");
-            entity.Property(e => e.IdUser)
-                .HasColumnName("id_user");
-            entity.Property(e => e.Uuid)
-                .HasColumnName("uuid");
+            entity.Property(e => e.IdUserAccount)
+                .HasColumnName("id_user_account");
             entity.Property(e => e.Status)
                 .HasColumnName("status")
                 .HasColumnType("AssistantStatusType");
 
             entity.HasOne(d => d.UserAccount)
             .WithOne(ua => ua.Assistant)
-            .HasForeignKey<Assistant>(a => a.IdUser)
+            .HasForeignKey<Assistant>(a => a.IdUserAccount)
             .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -112,22 +107,17 @@ public partial class AppointmentDbContext : DbContext
         modelBuilder.Entity<Client>(entity =>
         {
             entity.ToTable("Client");
-            entity.HasKey(e => e.Id);
+            entity.HasKey(e => e.IdUserAccount);
 
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("nextval(('\"assistant_id_seq\"'::text)::regclass)")
-                .HasColumnName("id");
-            entity.Property(e => e.IdUser)
-                .HasColumnName("id_user");
-            entity.Property(e => e.Uuid)
-                .HasColumnName("uuid");
+            entity.Property(e => e.IdUserAccount)
+                .HasColumnName("id_user_account");
             entity.Property(e => e.Status)
                 .HasColumnName("status")
                 .HasColumnType("ClientStatusType");
 
             entity.HasOne(d => d.UserAccount)
             .WithOne(ua => ua.Client)
-            .HasForeignKey<Client>(a => a.IdUser)
+            .HasForeignKey<Client>(a => a.IdUserAccount)
             .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -146,15 +136,15 @@ public partial class AppointmentDbContext : DbContext
            entity.Property(e => e.Date)
                 .HasColumnName("date");
            entity.Property(e => e.EndTime)
-                .HasColumnName("endTime");
+                .HasColumnName("end_time");
            entity.Property(e => e.IdAssistant)
                 .HasColumnName("id_assistant");
            entity.Property(e => e.IdClient)
                 .HasColumnName("id_client");
            entity.Property(e => e.StartTime)
-                .HasColumnName("startTime");
+                .HasColumnName("start_time");
            entity.Property(e => e.TotalCost)
-                .HasColumnName("totalCost");
+                .HasColumnName("total_cost");
            entity.Property(e => e.Uuid)
                 .HasColumnName("uuid");
            entity.Property(e => e.Status)
@@ -257,12 +247,12 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnName("date");
             entity.Property(e => e.EndTime)
                 .HasMaxLength(50)
-                .HasColumnName("endTime");
+                .HasColumnName("end_time");
             entity.Property(e => e.IdAssistant)
                 .HasColumnName("id_assistant");
             entity.Property(e => e.StartTime)
                 .HasMaxLength(50)
-                .HasColumnName("startTime");
+                .HasColumnName("start_time");
             entity.Property(e => e.Uuid).HasColumnName("uuid");
 
             entity.HasOne(d => d.Assistant)
