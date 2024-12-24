@@ -7,6 +7,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO
         public string? PhoneNumber { get; set; }
         public string? Username { get; set; }
         public string? Status { get; set; }
+        public DateTime? CreatedAt { get; set; }
         public Guid? Uuid { get; set; }
     }
 }

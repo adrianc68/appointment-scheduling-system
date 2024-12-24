@@ -59,7 +59,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Name = a.Name,
                     PhoneNumber = a.PhoneNumber,
                     Username = a.Username,
-                    Status = a.Status.ToString()
+                    Status = a.Status.ToString(),
+                    CreatedAt = a.CreatedAt
                 }).ToList();
             }
             catch (System.Exception ex)

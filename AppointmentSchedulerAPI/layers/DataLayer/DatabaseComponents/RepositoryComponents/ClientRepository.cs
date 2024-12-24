@@ -32,7 +32,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Name = a.UserAccount.UserInformation!.Name!,
                     PhoneNumber = a.UserAccount.UserInformation.PhoneNumber!,
                     Username = a.UserAccount.Username!,
-                    Status = (BusinessLogicLayer.Model.Types.ClientStatusType)a.Status
+                    Status = (BusinessLogicLayer.Model.Types.ClientStatusType)a.Status,
+                    CreatedAt = a.UserAccount.CreatedAt
                 })
                 .ToList();
             return businessClient;

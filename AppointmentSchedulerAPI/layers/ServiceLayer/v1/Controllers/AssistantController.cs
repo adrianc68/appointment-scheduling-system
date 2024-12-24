@@ -56,7 +56,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Name = a.Name,
                     PhoneNumber = a.PhoneNumber,
                     Username = a.Username,
-                    Status = a.Status.ToString()
+                    Status = a.Status.ToString(),
+                    CreatedAt = a.CreatedAt
                 }).ToList();
             }
             catch (System.Exception ex)
@@ -90,11 +91,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
 
-        // public async Task<Guid> RegisterAssistant(Assistant assistant)
-        // {
-        //     assistant.Uuid = Guid.CreateVersion7();
-        //     bool isRegistered = await assistantRepository.RegisterAssistant(assistant);
-        //     return (Guid)assistant.Uuid;
-        // }
+
+        
     }
 }
