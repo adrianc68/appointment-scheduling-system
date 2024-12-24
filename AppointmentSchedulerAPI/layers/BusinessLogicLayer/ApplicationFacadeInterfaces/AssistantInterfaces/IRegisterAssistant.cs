@@ -5,6 +5,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IRegisterAssistant
     {
-        Task<Guid> RegisterAssistant(Assistant assistant);
+        Task<Guid?> RegisterAssistant(Assistant assistant);
     }
 }

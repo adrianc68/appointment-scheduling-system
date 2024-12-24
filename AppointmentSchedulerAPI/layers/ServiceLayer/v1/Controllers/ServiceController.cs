@@ -1,6 +1,7 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -55,10 +56,28 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         //     throw new NotImplementedException();
         // }
 
-        // public IActionResult RegisterService()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterService([FromBody] CreateServiceDTO serviceDTO)
+        {
+            Guid? guid;
+            try
+            {
+                BusinessLogicLayer.Model.Service service = new()
+                {
+                    Description = serviceDTO.Description,
+                    Minutes = serviceDTO.Minutes,
+                    Name = serviceDTO.Name,
+                    Price = serviceDTO.Price
+                };
+                guid = await systemFacade.RegisterService(service);
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+        }
 
         // public IActionResult EditService()
         // {

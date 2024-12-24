@@ -70,7 +70,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> RegisterAssistant([FromBody] CreateAssistantDTO assistantDTO)
         {
-            Guid guid;
+            Guid? guid;
             try
             {
                 BusinessLogicLayer.Model.Assistant assistant = new()

@@ -124,7 +124,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public Task<Guid> RegisterAssistant(Assistant assistant)
+        public Task<Guid?> RegisterAssistant(Assistant assistant)
         {
             return assistantMgr.RegisterAssistantAsync(assistant);
         }
@@ -144,9 +144,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public bool RegisterService(Service service)
+        public Task<Guid?> RegisterService(Service service)
         {
-            throw new NotImplementedException();
+            return serviceMgr.RegisterService(service);
         }
 
         public bool ScheduleAppointmentAsClient(DateTimeRange range, List<Service> services, int idClient)

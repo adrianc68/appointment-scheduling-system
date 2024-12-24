@@ -40,10 +40,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
-        public async Task<Guid> RegisterAssistantAsync(Assistant assistant)
+        public async Task<Guid?> RegisterAssistantAsync(Assistant assistant)
         {
             assistant.Uuid = Guid.CreateVersion7();
             bool isRegistered = await assistantRepository.RegisterAssistantAsync(assistant);
+            if (!isRegistered)
+            {
+                return null;
+            }
             return assistant.Uuid.Value;
         }
 

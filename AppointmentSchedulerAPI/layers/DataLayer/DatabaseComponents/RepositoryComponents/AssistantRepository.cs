@@ -103,8 +103,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
                 context.Assistants.Add(newAssistant);
                 await context.SaveChangesAsync();
-
                 await transaction.CommitAsync();
+                isRegistered = true;
             }
             catch (Exception)
             {
