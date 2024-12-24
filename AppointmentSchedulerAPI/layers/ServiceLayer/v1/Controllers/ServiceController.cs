@@ -28,19 +28,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return Ok(appointments);
         }
 
-        [HttpGet]
-        // [Authorize(Roles = UserRoleConstants.ASSISTANT + "," + UserRoleConstants.ADMINISTRATOR)]
-        public IActionResult GetAllServices()
-        {
-            var services = new List<string> { "Service 1", "Service 2", "Service 3", "Service 4", "Service 5" };
-            var data = new
-            {
-                services = services
-            };
-            return httpResponseService.OkResponse(data, ApiVersionEnum.V1);
-            // return httpResponseService.InternalServerErrorResponse(new Exception("test"), ApiVersionEnum.V1);
-        }
-
         // public IActionResult DisableService()
         // {
         //     throw new NotImplementedException();
@@ -77,6 +64,32 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
             }
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+        }
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllServices()
+        {
+            List<ServiceDTO> serviceDtos = [];
+            try
+            {
+                var services = await systemFacade.GetAllServiceAsync();
+                serviceDtos = services.Select(a => new ServiceDTO
+                {
+                    Uuid = a.Uuid,
+                    Status = a.Status.ToString(),
+                    Description = a.Description,
+                    Minutes = a.Minutes,
+                    Price = a.Price,
+                    CreatedAt = a.CreatedAt
+                }).ToList();
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
+            }
+            return httpResponseService.OkResponse(serviceDtos, ApiVersionEnum.V1);
         }
 
         // public IActionResult EditService()

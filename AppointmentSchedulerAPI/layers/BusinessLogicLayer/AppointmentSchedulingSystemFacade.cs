@@ -149,6 +149,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return serviceMgr.RegisterService(service);
         }
 
+        public Task<List<Service>> GetAllServiceAsync()
+        {
+            return serviceMgr.GetAllServicesAsync();
+        }
+
         public bool ScheduleAppointmentAsClient(DateTimeRange range, List<Service> services, int idClient)
         {
             throw new NotImplementedException();
@@ -158,6 +163,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         {
             throw new NotImplementedException();
         }
+
+
     }
 
 

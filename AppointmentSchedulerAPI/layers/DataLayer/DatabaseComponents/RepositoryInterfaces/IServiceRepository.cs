@@ -7,6 +7,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
     public interface IServiceRepository
     {
         Task<bool> RegisterService(Service service);
+        Task<IEnumerable<Service>> GetAllServicesAsync();
         // bool ChangeServiceStatusType(ServiceStatusType status);
         // bool DeleteService(int idService);
         // bool EditService(Service service);

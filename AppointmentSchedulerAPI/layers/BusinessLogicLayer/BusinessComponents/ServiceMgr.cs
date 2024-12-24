@@ -28,9 +28,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
-        public List<Service> GetServices()
+        public async Task<List<Service>> GetAllServicesAsync()
         {
-            throw new NotImplementedException();
+            return (List<Service>)await serviceRepository.GetAllServicesAsync();
         }
 
         public List<Service> GetServicesDetailsByIds(List<int> serviceIds)
@@ -52,7 +52,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             service.Uuid = Guid.CreateVersion7();
             bool isRegistered = await serviceRepository.RegisterService(service);
-            if(!isRegistered)
+            if (!isRegistered)
             {
                 return null;
             }

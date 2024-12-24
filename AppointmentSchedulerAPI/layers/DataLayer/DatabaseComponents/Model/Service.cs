@@ -12,7 +12,7 @@ public partial class Service
     public int Id { get; set; }
     public Guid? Uuid { get; set; }
     public DateTime? CreatedAt { get; set; }
-    public ServiceStatusType Status { get; set; }
+    public ServiceStatusType? Status { get; set; }
 
     public ICollection<AssistantService> AssistantServices { get; set; } = new List<AssistantService>();
     public ICollection<AppointmentService> AppointmentServices { get; set; } = new List<AppointmentService>();

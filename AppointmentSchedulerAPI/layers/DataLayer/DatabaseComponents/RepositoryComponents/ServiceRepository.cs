@@ -1,5 +1,6 @@
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryComponents
 {
@@ -53,7 +54,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         // }
 
 
-  public async Task<bool> RegisterService(BusinessLogicLayer.Model.Service service)
+        public async Task<bool> RegisterService(BusinessLogicLayer.Model.Service service)
         {
             bool isRegistered = false;
             using var transaction = await context.Database.BeginTransactionAsync();
@@ -81,6 +82,27 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }
             return isRegistered;
         }
+
+        public async Task<IEnumerable<BusinessLogicLayer.Model.Service>> GetAllServicesAsync()
+        {
+            IEnumerable<BusinessLogicLayer.Model.Service> services = [];
+            var servicesdb = await context.Services.ToListAsync();
+
+            services = servicesdb
+                .Select(a => new BusinessLogicLayer.Model.Service
+                {
+                    Description = a.Description,
+                    Name = a.Name,
+                    Minutes = a.Minutes,
+                    Price = a.Price,
+                    Uuid = a.Uuid,
+                    Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)a.Status,
+                    CreatedAt = a.CreatedAt
+                })
+                .ToList();
+            return services;
+        }
+
 
     }
 }
