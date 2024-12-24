@@ -168,6 +168,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         {
             return clientMgr.GetAllClientsAsync();
         }
+
+        public Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
+        {
+            return assistantMgr.AssignServicesToAssistant(assistantUuid, servicesUuid);
+        }
     }
 
 

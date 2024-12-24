@@ -10,6 +10,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<bool> RegisterAssistantAsync(Assistant assistant);
         // Task<Assistant?> GetAssistantByUuidAsync(Guid uuid);
         Task<IEnumerable<Assistant>> GetAllAssistantsAsync();
+        Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid);
         // Task<bool> UpdateAssistantAsync(Assistant assistant);
         // Task<bool> DeleteAssistantAsync(Guid uuid);
 

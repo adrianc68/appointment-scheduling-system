@@ -91,7 +91,24 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
 
+        [HttpPost("assign")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AssignServiceToAssistant([FromBody] AssignServiceToAssistantDTO assignServiceDTO)
+        {
+            bool isAssigned = false;
+            try
+            {
+                isAssigned = await systemFacade.AssignServicesToAssistant(assignServiceDTO.assistantUuid, assignServiceDTO.servicesUuid);
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isAssigned, ApiVersionEnum.V1);
 
-        
+        }
+
+
+
     }
 }

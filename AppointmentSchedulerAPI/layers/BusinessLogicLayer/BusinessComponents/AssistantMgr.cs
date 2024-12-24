@@ -15,6 +15,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             this.assistantRepository = assistantRepository;
         }
 
+        public async Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
+        {
+            bool areAllServicesRegistered = await assistantRepository.AssignServicesToAssistant(assistantUuid, servicesUuid);
+            return areAllServicesRegistered;
+        }
+
         public bool ChangeAssistantStatus(int idAssistant, AssistantStatusType status)
         {
             throw new NotImplementedException();

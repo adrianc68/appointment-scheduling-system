@@ -809,6 +809,8 @@ The instantiation design decisions considered and made are summarized in the fol
 | IGetAllService                               | ![](images/any/systeminterface%20IGetAllService.png)                    |
 |                                              |                                                                         |
 | IGetAllClient                                | ![](images/any/systeminterface%20IGetAllClient.png)                     |
+|                                              |                                                                         |
+| IAssignServiceToAssistant                    | ![](images/any/systeminterface%20IAssignServiceToAssistant.png)         |
 
 
 

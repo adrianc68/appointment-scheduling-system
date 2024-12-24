@@ -48,12 +48,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         //     throw new NotImplementedException();
         // }
 
-        // public bool RegisterService(List<Service> services)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-
         public async Task<bool> RegisterService(BusinessLogicLayer.Model.Service service)
         {
             bool isRegistered = false;

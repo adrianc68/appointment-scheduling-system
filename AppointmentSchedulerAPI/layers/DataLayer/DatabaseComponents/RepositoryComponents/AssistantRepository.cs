@@ -13,6 +13,51 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             this.context = context;
         }
 
+        public async Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
+        {
+            bool isRegistered = false;
+            using var transaction = await context.Database.BeginTransactionAsync();
+            try
+            {
+                var assistantId = await context.Assistants
+                    .Where(a => a.UserAccount.Uuid == assistantUuid)
+                    .Select(a => a.IdUserAccount)
+                    .FirstOrDefaultAsync();
+
+                if (assistantId == 0)
+                {
+                    return false;
+                }
+
+                var serviceIds = await context.Services
+                    .Where(s => servicesUuid.Contains(s.Uuid))
+                    .Select(s => s.Id)
+                    .ToListAsync();
+
+                if (!serviceIds.Any())
+                {
+                    return false;
+                }
+
+                var assistantServices = serviceIds.Select(serviceId => new AssistantService
+                {
+                    IdAssistant = assistantId,
+                    IdService = serviceId
+                }).ToList();
+
+                context.AssistantServices.AddRange(assistantServices);
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isRegistered = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isRegistered;
+        }
+
         public bool ChangeAssistantStatus(int idAssistant, BusinessLogicLayer.Model.Types.AssistantStatusType status)
         {
             throw new NotImplementedException();

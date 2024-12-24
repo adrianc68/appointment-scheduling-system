@@ -5,7 +5,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
         IEditAssistant,
         IEnableAssistant,
         IRegisterAssistant,
-        IGetAllAsssitant
+        IGetAllAsssitant,
+        IAssignServiceToAssistant
     {
     }
 }
