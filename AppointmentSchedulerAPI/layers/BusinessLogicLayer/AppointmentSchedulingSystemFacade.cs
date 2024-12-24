@@ -124,10 +124,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public bool RegisterAssistant(Assistant assistant)
+        public Task<Guid> RegisterAssistant(Assistant assistant)
         {
-            assistantMgr.RegisterAssistant(new Assistant());
-            return true;
+            return assistantMgr.RegisterAssistantAsync(assistant);
+        }
+
+        public Task<List<Assistant>> GetAllAssistantAsync()
+        {
+            return assistantMgr.GetAllAssistantAsync();
         }
 
         public bool RegisterAvailabilityTimeSlot(DateTimeRange range, int idAssistant)

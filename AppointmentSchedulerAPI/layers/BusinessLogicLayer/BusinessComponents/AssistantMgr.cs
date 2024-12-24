@@ -20,6 +20,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
+        public async Task<List<Assistant>> GetAllAssistantAsync()
+        {
+            return (List<Assistant>)await assistantRepository.GetAllAssistantsAsync();
+        }
+
         public AssistantStatusType GetAssistantStatus(int idAssistant)
         {
             throw new NotImplementedException();
@@ -35,10 +40,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
-        public bool RegisterAssistant(Assistant assistant)
+        public async Task<Guid> RegisterAssistantAsync(Assistant assistant)
         {
-            assistantRepository.RegisterAssistant(assistant);
-            throw new NotImplementedException();
+            assistant.Uuid = Guid.CreateVersion7();
+            bool isRegistered = await assistantRepository.RegisterAssistantAsync(assistant);
+            return assistant.Uuid.Value;
         }
 
         public bool UpdateAssistant(int idAssistant, Assistant assistant)

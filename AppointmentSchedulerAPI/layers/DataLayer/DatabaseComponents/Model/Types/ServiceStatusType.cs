@@ -1,6 +1,6 @@
 using NpgsqlTypes;
 
-namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model
+namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types
 {
     public enum ServiceStatusType
     {

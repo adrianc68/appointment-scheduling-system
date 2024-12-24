@@ -1,4 +1,6 @@
-﻿namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model
+﻿using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
+
+namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model
 {
     public partial class Client
     {

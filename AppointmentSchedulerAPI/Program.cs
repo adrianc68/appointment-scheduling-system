@@ -12,6 +12,7 @@ using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement.Exc
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authentication;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
+using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryComponents;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

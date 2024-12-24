@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
+using Microsoft.EntityFrameworkCore;
 
 namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 

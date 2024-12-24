@@ -11,7 +11,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         AssistantStatusType GetAssistantStatus(int idAssistant);
         bool GetServicesAssignedToAssistant(int idAssistant);
         bool IsAssistantRegistered(Assistant assistant);
-        bool RegisterAssistant(Assistant assistant);
+        Task<Guid> RegisterAssistantAsync(Assistant assistant);
         bool UpdateAssistant(int idAssistant, Assistant assistant);
+        
+        Task<List<Assistant>> GetAllAssistantAsync();
     }
 }

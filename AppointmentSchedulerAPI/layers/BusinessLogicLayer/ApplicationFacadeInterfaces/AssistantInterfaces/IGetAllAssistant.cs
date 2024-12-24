@@ -1,10 +1,9 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 
-
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AssistantInterfaces
 {
-    public interface IRegisterAssistant
+    public interface IGetAllAsssitant
     {
-        Task<Guid> RegisterAssistant(Assistant assistant);
+        Task<List<Assistant>> GetAllAssistantAsync();
     }
 }

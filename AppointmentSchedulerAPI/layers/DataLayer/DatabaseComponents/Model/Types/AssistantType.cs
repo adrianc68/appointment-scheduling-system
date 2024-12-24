@@ -1,8 +1,8 @@
 using NpgsqlTypes;
 
-namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model
+namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types
 {
-    public enum ClientStatusType
+    public enum AssistantStatusType
     {
         [PgName("ENABLED")]
         ENABLED,
