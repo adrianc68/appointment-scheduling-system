@@ -74,7 +74,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             List<ServiceDTO> serviceDtos = [];
             try
             {
-                var services = await systemFacade.GetAllServiceAsync();
+                var services = await systemFacade.GetAllServicesAsync();
                 serviceDtos = services.Select(a => new ServiceDTO
                 {
                     Uuid = a.Uuid,

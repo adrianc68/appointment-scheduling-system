@@ -6,10 +6,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 {
     public interface IClientRepository
     {
-        bool ChangeClientStatusType(int idClient, ClientStatusType status);
-        Client GetClientDetails(int idClient);
-        ClientStatusType GetClientStatusType(int idClient);
-        bool IsClientAvailable(int idClient);
-        bool RegisterClient(Client client);
+        // bool ChangeClientStatusType(int idClient, ClientStatusType status);
+        // Client GetClientDetails(int idClient);
+        // ClientStatusType GetClientStatusType(int idClient);
+        // bool IsClientAvailable(int idClient);
+        Task<IEnumerable<Client>> GetAllClientsAsync();
+        Task<bool> RegisterClientAsync(Client client);
     }
 }

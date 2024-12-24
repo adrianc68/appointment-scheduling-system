@@ -48,7 +48,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             List<AssistantDTO> assistantDtos = [];
             try
             {
-                var assistants = await systemFacade.GetAllAssistantAsync();
+                var assistants = await systemFacade.GetAllAssistantsAsync();
                 assistantDtos = assistants.Select(a => new AssistantDTO
                 {
                     Uuid = a.Uuid,

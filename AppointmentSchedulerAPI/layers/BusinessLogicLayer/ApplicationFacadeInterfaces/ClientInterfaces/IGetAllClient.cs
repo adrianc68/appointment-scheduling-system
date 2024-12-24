@@ -1,10 +1,9 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 
-
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ClientInterfaces
 {
-    public interface IRegisterClient
+    public interface IGetAllClient
     {
-        Task<Guid?> RegisterClientAsync(Client client);
+        Task<List<Client>> GetAllClientsAsync();
     }
 }

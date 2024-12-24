@@ -29,6 +29,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             var assistantsDB = await context.Assistants
               .Include(a => a.UserAccount)
                   .ThenInclude(ua => ua.UserInformation)
+                  .Where(c => c.UserAccount.Role == RoleType.ASSISTANT)
               .ToListAsync();
 
             businessAssistants = assistantsDB

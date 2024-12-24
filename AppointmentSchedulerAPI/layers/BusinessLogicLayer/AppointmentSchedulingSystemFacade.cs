@@ -129,9 +129,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return assistantMgr.RegisterAssistantAsync(assistant);
         }
 
-        public Task<List<Assistant>> GetAllAssistantAsync()
+        public Task<List<Assistant>> GetAllAssistantsAsync()
         {
-            return assistantMgr.GetAllAssistantAsync();
+            return assistantMgr.GetAllAssistantsAsync();
         }
 
         public bool RegisterAvailabilityTimeSlot(DateTimeRange range, int idAssistant)
@@ -139,9 +139,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public bool RegisterClient(Client client)
+        public Task<Guid?> RegisterClientAsync(Client client)
         {
-            throw new NotImplementedException();
+            return clientMgr.RegisterClientAsync(client);
         }
 
         public Task<Guid?> RegisterService(Service service)
@@ -149,7 +149,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return serviceMgr.RegisterService(service);
         }
 
-        public Task<List<Service>> GetAllServiceAsync()
+        public Task<List<Service>> GetAllServicesAsync()
         {
             return serviceMgr.GetAllServicesAsync();
         }
@@ -164,7 +164,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-
+        public Task<List<Client>> GetAllClientsAsync()
+        {
+            return clientMgr.GetAllClientsAsync();
+        }
     }
 
 

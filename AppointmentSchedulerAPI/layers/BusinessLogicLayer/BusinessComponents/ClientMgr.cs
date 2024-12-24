@@ -3,36 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
     public class ClientMgr : IClientMgt
     {
-        public bool ChangeClientStatusType(int idClient, ClientStatusType status)
+        private readonly IClientRepository clientRepository;
+
+        public ClientMgr(IClientRepository clientRepository)
         {
-            throw new NotImplementedException();
+            this.clientRepository = clientRepository;
+        }
+        public async Task<List<Client>> GetAllClientsAsync()
+        {
+            return (List<Client>)await clientRepository.GetAllClientsAsync();
         }
 
-        public Client GetClientDetails(int idClient)
+        public async Task<Guid?> RegisterClientAsync(Client client)
         {
-            throw new NotImplementedException();
-        }
-
-        public ClientStatusType GetClientStatusType(int idClient)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsClientAvailable(int idClient)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool RegisterClient(Client client)
-        {
-            throw new NotImplementedException();
+            client.Uuid = Guid.CreateVersion7();
+            bool isRegistered = await clientRepository.RegisterClientAsync(client);
+            if (!isRegistered)
+            {
+                return null;
+            }
+            return client.Uuid.Value;
         }
     }
 }

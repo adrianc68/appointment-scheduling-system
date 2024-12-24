@@ -7,13 +7,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
 {
     public interface IAssistantMgt
     {
-        bool ChangeAssistantStatus(int idAssistant, AssistantStatusType status);
-        AssistantStatusType GetAssistantStatus(int idAssistant);
-        bool GetServicesAssignedToAssistant(int idAssistant);
-        bool IsAssistantRegistered(Assistant assistant);
+        // bool ChangeAssistantStatus(int idAssistant, AssistantStatusType status);
+        // AssistantStatusType GetAssistantStatus(int idAssistant);
+        // bool GetServicesAssignedToAssistant(int idAssistant);
+        // bool IsAssistantRegistered(Assistant assistant);
         Task<Guid?> RegisterAssistantAsync(Assistant assistant);
-        bool UpdateAssistant(int idAssistant, Assistant assistant);
-        
-        Task<List<Assistant>> GetAllAssistantAsync();
+        // bool UpdateAssistant(int idAssistant, Assistant assistant);
+        Task<List<Assistant>> GetAllAssistantsAsync();
     }
 }

@@ -4,6 +4,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IGetAllAsssitant
     {
-        Task<List<Assistant>> GetAllAssistantAsync();
+        Task<List<Assistant>> GetAllAssistantsAsync();
     }
 }

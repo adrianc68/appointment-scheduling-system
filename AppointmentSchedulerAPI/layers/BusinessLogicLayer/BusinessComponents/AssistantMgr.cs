@@ -20,7 +20,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
-        public async Task<List<Assistant>> GetAllAssistantAsync()
+        public async Task<List<Assistant>> GetAllAssistantsAsync()
         {
             return (List<Assistant>)await assistantRepository.GetAllAssistantsAsync();
         }
