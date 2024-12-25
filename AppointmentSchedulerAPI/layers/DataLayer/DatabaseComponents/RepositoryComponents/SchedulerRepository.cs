@@ -14,6 +14,26 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             this.context = context;
         }
 
+        public async Task<IEnumerable<BusinessLogicLayer.Model.AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
+        {
+            var availableServices = await context.AvailabilityTimeSlots
+                .Where(slot => slot.Date >= startDate && slot.Date <= endDate)
+                .ToListAsync();
+
+            var availabilityTimeSlotsModel = availableServices
+                .Select(slot => new BusinessLogicLayer.Model.AvailabilityTimeSlot
+                {
+                    Id = slot.Id,
+                    Uuid = slot.Uuid,
+                    Date = slot.Date,
+                    StartTime = slot.StartTime,
+                    EndTime = slot.EndTime,
+                })
+                .ToList();
+
+            return availabilityTimeSlotsModel;
+        }
+
         public async Task<IEnumerable<BusinessLogicLayer.Model.AssistantService>> GetAvailableServicesAsync(DateOnly date)
         {
             var availableServices = await context.AvailabilityTimeSlots
@@ -32,9 +52,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Assistant = new BusinessLogicLayer.Model.Assistant
                     {
-                        Id = (int)group.Key,
+                        Id = group.Key,
                         Uuid = group.FirstOrDefault()?.Assistant.UserAccount.Uuid,
-                        Name = group.FirstOrDefault()?.Assistant?.UserAccount?.UserInformation?.Name  
+                        Name = group.FirstOrDefault()?.Assistant?.UserAccount?.UserInformation?.Name
                     },
                     Services = group
                         .SelectMany(slot => slot.Assistant?.AssistantServices?.Select(asService => new BusinessLogicLayer.Model.Service
@@ -47,7 +67,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                         }) ?? new List<BusinessLogicLayer.Model.Service>())
                         .GroupBy(service => new { service.Name, service.Price, service.Minutes })
                         .Select(groupedService => groupedService.First())
-                        .ToList() 
+                        .ToList()
                 })
                 .ToList();
             return businessLogicAssistantServices;

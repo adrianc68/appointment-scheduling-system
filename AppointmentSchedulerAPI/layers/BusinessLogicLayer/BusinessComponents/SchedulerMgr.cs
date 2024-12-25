@@ -15,6 +15,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             this.schedulerRepository = SchedulerRepository;
         }
 
+        public async Task<IEnumerable<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
+        {
+            return (List<AvailabilityTimeSlot>) await schedulerRepository.GetAllAvailabilityTimeSlots(startDate, endDate);
+        }
+
         public async Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date)
         {
             return (List<AssistantService>) await schedulerRepository.GetAvailableServicesAsync(date);

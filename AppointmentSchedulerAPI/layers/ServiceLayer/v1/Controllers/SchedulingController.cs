@@ -75,7 +75,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
 
-        [HttpGet("availableServices")]
+        [HttpGet("services/available")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllAvailableServicesByDate([FromQuery] GetAvailableServicesByDateDTO getByDateDTO)
         {
@@ -106,6 +106,33 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             }
             return httpResponseService.OkResponse(assistantServiceDTO, ApiVersionEnum.V1);
         }
+
+
+        [HttpGet("availabilityTimeSlot")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllAvailabilityTimeslot([FromQuery] DateOnlyRangeDTO rangeDTO)
+        {
+            List<AvailabilityTimeSlotDTO> availabilityTimeslotsDTO = [];
+            try
+            {
+                var availabilityTimeSlots = await systemFacade.GetAllAvailabilityTimeSlots(rangeDTO.StartDate, rangeDTO.EndDate);
+
+                availabilityTimeslotsDTO = availabilityTimeSlots.Select(a => new AvailabilityTimeSlotDTO
+                {
+                    Date = a.Date,
+                    EndTime = a.EndTime,
+                    StartTime = a.StartTime,
+                    Uuid = a.Uuid
+                    
+                }).ToList();
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
+            }
+            return httpResponseService.OkResponse(availabilityTimeslotsDTO, ApiVersionEnum.V1);
+        }
+
 
         // public IActionResult EditAppointment()
         // {

@@ -178,6 +178,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         {
             return schedulerMgr.GetAvailableServicesAsync(date);
         }
+
+        public Task<IEnumerable<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
+        {
+            return schedulerMgr.GetAllAvailabilityTimeSlots(startDate, endDate);
+        }
     }
 
 

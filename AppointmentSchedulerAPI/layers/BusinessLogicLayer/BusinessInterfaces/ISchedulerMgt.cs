@@ -22,6 +22,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         // bool IsAppointmentInSpecificState(int idAppointment, AppointmentStatusType expected);
         // bool IsAssistantAvailableInTimeRange(int idAssistant, DateTimeRange range);
         // bool IsAvailabilityTimeSlotAvailable(DateTimeRange range);
+         Task<IEnumerable<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate);
         Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date);
         Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid);
         // bool ScheduleAppointment(DateTimeRange range, List<Service> services, Client client);
