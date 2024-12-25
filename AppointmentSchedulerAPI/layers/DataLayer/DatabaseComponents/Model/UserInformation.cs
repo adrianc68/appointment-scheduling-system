@@ -11,6 +11,6 @@ public partial class UserInformation
 
     public string? Filepath { get; set; }
 
-    public int IdUser { get; set; }
-    public virtual UserAccount UserAccount { get; set; } = null!;
+    public int? IdUser { get; set; }
+    public virtual UserAccount? UserAccount { get; set; } = null!;
 }

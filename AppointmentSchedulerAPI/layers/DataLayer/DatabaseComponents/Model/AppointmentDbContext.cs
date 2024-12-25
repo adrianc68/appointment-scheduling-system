@@ -15,15 +15,15 @@ public partial class AppointmentDbContext : DbContext
     {
     }
 
-    public virtual DbSet<UserAccount> UserAccounts { get; set; }
+    public required virtual DbSet<UserAccount> UserAccounts { get; set; }
 
-    public virtual DbSet<UserInformation> UserInformations { get; set; }
-    public virtual DbSet<Assistant> Assistants { get; set; }
-    public virtual DbSet<Client> Clients { get; set; }
-    public virtual DbSet<Appointment> Appointments { get; set; }
-    public virtual DbSet<Service> Services { get; set; }
-    public virtual DbSet<AssistantService> AssistantServices { get; set; }
-    public virtual DbSet<AvailabilityTimeSlot> AvailabilityTimeSlots { get; set; }
+    public required virtual DbSet<UserInformation> UserInformations { get; set; }
+    public required virtual DbSet<Assistant> Assistants { get; set; }
+    public required virtual DbSet<Client> Clients { get; set; }
+    public required virtual DbSet<Appointment> Appointments { get; set; }
+    public required virtual DbSet<Service> Services { get; set; }
+    public required virtual DbSet<AssistantService> AssistantServices { get; set; }
+    public required virtual DbSet<AvailabilityTimeSlot> AvailabilityTimeSlots { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

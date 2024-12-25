@@ -80,6 +80,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Uuid = a.Uuid,
                     Status = a.Status.ToString(),
                     Description = a.Description,
+                    Name = a.Name,
                     Minutes = a.Minutes,
                     Price = a.Price,
                     CreatedAt = a.CreatedAt
