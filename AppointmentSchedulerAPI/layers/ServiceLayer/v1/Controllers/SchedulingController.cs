@@ -40,15 +40,18 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         //     throw new NotImplementedException();
         // }
 
-        // public IActionResult ScheduleAppointmentAsClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPost("asClient")]
+        [AllowAnonymous]
+        public IActionResult ScheduleAppointmentAsClient()
+        {
+            throw new NotImplementedException();
+        }
 
         // public IActionResult ScheduleAppointmentAsStaff()
         // {
         //     throw new NotImplementedException();
         // }
+
         [HttpPost("assign")]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterAvailabilityTimeSlot([FromBody] CreateAvailabilityTimeSlotDTO availabilityDTO)
@@ -58,9 +61,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot = new()
                 {
-                   Date = availabilityDTO.Date,
-                   EndTime = availabilityDTO.EndTime,
-                   StartTime = availabilityDTO.StartTime
+                    Date = availabilityDTO.Date,
+                    EndTime = availabilityDTO.EndTime,
+                    StartTime = availabilityDTO.StartTime
                 };
                 guid = await systemFacade.RegisterAvailabilityTimeSlotAsync(availabilityTimeSlot, availabilityDTO.AssistantUuid);
             }
@@ -69,6 +72,39 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
             }
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+        }
+
+
+        [HttpGet("availableServices")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllAvailableServicesByDate([FromQuery] GetAvailableServicesByDateDTO getByDateDTO)
+        {
+            List<AssistantServiceDTO> assistantServiceDTO = [];
+            try
+            {
+                var assistantsAvailable = await systemFacade.GetAvailableServicesClientAsync(getByDateDTO.Date);
+
+                assistantServiceDTO = assistantsAvailable.Select(a => new AssistantServiceDTO
+                {
+                    Assistant = new AssistantDTO
+                    {
+                        Uuid = a.Assistant?.Uuid,
+                        Name = a.Assistant?.Name,
+                    },
+                    Services = a.Services?.Select(service => new ServiceDTO
+                    {
+                        Uuid = service.Uuid,
+                        Name = service.Name,
+                        Price = service.Price,
+                        Minutes = service.Minutes
+                    }).ToList()
+                }).ToList();
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
+            }
+            return httpResponseService.OkResponse(assistantServiceDTO, ApiVersionEnum.V1);
         }
 
         // public IActionResult EditAppointment()

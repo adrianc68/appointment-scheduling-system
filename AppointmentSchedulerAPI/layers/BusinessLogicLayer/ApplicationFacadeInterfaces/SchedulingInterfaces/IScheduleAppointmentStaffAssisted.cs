@@ -8,7 +8,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
     {
         Appointment GetAppointmentDetails(int idAppointment);
         List<Appointment> GetAppointments(DateTime startDate, DateTime endDate);
-        List<Service> GetAvailableServices(DateTimeRange range);
+        Task<List<AssistantService>> GetAvailableServices(DateOnly date);
         bool ScheduleAppointmentAsStaff(DateTimeRange range, List<Service> services, int idClient);
     }
 }

@@ -9,7 +9,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
         bool ConfirmAppointment(int idAppointment);
         Appointment GetAppointmentDetails(int idAppointment);
         List<Appointment> GetAppoinments(DateTime startDate, DateTime endDate);
-        List<Service> GetAvailableServices(DateTimeRange range);
+        Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date);
         bool ScheduleAppointmentAsClient(DateTimeRange range, List<Service> services, int idClient);
     }
 }

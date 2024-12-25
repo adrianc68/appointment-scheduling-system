@@ -62,7 +62,7 @@ CREATE TYPE public."RoleType" AS ENUM ('ADMINISTRATOR', 'CLIENT', 'ASSISTANT');
 
 CREATE TABLE "Appointment"
 (
-	date timestamp with time zone NULL,
+	date date NULL,
 	end_time time without time zone NULL,
 	start_time time without time zone NULL,
 	status public."AppointmentStatusType" NULL,
@@ -100,7 +100,7 @@ CREATE TABLE "AvailabilityTimeSlot"
 (
 	id integer NOT NULL   DEFAULT NEXTVAL(('"availabilitytimeslot_id_seq"'::text)::regclass),
 	uuid uuid NULL,
-	date timestamp without time zone NULL   DEFAULT CURRENT_TIMESTAMP,
+	date date NULL,
 	start_time time without time zone NULL,
 	end_time time without time zone NULL,
 	created_at timestamp without time zone NULL   DEFAULT CURRENT_TIMESTAMP,

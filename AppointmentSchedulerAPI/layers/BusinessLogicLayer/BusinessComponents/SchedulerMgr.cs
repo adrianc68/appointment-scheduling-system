@@ -8,11 +8,17 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
     public class SchedulerMgr : ISchedulerMgt
     {
-        private readonly ISchedulerRepository SchedulerRepository;
+        private readonly ISchedulerRepository schedulerRepository;
 
         public SchedulerMgr(ISchedulerRepository SchedulerRepository)
         {
-            this.SchedulerRepository = SchedulerRepository;
+            this.schedulerRepository = SchedulerRepository;
+        }
+
+        public async Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date)
+        {
+            return (List<AssistantService>) await schedulerRepository.GetAvailableServicesAsync(date);
+
         }
 
         // public bool AreServicesAvailable(List<int> services, DateTimeRange range)
@@ -88,7 +94,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid)
         {
             availabilityTimeSlot.Uuid = Guid.CreateVersion7();
-            bool isRegistered = await SchedulerRepository.RegisterAvailabilityTimeSlot(availabilityTimeSlot, assistantUuid);
+            bool isRegistered = await schedulerRepository.RegisterAvailabilityTimeSlot(availabilityTimeSlot, assistantUuid);
             if (!isRegistered)
             {
                 return null;

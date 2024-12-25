@@ -21,6 +21,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         // bool IsAppointmentInSpecificState(int idAppointment, AppointmentStatusType expected);
         // bool IsAssistantAvailableInTimeRange(int idAssistant, DateTimeRange range);
         // bool IsAvailabilityTimeSlotAvailable(DateTimeRange range);
+        Task<IEnumerable<AssistantService>> GetAvailableServicesAsync(DateOnly date);
         Task<bool> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid);
         // bool ScheduleAppointment(DateTimeRange range, List<Service> services, Client client);
     }

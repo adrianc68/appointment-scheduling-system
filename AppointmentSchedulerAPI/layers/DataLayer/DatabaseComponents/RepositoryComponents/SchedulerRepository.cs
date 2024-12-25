@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -13,15 +14,52 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             this.context = context;
         }
 
+        public async Task<IEnumerable<BusinessLogicLayer.Model.AssistantService>> GetAvailableServicesAsync(DateOnly date)
+        {
+            var availableServices = await context.AvailabilityTimeSlots
+                .Where(slot => slot.Date == date)
+                .Include(slot => slot.Assistant)
+                    .ThenInclude(assistant => assistant.UserAccount)
+                    .ThenInclude(assistant => assistant.UserInformation)
+                .Include(slot => slot.Assistant)
+                    .ThenInclude(assistant => assistant.AssistantServices)
+                        .ThenInclude(asService => asService.Service)
+                .ToListAsync();
+
+            var businessLogicAssistantServices = availableServices
+                .GroupBy(slot => slot.Assistant?.IdUserAccount)
+                .Select(group => new BusinessLogicLayer.Model.AssistantService
+                {
+                    Assistant = new BusinessLogicLayer.Model.Assistant
+                    {
+                        Id = (int)group.Key,
+                        Uuid = group.FirstOrDefault()?.Assistant.UserAccount.Uuid,
+                        Name = group.FirstOrDefault()?.Assistant?.UserAccount?.UserInformation?.Name  
+                    },
+                    Services = group
+                        .SelectMany(slot => slot.Assistant?.AssistantServices?.Select(asService => new BusinessLogicLayer.Model.Service
+                        {
+                            Id = asService.IdService,
+                            Name = asService.Service?.Name,
+                            Price = asService.Service?.Price,
+                            Minutes = asService.Service?.Minutes,
+                            Uuid = asService.Service?.Uuid
+                        }) ?? new List<BusinessLogicLayer.Model.Service>())
+                        .GroupBy(service => new { service.Name, service.Price, service.Minutes })
+                        .Select(groupedService => groupedService.First())
+                        .ToList() 
+                })
+                .ToList();
+            return businessLogicAssistantServices;
+        }
+
         public async Task<bool> RegisterAvailabilityTimeSlot(BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid)
         {
             bool isRegistered = false;
             using var transaction = await context.Database.BeginTransactionAsync();
             try
             {
-                Console.WriteLine(assistantUuid);
                 var assistant = await context.UserAccounts.FirstOrDefaultAsync(a => a.Uuid == assistantUuid);
-                Console.WriteLine("OK... Looking for item in database");
                 if (assistant == null)
                 {
                     return false;

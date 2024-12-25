@@ -119,11 +119,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public List<Service> GetAvailableServices(DateTimeRange range)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<Guid?> RegisterAssistant(Assistant assistant)
         {
             return assistantMgr.RegisterAssistantAsync(assistant);
@@ -172,6 +167,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         public Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
         {
             return assistantMgr.AssignServicesToAssistant(assistantUuid, servicesUuid);
+        }
+
+        public Task<List<AssistantService>> GetAvailableServices(DateOnly date)
+        {
+            throw new NotImplementedException();
+        }
+
+       public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
+        {
+            return schedulerMgr.GetAvailableServicesAsync(date);
         }
     }
 
