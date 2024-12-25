@@ -1,5 +1,7 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
@@ -47,11 +49,27 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         // {
         //     throw new NotImplementedException();
         // }
-
-        // public IActionResult RegisterAvailabilityTimeSlot()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPost("assign")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterAvailabilityTimeSlot([FromBody] CreateAvailabilityTimeSlotDTO availabilityDTO)
+        {
+            Guid? guid;
+            try
+            {
+                BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot = new()
+                {
+                   Date = availabilityDTO.Date,
+                   EndTime = availabilityDTO.EndTime,
+                   StartTime = availabilityDTO.StartTime
+                };
+                guid = await systemFacade.RegisterAvailabilityTimeSlotAsync(availabilityTimeSlot, availabilityDTO.AssistantUuid);
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+        }
 
         // public IActionResult EditAppointment()
         // {

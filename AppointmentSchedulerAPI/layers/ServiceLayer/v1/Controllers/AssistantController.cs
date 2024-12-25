@@ -67,7 +67,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(assistantDtos, ApiVersionEnum.V1);
         }
 
-        [HttpPost("register")]
+        [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterAssistant([FromBody] CreateAssistantDTO assistantDTO)
         {
