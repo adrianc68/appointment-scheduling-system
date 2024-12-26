@@ -14,7 +14,7 @@ public partial class Service
     public DateTime? CreatedAt { get; set; }
     public ServiceStatusType? Status { get; set; }
 
-    public ICollection<AssistantService>? AssistantServices { get; set; } = new List<AssistantService>();
-    public ICollection<AppointmentService>? AppointmentServices { get; set; } = new List<AppointmentService>();
+    public virtual IEnumerable<AssistantService>? AssistantServices { get; set; } 
+    public virtual IEnumerable<AppointmentService>? AppointmentServices { get; set; }
 
 }

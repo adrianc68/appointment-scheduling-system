@@ -804,13 +804,14 @@ The instantiation design decisions considered and made are summarized in the fol
 | enableClient()                               | ![](images/any/interaction%20enableClient().png)                        |
 | IRegisterClient                              | ![](images/any/systeminterface%20IRegisterClient.png)                   |
 | registerClient()                             | ![](images/any/interaction%20registerClient().png)                      |
-| IGetAllAssistant                             | ![](images/any/systeminterface%20IGetAllAssistant.png)                  |
-|                                              |                                                                         |
-| IGetAllService                               | ![](images/any/systeminterface%20IGetAllService.png)                    |
-|                                              |                                                                         |
-| IGetAllClient                                | ![](images/any/systeminterface%20IGetAllClient.png)                     |
 |                                              |                                                                         |
 | IAssignServiceToAssistant                    | ![](images/any/systeminterface%20IAssignServiceToAssistant.png)         |
+|                                              |                                                                         |
+|                                              | ![](images/any/systeminterface%20IGetAssistant.png)                     |
+|                                              | ![](images/any/systeminterface%20IGetClient.png)                        |
+|                                              | ![](images/any/systeminterface%20IGetService.png)                       |
+|                                              | ![](images/any/systeminterface%20IGetAppointment.png)                   |
+|                                              | ![](images/any/systeminterface%20IGetAvailabilityTimeSlot.png)          |
 
 
 

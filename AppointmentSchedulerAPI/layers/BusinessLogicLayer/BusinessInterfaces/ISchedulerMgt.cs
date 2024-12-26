@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
 
 
@@ -25,6 +23,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
          Task<IEnumerable<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate);
         Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date);
         Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid);
-        // bool ScheduleAppointment(DateTimeRange range, List<Service> services, Client client);
+        Task<Guid?> ScheduleAppointment(Appointment appointment);
     }
 }

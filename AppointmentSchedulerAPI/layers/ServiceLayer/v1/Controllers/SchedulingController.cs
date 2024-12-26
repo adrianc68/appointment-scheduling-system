@@ -1,13 +1,15 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
-using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 {
     [ApiController]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiVersion("1")]
     public class SchedulingController : ControllerBase
     {
@@ -40,11 +42,42 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         //     throw new NotImplementedException();
         // }
 
-        [HttpPost("asClient")]
+        [HttpPost("appointment")]
         [AllowAnonymous]
-        public IActionResult ScheduleAppointmentAsClient()
+        public async Task<IActionResult> ScheduleAppointmentAsClientAsync([FromBody] CreateAppointmentAsClientDTO createDTO)
         {
-            throw new NotImplementedException();
+            Guid? guid;
+            try
+            {
+                BusinessLogicLayer.Model.Appointment appointment = new()
+                {
+                    StartTime = createDTO.StartTime,
+                    Date = createDTO.Date,
+                    Client = new BusinessLogicLayer.Model.Client
+                    {
+                        Uuid = createDTO.ClientUuid
+                    },
+                    AssistantServices = createDTO.AssistantServices?.Select(asDTO => new BusinessLogicLayer.Model.AssistantService
+                    {
+                        Assistant = new BusinessLogicLayer.Model.Assistant
+                        {
+                            Uuid = asDTO.AssistantUuid
+                        },
+                        Services = asDTO.ServiceUuid?.Select(serviceUuid => new BusinessLogicLayer.Model.Service
+                        {
+                            Uuid = serviceUuid
+                        }).ToList()
+                    }).ToList()
+                }; 
+
+                guid = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
+
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
 
         // public IActionResult ScheduleAppointmentAsStaff()
@@ -52,7 +85,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         //     throw new NotImplementedException();
         // }
 
-        [HttpPost("assign")]
+        [HttpPost("availabilityTimeSlot")]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterAvailabilityTimeSlot([FromBody] CreateAvailabilityTimeSlotDTO availabilityDTO)
         {
@@ -77,7 +110,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpGet("services/available")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllAvailableServicesByDate([FromQuery] GetAvailableServicesByDateDTO getByDateDTO)
+        public async Task<IActionResult> GetAllAvailableServicesByDate([FromQuery] AvailableServicesByDateDTO getByDateDTO)
         {
             List<AssistantServiceDTO> assistantServiceDTO = [];
             try
@@ -110,7 +143,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpGet("availabilityTimeSlot")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllAvailabilityTimeslot([FromQuery] DateOnlyRangeDTO rangeDTO)
+        public async Task<IActionResult> GetAllAvailabilityTimeSlot([FromQuery] DateOnlyRangeDTO rangeDTO)
         {
             List<AvailabilityTimeSlotDTO> availabilityTimeslotsDTO = [];
             try
@@ -122,8 +155,10 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Date = a.Date,
                     EndTime = a.EndTime,
                     StartTime = a.StartTime,
-                    Uuid = a.Uuid
-                    
+                    Uuid = a.Uuid,
+                    AssistantUuid = a.Assistant.Uuid,
+                    AssistantName = a.Assistant.Name
+
                 }).ToList();
             }
             catch (System.Exception ex)

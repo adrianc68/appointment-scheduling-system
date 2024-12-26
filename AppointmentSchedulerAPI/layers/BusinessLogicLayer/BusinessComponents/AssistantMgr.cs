@@ -17,7 +17,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public async Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
         {
-            bool areAllServicesRegistered = await assistantRepository.AssignServicesToAssistant(assistantUuid, servicesUuid);
+            bool areAllServicesRegistered = await assistantRepository.AddServicesToAssistant(assistantUuid, servicesUuid);
             return areAllServicesRegistered;
         }
 
@@ -49,7 +49,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<Guid?> RegisterAssistantAsync(Assistant assistant)
         {
             assistant.Uuid = Guid.CreateVersion7();
-            bool isRegistered = await assistantRepository.RegisterAssistantAsync(assistant);
+            bool isRegistered = await assistantRepository.AddAssistantAsync(assistant);
             if (!isRegistered)
             {
                 return null;

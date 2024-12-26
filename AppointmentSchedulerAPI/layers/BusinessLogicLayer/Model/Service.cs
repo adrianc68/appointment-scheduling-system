@@ -13,8 +13,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
         public ServiceStatusType? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
 
-        public List<AvailabilityTimeSlot>? AvailabilityTimeSlots { get; set; }
-        public List<Assistant>? Assistants { get; set; }
+        public List<AssistantService>? AssistantServices { get; set; }
         public List<Appointment>? Appointments { get; set; }
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
+﻿namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 
 public partial class AppointmentService
 {

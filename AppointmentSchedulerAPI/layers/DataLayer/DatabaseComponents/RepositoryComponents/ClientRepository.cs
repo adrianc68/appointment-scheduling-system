@@ -39,6 +39,30 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return businessClient;
         }
 
+        public async Task<BusinessLogicLayer.Model.Client?> GetClientByUuid(Guid uuid)
+        {
+            BusinessLogicLayer.Model.Client? client = null;
+            var clientDB = await context.Clients
+                 .Include(a => a.UserAccount)
+                     .ThenInclude(ua => ua.UserInformation)
+                 .FirstOrDefaultAsync(a => a.UserAccount.Uuid == uuid);
+
+            if (clientDB != null)
+            {
+                client = new BusinessLogicLayer.Model.Client
+                {
+                    Id = clientDB.UserAccount.Id,
+                    Name = clientDB.UserAccount.UserInformation.Name,
+                    PhoneNumber = clientDB.UserAccount.UserInformation.PhoneNumber,
+                    Email = clientDB.UserAccount.Email,
+                    Username = clientDB.UserAccount.Username,
+                    CreatedAt = clientDB.UserAccount.CreatedAt,
+                    Status = (BusinessLogicLayer.Model.Types.ClientStatusType?)clientDB.Status,
+                    Uuid = clientDB.UserAccount.Uuid
+                };
+            }
+            return client;
+        }
 
         public async Task<bool> RegisterClientAsync(BusinessLogicLayer.Model.Client client)
         {

@@ -13,7 +13,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             this.context = context;
         }
 
-        public async Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
+        public async Task<bool> AddServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
         {
             bool isRegistered = false;
             using var transaction = await context.Database.BeginTransactionAsync();
@@ -58,14 +58,29 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isRegistered;
         }
 
-        public bool ChangeAssistantStatus(int idAssistant, BusinessLogicLayer.Model.Types.AssistantStatusType status)
+        public async Task<BusinessLogicLayer.Model.Assistant?> GetAssistantByUuidAsync(Guid uuid)
         {
-            throw new NotImplementedException();
-        }
+            BusinessLogicLayer.Model.Assistant? assistant = null;
+            var assistantDB = await context.Assistants
+                 .Include(a => a.UserAccount)
+                     .ThenInclude(ua => ua.UserInformation)
+                 .FirstOrDefaultAsync(a => a.UserAccount.Uuid == uuid);
 
-        public Task<bool> DeleteAssistantAsync(Guid uuid)
-        {
-            throw new NotImplementedException();
+            if (assistantDB != null)
+            {
+                assistant = new BusinessLogicLayer.Model.Assistant
+                {
+                    Id = assistantDB.UserAccount.Id,
+                    Name = assistantDB.UserAccount.UserInformation.Name,
+                    PhoneNumber = assistantDB.UserAccount.UserInformation.PhoneNumber,
+                    Email = assistantDB.UserAccount.Email,
+                    Username = assistantDB.UserAccount.Username,
+                    CreatedAt = assistantDB.UserAccount.CreatedAt,
+                    Status = (BusinessLogicLayer.Model.Types.AssistantStatusType?)assistantDB.Status,
+                    Uuid = assistantDB.UserAccount.Uuid
+                };
+            }
+            return assistant;
         }
 
         public async Task<IEnumerable<BusinessLogicLayer.Model.Assistant>> GetAllAssistantsAsync()
@@ -94,27 +109,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return businessAssistants;
         }
 
-        public Task<BusinessLogicLayer.Model.Assistant?> GetAssistantByUuidAsync(Guid uuid)
-        {
-            throw new NotImplementedException();
-        }
-
-        public BusinessLogicLayer.Model.Types.AssistantStatusType GetAssistantStatus(int idAssistant)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool GetServicesAssignedToAssistant(int idAssistant)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsAssistantRegistered(BusinessLogicLayer.Model.Assistant assistant)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<bool> RegisterAssistantAsync(BusinessLogicLayer.Model.Assistant assistant)
+        public async Task<bool> AddAssistantAsync(BusinessLogicLayer.Model.Assistant assistant)
         {
             bool isRegistered = false;
             using var transaction = await context.Database.BeginTransactionAsync();
@@ -161,14 +156,36 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isRegistered;
         }
 
-        public bool UpdateAssistant(int idAssistant, BusinessLogicLayer.Model.Assistant assistant)
+        public async Task<List<BusinessLogicLayer.Model.Service>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid)
         {
-            throw new NotImplementedException();
+            IEnumerable<BusinessLogicLayer.Model.Service> businessService = [];
+            var assistantDB = await context.Assistants
+                .Include(a => a.AssistantServices)
+                    .ThenInclude(ase => ase.Service)
+                .FirstOrDefaultAsync(a => a.UserAccount.Uuid == uuid);
+
+            if (assistantDB == null)
+            {
+                return [];
+            }
+
+            businessService = assistantDB.AssistantServices
+                .Where(ase => ase.Service != null) 
+                .Select(ase => new BusinessLogicLayer.Model.Service
+                {
+                    Id = ase.Service.Id,
+                    Name = ase.Service.Name,
+                    Description = ase.Service.Description,
+                    Minutes = ase.Service.Minutes,
+                    Price = ase.Service.Price,
+                    Uuid = ase.Service.Uuid,
+                    CreatedAt = ase.Service.CreatedAt,
+                    Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)ase.Service.Status
+                })
+                .ToList();
+
+            return (List<BusinessLogicLayer.Model.Service>)businessService;
         }
 
-        public Task<bool> UpdateAssistantAsync(BusinessLogicLayer.Model.Assistant assistant)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

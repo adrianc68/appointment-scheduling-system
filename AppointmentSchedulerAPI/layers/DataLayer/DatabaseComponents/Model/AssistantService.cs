@@ -6,8 +6,8 @@
 
         public int? IdService { get; set; }
 
-        public virtual Assistant? Assistant { get; set; }
+        public virtual Assistant Assistant { get; set; }
 
-        public virtual Service? Service { get; set; }
+        public virtual Service Service { get; set; }
     }
 }

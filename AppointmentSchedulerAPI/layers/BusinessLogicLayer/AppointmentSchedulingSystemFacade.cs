@@ -149,11 +149,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return serviceMgr.GetAllServicesAsync();
         }
 
-        public bool ScheduleAppointmentAsClient(DateTimeRange range, List<Service> services, int idClient)
-        {
-            throw new NotImplementedException();
-        }
-
         public bool ScheduleAppointmentAsStaff(DateTimeRange range, List<Service> services, int idClient)
         {
             throw new NotImplementedException();
@@ -182,6 +177,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         public Task<IEnumerable<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
         {
             return schedulerMgr.GetAllAvailabilityTimeSlots(startDate, endDate);
+        }
+
+        public Task<Guid?> ScheduleAppointmentAsClientAsync(Appointment appointment)
+        {
+            return schedulerMgr.ScheduleAppointment(appointment);
         }
     }
 

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthenticationService<JwtUserCredentials, JwtTokenResult> authenticationService;

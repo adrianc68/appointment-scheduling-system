@@ -1,14 +1,14 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;
-using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 {
     [ApiController]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiVersion(ApiVersionEnum.V1)]
     public class ServiceController : ControllerBase
     {

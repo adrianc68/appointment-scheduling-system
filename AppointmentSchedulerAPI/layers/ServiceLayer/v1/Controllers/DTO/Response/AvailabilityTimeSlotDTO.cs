@@ -1,4 +1,4 @@
-namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO
+namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response
 {
     public class AvailabilityTimeSlotDTO
     {
@@ -7,5 +7,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO
         public TimeOnly? EndTime { get; set; }
         public Guid? Uuid { get; set; }
         public Guid? AssistantUuid { get; set; }
+        public string? AssistantName { get; set; }
     }
 }

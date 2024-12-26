@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
+﻿namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 
 public partial class UserInformation
 {
@@ -12,5 +9,5 @@ public partial class UserInformation
     public string? Filepath { get; set; }
 
     public int? IdUser { get; set; }
-    public virtual UserAccount? UserAccount { get; set; } = null!;
+    public virtual UserAccount? UserAccount { get; set; } 
 }

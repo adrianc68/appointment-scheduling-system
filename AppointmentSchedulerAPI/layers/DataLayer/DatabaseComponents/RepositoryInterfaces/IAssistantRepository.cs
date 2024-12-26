@@ -1,16 +1,18 @@
 
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
 namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces
 {
     public interface IAssistantRepository
     {
 
-        Task<bool> RegisterAssistantAsync(Assistant assistant);
-        // Task<Assistant?> GetAssistantByUuidAsync(Guid uuid);
+        Task<bool> AddAssistantAsync(Assistant assistant);
+        Task<bool> AddServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid);
         Task<IEnumerable<Assistant>> GetAllAssistantsAsync();
-        Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid);
+        Task<Assistant?> GetAssistantByUuidAsync(Guid uuid);
+        Task<List<Service>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid);
+        
+
         // Task<bool> UpdateAssistantAsync(Assistant assistant);
         // Task<bool> DeleteAssistantAsync(Guid uuid);
 

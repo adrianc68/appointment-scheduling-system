@@ -13,42 +13,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             this.context = context;
         }
 
-        // public bool ChangeServiceStatusType(ServiceStatusType status)
-        // {
-        //     throw new NotImplementedException();
-        // }
 
-        // public bool DeleteService(int idService)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public bool EditService(Service service)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public List<Service> GetServices()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public List<Service> GetServicesDetailsByIds(List<int> serviceIds)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public ServiceStatusType GetServiceStatusType(int idService)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public bool IsServiceInSpecificStatusType(int idService, ServiceStatusType expected)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        public async Task<bool> RegisterService(BusinessLogicLayer.Model.Service service)
+        public async Task<bool> AddService(BusinessLogicLayer.Model.Service service)
         {
             bool isRegistered = false;
             using var transaction = await context.Database.BeginTransactionAsync();
@@ -91,12 +57,36 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Price = a.Price,
                     Uuid = a.Uuid,
                     Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)a.Status,
-                    CreatedAt = a.CreatedAt
+                    CreatedAt = a.CreatedAt,
+                    Id = a.Id
                 })
                 .ToList();
             return services;
         }
 
+        public async Task<BusinessLogicLayer.Model.Service?> GetServiceByUuidAsync(Guid uuid)
+        {
+           BusinessLogicLayer.Model.Service? service = null;
 
+            var serviceDB = await context.Services
+                .FirstOrDefaultAsync(a => a.Uuid == uuid);
+            
+            if(serviceDB != null )
+            {
+                service = new BusinessLogicLayer.Model.Service
+                {
+                    Description = serviceDB.Description,
+                    Name = serviceDB.Name,
+                    Minutes = serviceDB.Minutes,
+                    Price = serviceDB.Price,
+                    Uuid = serviceDB.Uuid,
+                    Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)serviceDB.Status,
+                    CreatedAt = serviceDB.CreatedAt,
+                    Id = serviceDB.Id
+                };
+            }
+
+           return service;
+        }
     }
 }

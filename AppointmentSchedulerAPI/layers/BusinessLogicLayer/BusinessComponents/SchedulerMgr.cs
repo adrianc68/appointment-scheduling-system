@@ -1,6 +1,5 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 
@@ -17,7 +16,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public async Task<IEnumerable<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
         {
-            return (List<AvailabilityTimeSlot>) await schedulerRepository.GetAllAvailabilityTimeSlots(startDate, endDate);
+            return (List<AvailabilityTimeSlot>) await schedulerRepository.GetAvailabilityTimeSlotsAsync(startDate, endDate);
         }
 
         public async Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date)
@@ -99,12 +98,28 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid)
         {
             availabilityTimeSlot.Uuid = Guid.CreateVersion7();
-            bool isRegistered = await schedulerRepository.RegisterAvailabilityTimeSlot(availabilityTimeSlot, assistantUuid);
+            bool isRegistered = await schedulerRepository.AddAvailabilityTimeSlotAsync(availabilityTimeSlot, assistantUuid);
             if (!isRegistered)
             {
                 return null;
             }
             return availabilityTimeSlot.Uuid.Value;
+        }
+
+        public async Task<Guid?> ScheduleAppointment(Appointment appointment)
+        {
+            appointment.Uuid = Guid.CreateVersion7();
+            appointment.Status= Model.Types.AppointmentStatusType.SCHEDULED;
+            appointment.TotalCost = 500;
+            appointment.EndTime = TimeOnly.Parse("12:00:00");
+            appointment.Client.Id = 2;
+
+            bool isRegistered = await schedulerRepository.AddAppointmentAsync(appointment);
+            if(!isRegistered)
+            {
+                return null;
+            }
+            return appointment.Uuid.Value;
         }
 
         // public bool ScheduleAppointment(DateTimeRange range, List<Service> services, Client client)

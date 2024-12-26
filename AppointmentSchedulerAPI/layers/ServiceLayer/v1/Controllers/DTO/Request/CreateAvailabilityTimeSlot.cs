@@ -1,4 +1,4 @@
-namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO
+namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
 {
     public class CreateAvailabilityTimeSlotDTO
     {

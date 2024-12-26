@@ -14,10 +14,13 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             this.context = context;
         }
 
-        public async Task<IEnumerable<BusinessLogicLayer.Model.AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
+        public async Task<IEnumerable<BusinessLogicLayer.Model.AvailabilityTimeSlot>> GetAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate)
         {
             var availableServices = await context.AvailabilityTimeSlots
                 .Where(slot => slot.Date >= startDate && slot.Date <= endDate)
+                    .Include(a => a.Assistant)
+                        .ThenInclude(ass => ass.UserAccount)
+                        .ThenInclude(assc => assc.UserInformation)
                 .ToListAsync();
 
             var availabilityTimeSlotsModel = availableServices
@@ -28,6 +31,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Date = slot.Date,
                     StartTime = slot.StartTime,
                     EndTime = slot.EndTime,
+                    Assistant = new BusinessLogicLayer.Model.Assistant
+                    {
+                        Name = slot.Assistant.UserAccount.UserInformation.Name,
+                        Uuid = slot.Assistant.UserAccount.Uuid,
+                    }
                 })
                 .ToList();
 
@@ -40,7 +48,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .Where(slot => slot.Date == date)
                 .Include(slot => slot.Assistant)
                     .ThenInclude(assistant => assistant.UserAccount)
-                    .ThenInclude(assistant => assistant.UserInformation)
+                    .ThenInclude(userAccount => userAccount.UserInformation)
                 .Include(slot => slot.Assistant)
                     .ThenInclude(assistant => assistant.AssistantServices)
                         .ThenInclude(asService => asService.Service)
@@ -53,7 +61,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Assistant = new BusinessLogicLayer.Model.Assistant
                     {
                         Id = group.Key,
-                        Uuid = group.FirstOrDefault()?.Assistant.UserAccount.Uuid,
+                        Uuid = group.FirstOrDefault()?.Assistant?.UserAccount?.Uuid,
                         Name = group.FirstOrDefault()?.Assistant?.UserAccount?.UserInformation?.Name
                     },
                     Services = group
@@ -73,7 +81,140 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return businessLogicAssistantServices;
         }
 
-        public async Task<bool> RegisterAvailabilityTimeSlot(BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid)
+        public async Task<bool> AddAppointmentAsync(BusinessLogicLayer.Model.Appointment appointment)
+        {
+            if (appointment.Client == null)
+            {
+                return false;
+            }
+
+
+            bool isRegistered = false;
+            using var transaction = await context.Database.BeginTransactionAsync();
+            try
+            {
+                var newAppointment = new Appointment
+                {
+                    Uuid = appointment.Uuid,
+                    EndTime = appointment.EndTime,
+                    StartTime = appointment.StartTime,
+                    Date = appointment.Date,
+                    Status = (Model.Types.AppointmentStatusType?)appointment.Status,
+                    TotalCost = appointment.TotalCost,
+                    IdClient = appointment.Client.Id,
+                };
+
+                context.Appointments.Add(newAppointment);
+                await context.SaveChangesAsync();
+
+                var newAppointmentServices = appointment.AssistantServices?.Select(async asstService =>
+                       {
+                           var assistant = await context.Assistants.FirstOrDefaultAsync(a => a.UserAccount.Uuid == asstService.Assistant.Uuid);
+                           if (assistant == null)
+                               throw new Exception("Assistant not found with the provided UUID");
+                           var services = new List<AppointmentService>();
+                           if (asstService.Services != null)
+                           {
+                               foreach (var service in asstService.Services)
+                               {
+                                   var serviceEntity = await context.Services.FirstOrDefaultAsync(s => s.Uuid == service.Uuid);
+
+                                   if (serviceEntity == null)
+                                       throw new Exception("Service not found with the provided UUID");
+                                   services.Add(new AppointmentService
+                                   {
+                                       IdAppointment = newAppointment.Id,
+                                       IdService = serviceEntity.Id
+                                   });
+                               }
+                           }
+
+                           return services;
+                       }).ToList();
+
+
+                var allServices = (await Task.WhenAll(newAppointmentServices)).SelectMany(s => s).ToList();
+
+                if (allServices.Any())
+                {
+                    await context.AppointmentServices.AddRangeAsync(allServices);
+                    await context.SaveChangesAsync();
+                }
+
+
+                // Handling assistants
+                var newAppointmentAssistants = new List<AppointmentAssistant>();
+                if (appointment.AssistantServices != null)
+                {
+                    foreach (var asstService in appointment.AssistantServices)
+                    {
+                        var assistant = await context.Assistants.FirstOrDefaultAsync(a => a.UserAccount.Uuid == asstService.Assistant.Uuid);
+                        if (assistant == null)
+                            throw new Exception("Assistant not found with the provided UUID");
+
+                        newAppointmentAssistants.Add(new AppointmentAssistant
+                        {
+                            IdAppointment = newAppointment.Id,
+                            IdAssistant = assistant.UserAccount.Id
+                        });
+                    }
+                }
+
+                if (newAppointmentAssistants.Any())
+                {
+                    await context.AppointmentAssistants.AddRangeAsync(newAppointmentAssistants);
+                    await context.SaveChangesAsync();
+                }
+
+
+                // // Create AppointmentAssistant relationships
+                // var newAppointmentAssistants = appointment.AssistantServices?.Select(async asstService =>
+                // {
+                //     PropToString.PrintData(asstService);
+                //     PropToString.PrintData(asstService.Assistant);
+                //     var assistant = await context.Assistants.FirstOrDefaultAsync(a => a.UserAccount.Uuid == asstService.Assistant.Uuid);
+                //     if (assistant == null)
+                //         throw new Exception("Assistant not found with the provided UUID");
+
+                //     System.Console.WriteLine("*****************");
+                //     System.Console.WriteLine("*****************");
+
+                //     PropToString.PrintData(assistant);
+
+                //     return new AppointmentAssistant
+                //     {
+                //         IdAppointment = newAppointment.Id,
+                //         IdAssistant = assistant.IdUserAccount
+                //     };
+                // }).ToList();
+
+                // // Await all tasks and get the list of AppointmentAssistant objects
+                // var allAssistants = await Task.WhenAll(newAppointmentAssistants);
+
+                // // Flatten the result: each element in `allAssistants` is an `AppointmentAssistant`
+                // var flattenedAssistants = allAssistants.ToList();
+
+                // if (flattenedAssistants.Any())
+                // {
+                //     await context.AppointmentAssistants.AddRangeAsync(flattenedAssistants);
+                //     await context.SaveChangesAsync();
+                // }
+
+
+                await transaction.CommitAsync();
+                isRegistered = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+
+            return isRegistered;
+        }
+
+
+        public async Task<bool> AddAvailabilityTimeSlotAsync(BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid)
         {
             bool isRegistered = false;
             using var transaction = await context.Database.BeginTransactionAsync();
@@ -87,7 +228,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
                 var timeSlot = new AvailabilityTimeSlot
                 {
-                    Uuid = Guid.NewGuid(),
+                    Uuid = availabilityTimeSlot.Uuid,
                     Date = availabilityTimeSlot.Date,
                     StartTime = availabilityTimeSlot.StartTime,
                     EndTime = availabilityTimeSlot.EndTime,

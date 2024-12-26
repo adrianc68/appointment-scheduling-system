@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
+﻿using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 
 namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 
@@ -14,7 +12,7 @@ public partial class UserAccount
     public Guid? Uuid { get; set; }
     public RoleType? Role {get; set;}
 
-    public virtual UserInformation? UserInformation { get; set; }
+    public virtual UserInformation UserInformation { get; set; }
     public virtual Assistant? Assistant { get; set; }
     public virtual Client? Client { get; set; }
 }
