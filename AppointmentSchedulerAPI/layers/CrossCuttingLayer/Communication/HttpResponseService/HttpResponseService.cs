@@ -20,20 +20,6 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpRes
             var payload = new ApiResponse<T>(StatusCodes.Status200OK, "OK", version, data);
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status200OK };
         }
-        public IActionResult InternalServerErrorResponse(Exception exception, string version, string? customMessage = null)
-        {
-            string identifier = exceptionHandlerService.HandleException(exception, version);
-
-            ErrorDetails errorData = new ErrorDetails
-            {
-                Error = MessageCodeType.SERVER_ERROR,
-                Message = "Please contact an administrator and provide the identifier.",
-                Details = customMessage,
-                Identifier = identifier
-            };
-            var payload = new ApiResponse<object>(StatusCodes.Status500InternalServerError, "Internal Server Error", version, errorData);
-            return new ObjectResult(payload) { StatusCode = StatusCodes.Status500InternalServerError };
-        }
 
         public IActionResult BadRequest(string version, string message = "Bad request")
         {
@@ -46,5 +32,33 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpRes
             var payload = new ApiResponse<object>(StatusCodes.Status401Unauthorized, message, version);
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status401Unauthorized };
         }
+
+        public IActionResult Forbidden(string version, string message = "Forbidden")
+        {
+            var payload = new ApiResponse<object>(StatusCodes.Status403Forbidden, message, version);
+            return new ObjectResult(payload) { StatusCode = StatusCodes.Status403Forbidden };
+        }
+
+        public IActionResult Conflict(string version, string message = "Conflict")
+        {
+            var payload = new ApiResponse<object>(StatusCodes.Status409Conflict, message, version);
+            return new ObjectResult(payload) { StatusCode = StatusCodes.Status409Conflict };
+        }
+
+        public IActionResult InternalServerErrorResponse(Exception exception, string version, string? customMessage = null)
+        {
+            string identifier = exceptionHandlerService.HandleException(exception, version);
+
+            ErrorDetails errorData = new ErrorDetails
+            {
+                Error = MessageCodeType.SERVER_ERROR.ToString(),
+                Message = "Please contact an administrator and provide the identifier.",
+                Details = customMessage,
+                Identifier = identifier
+            };
+            var payload = new ApiResponse<object>(StatusCodes.Status500InternalServerError, "Internal Server Error", version, errorData);
+            return new ObjectResult(payload) { StatusCode = StatusCodes.Status500InternalServerError };
+        }
+
     }
 }

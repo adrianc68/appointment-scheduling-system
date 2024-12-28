@@ -5,6 +5,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfa
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
@@ -119,7 +120,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public Task<Guid?> RegisterAssistant(Assistant assistant)
+        public Task<RegistrationResponse<Guid>> RegisterAssistant(Assistant assistant)
         {
             return assistantMgr.RegisterAssistantAsync(assistant);
         }

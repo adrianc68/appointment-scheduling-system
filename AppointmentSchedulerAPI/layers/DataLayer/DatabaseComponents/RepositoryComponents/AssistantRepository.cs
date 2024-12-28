@@ -197,5 +197,35 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .FirstOrDefaultAsync();
             return assistantId;
         }
+
+        public async Task<bool> isUsernameRegistered(string username)
+        {
+            var usernameDB = await context.Assistants
+                .Where(a => a.UserAccount.Username == username)
+                .Select(a => a.UserAccount.Username)
+                .FirstOrDefaultAsync();
+
+            return usernameDB != null;
+        }
+
+        public async Task<bool> isEmailRegistered(string email)
+        {
+            var emailDB = await context.Assistants
+                .Where(a => a.UserAccount.Email == email)
+                .Select(a => a.UserAccount.Email)
+                .FirstOrDefaultAsync();
+
+            return emailDB != null;
+        }
+
+        public async Task<bool> IsPhoneNumberRegistered(string phoneNumber)
+        {
+            var phoneNumberDB = await context.Assistants
+                .Where(a => a.UserAccount.UserInformation.PhoneNumber == phoneNumber)
+                .Select(a => a.UserAccount.UserInformation.PhoneNumber)
+                .FirstOrDefaultAsync();
+
+            return phoneNumberDB != null;
+        }
     }
 }

@@ -1,6 +1,7 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 
@@ -46,15 +47,71 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
-        public async Task<Guid?> RegisterAssistantAsync(Assistant assistant)
+        public async Task<RegistrationResponse<Guid>> RegisterAssistantAsync(Assistant assistant)
         {
-            assistant.Uuid = Guid.CreateVersion7();
-            bool isRegistered = await assistantRepository.AddAssistantAsync(assistant);
-            if (!isRegistered)
+
+            // 1. Check if username is is registered
+            if (string.IsNullOrWhiteSpace(assistant.Username) ||
+                 string.IsNullOrWhiteSpace(assistant.Email) ||
+                 string.IsNullOrWhiteSpace(assistant.PhoneNumber))
             {
-                return null;
+                return new RegistrationResponse<Guid>
+                {
+                    IsSuccessful = false,
+                    Code = MessageCodeType.NULL_VALUE_IS_PRESENT
+                };
             }
-            return assistant.Uuid.Value;
+
+            bool isUsernameRegistered = await assistantRepository.isUsernameRegistered(assistant.Username);
+            if (isUsernameRegistered)
+            {
+                return new RegistrationResponse<Guid>
+                {
+                    IsSuccessful = false,
+                    Code = MessageCodeType.USERNAME_ALREADY_REGISTERED
+                };
+            }
+
+            // 2. Check if email is registered
+            bool isEmailRegistered = await assistantRepository.isEmailRegistered(assistant.Email);
+            if (isEmailRegistered)
+            {
+                return new RegistrationResponse<Guid>
+                {
+                    IsSuccessful = false,
+                    Code = MessageCodeType.EMAIL_ALREADY_REGISTERED
+                };
+            }
+
+            // 3. Check if phoneNumber is registered
+            bool isPhoneNumberRegistered = await assistantRepository.IsPhoneNumberRegistered(assistant.PhoneNumber);
+            if (isPhoneNumberRegistered)
+            {
+                return new RegistrationResponse<Guid>
+                {
+                    IsSuccessful = false,
+                    Code = MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED
+                };
+            }
+            // 4. Create Guid UUID
+            assistant.Uuid = Guid.CreateVersion7();
+
+            bool isRegistered = await assistantRepository.AddAssistantAsync(assistant);
+            if (isRegistered)
+            {
+                return new RegistrationResponse<Guid>
+                {
+                    IsSuccessful = true,
+                    Data = assistant.Uuid.Value,
+                    Code = MessageCodeType.SUCCESS_OPERATION
+
+                };
+            }
+            return new RegistrationResponse<Guid>
+            {
+                IsSuccessful = true,
+                Code = MessageCodeType.REGISTER_ERROR
+            };
         }
 
         public bool UpdateAssistant(int idAssistant, Assistant assistant)

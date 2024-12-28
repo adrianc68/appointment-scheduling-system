@@ -23,7 +23,7 @@ public class HttpResponseAuthorizationMiddleware
                 var httpResponseService = scope.ServiceProvider.GetRequiredService<IHttpResponseService>();
                 var version = ApiVersionEnum.V1;
                 var message = MessageCodeType.UNAUTHORIZED;
-                var response = httpResponseService.Unauthorized(version, message);
+                var response = httpResponseService.Unauthorized(version, message.ToString());
                 await response.ExecuteResultAsync(new ActionContext { HttpContext = httpContext });
             }
             return;

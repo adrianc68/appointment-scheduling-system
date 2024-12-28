@@ -80,7 +80,15 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Password = assistantDTO.Password,
                     Username = assistantDTO.Username
                 };
-                guid = await systemFacade.RegisterAssistant(assistant);
+                var result = await systemFacade.RegisterAssistant(assistant);
+                if(result.IsSuccessful)
+                {
+                    guid = result.Data;
+                }
+                else 
+                {
+                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
+                }
             }
             catch (System.Exception ex)
             {
