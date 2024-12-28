@@ -1,4 +1,5 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
@@ -10,6 +11,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         // ClientStatusType GetClientStatusType(int idClient);
         // bool IsClientAvailable(int idClient);
         Task<List<Client>> GetAllClientsAsync();
-        Task<Guid?> RegisterClientAsync(Client client);
+        Task<RegistrationResponse<Guid>> RegisterClientAsync(Client client);
     }
 }

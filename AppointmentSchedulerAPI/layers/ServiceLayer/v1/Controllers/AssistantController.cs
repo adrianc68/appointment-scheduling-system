@@ -80,7 +80,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Password = assistantDTO.Password,
                     Username = assistantDTO.Username
                 };
-                var result = await systemFacade.RegisterAssistant(assistant);
+                CrossCuttingLayer.Communication.Model.RegistrationResponse<Guid> result = await systemFacade.RegisterAssistant(assistant);
                 if(result.IsSuccessful)
                 {
                     guid = result.Data;

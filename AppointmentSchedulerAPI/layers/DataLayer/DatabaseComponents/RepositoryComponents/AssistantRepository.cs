@@ -200,9 +200,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<bool> isUsernameRegistered(string username)
         {
-            var usernameDB = await context.Assistants
-                .Where(a => a.UserAccount.Username == username)
-                .Select(a => a.UserAccount.Username)
+            var usernameDB = await context.UserAccounts
+                .Where(a => a.Username == username)
+                .Select(a => a.Username)
                 .FirstOrDefaultAsync();
 
             return usernameDB != null;
@@ -210,9 +210,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<bool> isEmailRegistered(string email)
         {
-            var emailDB = await context.Assistants
-                .Where(a => a.UserAccount.Email == email)
-                .Select(a => a.UserAccount.Email)
+            var emailDB = await context.UserAccounts
+                .Where(a => a.Email == email)
+                .Select(a => a.Email)
                 .FirstOrDefaultAsync();
 
             return emailDB != null;
@@ -220,9 +220,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<bool> IsPhoneNumberRegistered(string phoneNumber)
         {
-            var phoneNumberDB = await context.Assistants
-                .Where(a => a.UserAccount.UserInformation.PhoneNumber == phoneNumber)
-                .Select(a => a.UserAccount.UserInformation.PhoneNumber)
+            var phoneNumberDB = await context.UserInformations
+                .Where(a => a.PhoneNumber == phoneNumber)
+                .Select(a => a.PhoneNumber)
                 .FirstOrDefaultAsync();
 
             return phoneNumberDB != null;

@@ -135,7 +135,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return schedulerMgr.RegisterAvailabilityTimeSlot(availabilityTimeSlot, assistantUuid);
         }
 
-        public Task<Guid?> RegisterClientAsync(Client client)
+        public Task<RegistrationResponse<Guid>> RegisterClientAsync(Client client)
         {
             return clientMgr.RegisterClientAsync(client);
         }

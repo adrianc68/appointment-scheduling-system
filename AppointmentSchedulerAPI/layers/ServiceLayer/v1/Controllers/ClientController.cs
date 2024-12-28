@@ -23,7 +23,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterService([FromBody] CreateClientDTO clientDTO)
+        public async Task<IActionResult> RegisterClient([FromBody] CreateClientDTO clientDTO)
         {
             Guid? guid;
             try
@@ -36,7 +36,16 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Password = clientDTO.Password,
                     Username = clientDTO.Username
                 };
-                guid = await systemFacade.RegisterClientAsync(client);
+
+                CrossCuttingLayer.Communication.Model.RegistrationResponse<Guid> result = await systemFacade.RegisterClientAsync(client);
+                if (result.IsSuccessful)
+                {
+                    guid = result.Data;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
+                }
             }
             catch (System.Exception ex)
             {
