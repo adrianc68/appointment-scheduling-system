@@ -1,11 +1,18 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
     public class ServiceMgr : IServiceMgt
     {
+        private readonly IServiceRepository serviceRepository;
+        public ServiceMgr(IServiceRepository serviceRepository)
+        {
+            this.serviceRepository = serviceRepository;
+        }
+
         public bool ChangeServiceStatusType(ServiceStatusType status)
         {
             throw new NotImplementedException();
@@ -21,9 +28,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
-        public List<Service> GetServices()
+        public async Task<List<Service>> GetAllServicesAsync()
         {
-            throw new NotImplementedException();
+            return (List<Service>)await serviceRepository.GetAllServicesAsync();
         }
 
         public List<Service> GetServicesDetailsByIds(List<int> serviceIds)
@@ -41,9 +48,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
-        public bool RegisterService(List<Service> services)
+        public async Task<Guid?> RegisterService(Service service)
         {
-            throw new NotImplementedException();
+            service.Uuid = Guid.CreateVersion7();
+            bool isRegistered = await serviceRepository.AddServiceAsync(service);
+            if (!isRegistered)
+            {
+                return null;
+            }
+            return service.Uuid.Value;
         }
     }
 }

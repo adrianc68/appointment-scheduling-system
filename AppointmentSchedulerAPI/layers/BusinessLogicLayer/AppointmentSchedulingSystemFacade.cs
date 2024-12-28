@@ -5,6 +5,8 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfa
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 {
@@ -118,39 +120,69 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public List<Service> GetAvailableServices(DateTimeRange range)
+        public Task<RegistrationResponse<Guid>> RegisterAssistant(Assistant assistant)
         {
-            throw new NotImplementedException();
+            return assistantMgr.RegisterAssistantAsync(assistant);
         }
 
-        public bool RegisterAssistant(Assistant assistant)
+        public Task<List<Assistant>> GetAllAssistantsAsync()
         {
-            throw new NotImplementedException();
+            return assistantMgr.GetAllAssistantsAsync();
         }
 
-        public bool RegisterAvailabilityTimeSlot(DateTimeRange range, int idAssistant)
+        public Task<Guid?>  RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid)
         {
-            throw new NotImplementedException();
+            return schedulerMgr.RegisterAvailabilityTimeSlot(availabilityTimeSlot, assistantUuid);
         }
 
-        public bool RegisterClient(Client client)
+        public Task<RegistrationResponse<Guid>> RegisterClientAsync(Client client)
         {
-            throw new NotImplementedException();
+            return clientMgr.RegisterClientAsync(client);
         }
 
-        public bool RegisterService(Service service)
+        public Task<Guid?> RegisterService(Service service)
         {
-            throw new NotImplementedException();
+            return serviceMgr.RegisterService(service);
         }
 
-        public bool ScheduleAppointmentAsClient(DateTimeRange range, List<Service> services, int idClient)
+        public Task<List<Service>> GetAllServicesAsync()
         {
-            throw new NotImplementedException();
+            return serviceMgr.GetAllServicesAsync();
         }
 
         public bool ScheduleAppointmentAsStaff(DateTimeRange range, List<Service> services, int idClient)
         {
             throw new NotImplementedException();
+        }
+
+        public Task<List<Client>> GetAllClientsAsync()
+        {
+            return clientMgr.GetAllClientsAsync();
+        }
+
+        public Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
+        {
+            return assistantMgr.AssignServicesToAssistant(assistantUuid, servicesUuid);
+        }
+
+        public Task<List<AssistantService>> GetAvailableServices(DateOnly date)
+        {
+            throw new NotImplementedException();
+        }
+
+       public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
+        {
+            return schedulerMgr.GetAvailableServicesAsync(date);
+        }
+
+        public Task<IEnumerable<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
+        {
+            return schedulerMgr.GetAllAvailabilityTimeSlots(startDate, endDate);
+        }
+
+        public Task<Guid?> ScheduleAppointmentAsClientAsync(Appointment appointment)
+        {
+            return schedulerMgr.ScheduleAppointment(appointment);
         }
     }
 

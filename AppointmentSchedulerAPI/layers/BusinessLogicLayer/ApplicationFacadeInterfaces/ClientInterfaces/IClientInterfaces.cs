@@ -5,7 +5,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
         IDisableClient,
         IEditClient,
         IEnableClient,
-        IRegisterClient
+        IRegisterClient,
+        IGetAllClient
     {
     }
 }

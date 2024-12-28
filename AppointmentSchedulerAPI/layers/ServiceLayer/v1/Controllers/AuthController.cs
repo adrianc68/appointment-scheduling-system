@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthenticationService<JwtUserCredentials, JwtTokenResult> authenticationService;
@@ -17,7 +17,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         {
             this.authenticationService = authenticationService;
             this.httpResponseService = httpResponseService;
-            
+
         }
 
         [HttpPost("login")]
@@ -25,14 +25,14 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         {
             if (credentials == null)
             {
-                return httpResponseService.BadRequest(ApiVersionEnum.V1, MessageCodeType.INVALID_CREDENTIALS);
+                return httpResponseService.BadRequest(ApiVersionEnum.V1, MessageCodeType.INVALID_CREDENTIALS.ToString());
             }
 
             JwtTokenResult? result = authenticationService.Authenticate(credentials);
 
             if (result == null)
             {
-                return httpResponseService.Unauthorized(ApiVersionEnum.V1, MessageCodeType.UNAUTHORIZED);
+                return httpResponseService.Unauthorized(ApiVersionEnum.V1, MessageCodeType.UNAUTHORIZED.ToString());
             }
             return httpResponseService.OkResponse(result, ApiVersionEnum.V1);
         }

@@ -4,6 +4,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types
     {
         ENABLED,
         DISABLED,
-        DELETED
+        DELETED,
     }
 }

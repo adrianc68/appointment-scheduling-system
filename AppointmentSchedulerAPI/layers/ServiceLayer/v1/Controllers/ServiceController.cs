@@ -1,11 +1,14 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 {
     [ApiController]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiVersion(ApiVersionEnum.V1)]
     public class ServiceController : ControllerBase
     {
@@ -25,17 +28,75 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return Ok(appointments);
         }
 
-        [HttpGet]
-        public IActionResult GetAllServices()
+        // public IActionResult DisableService()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult EnableService()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult DeleteService()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterService([FromBody] CreateServiceDTO serviceDTO)
         {
-            var services = new List<string> { "Service 1", "Service 2", "Service 3", "Service 4", "Service 5" };
-            var data = new
+            Guid? guid;
+            try
             {
-                services = services
-            };
-            // return httpResponseService.OkResponse(data, ApiVersionEnum.V1);
-            return httpResponseService.InternalServerErrorResponse(new Exception("test"), ApiVersionEnum.V1);
+                BusinessLogicLayer.Model.Service service = new()
+                {
+                    Description = serviceDTO.Description,
+                    Minutes = serviceDTO.Minutes,
+                    Name = serviceDTO.Name,
+                    Price = serviceDTO.Price
+                };
+                guid = await systemFacade.RegisterService(service);
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllServices()
+        {
+            List<ServiceDTO> serviceDtos = [];
+            try
+            {
+                var services = await systemFacade.GetAllServicesAsync();
+                serviceDtos = services.Select(a => new ServiceDTO
+                {
+                    Uuid = a.Uuid,
+                    Status = a.Status.ToString(),
+                    Description = a.Description,
+                    Name = a.Name,
+                    Minutes = a.Minutes,
+                    Price = a.Price,
+                    CreatedAt = a.CreatedAt
+                }).ToList();
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
+            }
+            return httpResponseService.OkResponse(serviceDtos, ApiVersionEnum.V1);
+        }
+
+        // public IActionResult EditService()
+        // {
+        //     throw new NotImplementedException();
+        // }
 
 
     }

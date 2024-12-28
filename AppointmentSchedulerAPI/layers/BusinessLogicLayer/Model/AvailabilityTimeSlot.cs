@@ -2,10 +2,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
 {
     public class AvailabilityTimeSlot
     {
-        public int Id { get; set; }
-        public DateTime Date { get; set; }
-        public TimeSpan EndTime { get; set; }
-        public TimeSpan StartTime { get; set; }
+        public int? Id { get; set; }
+        public Guid? Uuid { get; set; }
+        public DateOnly? Date { get; set; }
+        public TimeOnly? EndTime { get; set; }
+        public TimeOnly? StartTime { get; set; }
+
+        public List<Service>? Services { get; set; }
+        public Assistant? Assistant { get; set; }
 
         public AvailabilityTimeSlot() { }
 

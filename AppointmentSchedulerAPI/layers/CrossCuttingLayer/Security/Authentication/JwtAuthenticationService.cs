@@ -36,7 +36,7 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authenticati
                 Subject = new ClaimsIdentity(
                  [
                      new Claim(ClaimTypes.Name, credentials.Username),
-                    new Claim(ClaimTypes.Role, credentials.Role.ToString())
+                    new Claim(ClaimTypes.Role, UserRoleConstants.CLIENT) // $$$>> We need a specific user role from database
                  ]),
                 Expires = DateTime.UtcNow.AddHours(24),
                 Issuer = issuer,

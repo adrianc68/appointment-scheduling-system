@@ -743,6 +743,9 @@ The instantiation design decisions considered and made are summarized in the fol
 
 ![](images/any/Interface%20Responsibility%20Diagram%20refined.png)
 
+![](images/any/server%20side%20module%20view%20allocation.png)
+![](images/any/physical%20data%20model.png)
+
 
 | Business Interface | Diagram                                               |
 | ------------------ | ----------------------------------------------------- |
@@ -801,9 +804,17 @@ The instantiation design decisions considered and made are summarized in the fol
 | enableClient()                               | ![](images/any/interaction%20enableClient().png)                        |
 | IRegisterClient                              | ![](images/any/systeminterface%20IRegisterClient.png)                   |
 | registerClient()                             | ![](images/any/interaction%20registerClient().png)                      |
+|                                              |                                                                         |
+| IAssignServiceToAssistant                    | ![](images/any/systeminterface%20IAssignServiceToAssistant.png)         |
+|                                              |                                                                         |
+|                                              | ![](images/any/systeminterface%20IGetAssistant.png)                     |
+|                                              | ![](images/any/systeminterface%20IGetClient.png)                        |
+|                                              | ![](images/any/systeminterface%20IGetService.png)                       |
+|                                              | ![](images/any/systeminterface%20IGetAppointment.png)                   |
+|                                              | ![](images/any/systeminterface%20IGetAvailabilityTimeSlot.png)          |
 
 
-![](images/any/server%20side%20module%20view%20allocation.png)
+
 
 Initial elements allocation is in process...
 
