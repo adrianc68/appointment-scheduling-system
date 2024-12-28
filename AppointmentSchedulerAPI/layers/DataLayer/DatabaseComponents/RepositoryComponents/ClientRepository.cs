@@ -123,7 +123,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<bool> isUsernameRegistered(string username)
         {
             var usernameDB = await context.UserAccounts
-                .Where(a => a.Username == username)
+                .Where(a => a.Username.ToLower() == username)
                 .Select(a => a.Username)
                 .FirstOrDefaultAsync();
 
@@ -133,7 +133,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<bool> isEmailRegistered(string email)
         {
             var emailDB = await context.UserAccounts
-                .Where(a => a.Email == email)
+                .Where(a => a.Email.ToLower() == email)
                 .Select(a => a.Email)
                 .FirstOrDefaultAsync();
 

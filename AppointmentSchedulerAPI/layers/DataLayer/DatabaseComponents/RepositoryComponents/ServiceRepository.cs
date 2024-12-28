@@ -97,5 +97,14 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .FirstOrDefaultAsync();
             return serviceId;
         }
+
+        public async Task<bool> IsServiceNameRegistered(string name)
+        {
+            var serviceName = await context.Services
+                .Where(a => a.Name.ToLower() == name.ToLower())
+                .Select(a => a.Name)
+                .FirstOrDefaultAsync();
+            return serviceName != null;
+        }
     }
 }

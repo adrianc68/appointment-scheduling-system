@@ -57,7 +57,16 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Name = serviceDTO.Name,
                     Price = serviceDTO.Price
                 };
-                guid = await systemFacade.RegisterService(service);
+
+                CrossCuttingLayer.Communication.Model.RegistrationResponse<Guid> result = await systemFacade.RegisterService(service);
+                if (result.IsSuccessful)
+                {
+                    guid = result.Data;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
+                }
             }
             catch (System.Exception ex)
             {

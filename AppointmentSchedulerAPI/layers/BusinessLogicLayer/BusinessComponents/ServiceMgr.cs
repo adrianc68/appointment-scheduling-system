@@ -1,6 +1,7 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
@@ -48,15 +49,43 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
-        public async Task<Guid?> RegisterService(Service service)
+        public async Task<RegistrationResponse<Guid>> RegisterService(Service service)
         {
+            if (string.IsNullOrWhiteSpace(service.Name))
+            {
+                return new RegistrationResponse<Guid>
+                {
+                    IsSuccessful = false,
+                    Code = MessageCodeType.NULL_VALUE_IS_PRESENT
+                };
+            }
+
+            bool isServiceNameRegistered = await serviceRepository.IsServiceNameRegistered(service.Name);
+            if (isServiceNameRegistered)
+            {
+                return new RegistrationResponse<Guid>
+                {
+                    IsSuccessful = false,
+                    Code = MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED
+                };
+            }
             service.Uuid = Guid.CreateVersion7();
             bool isRegistered = await serviceRepository.AddServiceAsync(service);
-            if (!isRegistered)
+            if (isRegistered)
             {
-                return null;
+                return new RegistrationResponse<Guid>
+                {
+                    IsSuccessful = true,
+                    Data = service.Uuid.Value,
+                    Code = MessageCodeType.SUCCESS_OPERATION
+
+                };
             }
-            return service.Uuid.Value;
+            return new RegistrationResponse<Guid>
+            {
+                IsSuccessful = true,
+                Code = MessageCodeType.REGISTER_ERROR
+            };
         }
     }
 }

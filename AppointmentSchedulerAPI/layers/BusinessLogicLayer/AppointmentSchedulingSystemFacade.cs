@@ -140,7 +140,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return clientMgr.RegisterClientAsync(client);
         }
 
-        public Task<Guid?> RegisterService(Service service)
+        public Task<RegistrationResponse<Guid>> RegisterService(Service service)
         {
             return serviceMgr.RegisterService(service);
         }

@@ -12,6 +12,7 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         NULL_VALUE_IS_PRESENT,
         EMAIL_ALREADY_REGISTERED,
         PHONE_NUMBER_ALREADY_REGISTERED,
-        REGISTER_ERROR
+        REGISTER_ERROR,
+        SERVICE_NAME_ALREADY_REGISTERED
     }
 }

@@ -9,6 +9,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<IEnumerable<Service>> GetAllServicesAsync();
         Task<Service?> GetServiceByUuidAsync(Guid uuid);
         Task<int?> GetServiceIdByUuidAsync(Guid uuid);
+        Task<bool> IsServiceNameRegistered(string name);
         // bool ChangeServiceStatusType(ServiceStatusType status);
         // bool DeleteService(int idService);
         // bool EditService(Service service);
