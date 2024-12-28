@@ -17,7 +17,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public async Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
         {
-            bool areAllServicesRegistered = await assistantRepository.AddServicesToAssistant(assistantUuid, servicesUuid);
+            bool areAllServicesRegistered = await assistantRepository.AddServicesToAssistantAsync(assistantUuid, servicesUuid);
             return areAllServicesRegistered;
         }
 

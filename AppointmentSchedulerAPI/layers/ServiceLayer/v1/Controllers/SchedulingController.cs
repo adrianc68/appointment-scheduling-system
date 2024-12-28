@@ -49,28 +49,29 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             Guid? guid;
             try
             {
-                BusinessLogicLayer.Model.Appointment appointment = new()
-                {
-                    StartTime = createDTO.StartTime,
-                    Date = createDTO.Date,
-                    Client = new BusinessLogicLayer.Model.Client
-                    {
-                        Uuid = createDTO.ClientUuid
-                    },
-                    AssistantServices = createDTO.AssistantServices?.Select(asDTO => new BusinessLogicLayer.Model.AssistantService
-                    {
-                        Assistant = new BusinessLogicLayer.Model.Assistant
-                        {
-                            Uuid = asDTO.AssistantUuid
-                        },
-                        Services = asDTO.ServiceUuid?.Select(serviceUuid => new BusinessLogicLayer.Model.Service
-                        {
-                            Uuid = serviceUuid
-                        }).ToList()
-                    }).ToList()
-                }; 
+                guid = Guid.CreateVersion7();
+                // BusinessLogicLayer.Model.Appointment appointment = new()
+                // {
+                //     StartTime = createDTO.StartTime,
+                //     Date = createDTO.Date,
+                //     Client = new BusinessLogicLayer.Model.Client
+                //     {
+                //         Uuid = createDTO.ClientUuid
+                //     },
+                //     AssistantServices = createDTO.AssistantServices?.Select(asDTO => new BusinessLogicLayer.Model.AssistantService
+                //     {
+                //         Assistant = new BusinessLogicLayer.Model.Assistant
+                //         {
+                //             Uuid = asDTO.AssistantUuid
+                //         },
+                //         Services = asDTO.ServiceUuids?.Select(serviceUuid => new BusinessLogicLayer.Model.Service
+                //         {
+                //             Uuid = serviceUuid
+                //         }).ToList()
+                //     }).ToList()
+                // }; 
 
-                guid = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
+                // guid = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
 
             }
             catch (System.Exception ex)

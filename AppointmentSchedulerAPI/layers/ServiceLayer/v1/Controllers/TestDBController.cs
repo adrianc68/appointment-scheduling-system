@@ -33,23 +33,58 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
 
-        [HttpGet("test")]
+        [HttpPost("test")]
         [AllowAnonymous]
-        public async Task<IActionResult> TestDBMethod()
+        public async Task<IActionResult> TestDBMethod([FromBody] CreateAppointmentAsClientDTO dto)
         {
-            object result;
+            object? result;
 
             try
             {
-                
-                Guid guid = Guid.Parse("01940146-3d5f-756b-b03c-0776ffa7a7bf");
 
+                // Appointment appointment = new Appointment
+                // {
+                //     EndTime = TimeOnly.Parse("12:00:00"),
+                //     StartTime = dto.StartTime,
+                //     Date = dto.Date,
+                //     Status = BusinessLogicLayer.Model.Types.AppointmentStatusType.SCHEDULED,
+                //     TotalCost = 500,
+                //     Client = new Client { Uuid = dto.ClientUuid },
+                //     AssistantService = [],
+                //     Uuid = Guid.CreateVersion7()
+                // };
+
+                // foreach (var serviceUuid in dto.SelectedServices)
+                // {
+                //     var assistantService = new Service
+                //     {
+                //         Uuid = serviceUuid,  
+                //     };
+                //     appointment.AssistantService.Add(assistantService);
+                // }
+
+                // var client = await schedulerRepository.AddAppointmentAsync(appointment);
+                // result = client;
+
+
+                var data = await schedulerRepository.GetAppointmentsAsync(DateOnly.Parse("2024-12-26"), DateOnly.Parse("2024-12-26"));
+
+                PropToString.PrintListData(data);
+                result = data;
+
+
+
+
+                // dto.AssistantServices.ForEach(e => )
+
+
+                // Guid guid = Guid.Parse("01940146-3d5f-756b-b03c-0776ffa7a7bf");
                 // Assistant uid
                 // Guid guid = Guid.Parse("019401d1-1634-7daf-afb7-d8d6066899b6");
                 // List<Service>? assistant = await assistantRepository.GetServicesAssignedToAssistantByUuidAsync(guid);
                 // result = assistant;
                 // PropToString.PrintListData(assistant);
-                result = await serviceRepository.GetServiceByUuidAsync(guid);
+                // result = await serviceRepository.GetServiceByUuidAsync(guid);
 
             }
             catch (System.Exception ex)
@@ -59,6 +94,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(result, ApiVersionEnum.V1);
         }
 
-      
+
     }
 }

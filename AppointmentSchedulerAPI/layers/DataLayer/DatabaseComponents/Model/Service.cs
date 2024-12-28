@@ -15,6 +15,5 @@ public partial class Service
     public ServiceStatusType? Status { get; set; }
 
     public virtual IEnumerable<AssistantService>? AssistantServices { get; set; } 
-    public virtual IEnumerable<AppointmentService>? AppointmentServices { get; set; }
 
 }

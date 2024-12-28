@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
@@ -13,7 +14,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             this.context = context;
         }
 
-        public async Task<bool> AddServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
+        public async Task<bool> AddServicesToAssistantAsync(Guid assistantUuid, List<Guid?> servicesUuid)
         {
             bool isRegistered = false;
             using var transaction = await context.Database.BeginTransactionAsync();
@@ -24,7 +25,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     .Select(a => a.IdUserAccount)
                     .FirstOrDefaultAsync();
 
-                if (assistantId == 0)
+                if (assistantId == null)
                 {
                     return false;
                 }
@@ -42,7 +43,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 var assistantServices = serviceIds.Select(serviceId => new AssistantService
                 {
                     IdAssistant = assistantId,
-                    IdService = serviceId
+                    IdService = serviceId,
+                    Uuid = Guid.CreateVersion7()
                 }).ToList();
 
                 context.AssistantServices.AddRange(assistantServices);
@@ -170,7 +172,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }
 
             businessService = assistantDB.AssistantServices
-                .Where(ase => ase.Service != null) 
+                .Where(ase => ase.Service != null)
                 .Select(ase => new BusinessLogicLayer.Model.Service
                 {
                     Id = ase.Service.Id,
@@ -187,5 +189,13 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return (List<BusinessLogicLayer.Model.Service>)businessService;
         }
 
+        public async Task<int?> GetAssistantIdByUuidAsync(Guid uuid)
+        {
+            var assistantId = await context.Assistants
+                .Where(a => a.UserAccount.Uuid == uuid)
+                .Select(a => a.IdUserAccount)
+                .FirstOrDefaultAsync();
+            return assistantId;
+        }
     }
 }

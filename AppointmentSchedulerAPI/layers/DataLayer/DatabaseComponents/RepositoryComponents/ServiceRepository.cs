@@ -14,7 +14,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         }
 
 
-        public async Task<bool> AddService(BusinessLogicLayer.Model.Service service)
+        public async Task<bool> AddServiceAsync(BusinessLogicLayer.Model.Service service)
         {
             bool isRegistered = false;
             using var transaction = await context.Database.BeginTransactionAsync();
@@ -87,6 +87,15 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }
 
            return service;
+        }
+
+        public async Task<int?> GetServiceIdByUuidAsync(Guid uuid)
+        {
+            var serviceId = await context.Services
+                .Where(a => a.Uuid == uuid)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+            return serviceId;
         }
     }
 }

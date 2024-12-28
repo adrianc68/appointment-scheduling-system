@@ -9,8 +9,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         // Client GetClientDetails(int idClient);
         // ClientStatusType GetClientStatusType(int idClient);
         // bool IsClientAvailable(int idClient);
-        Task<Client?> GetClientByUuid(Guid uuid);
+        Task<Client?> GetClientByUuidAsync(Guid uuid);
+        Task<int?> GetClientIdByUuidAsync(Guid uuid);
         Task<IEnumerable<Client>> GetAllClientsAsync();
-        Task<bool> RegisterClientAsync(Client client);
+        Task<bool> AddClientAsync(Client client);
     }
 }

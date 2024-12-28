@@ -24,9 +24,7 @@ public partial class AppointmentDbContext : DbContext
     public required virtual DbSet<Service> Services { get; set; }
     public required virtual DbSet<AssistantService> AssistantServices { get; set; }
     public required virtual DbSet<AvailabilityTimeSlot> AvailabilityTimeSlots { get; set; }
-    public required virtual DbSet<AppointmentAssistant> AppointmentAssistants { get; set; }
-    public required virtual DbSet<AppointmentService> AppointmentServices { get; set; }
-
+    public required virtual DbSet<AppointmentAssistantService> AppointmentAssistantServices { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -190,13 +188,18 @@ public partial class AppointmentDbContext : DbContext
         modelBuilder.Entity<AssistantService>(entity =>
         {
             entity.ToTable("AssistantService");
-            entity.HasKey(e => new { e.IdAssistant, e.IdService });
+            entity.HasKey(e => e.Id);
 
+            
             entity.Property(e => e.IdAssistant)
                 .HasColumnName("id_assistant");
             entity.Property(e => e.IdService)
                 .HasColumnName("id_service");
-
+            entity.Property(e => e.Uuid)
+                .HasColumnName("uuid");
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("nextval(('\"service_id_seq\"'::text)::regclass)")
+                .HasColumnName("id");
             entity.HasOne(e => e.Assistant)
                 .WithMany(a => a.AssistantServices)
                 .HasForeignKey(ase => ase.IdAssistant);
@@ -206,45 +209,24 @@ public partial class AppointmentDbContext : DbContext
                 .HasForeignKey(sse => sse.IdService);
         });
 
-        modelBuilder.Entity<AppointmentService>(entity =>
+        modelBuilder.Entity<AppointmentAssistantService>(entity =>
         {
-            entity.ToTable("AppointmentService");
-            entity.HasKey(e => new { e.IdAppointment, e.IdService });
+            entity.ToTable("AppointmentAssistantService");
+            entity.HasKey(e => new { e.IdAppointment, e.IdAssistantService });
 
             entity.Property(e => e.IdAppointment)
                 .HasColumnName("id_appointment");
-            entity.Property(e => e.IdService)
-                .HasColumnName("id_service");
+            entity.Property(e => e.IdAssistantService)
+                .HasColumnName("id_assistant_service");
 
             entity.HasOne(e => e.Appointment)
-                .WithMany(a => a.AppointmentServices)
+                .WithMany(a => a.AppointmentAssistantServices)
                 .HasForeignKey(ase => ase.IdAppointment);
 
-            entity.HasOne(e => e.Service)
-                .WithMany(se => se.AppointmentServices)
-                .HasForeignKey(sse => sse.IdService);
+            entity.HasOne(e => e.AssistantService)
+                .WithMany(se => se.AppointmentAssistantServices)
+                .HasForeignKey(sse => sse.IdAssistantService);
         });
-
-
-        modelBuilder.Entity<AppointmentAssistant>(entity =>
-        {
-            entity.ToTable("AppointmentAssistant");
-            entity.HasKey(e => new { e.IdAppointment, e.IdAssistant });
-
-            entity.Property(e => e.IdAppointment)
-                .HasColumnName("id_appointment");
-            entity.Property(e => e.IdAssistant)
-                .HasColumnName("id_assistant");
-
-            entity.HasOne(e => e.Appointment)
-                .WithMany(a => a.AppointmentAssistants)
-                .HasForeignKey(ase => ase.IdAppointment);
-
-            entity.HasOne(e => e.Assistant)
-                .WithMany(se => se.AppointmentAssistants)
-                .HasForeignKey(sse => sse.IdAssistant);
-        });
-
 
         modelBuilder.Entity<AvailabilityTimeSlot>(entity =>
         {

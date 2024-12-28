@@ -8,6 +8,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model
         public ClientStatusType Status { get; set; }
 
         public virtual IEnumerable<Appointment>? Appointments { get; set; } 
-        public virtual UserAccount UserAccount { get; set; } 
+        public virtual UserAccount UserAccount { get; set; }
     }
 }

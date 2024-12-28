@@ -9,5 +9,5 @@ public partial class AvailabilityTimeSlot
     public TimeOnly? EndTime { get; set; }
     public DateTime? CreatedAt { get; set; }
     public int? IdAssistant { get; set; }
-    public virtual Assistant? Assistant { get; set; } = null!;
+    public virtual Assistant Assistant { get; set; }
 }

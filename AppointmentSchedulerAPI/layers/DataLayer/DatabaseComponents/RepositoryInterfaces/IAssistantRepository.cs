@@ -7,11 +7,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
     {
 
         Task<bool> AddAssistantAsync(Assistant assistant);
-        Task<bool> AddServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid);
+        Task<bool> AddServicesToAssistantAsync(Guid assistantUuid, List<Guid?> servicesUuid);
         Task<IEnumerable<Assistant>> GetAllAssistantsAsync();
         Task<Assistant?> GetAssistantByUuidAsync(Guid uuid);
+        Task<int?> GetAssistantIdByUuidAsync(Guid uuid);
         Task<List<Service>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid);
-        
 
         // Task<bool> UpdateAssistantAsync(Assistant assistant);
         // Task<bool> DeleteAssistantAsync(Guid uuid);

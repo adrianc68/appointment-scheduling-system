@@ -13,7 +13,6 @@ public partial class Appointment
     public DateTime? CreatedAt { get; set; }
     public int? IdClient { get; set; }
     public AppointmentStatusType? Status { get; set; }
-    public virtual Client? Client { get; set; }
-    public virtual IEnumerable<AppointmentService> AppointmentServices { get; set; } = new List<AppointmentService>();
-    public virtual IEnumerable<AppointmentAssistant> AppointmentAssistants { get; set; } = new List<AppointmentAssistant>();
+    public virtual Client Client { get; set; }
+    public virtual IEnumerable<AppointmentAssistantService> AppointmentAssistantServices { get; set; }
 }

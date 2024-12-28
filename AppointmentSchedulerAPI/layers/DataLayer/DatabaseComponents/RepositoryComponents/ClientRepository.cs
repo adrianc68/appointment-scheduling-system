@@ -39,7 +39,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return businessClient;
         }
 
-        public async Task<BusinessLogicLayer.Model.Client?> GetClientByUuid(Guid uuid)
+        public async Task<BusinessLogicLayer.Model.Client?> GetClientByUuidAsync(Guid uuid)
         {
             BusinessLogicLayer.Model.Client? client = null;
             var clientDB = await context.Clients
@@ -64,7 +64,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return client;
         }
 
-        public async Task<bool> RegisterClientAsync(BusinessLogicLayer.Model.Client client)
+        public async Task<bool> AddClientAsync(BusinessLogicLayer.Model.Client client)
         {
             bool isRegistered = false;
             using var transaction = await context.Database.BeginTransactionAsync();
@@ -109,6 +109,15 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 throw;
             }
             return isRegistered;
+        }
+
+        public async Task<int?> GetClientIdByUuidAsync(Guid uuid)
+        {
+            var clientID = await context.Clients
+                .Where(a => a.UserAccount.Uuid == uuid)
+                .Select(a => a.IdUserAccount)
+                .FirstOrDefaultAsync();
+            return clientID;
         }
     }
 }
