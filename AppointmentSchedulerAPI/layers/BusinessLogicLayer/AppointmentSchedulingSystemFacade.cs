@@ -121,14 +121,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         }
 
         public async Task<OperationResult<Guid>> RegisterAssistant(Assistant assistant)
-        {   
+        {
             OperationResult<bool> isAccountRegistered = await assistantMgr.IsAccountDataRegisteredAsync(assistant);
-            if(isAccountRegistered.Data)
+            if (isAccountRegistered.Data)
             {
-                return new OperationResult<Guid>{
+                return new OperationResult<Guid>
+                {
                     IsSuccessful = false,
                     Code = isAccountRegistered.Code
-                };   
+                };
             }
             return await assistantMgr.RegisterAssistantAsync(assistant);
         }
@@ -138,14 +139,23 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return assistantMgr.GetAllAssistantsAsync();
         }
 
-        public Task<Guid?>  RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid)
+        public Task<Guid?> RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid)
         {
             return schedulerMgr.RegisterAvailabilityTimeSlot(availabilityTimeSlot, assistantUuid);
         }
 
-        public Task<OperationResult<Guid>> RegisterClientAsync(Client client)
+        public async Task<OperationResult<Guid>> RegisterClientAsync(Client client)
         {
-            return clientMgr.RegisterClientAsync(client);
+            OperationResult<bool> isAccountRegistered = await clientMgr.IsAccountDataRegisteredAsync(client);
+            if (isAccountRegistered.Data)
+            {
+                return new OperationResult<Guid>
+                {
+                    IsSuccessful = false,
+                    Code = isAccountRegistered.Code
+                };
+            }
+            return await clientMgr.RegisterClientAsync(client);
         }
 
         public Task<OperationResult<Guid>> RegisterService(Service service)
@@ -178,7 +188,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-       public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
+        public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
         {
             return schedulerMgr.GetAvailableServicesAsync(date);
         }

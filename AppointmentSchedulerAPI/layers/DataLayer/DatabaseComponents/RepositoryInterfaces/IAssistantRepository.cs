@@ -13,9 +13,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<int?> GetAssistantIdByUuidAsync(Guid uuid);
         Task<List<Service>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid);
 
-        Task<bool> isUsernameRegistered(string username);
-        Task<bool> isEmailRegistered(string email);
-        Task<bool> IsPhoneNumberRegistered(string phoneNumber);
+        Task<bool> isUsernameRegisteredAsync(string username);
+        Task<bool> isEmailRegisteredAsync(string email);
+        Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber);
 
         // Task<bool> UpdateAssistantAsync(Assistant assistant);
         // Task<bool> DeleteAssistantAsync(Guid uuid);
@@ -23,7 +23,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         // bool ChangeAssistantStatus(int idAssistant, AssistantStatusType status);
         // AssistantStatusType GetAssistantStatus(int idAssistant);
-        // bool GetServicesAssignedToAssistant(int idAssistant);
         // bool UpdateAssistant(int idAssistant, Assistant assistant);
     }
 }
