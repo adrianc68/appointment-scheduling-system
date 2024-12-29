@@ -1,4 +1,5 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
@@ -22,56 +23,43 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
-        // public IActionResult ChangeAppointmentStatus()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult GetAppointmentDetails()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult GetAppointment()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult GetAvailableServices()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
         [HttpPost("appointment")]
         [AllowAnonymous]
-        public async Task<IActionResult> ScheduleAppointmentAsClientAsync([FromBody] CreateAppointmentAsClientDTO createDTO)
+        public async Task<IActionResult> ScheduleAppointmentAsClientAsync([FromBody] CreateAppointmentAsClientDTO dto)
         {
             Guid? guid;
             try
             {
-                guid = Guid.CreateVersion7();
-                // BusinessLogicLayer.Model.Appointment appointment = new()
-                // {
-                //     StartTime = createDTO.StartTime,
-                //     Date = createDTO.Date,
-                //     Client = new BusinessLogicLayer.Model.Client
-                //     {
-                //         Uuid = createDTO.ClientUuid
-                //     },
-                //     AssistantServices = createDTO.AssistantServices?.Select(asDTO => new BusinessLogicLayer.Model.AssistantService
-                //     {
-                //         Assistant = new BusinessLogicLayer.Model.Assistant
-                //         {
-                //             Uuid = asDTO.AssistantUuid
-                //         },
-                //         Services = asDTO.ServiceUuids?.Select(serviceUuid => new BusinessLogicLayer.Model.Service
-                //         {
-                //             Uuid = serviceUuid
-                //         }).ToList()
-                //     }).ToList()
-                // }; 
+                Appointment appointment = new Appointment
+                {
+                    EndTime = TimeOnly.Parse("12:00:00"),
+                    StartTime = dto.StartTime,
+                    Date = dto.Date,
+                    Status = BusinessLogicLayer.Model.Types.AppointmentStatusType.SCHEDULED,
+                    TotalCost = 500,
+                    Client = new Client { Uuid = dto.ClientUuid },
+                    AssistantService = [],
+                    Uuid = Guid.CreateVersion7()
+                };
 
-                // guid = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
+                foreach (var serviceUuid in dto.SelectedServices)
+                {
+                    var assistantService = new Service
+                    {
+                        Uuid = serviceUuid,
+                    };
+                    appointment.AssistantService.Add(assistantService);
+                }
+
+                CrossCuttingLayer.Communication.Model.OperationResult<Guid> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
+                if (result.IsSuccessful)
+                {
+                    guid = result.Data;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
+                }
 
             }
             catch (System.Exception ex)

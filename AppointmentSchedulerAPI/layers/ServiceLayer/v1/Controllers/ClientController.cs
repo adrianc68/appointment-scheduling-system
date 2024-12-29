@@ -37,7 +37,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Username = clientDTO.Username
                 };
 
-                CrossCuttingLayer.Communication.Model.RegistrationResponse<Guid> result = await systemFacade.RegisterClientAsync(client);
+                CrossCuttingLayer.Communication.Model.OperationResult<Guid> result = await systemFacade.RegisterClientAsync(client);
                 if (result.IsSuccessful)
                 {
                     guid = result.Data;

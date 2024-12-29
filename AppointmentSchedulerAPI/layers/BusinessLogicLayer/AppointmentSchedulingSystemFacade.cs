@@ -120,9 +120,17 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public Task<RegistrationResponse<Guid>> RegisterAssistant(Assistant assistant)
-        {
-            return assistantMgr.RegisterAssistantAsync(assistant);
+        public async Task<OperationResult<Guid>> RegisterAssistant(Assistant assistant)
+        {   
+            OperationResult<bool> isAccountRegistered = await assistantMgr.IsAccountDataRegisteredAsync(assistant);
+            if(isAccountRegistered.Data)
+            {
+                return new OperationResult<Guid>{
+                    IsSuccessful = false,
+                    Code = isAccountRegistered.Code
+                };   
+            }
+            return await assistantMgr.RegisterAssistantAsync(assistant);
         }
 
         public Task<List<Assistant>> GetAllAssistantsAsync()
@@ -135,12 +143,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return schedulerMgr.RegisterAvailabilityTimeSlot(availabilityTimeSlot, assistantUuid);
         }
 
-        public Task<RegistrationResponse<Guid>> RegisterClientAsync(Client client)
+        public Task<OperationResult<Guid>> RegisterClientAsync(Client client)
         {
             return clientMgr.RegisterClientAsync(client);
         }
 
-        public Task<RegistrationResponse<Guid>> RegisterService(Service service)
+        public Task<OperationResult<Guid>> RegisterService(Service service)
         {
             return serviceMgr.RegisterService(service);
         }
@@ -180,7 +188,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return schedulerMgr.GetAllAvailabilityTimeSlots(startDate, endDate);
         }
 
-        public Task<Guid?> ScheduleAppointmentAsClientAsync(Appointment appointment)
+        public Task<OperationResult<Guid>> ScheduleAppointmentAsClientAsync(Appointment appointment)
         {
             return schedulerMgr.ScheduleAppointment(appointment);
         }

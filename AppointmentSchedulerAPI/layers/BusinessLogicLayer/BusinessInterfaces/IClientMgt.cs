@@ -11,6 +11,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         // ClientStatusType GetClientStatusType(int idClient);
         // bool IsClientAvailable(int idClient);
         Task<List<Client>> GetAllClientsAsync();
-        Task<RegistrationResponse<Guid>> RegisterClientAsync(Client client);
+        Task<OperationResult<Guid>> RegisterClientAsync(Client client);
     }
 }

@@ -123,7 +123,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Password = assistant.Password,
                     Username = assistant.Username,
                     Role = RoleType.ASSISTANT,
-                    Uuid = Guid.CreateVersion7()
+                    Uuid = assistant.Uuid
                 };
                 context.UserAccounts.Add(userAccount);
                 await context.SaveChangesAsync();

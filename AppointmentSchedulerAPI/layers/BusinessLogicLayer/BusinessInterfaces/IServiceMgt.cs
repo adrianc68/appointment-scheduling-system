@@ -13,6 +13,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         // List<Service> GetServicesDetailsByIds(List<int> serviceIds);
         // ServiceStatusType GetServiceStatusType(int idService);
         // bool IsServiceInSpecificStatusType(int idService, ServiceStatusType expected);
-        Task<RegistrationResponse<Guid>> RegisterService(Service service);
+        Task<OperationResult<Guid>> RegisterService(Service service);
     }
 }

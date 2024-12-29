@@ -19,7 +19,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<Client>)await clientRepository.GetAllClientsAsync();
         }
 
-        public async Task<RegistrationResponse<Guid>> RegisterClientAsync(Client client)
+        public async Task<OperationResult<Guid>> RegisterClientAsync(Client client)
         {
 
             // 1. Check if username is is registered
@@ -27,7 +27,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                  string.IsNullOrWhiteSpace(client.Email) ||
                  string.IsNullOrWhiteSpace(client.PhoneNumber))
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<Guid>
                 {
                     IsSuccessful = false,
                     Code = MessageCodeType.NULL_VALUE_IS_PRESENT
@@ -37,7 +37,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool isUsernameRegistered = await clientRepository.isUsernameRegistered(client.Username);
             if (isUsernameRegistered)
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<Guid>
                 {
                     IsSuccessful = false,
                     Code = MessageCodeType.USERNAME_ALREADY_REGISTERED
@@ -48,7 +48,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool isEmailRegistered = await clientRepository.isEmailRegistered(client.Email);
             if (isEmailRegistered)
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<Guid>
                 {
                     IsSuccessful = false,
                     Code = MessageCodeType.EMAIL_ALREADY_REGISTERED
@@ -59,7 +59,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool isPhoneNumberRegistered = await clientRepository.IsPhoneNumberRegistered(client.PhoneNumber);
             if (isPhoneNumberRegistered)
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<Guid>
                 {
                     IsSuccessful = false,
                     Code = MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED
@@ -71,7 +71,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool isRegistered = await clientRepository.AddClientAsync(client);
             if (isRegistered)
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<Guid>
                 {
                     IsSuccessful = true,
                     Data = client.Uuid.Value,
@@ -79,7 +79,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
                 };
             }
-            return new RegistrationResponse<Guid>
+            return new OperationResult<Guid>
             {
                 IsSuccessful = true,
                 Code = MessageCodeType.REGISTER_ERROR

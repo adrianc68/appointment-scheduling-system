@@ -42,33 +42,28 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
-        public bool IsAssistantRegistered(Assistant assistant)
+        public async Task<OperationResult<bool>> IsAccountDataRegisteredAsync(Assistant assistant)
         {
-            throw new NotImplementedException();
-        }
-
-        public async Task<RegistrationResponse<Guid>> RegisterAssistantAsync(Assistant assistant)
-        {
-
-            // 1. Check if username is is registered
             if (string.IsNullOrWhiteSpace(assistant.Username) ||
                  string.IsNullOrWhiteSpace(assistant.Email) ||
                  string.IsNullOrWhiteSpace(assistant.PhoneNumber))
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<bool>
                 {
                     IsSuccessful = false,
                     Code = MessageCodeType.NULL_VALUE_IS_PRESENT
                 };
             }
 
+            // 1. Check if username is is registered
             bool isUsernameRegistered = await assistantRepository.isUsernameRegistered(assistant.Username);
             if (isUsernameRegistered)
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<bool>
                 {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.USERNAME_ALREADY_REGISTERED
+                    IsSuccessful = true,
+                    Code = MessageCodeType.USERNAME_ALREADY_REGISTERED,
+                    Data = true
                 };
             }
 
@@ -76,10 +71,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool isEmailRegistered = await assistantRepository.isEmailRegistered(assistant.Email);
             if (isEmailRegistered)
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<bool>
                 {
                     IsSuccessful = false,
-                    Code = MessageCodeType.EMAIL_ALREADY_REGISTERED
+                    Code = MessageCodeType.EMAIL_ALREADY_REGISTERED,
+                    Data = true,
                 };
             }
 
@@ -87,19 +83,33 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool isPhoneNumberRegistered = await assistantRepository.IsPhoneNumberRegistered(assistant.PhoneNumber);
             if (isPhoneNumberRegistered)
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<bool>
                 {
                     IsSuccessful = false,
-                    Code = MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED
+                    Code = MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED,
+                    Data = true
                 };
             }
-            // 4. Create Guid UUID
-            assistant.Uuid = Guid.CreateVersion7();
+            return new OperationResult<bool>
+            {
+                IsSuccessful = true,
+                Data = false,
+            };
+        }
 
+        public async Task<bool> IsAssistantRegisteredByUuidAsync(Guid uuid)
+        {
+            int? assistantId = await assistantRepository.GetAssistantIdByUuidAsync(uuid);
+            return assistantId != null;
+        }
+
+        public async Task<OperationResult<Guid>> RegisterAssistantAsync(Assistant assistant)
+        {
+            assistant.Uuid = Guid.CreateVersion7();
             bool isRegistered = await assistantRepository.AddAssistantAsync(assistant);
             if (isRegistered)
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<Guid>
                 {
                     IsSuccessful = true,
                     Data = assistant.Uuid.Value,
@@ -107,9 +117,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
                 };
             }
-            return new RegistrationResponse<Guid>
+            return new OperationResult<Guid>
             {
-                IsSuccessful = true,
+                IsSuccessful = false,
                 Code = MessageCodeType.REGISTER_ERROR
             };
         }

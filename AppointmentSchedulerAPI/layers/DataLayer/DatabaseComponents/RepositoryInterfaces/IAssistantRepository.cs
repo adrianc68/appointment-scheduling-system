@@ -24,7 +24,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         // bool ChangeAssistantStatus(int idAssistant, AssistantStatusType status);
         // AssistantStatusType GetAssistantStatus(int idAssistant);
         // bool GetServicesAssignedToAssistant(int idAssistant);
-        // bool IsAssistantRegistered(Assistant assistant);
         // bool UpdateAssistant(int idAssistant, Assistant assistant);
     }
 }

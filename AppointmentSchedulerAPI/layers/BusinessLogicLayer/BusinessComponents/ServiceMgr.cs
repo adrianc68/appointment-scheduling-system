@@ -49,11 +49,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
-        public async Task<RegistrationResponse<Guid>> RegisterService(Service service)
+        public async Task<OperationResult<Guid>> RegisterService(Service service)
         {
             if (string.IsNullOrWhiteSpace(service.Name))
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<Guid>
                 {
                     IsSuccessful = false,
                     Code = MessageCodeType.NULL_VALUE_IS_PRESENT
@@ -63,7 +63,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool isServiceNameRegistered = await serviceRepository.IsServiceNameRegistered(service.Name);
             if (isServiceNameRegistered)
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<Guid>
                 {
                     IsSuccessful = false,
                     Code = MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED
@@ -73,7 +73,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool isRegistered = await serviceRepository.AddServiceAsync(service);
             if (isRegistered)
             {
-                return new RegistrationResponse<Guid>
+                return new OperationResult<Guid>
                 {
                     IsSuccessful = true,
                     Data = service.Uuid.Value,
@@ -81,7 +81,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
                 };
             }
-            return new RegistrationResponse<Guid>
+            return new OperationResult<Guid>
             {
                 IsSuccessful = true,
                 Code = MessageCodeType.REGISTER_ERROR
