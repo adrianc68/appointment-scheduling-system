@@ -58,7 +58,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Price = serviceDTO.Price
                 };
 
-                CrossCuttingLayer.Communication.Model.OperationResult<Guid> result = await systemFacade.RegisterService(service);
+                CrossCuttingLayer.Communication.Model.OperationResult<Guid?> result = await systemFacade.RegisterService(service);
                 if (result.IsSuccessful)
                 {
                     guid = result.Result;

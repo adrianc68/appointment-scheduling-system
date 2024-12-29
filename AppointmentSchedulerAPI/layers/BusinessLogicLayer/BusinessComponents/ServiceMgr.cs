@@ -42,7 +42,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             if (string.IsNullOrWhiteSpace(service.Name))
             {
-                return new OperationResult<bool?>(false, MessageCodeType.NULL_VALUE_IS_PRESENT, true);
+                return new OperationResult<bool?>(false, MessageCodeType.NULL_VALUE_IS_PRESENT);
             }
 
             bool isServiceNameRegistered = await serviceRepository.IsServiceNameRegistered(service.Name);

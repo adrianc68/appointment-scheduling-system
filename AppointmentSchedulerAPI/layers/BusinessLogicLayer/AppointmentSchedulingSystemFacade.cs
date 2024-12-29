@@ -120,16 +120,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public async Task<OperationResult<Guid>> RegisterAssistant(Assistant assistant)
+        public async Task<OperationResult<Guid?>> RegisterAssistant(Assistant assistant)
         {
-            OperationResult<bool> isAccountRegistered = await assistantMgr.IsAccountDataRegisteredAsync(assistant);
-            if (isAccountRegistered.Result)
+            OperationResult<bool?> isAccountRegistered = await assistantMgr.IsAccountDataRegisteredAsync(assistant);
+            if (isAccountRegistered.Result.HasValue && isAccountRegistered.Result.Value)
             {
-                return new OperationResult<Guid>
-                {
-                    IsSuccessful = false,
-                    Code = isAccountRegistered.Code
-                };
+                return new OperationResult<Guid?>(false, isAccountRegistered.Code);
             }
             return await assistantMgr.RegisterAssistantAsync(assistant);
         }
@@ -144,30 +140,22 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return schedulerMgr.RegisterAvailabilityTimeSlot(availabilityTimeSlot, assistantUuid);
         }
 
-        public async Task<OperationResult<Guid>> RegisterClientAsync(Client client)
+        public async Task<OperationResult<Guid?>> RegisterClientAsync(Client client)
         {
-            OperationResult<bool> isAccountRegistered = await clientMgr.IsAccountDataRegisteredAsync(client);
-            if (isAccountRegistered.Result)
+            OperationResult<bool?> isAccountRegistered = await clientMgr.IsAccountDataRegisteredAsync(client);
+            if (isAccountRegistered.Result.HasValue && isAccountRegistered.Result.Value)
             {
-                return new OperationResult<Guid>
-                {
-                    IsSuccessful = false,
-                    Code = isAccountRegistered.Code
-                };
+                return new OperationResult<Guid?>(false, isAccountRegistered.Code);
             }
             return await clientMgr.RegisterClientAsync(client);
         }
 
-        public async Task<OperationResult<Guid>> RegisterService(Service service)
+        public async Task<OperationResult<Guid?>> RegisterService(Service service)
         {
-            OperationResult<bool> isServiceRegistered = await serviceMgr.IsServiceDataRegisteredAsync(service);
-            if (isServiceRegistered.Result)
+            OperationResult<bool?> isServiceRegistered = await serviceMgr.IsServiceDataRegisteredAsync(service);
+            if (isServiceRegistered.Result.HasValue && isServiceRegistered.Result.Value)
             {
-                return new OperationResult<Guid>
-                {
-                    IsSuccessful = false,
-                    Code = isServiceRegistered.Code
-                };
+                return new OperationResult<Guid?>(false, isServiceRegistered.Code);
             }
             return await serviceMgr.RegisterService(service);
         }
