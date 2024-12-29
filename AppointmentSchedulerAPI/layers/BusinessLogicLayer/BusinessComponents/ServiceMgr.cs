@@ -44,31 +44,45 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             throw new NotImplementedException();
         }
 
-        public bool IsServiceInSpecificStatusType(int idService, ServiceStatusType expected)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<OperationResult<Guid>> RegisterService(Service service)
+        public async Task<OperationResult<bool>> IsServiceDataRegisteredAsync(Service service)
         {
             if (string.IsNullOrWhiteSpace(service.Name))
             {
-                return new OperationResult<Guid>
+                return new OperationResult<bool>
                 {
                     IsSuccessful = false,
-                    Code = MessageCodeType.NULL_VALUE_IS_PRESENT
+                    Code = MessageCodeType.NULL_VALUE_IS_PRESENT,
+                    Data = true
                 };
             }
 
             bool isServiceNameRegistered = await serviceRepository.IsServiceNameRegistered(service.Name);
             if (isServiceNameRegistered)
             {
-                return new OperationResult<Guid>
+                return new OperationResult<bool>
                 {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED
+                    IsSuccessful = true,
+                    Code = MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED,
+                    Data = true
                 };
             }
+            return new OperationResult<bool>
+            {
+                IsSuccessful = true,
+                Data = false,
+            };
+
+        }
+
+        public async Task<bool> IsServiceRegisteredByUuidAsync(Guid uuid)
+        {
+            int? serviceId = await serviceRepository.GetServiceIdByUuidAsync(uuid);
+            return serviceId != null;
+        }
+
+        public async Task<OperationResult<Guid>> RegisterService(Service service)
+        {
+
             service.Uuid = Guid.CreateVersion7();
             bool isRegistered = await serviceRepository.AddServiceAsync(service);
             if (isRegistered)

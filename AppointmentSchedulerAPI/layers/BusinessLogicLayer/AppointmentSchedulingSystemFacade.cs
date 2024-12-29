@@ -158,9 +158,18 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return await clientMgr.RegisterClientAsync(client);
         }
 
-        public Task<OperationResult<Guid>> RegisterService(Service service)
+        public async Task<OperationResult<Guid>> RegisterService(Service service)
         {
-            return serviceMgr.RegisterService(service);
+            OperationResult<bool> isServiceRegistered = await serviceMgr.IsServiceDataRegisteredAsync(service);
+            if (isServiceRegistered.Data)
+            {
+                return new OperationResult<Guid>
+                {
+                    IsSuccessful = false,
+                    Code = isServiceRegistered.Code
+                };
+            }
+            return await serviceMgr.RegisterService(service);
         }
 
         public Task<List<Service>> GetAllServicesAsync()
