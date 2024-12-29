@@ -83,7 +83,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 CrossCuttingLayer.Communication.Model.OperationResult<Guid> result = await systemFacade.RegisterAssistant(assistant);
                 if(result.IsSuccessful)
                 {
-                    guid = result.Data;
+                    guid = result.Result;
                 }
                 else 
                 {

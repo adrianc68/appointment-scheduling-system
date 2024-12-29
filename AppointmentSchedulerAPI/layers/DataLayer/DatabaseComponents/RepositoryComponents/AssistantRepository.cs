@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
@@ -226,6 +227,15 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .FirstOrDefaultAsync();
 
             return phoneNumberDB != null;
+        }
+
+        public async Task<int?> GetServiceIdByAssistantServiceUuid(Guid uuid)
+        {
+            var serviceId = await context.AssistantServices
+                .Where(a => a.Service.Uuid == uuid)
+                .Select(a => a.Service.Id)
+                .FirstOrDefaultAsync();
+            return serviceId;
         }
     }
 }

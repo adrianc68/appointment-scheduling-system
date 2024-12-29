@@ -123,7 +123,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         public async Task<OperationResult<Guid>> RegisterAssistant(Assistant assistant)
         {
             OperationResult<bool> isAccountRegistered = await assistantMgr.IsAccountDataRegisteredAsync(assistant);
-            if (isAccountRegistered.Data)
+            if (isAccountRegistered.Result)
             {
                 return new OperationResult<Guid>
                 {
@@ -147,7 +147,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         public async Task<OperationResult<Guid>> RegisterClientAsync(Client client)
         {
             OperationResult<bool> isAccountRegistered = await clientMgr.IsAccountDataRegisteredAsync(client);
-            if (isAccountRegistered.Data)
+            if (isAccountRegistered.Result)
             {
                 return new OperationResult<Guid>
                 {
@@ -161,7 +161,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         public async Task<OperationResult<Guid>> RegisterService(Service service)
         {
             OperationResult<bool> isServiceRegistered = await serviceMgr.IsServiceDataRegisteredAsync(service);
-            if (isServiceRegistered.Data)
+            if (isServiceRegistered.Result)
             {
                 return new OperationResult<Guid>
                 {

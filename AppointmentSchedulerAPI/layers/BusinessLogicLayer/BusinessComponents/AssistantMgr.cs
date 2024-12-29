@@ -32,69 +32,37 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<Assistant>)await assistantRepository.GetAllAssistantsAsync();
         }
 
-        public AssistantStatusType GetAssistantStatus(int idAssistant)
-        {
-            throw new NotImplementedException();
-        }
 
-        public bool GetServicesAssignedToAssistant(int idAssistant)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<OperationResult<bool>> IsAccountDataRegisteredAsync(Assistant assistant)
+        public async Task<OperationResult<bool?>> IsAccountDataRegisteredAsync(Assistant assistant)
         {
             if (string.IsNullOrWhiteSpace(assistant.Username) ||
                  string.IsNullOrWhiteSpace(assistant.Email) ||
                  string.IsNullOrWhiteSpace(assistant.PhoneNumber))
             {
-                return new OperationResult<bool>
-                {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.NULL_VALUE_IS_PRESENT
-                };
+                return new OperationResult<bool?>(false, MessageCodeType.NULL_VALUE_IS_PRESENT);
             }
 
             // 1. Check if username is is registered
             bool isUsernameRegistered = await assistantRepository.IsUsernameRegisteredAsync(assistant.Username);
             if (isUsernameRegistered)
             {
-                return new OperationResult<bool>
-                {
-                    IsSuccessful = true,
-                    Code = MessageCodeType.USERNAME_ALREADY_REGISTERED,
-                    Data = true
-                };
+                return new OperationResult<bool?>(true, MessageCodeType.USERNAME_ALREADY_REGISTERED, isUsernameRegistered);
             }
 
             // 2. Check if email is registered
             bool isEmailRegistered = await assistantRepository.IsEmailRegisteredAsync(assistant.Email);
             if (isEmailRegistered)
             {
-                return new OperationResult<bool>
-                {
-                    IsSuccessful = true,
-                    Code = MessageCodeType.EMAIL_ALREADY_REGISTERED,
-                    Data = true,
-                };
+                return new OperationResult<bool?>(true, MessageCodeType.EMAIL_ALREADY_REGISTERED, isEmailRegistered);
             }
 
             // 3. Check if phoneNumber is registered
             bool isPhoneNumberRegistered = await assistantRepository.IsPhoneNumberRegisteredAsync(assistant.PhoneNumber);
             if (isPhoneNumberRegistered)
             {
-                return new OperationResult<bool>
-                {
-                    IsSuccessful = true,
-                    Code = MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED,
-                    Data = true
-                };
+                return new OperationResult<bool?>(true, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED, isPhoneNumberRegistered);
             }
-            return new OperationResult<bool>
-            {
-                IsSuccessful = true,
-                Data = false,
-            };
+            return new OperationResult<bool?>(true, MessageCodeType.OK, false);
         }
 
         public async Task<bool> IsAssistantRegisteredByUuidAsync(Guid uuid)
@@ -103,30 +71,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return assistantId != null;
         }
 
-        public async Task<OperationResult<Guid>> RegisterAssistantAsync(Assistant assistant)
+        public async Task<OperationResult<Guid?>> RegisterAssistantAsync(Assistant assistant)
         {
             assistant.Uuid = Guid.CreateVersion7();
             bool isRegistered = await assistantRepository.AddAssistantAsync(assistant);
             if (isRegistered)
             {
-                return new OperationResult<Guid>
-                {
-                    IsSuccessful = true,
-                    Data = assistant.Uuid.Value,
-                    Code = MessageCodeType.SUCCESS_OPERATION
-
-                };
+                return new OperationResult<Guid?>(true, MessageCodeType.SUCCESS_OPERATION, assistant.Uuid.Value);
             }
-            return new OperationResult<Guid>
-            {
-                IsSuccessful = false,
-                Code = MessageCodeType.REGISTER_ERROR
-            };
+            return new OperationResult<Guid?>(false, MessageCodeType.REGISTER_ERROR);
         }
 
-        public bool UpdateAssistant(int idAssistant, Assistant assistant)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

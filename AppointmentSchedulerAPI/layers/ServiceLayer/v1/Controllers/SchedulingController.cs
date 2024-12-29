@@ -32,11 +32,11 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 Appointment appointment = new Appointment
                 {
-                    EndTime = TimeOnly.Parse("12:00:00"),
+                    // EndTime = TimeOnly.Parse("12:00:00"),
                     StartTime = dto.StartTime,
                     Date = dto.Date,
                     Status = BusinessLogicLayer.Model.Types.AppointmentStatusType.SCHEDULED,
-                    TotalCost = 500,
+                    // TotalCost = 500,
                     Client = new Client { Uuid = dto.ClientUuid },
                     AssistantService = [],
                     Uuid = Guid.CreateVersion7()
@@ -54,7 +54,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 CrossCuttingLayer.Communication.Model.OperationResult<Guid> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
                 if (result.IsSuccessful)
                 {
-                    guid = result.Data;
+                    guid = result.Result;
                 }
                 else
                 {

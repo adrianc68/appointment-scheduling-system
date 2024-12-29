@@ -14,64 +14,43 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             this.serviceRepository = serviceRepository;
         }
 
-        public bool ChangeServiceStatusType(ServiceStatusType status)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool DeleteService(int idService)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool EditService(Service service)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<Service>> GetAllServicesAsync()
         {
             return (List<Service>)await serviceRepository.GetAllServicesAsync();
         }
-
-        public List<Service> GetServicesDetailsByIds(List<int> serviceIds)
+        public async Task<OperationResult<Service?>> GetServiceByUuidAsync(Guid uuid)
         {
-            throw new NotImplementedException();
+            Service? service = await serviceRepository.GetServiceByUuidAsync(uuid);
+            if (service == null)
+            {
+                return new OperationResult<Service?>(false, MessageCodeType.DATA_NOT_FOUND);
+            }
+            return new OperationResult<Service?>(true, MessageCodeType.DATA_FOUND, service);
         }
 
-        public ServiceStatusType GetServiceStatusType(int idService)
+        public async Task<OperationResult<int?>> GetServiceIdByUuidAsync(Guid uuid)
         {
-            throw new NotImplementedException();
+            int? serviceId = await serviceRepository.GetServiceIdByUuidAsync(uuid);
+            if (serviceId == null)
+            {
+                return new OperationResult<int?>(false, MessageCodeType.DATA_NOT_FOUND);
+            }
+            return new OperationResult<int?>(true, MessageCodeType.DATA_FOUND, serviceId);
         }
 
-        public async Task<OperationResult<bool>> IsServiceDataRegisteredAsync(Service service)
+        public async Task<OperationResult<bool?>> IsServiceDataRegisteredAsync(Service service)
         {
             if (string.IsNullOrWhiteSpace(service.Name))
             {
-                return new OperationResult<bool>
-                {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.NULL_VALUE_IS_PRESENT,
-                    Data = true
-                };
+                return new OperationResult<bool?>(false, MessageCodeType.NULL_VALUE_IS_PRESENT, true);
             }
 
             bool isServiceNameRegistered = await serviceRepository.IsServiceNameRegistered(service.Name);
             if (isServiceNameRegistered)
             {
-                return new OperationResult<bool>
-                {
-                    IsSuccessful = true,
-                    Code = MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED,
-                    Data = true
-                };
+                return new OperationResult<bool?>(true, MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED, true);
             }
-            return new OperationResult<bool>
-            {
-                IsSuccessful = true,
-                Data = false,
-            };
-
+            return new OperationResult<bool?>(true, MessageCodeType.SUCCESS_OPERATION, false);
         }
 
         public async Task<bool> IsServiceRegisteredByUuidAsync(Guid uuid)
@@ -80,25 +59,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return serviceId != null;
         }
 
-        public async Task<OperationResult<Guid>> RegisterService(Service service)
+        public async Task<OperationResult<Guid?>> RegisterService(Service service)
         {
-
             service.Uuid = Guid.CreateVersion7();
             bool isRegistered = await serviceRepository.AddServiceAsync(service);
             if (isRegistered)
             {
-                return new OperationResult<Guid>
-                {
-                    IsSuccessful = true,
-                    Data = service.Uuid.Value,
-                    Code = MessageCodeType.SUCCESS_OPERATION
-                };
+                return new OperationResult<Guid?>(false, MessageCodeType.SUCCESS_OPERATION, service.Uuid.Value);
             }
-            return new OperationResult<Guid>
-            {
-                IsSuccessful = true,
-                Code = MessageCodeType.REGISTER_ERROR
-            };
+            return new OperationResult<Guid?>(true, MessageCodeType.REGISTER_ERROR);
         }
     }
 }

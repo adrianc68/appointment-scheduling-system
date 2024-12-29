@@ -19,58 +19,36 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<Client>)await clientRepository.GetAllClientsAsync();
         }
 
-        public async Task<OperationResult<bool>> IsAccountDataRegisteredAsync(Client client)
+        public async Task<OperationResult<bool?>> IsAccountDataRegisteredAsync(Client client)
         {
             // 1. Check if username is is registered
             if (string.IsNullOrWhiteSpace(client.Username) ||
                  string.IsNullOrWhiteSpace(client.Email) ||
                  string.IsNullOrWhiteSpace(client.PhoneNumber))
             {
-                return new OperationResult<bool>
-                {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.NULL_VALUE_IS_PRESENT
-                };
+                return new OperationResult<bool?>(false, MessageCodeType.NULL_VALUE_IS_PRESENT);
             }
 
             bool isUsernameRegistered = await clientRepository.IsUsernameRegisteredAsync(client.Username);
             if (isUsernameRegistered)
             {
-                return new OperationResult<bool>
-                {
-                    IsSuccessful = true,
-                    Code = MessageCodeType.USERNAME_ALREADY_REGISTERED,
-                    Data = true
-                };
+                return new OperationResult<bool?>(true, MessageCodeType.USERNAME_ALREADY_REGISTERED, isUsernameRegistered);
             }
 
             // 2. Check if email is registered
             bool isEmailRegistered = await clientRepository.IsEmailRegisteredAsync(client.Email);
             if (isEmailRegistered)
             {
-                return new OperationResult<bool>
-                {
-                    IsSuccessful = true,
-                    Code = MessageCodeType.EMAIL_ALREADY_REGISTERED,
-                    Data = true
-                };
+                return new OperationResult<bool?>(true, MessageCodeType.EMAIL_ALREADY_REGISTERED, isEmailRegistered);
             }
 
             // 3. Check if phoneNumber is registered
             bool isPhoneNumberRegistered = await clientRepository.IsPhoneNumberRegisteredAsync(client.PhoneNumber);
             if (isPhoneNumberRegistered)
             {
-                return new OperationResult<bool>
-                {
-                    IsSuccessful = true,
-                    Code = MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED
-                };
+                return new OperationResult<bool?>(true, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
             }
-            return new OperationResult<bool>
-            {
-                IsSuccessful = true,
-                Data = false,
-            };
+            return new OperationResult<bool?>(true, MessageCodeType.OK, false);
         }
 
         public async Task<bool> IsClientRegisteredByUuidAsync(Guid uuid)
@@ -79,27 +57,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return clientId != null;
         }
 
-        public async Task<OperationResult<Guid>> RegisterClientAsync(Client client)
+        public async Task<OperationResult<Guid?>> RegisterClientAsync(Client client)
         {
             client.Uuid = Guid.CreateVersion7();
 
             bool isRegistered = await clientRepository.AddClientAsync(client);
             if (isRegistered)
             {
-                return new OperationResult<Guid>
-                {
-                    IsSuccessful = true,
-                    Data = client.Uuid.Value,
-                    Code = MessageCodeType.SUCCESS_OPERATION
-
-                };
+                return new OperationResult<Guid?>(true, MessageCodeType.SUCCESS_OPERATION, client.Uuid.Value);
             }
-            return new OperationResult<Guid>
-            {
-                IsSuccessful = true,
-                Code = MessageCodeType.REGISTER_ERROR
-            };
-
+            return new OperationResult<Guid?>(true, MessageCodeType.REGISTER_ERROR);
         }
     }
 }

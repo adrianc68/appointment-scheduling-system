@@ -10,9 +10,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         // Client GetClientDetails(int idClient);
         // ClientStatusType GetClientStatusType(int idClient);
         // bool IsClientAvailable(int idClient);
-        Task<OperationResult<bool>> IsAccountDataRegisteredAsync(Client client);
+        Task<OperationResult<bool?>> IsAccountDataRegisteredAsync(Client client);
         Task<bool> IsClientRegisteredByUuidAsync(Guid uuid);
-        Task<OperationResult<Guid>> RegisterClientAsync(Client client);
+        Task<OperationResult<Guid?>> RegisterClientAsync(Client client);
         Task<List<Client>> GetAllClientsAsync();
     }
 }

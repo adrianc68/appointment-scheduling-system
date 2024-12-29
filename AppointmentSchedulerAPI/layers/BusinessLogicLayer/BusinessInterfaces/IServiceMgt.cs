@@ -10,10 +10,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         // bool DeleteService(int idService);
         // bool EditService(Service service);
         
-        Task<OperationResult<bool>> IsServiceDataRegisteredAsync(Service service);
+        Task<OperationResult<bool?>> IsServiceDataRegisteredAsync(Service service);
         Task<bool> IsServiceRegisteredByUuidAsync(Guid uuid);
         Task<List<Service>> GetAllServicesAsync();
-        Task<OperationResult<Guid>> RegisterService(Service service);
+        Task<OperationResult<Service?>> GetServiceByUuidAsync(Guid uuid);
+        Task<OperationResult<int?>> GetServiceIdByUuidAsync(Guid uuid);
+        Task<OperationResult<Guid?>> RegisterService(Service service);
         // List<Service> GetServicesDetailsByIds(List<int> serviceIds);
         // ServiceStatusType GetServiceStatusType(int idService);
         // bool IsServiceInSpecificStatusType(int idService, ServiceStatusType expected);

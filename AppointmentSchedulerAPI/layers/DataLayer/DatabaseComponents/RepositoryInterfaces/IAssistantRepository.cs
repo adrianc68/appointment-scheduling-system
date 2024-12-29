@@ -1,5 +1,6 @@
 
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 
 namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces
 {
@@ -11,11 +12,12 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<IEnumerable<Assistant>> GetAllAssistantsAsync();
         Task<Assistant?> GetAssistantByUuidAsync(Guid uuid);
         Task<int?> GetAssistantIdByUuidAsync(Guid uuid);
-        Task<List<Service>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid);
-
         Task<bool> IsUsernameRegisteredAsync(string username);
         Task<bool> IsEmailRegisteredAsync(string email);
         Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber);
+
+        Task<List<Service>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid);
+         Task<int?> GetServiceIdByAssistantServiceUuid(Guid uuid);
 
         // Task<bool> UpdateAssistantAsync(Assistant assistant);
         // Task<bool> DeleteAssistantAsync(Guid uuid);
