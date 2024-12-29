@@ -57,16 +57,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return clientId != null;
         }
 
-        public async Task<OperationResult<Guid?>> RegisterClientAsync(Client client)
+        public async Task<Guid?> RegisterClientAsync(Client client)
         {
             client.Uuid = Guid.CreateVersion7();
 
             bool isRegistered = await clientRepository.AddClientAsync(client);
             if (isRegistered)
             {
-                return new OperationResult<Guid?>(true, MessageCodeType.SUCCESS_OPERATION, client.Uuid.Value);
+                return client.Uuid.Value;
             }
-            return new OperationResult<Guid?>(true, MessageCodeType.REGISTER_ERROR);
+            return null;
         }
     }
 }

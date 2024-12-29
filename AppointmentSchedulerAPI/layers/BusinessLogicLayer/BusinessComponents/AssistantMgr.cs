@@ -32,6 +32,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<Assistant>)await assistantRepository.GetAllAssistantsAsync();
         }
 
+        public async Task<int?> GetServiceIdByAssistantServiceUuidAsync(Guid uuid)
+        {
+            int? assistantId = await assistantRepository.GetServiceIdByAssistantServiceUuid(uuid);
+            return assistantId;
+        }
 
         public async Task<OperationResult<bool?>> IsAccountDataRegisteredAsync(Assistant assistant)
         {
@@ -71,15 +76,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return assistantId != null;
         }
 
-        public async Task<OperationResult<Guid?>> RegisterAssistantAsync(Assistant assistant)
+        public async Task<Guid?> RegisterAssistantAsync(Assistant assistant)
         {
             assistant.Uuid = Guid.CreateVersion7();
             bool isRegistered = await assistantRepository.AddAssistantAsync(assistant);
             if (isRegistered)
             {
-                return new OperationResult<Guid?>(true, MessageCodeType.SUCCESS_OPERATION, assistant.Uuid.Value);
+                return assistant.Uuid.Value;
             }
-            return new OperationResult<Guid?>(false, MessageCodeType.REGISTER_ERROR);
+            return null;
         }
 
     }

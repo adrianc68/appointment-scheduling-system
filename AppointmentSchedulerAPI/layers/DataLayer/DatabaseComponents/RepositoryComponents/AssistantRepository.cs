@@ -9,8 +9,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 {
     public class AssistantRepository : IAssistantRepository
     {
-        private readonly Model.AppointmentDbContext context;
-        public AssistantRepository(AppointmentDbContext context)
+        private readonly IDbContextFactory<Model.AppointmentDbContext> context;
+        public AssistantRepository(IDbContextFactory<AppointmentDbContext> context)
         {
             this.context = context;
         }
@@ -18,10 +18,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<bool> AddServicesToAssistantAsync(Guid assistantUuid, List<Guid?> servicesUuid)
         {
             bool isRegistered = false;
-            using var transaction = await context.Database.BeginTransactionAsync();
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
             {
-                var assistantId = await context.Assistants
+                var assistantId = await dbContext.Assistants
                     .Where(a => a.UserAccount.Uuid == assistantUuid)
                     .Select(a => a.IdUserAccount)
                     .FirstOrDefaultAsync();
@@ -31,7 +32,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     return false;
                 }
 
-                var serviceIds = await context.Services
+                var serviceIds = await dbContext.Services
                     .Where(s => servicesUuid.Contains(s.Uuid))
                     .Select(s => s.Id)
                     .ToListAsync();
@@ -48,8 +49,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Uuid = Guid.CreateVersion7()
                 }).ToList();
 
-                context.AssistantServices.AddRange(assistantServices);
-                await context.SaveChangesAsync();
+                dbContext.AssistantServices.AddRange(assistantServices);
+                await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
                 isRegistered = true;
             }
@@ -64,7 +65,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<BusinessLogicLayer.Model.Assistant?> GetAssistantByUuidAsync(Guid uuid)
         {
             BusinessLogicLayer.Model.Assistant? assistant = null;
-            var assistantDB = await context.Assistants
+            using var dbContext = context.CreateDbContext();
+            var assistantDB = await dbContext.Assistants
                  .Include(a => a.UserAccount)
                      .ThenInclude(ua => ua.UserInformation)
                  .FirstOrDefaultAsync(a => a.UserAccount.Uuid == uuid);
@@ -89,7 +91,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<IEnumerable<BusinessLogicLayer.Model.Assistant>> GetAllAssistantsAsync()
         {
             IEnumerable<BusinessLogicLayer.Model.Assistant> businessAssistants = [];
-            var assistantsDB = await context.Assistants
+            using var dbContext = context.CreateDbContext();
+            var assistantsDB = await dbContext.Assistants
               .Include(a => a.UserAccount)
                   .ThenInclude(ua => ua.UserInformation)
                   .Where(c => c.UserAccount.Role == RoleType.ASSISTANT)
@@ -115,7 +118,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<bool> AddAssistantAsync(BusinessLogicLayer.Model.Assistant assistant)
         {
             bool isRegistered = false;
-            using var transaction = await context.Database.BeginTransactionAsync();
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
             {
                 var userAccount = new UserAccount
@@ -126,8 +130,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Role = RoleType.ASSISTANT,
                     Uuid = assistant.Uuid
                 };
-                context.UserAccounts.Add(userAccount);
-                await context.SaveChangesAsync();
+                dbContext.UserAccounts.Add(userAccount);
+                await dbContext.SaveChangesAsync();
 
                 var userInformation = new UserInformation
                 {
@@ -137,8 +141,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     IdUser = userAccount.Id
                 };
 
-                context.UserInformations.Add(userInformation);
-                await context.SaveChangesAsync();
+                dbContext.UserInformations.Add(userInformation);
+                await dbContext.SaveChangesAsync();
 
                 var newAssistant = new Assistant
                 {
@@ -146,8 +150,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Status = AssistantStatusType.ENABLED
                 };
 
-                context.Assistants.Add(newAssistant);
-                await context.SaveChangesAsync();
+                dbContext.Assistants.Add(newAssistant);
+                await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
                 isRegistered = true;
             }
@@ -162,7 +166,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<List<BusinessLogicLayer.Model.Service>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid)
         {
             IEnumerable<BusinessLogicLayer.Model.Service> businessService = [];
-            var assistantDB = await context.Assistants
+            using var dbContext = context.CreateDbContext();
+            var assistantDB = await dbContext.Assistants
                 .Include(a => a.AssistantServices)
                     .ThenInclude(ase => ase.Service)
                 .FirstOrDefaultAsync(a => a.UserAccount.Uuid == uuid);
@@ -192,7 +197,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<int?> GetAssistantIdByUuidAsync(Guid uuid)
         {
-            var assistantId = await context.Assistants
+            using var dbContext = context.CreateDbContext();
+            var assistantId = await dbContext.Assistants
                 .Where(a => a.UserAccount.Uuid == uuid)
                 .Select(a => a.IdUserAccount)
                 .FirstOrDefaultAsync();
@@ -201,7 +207,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<bool> IsUsernameRegisteredAsync(string username)
         {
-            var usernameDB = await context.UserAccounts
+            using var dbContext = context.CreateDbContext();
+            var usernameDB = await dbContext.UserAccounts
                 .Where(a => a.Username.ToLower() == username)
                 .Select(a => a.Username)
                 .FirstOrDefaultAsync();
@@ -211,7 +218,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<bool> IsEmailRegisteredAsync(string email)
         {
-            var emailDB = await context.UserAccounts
+            using var dbContext = context.CreateDbContext();
+            var emailDB = await dbContext.UserAccounts
                 .Where(a => a.Email.ToLower() == email)
                 .Select(a => a.Email)
                 .FirstOrDefaultAsync();
@@ -221,7 +229,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber)
         {
-            var phoneNumberDB = await context.UserInformations
+            using var dbContext = context.CreateDbContext();
+            var phoneNumberDB = await dbContext.UserInformations
                 .Where(a => a.PhoneNumber == phoneNumber)
                 .Select(a => a.PhoneNumber)
                 .FirstOrDefaultAsync();
@@ -231,7 +240,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<int?> GetServiceIdByAssistantServiceUuid(Guid uuid)
         {
-            var serviceId = await context.AssistantServices
+            using var dbContext = context.CreateDbContext();
+            var serviceId = await dbContext.AssistantServices
                 .Where(a => a.Service.Uuid == uuid)
                 .Select(a => a.Service.Id)
                 .FirstOrDefaultAsync();

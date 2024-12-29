@@ -18,24 +18,23 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             return (List<Service>)await serviceRepository.GetAllServicesAsync();
         }
-        public async Task<OperationResult<Service?>> GetServiceByUuidAsync(Guid uuid)
+
+        public async Task<Service?> GetServiceByIdAsync(int id)
         {
-            Service? service = await serviceRepository.GetServiceByUuidAsync(uuid);
-            if (service == null)
-            {
-                return new OperationResult<Service?>(false, MessageCodeType.DATA_NOT_FOUND);
-            }
-            return new OperationResult<Service?>(true, MessageCodeType.DATA_FOUND, service);
+            Service? service = await serviceRepository.GetServiceByIdAsync(id);
+            return service;
         }
 
-        public async Task<OperationResult<int?>> GetServiceIdByUuidAsync(Guid uuid)
+        public async Task<Service?> GetServiceByUuidAsync(Guid uuid)
+        {
+            Service? service = await serviceRepository.GetServiceByUuidAsync(uuid);
+            return service;
+        }
+
+        public async Task<int?> GetServiceIdByUuidAsync(Guid uuid)
         {
             int? serviceId = await serviceRepository.GetServiceIdByUuidAsync(uuid);
-            if (serviceId == null)
-            {
-                return new OperationResult<int?>(false, MessageCodeType.DATA_NOT_FOUND);
-            }
-            return new OperationResult<int?>(true, MessageCodeType.DATA_FOUND, serviceId);
+            return serviceId;
         }
 
         public async Task<OperationResult<bool?>> IsServiceDataRegisteredAsync(Service service)
@@ -59,15 +58,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return serviceId != null;
         }
 
-        public async Task<OperationResult<Guid?>> RegisterService(Service service)
+        public async Task<Guid?> RegisterService(Service service)
         {
             service.Uuid = Guid.CreateVersion7();
             bool isRegistered = await serviceRepository.AddServiceAsync(service);
             if (isRegistered)
             {
-                return new OperationResult<Guid?>(false, MessageCodeType.SUCCESS_OPERATION, service.Uuid.Value);
+                return service.Uuid.Value;
             }
-            return new OperationResult<Guid?>(true, MessageCodeType.REGISTER_ERROR);
+            return null;
         }
     }
 }

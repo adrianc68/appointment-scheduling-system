@@ -25,7 +25,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddDbContext<AppointmentDbContext>((provider, options) =>
+builder.Services.AddDbContextFactory<AppointmentDbContext>((provider, options) =>
 {
     var envService = provider.GetRequiredService<EnvironmentVariableService>();
     var connectionString = envService.Get("DEFAULT_DB_CONNECTION");

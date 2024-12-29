@@ -1,4 +1,5 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
 
 
@@ -24,6 +25,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<IEnumerable<AvailabilityTimeSlot>> GetAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate);
         Task<int?> GetAvailabilityTimeSlotIdByUuidAsync(Guid uuid);
         Task<int?> GetAppointmentIdByUuidAsync(Guid uuid);
+        Task<bool> IsTimeSlotAvailable(DateTimeRange range);
         Task<bool> AddAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid);
         // bool ScheduleAppointment(DateTimeRange range, List<Service> services, Client client);
         Task<bool> AddAppointmentAsync(Appointment appointment);

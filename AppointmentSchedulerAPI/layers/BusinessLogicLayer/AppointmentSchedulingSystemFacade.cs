@@ -127,7 +127,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 return new OperationResult<Guid?>(false, isAccountRegistered.Code);
             }
-            return await assistantMgr.RegisterAssistantAsync(assistant);
+            Guid? uuidNewAssistant = await assistantMgr.RegisterAssistantAsync(assistant);
+            if (uuidNewAssistant == null)
+            {
+                return new OperationResult<Guid?>(false, MessageCodeType.REGISTER_ERROR);
+            }
+            return new OperationResult<Guid?>(true, MessageCodeType.OK, uuidNewAssistant);
         }
 
         public Task<List<Assistant>> GetAllAssistantsAsync()
@@ -147,7 +152,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 return new OperationResult<Guid?>(false, isAccountRegistered.Code);
             }
-            return await clientMgr.RegisterClientAsync(client);
+            Guid? uuidNewClient = await clientMgr.RegisterClientAsync(client);
+            if (uuidNewClient == null)
+            {
+                return new OperationResult<Guid?>(false, MessageCodeType.REGISTER_ERROR);
+            }
+            return new OperationResult<Guid?>(true, MessageCodeType.OK, uuidNewClient);
         }
 
         public async Task<OperationResult<Guid?>> RegisterService(Service service)
@@ -157,7 +167,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 return new OperationResult<Guid?>(false, isServiceRegistered.Code);
             }
-            return await serviceMgr.RegisterService(service);
+            Guid? UuidNewservice = await serviceMgr.RegisterService(service);
+            if (UuidNewservice == null)
+            {
+                return new OperationResult<Guid?>(false, MessageCodeType.REGISTER_ERROR);
+            }
+            return new OperationResult<Guid?>(true, MessageCodeType.OK, UuidNewservice);
         }
 
         public Task<List<Service>> GetAllServicesAsync()
@@ -195,9 +210,50 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return schedulerMgr.GetAllAvailabilityTimeSlots(startDate, endDate);
         }
 
-        public Task<OperationResult<Guid>> ScheduleAppointmentAsClientAsync(Appointment appointment)
+        public async Task<OperationResult<Guid>> ScheduleAppointmentAsClientAsync(Appointment appointment)
         {
-            return schedulerMgr.ScheduleAppointment(appointment);
+            // 1. Get Services data
+            var serviceTasks = appointment.AssistantService.Select(async service =>
+            {
+                if (service.Uuid == null)
+                {
+                    throw new InvalidOperationException("Service UUID cannot be null.");
+                }
+
+                int? result = await assistantMgr.GetServiceIdByAssistantServiceUuidAsync(service.Uuid.Value);
+                if (result == null)
+                {
+                    throw new KeyNotFoundException("Service not found.");
+                }
+
+                return await serviceMgr.GetServiceByIdAsync(result.Value); // Retornar datos del servicio
+            });
+
+            // Ejecutar todas las tareas en paralelo
+            var serviceResults = await Task.WhenAll(serviceTasks);
+
+            // 2. Calculate cost and endtime
+            double totalCost = serviceResults.Sum(service => service.Price.Value);
+            int totalMinutes = serviceResults.Sum(service => service.Minutes.Value);
+
+            appointment.TotalCost = totalCost;
+            appointment.EndTime = appointment.StartTime.Value.AddMinutes(totalMinutes);
+
+
+            // 3. Check if availability time slot available
+            DateTimeRange range = new()
+            {
+                Date = appointment.Date.Value,
+                StartTime = appointment.StartTime.Value,
+                EndTime = appointment.EndTime.Value
+
+            };
+            bool isTimeSlotAvailable = await schedulerMgr.IsTimeSlotAvailable(range);
+            if (!isTimeSlotAvailable)
+            {
+                return new OperationResult<Guid>(false, MessageCodeType.TIME_SLOT_NOT_AVAILABLE);
+            }
+            return await schedulerMgr.ScheduleAppointment(appointment);
         }
     }
 

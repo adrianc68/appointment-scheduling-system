@@ -1,5 +1,6 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
@@ -24,6 +25,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             return (List<AssistantService>)await schedulerRepository.GetAvailableServicesAsync(date);
 
+        }
+
+        public async Task<bool> IsTimeSlotAvailable(DateTimeRange range)
+        {
+            bool isTimeSlotAvailable = await schedulerRepository.IsTimeSlotAvailable(range);
+            return isTimeSlotAvailable;
         }
 
         public async Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid)

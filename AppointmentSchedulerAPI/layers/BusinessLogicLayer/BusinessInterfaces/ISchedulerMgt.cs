@@ -1,4 +1,5 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 
 
@@ -25,5 +26,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date);
         Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid);
         Task<OperationResult<Guid>>  ScheduleAppointment(Appointment appointment);
+        Task<bool> IsTimeSlotAvailable(DateTimeRange range);
     }
 }
