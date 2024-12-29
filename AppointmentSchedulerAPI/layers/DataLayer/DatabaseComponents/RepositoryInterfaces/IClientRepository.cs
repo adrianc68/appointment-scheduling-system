@@ -13,8 +13,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<int?> GetClientIdByUuidAsync(Guid uuid);
         Task<IEnumerable<Client>> GetAllClientsAsync();
         Task<bool> AddClientAsync(Client client);
-        Task<bool> isUsernameRegisteredAsync(string username);
-        Task<bool> isEmailRegisteredAsync(string email);
+        Task<bool> IsUsernameRegisteredAsync(string username);
+        Task<bool> IsEmailRegisteredAsync(string email);
         Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber);
     }
 }

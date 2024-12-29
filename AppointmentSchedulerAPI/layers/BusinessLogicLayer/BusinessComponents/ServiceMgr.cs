@@ -92,7 +92,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     IsSuccessful = true,
                     Data = service.Uuid.Value,
                     Code = MessageCodeType.SUCCESS_OPERATION
-
                 };
             }
             return new OperationResult<Guid>

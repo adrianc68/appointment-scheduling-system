@@ -198,7 +198,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return assistantId;
         }
 
-        public async Task<bool> isUsernameRegisteredAsync(string username)
+        public async Task<bool> IsUsernameRegisteredAsync(string username)
         {
             var usernameDB = await context.UserAccounts
                 .Where(a => a.Username.ToLower() == username)
@@ -208,7 +208,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return usernameDB != null;
         }
 
-        public async Task<bool> isEmailRegisteredAsync(string email)
+        public async Task<bool> IsEmailRegisteredAsync(string email)
         {
             var emailDB = await context.UserAccounts
                 .Where(a => a.Email.ToLower() == email)

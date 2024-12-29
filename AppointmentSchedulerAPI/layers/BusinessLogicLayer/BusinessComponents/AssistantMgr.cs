@@ -56,7 +56,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             }
 
             // 1. Check if username is is registered
-            bool isUsernameRegistered = await assistantRepository.isUsernameRegisteredAsync(assistant.Username);
+            bool isUsernameRegistered = await assistantRepository.IsUsernameRegisteredAsync(assistant.Username);
             if (isUsernameRegistered)
             {
                 return new OperationResult<bool>
@@ -68,7 +68,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             }
 
             // 2. Check if email is registered
-            bool isEmailRegistered = await assistantRepository.isEmailRegisteredAsync(assistant.Email);
+            bool isEmailRegistered = await assistantRepository.IsEmailRegisteredAsync(assistant.Email);
             if (isEmailRegistered)
             {
                 return new OperationResult<bool>
