@@ -15,6 +15,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         Task<Guid?> RegisterAssistantAsync(Assistant assistant);
         Task<List<Assistant>> GetAllAssistantsAsync();
         Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid);
-        Task<int?> GetServiceIdByAssistantServiceUuidAsync(Guid uuid);
+        Task<int?> GetServiceIdByServiceOfferUuidAsync(Guid uuid);
+        Task<ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid);
     }
 }

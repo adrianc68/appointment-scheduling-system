@@ -6,6 +6,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
@@ -210,35 +211,42 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return schedulerMgr.GetAllAvailabilityTimeSlots(startDate, endDate);
         }
 
-        public async Task<OperationResult<Guid>> ScheduleAppointmentAsClientAsync(Appointment appointment)
+        public async Task<OperationResult<Guid?>> ScheduleAppointmentAsClientAsync(Appointment appointment)
         {
-            // 1. Get Services data
-            var serviceTasks = appointment.AssistantService.Select(async service =>
+            if (appointment.Client.Uuid == null)
             {
-                if (service.Uuid == null)
+                return new OperationResult<Guid?>(false, MessageCodeType.CLIENT_NOT_FOUND);
+
+            }
+            // 0. Get Client data
+            var clientData = await clientMgr.GetClientByUuidAsync(appointment.Client.Uuid.Value);
+            if (clientData == null)
+            {
+                return new OperationResult<Guid?>(false, MessageCodeType.CLIENT_NOT_FOUND);
+            }
+            appointment.Client = clientData;
+
+            // 1. Get Services data
+            var serviceTasks = appointment.ServiceOffers.Select(async serviceOffer =>
+            {
+                if (serviceOffer.Uuid == null)
                 {
                     throw new InvalidOperationException("Service UUID cannot be null.");
                 }
 
-                int? result = await assistantMgr.GetServiceIdByAssistantServiceUuidAsync(service.Uuid.Value);
-                if (result == null)
+                ServiceOffer? serviceOfferData = await assistantMgr.GetServiceOfferByUuidAsync(serviceOffer.Uuid.Value);
+                if (serviceOfferData == null)
                 {
-                    throw new KeyNotFoundException("Service not found.");
+                    throw new KeyNotFoundException("Service not found");
                 }
-
-                return await serviceMgr.GetServiceByIdAsync(result.Value); // Retornar datos del servicio
+                return serviceOfferData;
             });
-
-            // Ejecutar todas las tareas en paralelo
             var serviceResults = await Task.WhenAll(serviceTasks);
-
             // 2. Calculate cost and endtime
-            double totalCost = serviceResults.Sum(service => service.Price.Value);
-            int totalMinutes = serviceResults.Sum(service => service.Minutes.Value);
-
-            appointment.TotalCost = totalCost;
-            appointment.EndTime = appointment.StartTime.Value.AddMinutes(totalMinutes);
-
+            appointment.TotalCost = serviceResults.Sum(service => service.Service.Price.Value);
+            appointment.EndTime = appointment.StartTime.Value.AddMinutes(serviceResults.Sum(service => service.Service.Minutes.Value));
+            appointment.Status = AppointmentStatusType.SCHEDULED;
+            appointment.ServiceOffers = serviceResults.ToList();
 
             // 3. Check if availability time slot available
             DateTimeRange range = new()
@@ -251,9 +259,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             bool isTimeSlotAvailable = await schedulerMgr.IsTimeSlotAvailable(range);
             if (!isTimeSlotAvailable)
             {
-                return new OperationResult<Guid>(false, MessageCodeType.TIME_SLOT_NOT_AVAILABLE);
+                return new OperationResult<Guid?>(false, MessageCodeType.TIME_SLOT_NOT_AVAILABLE);
             }
-            return await schedulerMgr.ScheduleAppointment(appointment);
+            Guid? UuidRegistered = await schedulerMgr.ScheduleAppointment(appointment);
+            if (UuidRegistered == null)
+            {
+                return new OperationResult<Guid?>(false, MessageCodeType.REGISTER_ERROR);
+            }
+            return new OperationResult<Guid?>(true, MessageCodeType.OK, UuidRegistered);
         }
     }
 

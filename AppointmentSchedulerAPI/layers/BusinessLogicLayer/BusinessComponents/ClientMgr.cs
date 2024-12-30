@@ -19,6 +19,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<Client>)await clientRepository.GetAllClientsAsync();
         }
 
+        public async Task<Client?> GetClientByUuidAsync(Guid uuid)
+        {
+            Client? client = await clientRepository.GetClientByUuidAsync(uuid);
+            return client;
+        }
+
         public async Task<OperationResult<bool?>> IsAccountDataRegisteredAsync(Client client)
         {
             // 1. Check if username is is registered

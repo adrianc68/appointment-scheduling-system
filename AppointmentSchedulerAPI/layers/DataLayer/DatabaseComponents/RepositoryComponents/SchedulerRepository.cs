@@ -22,15 +22,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
             {
-
-                var client = await dbContext.Clients
-                .FirstOrDefaultAsync(c => c.UserAccount.Uuid == appointment.Client.Uuid);
-
-                if (client == null)
-                {
-                    throw new Exception("Client not found");
-                }
-
                 var appointmentDB = new Appointment
                 {
                     Date = appointment.Date,
@@ -39,27 +30,18 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     TotalCost = appointment.TotalCost,
                     Uuid = appointment.Uuid,
                     Status = (Model.Types.AppointmentStatusType?)appointment.Status,
-                    IdClient = client.IdUserAccount
+                    IdClient = appointment.Client.Id
                 };
                 dbContext.Appointments.Add(appointmentDB);
                 await dbContext.SaveChangesAsync();
 
-                foreach (var service in appointment.AssistantService)
+                foreach (var serviceOffer in appointment.ServiceOffers)
                 {
-                    var serviceEntity = await dbContext.AssistantServices
-                        .FirstOrDefaultAsync(s => s.Uuid == service.Uuid);
-
-                    if (serviceEntity == null)
-                    {
-                        throw new Exception($"Service with UUID {service.Uuid} not found");
-                    }
-
-                    var appointmentAssistantService = new AppointmentAssistantService
+                    var appointmentAssistantService = new AppointmentServiceOffer
                     {
                         IdAppointment = appointmentDB.Id,
-                        IdAssistantService = serviceEntity.Id
+                        IdServiceOffer = serviceOffer.Id
                     };
-
                     dbContext.AppointmentAssistantServices.Add(appointmentAssistantService);
                 }
 
@@ -137,19 +119,19 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var dbContext = context.CreateDbContext();
             var appointmentDB = await dbContext.Appointments
                 .Where(app => app.Date >= startDate && app.Date <= endDate)
-                .Include(appAssSer => appAssSer.AppointmentAssistantServices)
-                    .ThenInclude(assisServ => assisServ.AssistantService)
+                .Include(appAssSer => appAssSer.AppointmentServiceOffers)
+                    .ThenInclude(assisServ => assisServ.ServiceOffer)
                         .ThenInclude(assis => assis.Assistant)
                             .ThenInclude(asacc => asacc.UserAccount)
                 .Include(client => client.Client)
                     .ThenInclude(clientAcc => clientAcc.UserAccount)
                     .ThenInclude(clientaccinf => clientaccinf.UserInformation)
-                .Include(appAssSer => appAssSer.AppointmentAssistantServices)
-                    .ThenInclude(serv => serv.AssistantService)
+                .Include(appAssSer => appAssSer.AppointmentServiceOffers)
+                    .ThenInclude(serv => serv.ServiceOffer)
                     .ThenInclude(assService => assService.Service)
                 .ToListAsync();
 
-            PropToString.PrintData(appointmentDB[0].AppointmentAssistantServices.First().AssistantService);
+            PropToString.PrintData(appointmentDB[0].AppointmentServiceOffers.First().ServiceOffer);
 
 
             var appointmentsModel = appointmentDB.Select(app => new BusinessLogicLayer.Model.Appointment
@@ -168,19 +150,19 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Uuid = app.Client.UserAccount.Uuid,
                     Id = app.Client.IdUserAccount,
                 },
-                AssistantService = app.AppointmentAssistantServices.Select(aas => new BusinessLogicLayer.Model.Service
-                {
-                    Id = aas.AssistantService.Service.Id,
-                    Description = aas.AssistantService.Service.Description,
-                    Minutes = aas.AssistantService.Service.Minutes,
-                    // Warning! we are returning the assistantservice uuid instead of the service uuid
-                    // This is intended to simplify communication and validation of selected services between the client and backend.
-                    Uuid = aas.AssistantService.Uuid,
-                    CreatedAt = aas.AssistantService.Service.CreatedAt,
-                    Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)aas.AssistantService.Service.Status,
-                    Name = aas.AssistantService.Service.Name,
-                    Price = aas.AssistantService.Service.Price,
-                }).ToList()
+                // ServiceOffers = app.AppointmentServiceOffers.Select(aas => new BusinessLogicLayer.Model.Service
+                // {
+                //     Id = aas.ServiceOffer.Service.Id,
+                //     Description = aas.ServiceOffer.Service.Description,
+                //     Minutes = aas.ServiceOffer.Service.Minutes,
+                //     // Warning! we are returning the assistantservice uuid instead of the service uuid
+                //     // This is intended to simplify communication and validation of selected services between the client and backend.
+                //     Uuid = aas.ServiceOffer.Uuid,
+                //     CreatedAt = aas.ServiceOffer.Service.CreatedAt,
+                //     Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)aas.ServiceOffer.Service.Status,
+                //     Name = aas.ServiceOffer.Service.Name,
+                //     Price = aas.ServiceOffer.Service.Price,
+                // }).ToList()
             }).ToList();
             return appointmentsModel;
         }
@@ -225,7 +207,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     .ThenInclude(assistant => assistant.UserAccount)
                     .ThenInclude(userAccount => userAccount.UserInformation)
                 .Include(slot => slot.Assistant)
-                    .ThenInclude(assistant => assistant.AssistantServices)
+                    .ThenInclude(assistant => assistant.ServiceOffers)
                         .ThenInclude(asService => asService.Service)
                 .ToListAsync();
 
@@ -240,7 +222,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Name = group.FirstOrDefault()?.Assistant?.UserAccount?.UserInformation?.Name
                         },
                         Services = group
-                            .SelectMany(slot => slot.Assistant?.AssistantServices?.Select(asService => new BusinessLogicLayer.Model.Service
+                            .SelectMany(slot => slot.Assistant?.ServiceOffers?.Select(asService => new BusinessLogicLayer.Model.Service
                             {
                                 Id = asService.IdService,
                                 Name = asService.Service?.Name,
@@ -264,7 +246,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             bool isAvailable = await dbContext.Appointments
-                .Where(a => a.Date == range.Date && a.StartTime < range.EndTime && a.EndTime > range.StartTime) 
+                .Where(a => a.Date == range.Date && a.StartTime < range.EndTime && a.EndTime > range.StartTime)
                 .AnyAsync();
 
             return !isAvailable;

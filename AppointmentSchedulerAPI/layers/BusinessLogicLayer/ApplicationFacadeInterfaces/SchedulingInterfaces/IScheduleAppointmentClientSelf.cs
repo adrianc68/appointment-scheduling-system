@@ -11,6 +11,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
         Appointment GetAppointmentDetails(int idAppointment);
         List<Appointment> GetAppoinments(DateTime startDate, DateTime endDate);
         Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date);
-        Task<OperationResult<Guid>> ScheduleAppointmentAsClientAsync(Appointment appointment);
+        Task<OperationResult<Guid?>> ScheduleAppointmentAsClientAsync(Appointment appointment);
     }
 }

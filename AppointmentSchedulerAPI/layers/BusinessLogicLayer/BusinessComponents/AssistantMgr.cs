@@ -32,10 +32,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<Assistant>)await assistantRepository.GetAllAssistantsAsync();
         }
 
-        public async Task<int?> GetServiceIdByAssistantServiceUuidAsync(Guid uuid)
+        public async Task<int?> GetServiceIdByServiceOfferUuidAsync(Guid uuid)
         {
             int? assistantId = await assistantRepository.GetServiceIdByAssistantServiceUuid(uuid);
             return assistantId;
+        }
+
+        public async Task<ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid)
+        {
+            ServiceOffer? serviceOffer = await assistantRepository.GetServiceOfferByUuid(uuid);
+            return serviceOffer;
         }
 
         public async Task<OperationResult<bool?>> IsAccountDataRegisteredAsync(Assistant assistant)

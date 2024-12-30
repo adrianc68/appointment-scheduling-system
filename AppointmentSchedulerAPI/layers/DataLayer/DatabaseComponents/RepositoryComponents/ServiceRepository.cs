@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -69,21 +70,22 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<BusinessLogicLayer.Model.Service?> GetServiceByIdAsync(int id)
         {
             using var dbContext = context.CreateDbContext();
-            var service = await dbContext.Services
-            .Where(serviceDB => serviceDB.Id == id)
-            .Select(serviceDB => new BusinessLogicLayer.Model.Service
+            var serviceDB = await dbContext.Services
+                .Where(a => a.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (serviceDB == null) return null;
+            return new BusinessLogicLayer.Model.Service
             {
                 Description = serviceDB.Description,
                 Name = serviceDB.Name,
                 Minutes = serviceDB.Minutes,
                 Price = serviceDB.Price,
                 Uuid = serviceDB.Uuid,
-                Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)serviceDB.Status,
+                Status = (BusinessLogicLayer.Model.Types.ServiceStatusType)serviceDB.Status,
                 CreatedAt = serviceDB.CreatedAt,
                 Id = serviceDB.Id
-            })
-            .FirstOrDefaultAsync();
-            return service;
+            };
         }
 
         public async Task<BusinessLogicLayer.Model.Service?> GetServiceByUuidAsync(Guid uuid)

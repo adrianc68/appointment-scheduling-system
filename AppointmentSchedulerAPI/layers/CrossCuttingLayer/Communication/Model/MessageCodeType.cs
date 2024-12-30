@@ -17,6 +17,7 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         REGISTER_ERROR,
         SERVICE_NAME_ALREADY_REGISTERED,
         SERVICE_NOT_FOUND,
-        TIME_SLOT_NOT_AVAILABLE
+        TIME_SLOT_NOT_AVAILABLE,
+        CLIENT_NOT_FOUND
     }
 }

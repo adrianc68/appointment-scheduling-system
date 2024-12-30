@@ -18,6 +18,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         Task<List<Service>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid);
          Task<int?> GetServiceIdByAssistantServiceUuid(Guid uuid);
+         Task<ServiceOffer?> GetServiceOfferByUuid(Guid uuid);
 
         // Task<bool> UpdateAssistantAsync(Assistant assistant);
         // Task<bool> DeleteAssistantAsync(Guid uuid);

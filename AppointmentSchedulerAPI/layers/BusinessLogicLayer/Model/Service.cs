@@ -12,8 +12,5 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
         public Guid? Uuid { get; set; }
         public ServiceStatusType? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
-
-        public List<AssistantService>? AssistantServices { get; set; }
-        public List<Appointment>? Appointments { get; set; }
     }
 }

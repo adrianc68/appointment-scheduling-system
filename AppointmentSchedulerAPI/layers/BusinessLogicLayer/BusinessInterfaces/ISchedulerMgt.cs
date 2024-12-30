@@ -25,7 +25,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
          Task<IEnumerable<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate);
         Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date);
         Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid);
-        Task<OperationResult<Guid>>  ScheduleAppointment(Appointment appointment);
+        Task<Guid?>  ScheduleAppointment(Appointment appointment);
         Task<bool> IsTimeSlotAvailable(DateTimeRange range);
     }
 }

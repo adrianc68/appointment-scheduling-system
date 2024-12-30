@@ -44,36 +44,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return availabilityTimeSlot.Uuid.Value;
         }
 
-        public async Task<OperationResult<Guid>> ScheduleAppointment(Appointment appointment)
+        public async Task<Guid?> ScheduleAppointment(Appointment appointment)
         {
             appointment.Uuid = Guid.CreateVersion7();
-            appointment.Status = Model.Types.AppointmentStatusType.SCHEDULED;
-            appointment.TotalCost = 500;
-            appointment.EndTime = TimeOnly.Parse("12:00:00");
-            appointment.Client.Id = 2;
-
-
-            // 1. Check if time slot is available for appointment
-            // using date, endTime, startTime
-
-
-
+            
             bool isRegistered = await schedulerRepository.AddAppointmentAsync(appointment);
             if (isRegistered)
             {
-                return new OperationResult<Guid>
-                {
-                    IsSuccessful = true,
-                    Result = appointment.Uuid.Value,
-                    Code = MessageCodeType.SUCCESS_OPERATION
-
-                };
+                return appointment.Uuid;
             }
-            return new OperationResult<Guid>
-            {
-                IsSuccessful = true,
-                Code = MessageCodeType.REGISTER_ERROR
-            };
+            return null;
         }
 
         // public bool ScheduleAppointment(DateTimeRange range, List<Service> services, Client client)

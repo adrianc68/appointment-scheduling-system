@@ -42,14 +42,14 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     return false;
                 }
 
-                var assistantServices = serviceIds.Select(serviceId => new AssistantService
+                var assistantServices = serviceIds.Select(serviceId => new ServiceOffer
                 {
                     IdAssistant = assistantId,
                     IdService = serviceId,
                     Uuid = Guid.CreateVersion7()
                 }).ToList();
 
-                dbContext.AssistantServices.AddRange(assistantServices);
+                dbContext.ServiceOffers.AddRange(assistantServices);
                 await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
                 isRegistered = true;
@@ -168,7 +168,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             IEnumerable<BusinessLogicLayer.Model.Service> businessService = [];
             using var dbContext = context.CreateDbContext();
             var assistantDB = await dbContext.Assistants
-                .Include(a => a.AssistantServices)
+                .Include(a => a.ServiceOffers)
                     .ThenInclude(ase => ase.Service)
                 .FirstOrDefaultAsync(a => a.UserAccount.Uuid == uuid);
 
@@ -177,7 +177,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 return [];
             }
 
-            businessService = assistantDB.AssistantServices
+            businessService = assistantDB.ServiceOffers
                 .Where(ase => ase.Service != null)
                 .Select(ase => new BusinessLogicLayer.Model.Service
                 {
@@ -241,11 +241,54 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<int?> GetServiceIdByAssistantServiceUuid(Guid uuid)
         {
             using var dbContext = context.CreateDbContext();
-            var serviceId = await dbContext.AssistantServices
-                .Where(a => a.Service.Uuid == uuid)
+            var serviceId = await dbContext.ServiceOffers
+                .Where(a => a.Uuid == uuid)
                 .Select(a => a.Service.Id)
                 .FirstOrDefaultAsync();
             return serviceId;
+        }
+
+        public async Task<BusinessLogicLayer.Model.ServiceOffer?> GetServiceOfferByUuid(Guid uuid)
+        {
+            using var dbContext = context.CreateDbContext();
+
+            var dbServiceOffer = await dbContext.ServiceOffers
+                .Include(a => a.Service)
+                .Include(a => a.Assistant)
+                    .ThenInclude(asi => asi.UserAccount)
+                    .ThenInclude(asc => asc.UserInformation)
+                .FirstOrDefaultAsync(a => a.Uuid == uuid);
+
+            if (dbServiceOffer == null)
+                return null;
+
+            return new BusinessLogicLayer.Model.ServiceOffer
+            {
+                Service = new BusinessLogicLayer.Model.Service
+                {
+                    Id = dbServiceOffer.Service.Id,
+                    Name = dbServiceOffer.Service.Name,
+                    Description = dbServiceOffer.Service.Description,
+                    Minutes = dbServiceOffer.Service.Minutes,
+                    Price = dbServiceOffer.Service.Price,
+                    Uuid = dbServiceOffer.Service.Uuid,
+                    CreatedAt = dbServiceOffer.Service.CreatedAt,
+                    Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)dbServiceOffer.Service.Status
+                },
+                Id = dbServiceOffer.Id,
+                Uuid = dbServiceOffer.Uuid,
+                Assistant = new BusinessLogicLayer.Model.Assistant
+                {
+                    Id = dbServiceOffer.Assistant.IdUserAccount,
+                    Uuid = dbServiceOffer.Assistant.UserAccount!.Uuid,
+                    Email = dbServiceOffer.Assistant.UserAccount.Email!,
+                    Name = dbServiceOffer.Assistant.UserAccount.UserInformation!.Name!,
+                    PhoneNumber = dbServiceOffer.Assistant.UserAccount.UserInformation.PhoneNumber!,
+                    Username = dbServiceOffer.Assistant.UserAccount.Username!,
+                    Status = (BusinessLogicLayer.Model.Types.AssistantStatusType)dbServiceOffer.Assistant.Status,
+                    CreatedAt = dbServiceOffer.Assistant.UserAccount.CreatedAt
+                }
+            };
         }
     }
 }
