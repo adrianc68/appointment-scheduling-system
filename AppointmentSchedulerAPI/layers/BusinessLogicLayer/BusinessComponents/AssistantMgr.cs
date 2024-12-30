@@ -22,14 +22,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return areAllServicesRegistered;
         }
 
-        public bool ChangeAssistantStatus(int idAssistant, AssistantStatusType status)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<Assistant>> GetAllAssistantsAsync()
         {
             return (List<Assistant>)await assistantRepository.GetAllAssistantsAsync();
+        }
+
+        public async Task<Assistant?> GetAssistantByUuidAsync(Guid uuid)
+        {
+            Assistant? assistant = await assistantRepository.GetAssistantByUuidAsync(uuid);
+            return assistant;
         }
 
         public async Task<int?> GetServiceIdByServiceOfferUuidAsync(Guid uuid)
@@ -86,11 +87,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             assistant.Uuid = Guid.CreateVersion7();
             bool isRegistered = await assistantRepository.AddAssistantAsync(assistant);
-            if (isRegistered)
+            if (!isRegistered)
             {
-                return assistant.Uuid.Value;
+                assistant.Uuid = null;
+                return null;
             }
-            return null;
+            return assistant.Uuid.Value;
         }
 
     }

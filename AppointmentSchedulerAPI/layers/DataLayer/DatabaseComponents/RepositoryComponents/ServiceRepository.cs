@@ -14,7 +14,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             this.context = context;
         }
 
-
         public async Task<bool> AddServiceAsync(BusinessLogicLayer.Model.Service service)
         {
             bool isRegistered = false;

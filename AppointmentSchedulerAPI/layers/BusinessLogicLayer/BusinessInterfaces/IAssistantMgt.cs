@@ -10,12 +10,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         // AssistantStatusType GetAssistantStatus(int idAssistant);
         // bool GetServicesAssignedToAssistant(int idAssistant);
         // bool UpdateAssistant(int idAssistant, Assistant assistant);
+        Task<List<Assistant>> GetAllAssistantsAsync();
+        Task<Assistant?> GetAssistantByUuidAsync(Guid uuid);
+        Task<int?> GetServiceIdByServiceOfferUuidAsync(Guid uuid);
+        Task<ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid);
         Task<OperationResult<bool?>> IsAccountDataRegisteredAsync(Assistant assistant);
         Task<bool> IsAssistantRegisteredByUuidAsync(Guid uuid);
         Task<Guid?> RegisterAssistantAsync(Assistant assistant);
-        Task<List<Assistant>> GetAllAssistantsAsync();
         Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid);
-        Task<int?> GetServiceIdByServiceOfferUuidAsync(Guid uuid);
-        Task<ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid);
     }
 }

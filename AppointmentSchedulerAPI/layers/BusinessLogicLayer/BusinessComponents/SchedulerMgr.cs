@@ -27,18 +27,25 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         }
 
-        public async Task<bool> IsTimeSlotAvailable(DateTimeRange range)
+        public async Task<bool> IsAppointmentTimeSlotAvailable(DateTimeRange range)
         {
-            bool isTimeSlotAvailable = await schedulerRepository.IsTimeSlotAvailable(range);
+            bool isTimeSlotAvailable = await schedulerRepository.IsAppointmentTimeSlotAvailableAsync(range);
             return isTimeSlotAvailable;
         }
 
-        public async Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid)
+        public async Task<bool> IsAvailabilityTimeSlotAvailable(DateTimeRange range)
+        {
+            bool isAvailabilityTimeSlotRegistered = await schedulerRepository.IsAvailabilityTimeSlotRegisteredAsync(range);
+            return isAvailabilityTimeSlotRegistered;
+        }
+
+        public async Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot)
         {
             availabilityTimeSlot.Uuid = Guid.CreateVersion7();
-            bool isRegistered = await schedulerRepository.AddAvailabilityTimeSlotAsync(availabilityTimeSlot, assistantUuid);
+            bool isRegistered = await schedulerRepository.AddAvailabilityTimeSlotAsync(availabilityTimeSlot);
             if (!isRegistered)
             {
+                availabilityTimeSlot.Uuid = null;
                 return null;
             }
             return availabilityTimeSlot.Uuid.Value;
@@ -47,18 +54,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<Guid?> ScheduleAppointment(Appointment appointment)
         {
             appointment.Uuid = Guid.CreateVersion7();
-            
+
             bool isRegistered = await schedulerRepository.AddAppointmentAsync(appointment);
             if (isRegistered)
             {
-                return appointment.Uuid;
+                appointment.Uuid = null;
+                return null;
             }
-            return null;
+            return appointment.Uuid;
         }
-
-        // public bool ScheduleAppointment(DateTimeRange range, List<Service> services, Client client)
-        // {
-        //     throw new NotImplementedException();
-        // }
     }
 }

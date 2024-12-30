@@ -1,6 +1,7 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
@@ -82,9 +83,21 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 {
                     Date = availabilityDTO.Date,
                     EndTime = availabilityDTO.EndTime,
-                    StartTime = availabilityDTO.StartTime
+                    StartTime = availabilityDTO.StartTime,
+                    Assistant = new BusinessLogicLayer.Model.Assistant
+                    {
+                        Uuid = availabilityDTO.AssistantUuid
+                    }
                 };
-                guid = await systemFacade.RegisterAvailabilityTimeSlotAsync(availabilityTimeSlot, availabilityDTO.AssistantUuid);
+                OperationResult<Guid?> result = await systemFacade.RegisterAvailabilityTimeSlotAsync(availabilityTimeSlot);
+                if(result.IsSuccessful)
+                {
+                    guid = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
+                }
             }
             catch (System.Exception ex)
             {

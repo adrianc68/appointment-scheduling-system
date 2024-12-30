@@ -68,11 +68,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             client.Uuid = Guid.CreateVersion7();
 
             bool isRegistered = await clientRepository.AddClientAsync(client);
-            if (isRegistered)
+            if (!isRegistered)
             {
-                return client.Uuid.Value;
+                client.Uuid = null;
+                return null;
             }
-            return null;
+            return client.Uuid.Value;
+
         }
     }
 }

@@ -59,26 +59,20 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         }
 
 
-        public async Task<bool> AddAvailabilityTimeSlotAsync(BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot, Guid assistantUuid)
+        public async Task<bool> AddAvailabilityTimeSlotAsync(BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot)
         {
             bool isRegistered = false;
             using var dbContext = context.CreateDbContext();
             using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
             {
-                var assistant = await dbContext.UserAccounts.FirstOrDefaultAsync(a => a.Uuid == assistantUuid);
-                if (assistant == null)
-                {
-                    return false;
-                }
-
                 var timeSlot = new AvailabilityTimeSlot
                 {
                     Uuid = availabilityTimeSlot.Uuid,
                     Date = availabilityTimeSlot.Date,
                     StartTime = availabilityTimeSlot.StartTime,
                     EndTime = availabilityTimeSlot.EndTime,
-                    IdAssistant = assistant.Id
+                    IdAssistant = availabilityTimeSlot.Assistant!.Id
                 };
 
                 dbContext.AvailabilityTimeSlots.Add(timeSlot);
@@ -242,13 +236,22 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return businessLogicAssistantServices;
         }
 
-        public async Task<bool> IsTimeSlotAvailable(BusinessLogicLayer.Model.Types.DateTimeRange range)
+        public async Task<bool> IsAppointmentTimeSlotAvailableAsync(BusinessLogicLayer.Model.Types.DateTimeRange range)
         {
             using var dbContext = context.CreateDbContext();
             bool isAvailable = await dbContext.Appointments
                 .Where(a => a.Date == range.Date && a.StartTime < range.EndTime && a.EndTime > range.StartTime)
                 .AnyAsync();
 
+            return !isAvailable;
+        }
+
+        public async Task<bool> IsAvailabilityTimeSlotRegisteredAsync(DateTimeRange range)
+        {
+            using var dbContext = context.CreateDbContext();
+            bool isAvailable = await dbContext.AvailabilityTimeSlots
+                .Where(a => a.Date == range.Date && a.StartTime < range.EndTime && a.EndTime > range.StartTime)
+                .AnyAsync();
             return !isAvailable;
         }
     }

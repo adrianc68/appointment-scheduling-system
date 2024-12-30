@@ -65,7 +65,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var usernameDB = await dbContext.UserAccounts
-                .Where(a => a.Username.ToLower() == username)
+                .Where(a => a.Username!.ToLower() == username)
                 .Select(a => a.Username)
                 .FirstOrDefaultAsync();
 
@@ -76,7 +76,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var emailDB = await dbContext.UserAccounts
-                .Where(a => a.Email.ToLower() == email)
+                .Where(a => a.Email!.ToLower() == email)
                 .Select(a => a.Email)
                 .FirstOrDefaultAsync();
 
