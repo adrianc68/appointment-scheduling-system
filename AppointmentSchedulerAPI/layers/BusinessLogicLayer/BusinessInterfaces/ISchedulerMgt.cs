@@ -27,6 +27,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot);
         Task<Guid?> ScheduleAppointment(Appointment appointment);
         Task<bool> IsAppointmentTimeSlotAvailable(DateTimeRange range);
-        Task<bool> IsAvailabilityTimeSlotAvailable(DateTimeRange range);
+        Task<bool> IsAvailabilityTimeSlotAvailable(DateTimeRange range, int idAssistant);
+        Task<bool> IsAssistantAvailableInTimeRange(DateTimeRange range, int idAssistant);
     }
 }

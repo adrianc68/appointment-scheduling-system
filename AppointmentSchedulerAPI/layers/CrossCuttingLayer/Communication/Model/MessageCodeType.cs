@@ -10,6 +10,7 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         SERVER_ERROR,
         REGISTER_ERROR,
         INVALID_CREDENTIALS,
+        INVALID_RANGE_TIME,
         UNAUTHORIZED,
         NULL_VALUE_IS_PRESENT,
         CLIENT_NOT_FOUND,
@@ -21,5 +22,6 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         PHONE_NUMBER_ALREADY_REGISTERED,
         AVAILABILITY_TIME_SLOT_NOT_AVAILABLE,
         APPOINTMENT_TIME_SLOT_NOT_AVAILABLE,
+        ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE
     }
 }

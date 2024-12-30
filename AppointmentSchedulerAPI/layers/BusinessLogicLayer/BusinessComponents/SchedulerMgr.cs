@@ -33,9 +33,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return isTimeSlotAvailable;
         }
 
-        public async Task<bool> IsAvailabilityTimeSlotAvailable(DateTimeRange range)
+        public async Task<bool> IsAssistantAvailableInTimeRange(DateTimeRange range, int idAssistant)
         {
-            bool isAvailabilityTimeSlotRegistered = await schedulerRepository.IsAvailabilityTimeSlotRegisteredAsync(range);
+            bool isAssistantAvailableInTimeRange = await schedulerRepository.IsAssistantAvailableInTimeRange(range, idAssistant);
+            return isAssistantAvailableInTimeRange;
+        }
+
+        public async Task<bool> IsAvailabilityTimeSlotAvailable(DateTimeRange range, int idAssistant)
+        {
+            bool isAvailabilityTimeSlotRegistered = await schedulerRepository.IsAvailabilityTimeSlotRegisteredAsync(range, idAssistant);
             return isAvailabilityTimeSlotRegistered;
         }
 

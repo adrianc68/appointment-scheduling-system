@@ -24,7 +24,7 @@ public partial class AppointmentDbContext : DbContext
     public required virtual DbSet<Service> Services { get; set; }
     public required virtual DbSet<ServiceOffer> ServiceOffers { get; set; }
     public required virtual DbSet<AvailabilityTimeSlot> AvailabilityTimeSlots { get; set; }
-    public required virtual DbSet<AppointmentServiceOffer> AppointmentAssistantServices { get; set; }
+    public required virtual DbSet<AppointmentServiceOffer> AppointmentServiceOffers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -2,7 +2,6 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfa
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -49,7 +48,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     appointment.ServiceOffers.Add(assistantService);
                 }
 
-                CrossCuttingLayer.Communication.Model.OperationResult<Guid?> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
+                OperationResult<Guid?> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
                 if (result.IsSuccessful)
                 {
                     guid = result.Result;
@@ -79,12 +78,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             Guid? guid;
             try
             {
-                BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot = new()
+                AvailabilityTimeSlot availabilityTimeSlot = new()
                 {
                     Date = availabilityDTO.Date,
                     EndTime = availabilityDTO.EndTime,
                     StartTime = availabilityDTO.StartTime,
-                    Assistant = new BusinessLogicLayer.Model.Assistant
+                    Assistant = new Assistant
                     {
                         Uuid = availabilityDTO.AssistantUuid
                     }
@@ -155,7 +154,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     EndTime = a.EndTime,
                     StartTime = a.StartTime,
                     Uuid = a.Uuid,
-                    AssistantUuid = a.Assistant.Uuid,
+                    AssistantUuid = a.Assistant!.Uuid,
                     AssistantName = a.Assistant.Name
 
                 }).ToList();

@@ -42,7 +42,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                         IdAppointment = appointmentDB.Id,
                         IdServiceOffer = serviceOffer.Id
                     };
-                    dbContext.AppointmentAssistantServices.Add(appointmentAssistantService);
+                    dbContext.AppointmentServiceOffers.Add(appointmentAssistantService);
                 }
 
                 await dbContext.SaveChangesAsync();
@@ -246,13 +246,46 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return !isAvailable;
         }
 
-        public async Task<bool> IsAvailabilityTimeSlotRegisteredAsync(DateTimeRange range)
+        public async Task<bool> IsAvailabilityTimeSlotRegisteredAsync(DateTimeRange range, int idAssistant)
         {
             using var dbContext = context.CreateDbContext();
             bool isAvailable = await dbContext.AvailabilityTimeSlots
-                .Where(a => a.Date == range.Date && a.StartTime < range.EndTime && a.EndTime > range.StartTime)
+                .Where(a => a.Date == range.Date && a.StartTime < range.EndTime && a.EndTime > range.StartTime && a.IdAssistant == idAssistant)
                 .AnyAsync();
             return !isAvailable;
+        }
+
+        public async Task<bool> IsAssistantAvailableInTimeRange(DateTimeRange range, int idAssistant)
+        {
+            using var dbContext = context.CreateDbContext();
+
+            var availableSlots = await dbContext.AvailabilityTimeSlots
+                .Where(ats => ats.IdAssistant == idAssistant && ats.Date == range.Date)
+                .ToListAsync();
+
+            foreach (var slot in availableSlots)
+            {
+                if (!(range.StartTime >= slot.EndTime || range.EndTime <= slot.StartTime))
+                {
+                    return false;
+                }
+            }
+
+            var conflictingAppointments = await dbContext.Appointments
+                .Where(appointment => appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED
+                                    && appointment.IdClient != null
+                                    && appointment.Date == range.Date
+                                    && appointment.AppointmentServiceOffers
+                                        .Any(serviceOffer => serviceOffer.ServiceOffer.IdAssistant == idAssistant
+                                                                && range.StartTime < appointment.EndTime
+                                                                && range.EndTime > appointment.StartTime))
+                .ToListAsync();
+
+            if (conflictingAppointments.Any())
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

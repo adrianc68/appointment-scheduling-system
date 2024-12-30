@@ -147,6 +147,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 return new OperationResult<Guid?>(false, MessageCodeType.NULL_VALUE_IS_PRESENT);
             }
+
+            if(!(availabilityTimeSlot.StartTime < availabilityTimeSlot.EndTime || availabilityTimeSlot.StartTime == TimeOnly.MinValue))
+            {
+                return new OperationResult<Guid?>(false, MessageCodeType.INVALID_RANGE_TIME);
+            }
+
             // 1. Get account data
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(availabilityTimeSlot.Assistant.Uuid.Value);
             if (assistantData == null)
@@ -161,11 +167,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 StartTime = availabilityTimeSlot.StartTime!.Value,
                 EndTime = availabilityTimeSlot.EndTime!.Value
             };
-            bool isAvailabilityTimeSlotAvailable = await schedulerMgr.IsAvailabilityTimeSlotAvailable(range);
-            if(!isAvailabilityTimeSlotAvailable)
+ 
+            bool isAvailabilityTimeSlotAvailable = await schedulerMgr.IsAvailabilityTimeSlotAvailable(range, assistantData.Id!.Value);
+            if (!isAvailabilityTimeSlotAvailable)
             {
                 return new OperationResult<Guid?>(false, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_AVAILABLE);
             }
+
+
+
+
             // 3. Register availability time slot
             Guid? uuid = await schedulerMgr.RegisterAvailabilityTimeSlot(availabilityTimeSlot);
             if (uuid == null)
@@ -255,7 +266,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
             appointment.Client = clientData;
 
-            // 1. Get Services data
+            // 0.1. Get Services data
             for (int i = 0; i < appointment.ServiceOffers.Count; i++)
             {
                 var serviceOffer = appointment.ServiceOffers[i];
@@ -273,12 +284,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
 
 
-            // 2. Calculate cost and endtime
+            // 0.2. Calculate cost and endtime
             appointment.TotalCost = appointment.ServiceOffers.Sum(service => service.Service!.Price!.Value);
             appointment.EndTime = appointment.StartTime!.Value.AddMinutes(appointment.ServiceOffers.Sum(service => service.Service!.Minutes!.Value));
             appointment.Status = AppointmentStatusType.SCHEDULED;
 
-            // 3. Check if availability time slot available
+            // 1.1. Check if availability time slot available
             DateTimeRange range = new()
             {
                 Date = appointment.Date!.Value,
@@ -286,11 +297,46 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 EndTime = appointment.EndTime.Value
 
             };
-            bool isTimeSlotAvailable = await schedulerMgr.IsAppointmentTimeSlotAvailable(range);
-            if (!isTimeSlotAvailable)
+            // bool isTimeSlotAvailable = await schedulerMgr.IsAppointmentTimeSlotAvailable(range);
+            // if (!isTimeSlotAvailable)
+            // {
+            //     return new OperationResult<Guid?>(false, MessageCodeType.APPOINTMENT_TIME_SLOT_NOT_AVAILABLE);
+            // }
+
+
+
+            var tasks = appointment.ServiceOffers.Select(async serviceOffer =>
             {
-                return new OperationResult<Guid?>(false, MessageCodeType.APPOINTMENT_TIME_SLOT_NOT_AVAILABLE);
+                bool isAssistantAvailableInTimeRange = await schedulerMgr.IsAssistantAvailableInTimeRange(range, serviceOffer.Assistant!.Id!.Value);
+                if (!isAssistantAvailableInTimeRange)
+                {
+                    return new OperationResult<Guid?>(false, MessageCodeType.ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE, serviceOffer.Assistant.Uuid);
+                }
+                return null;
+            }).ToList();
+
+            var results = await Task.WhenAll(tasks);
+
+            foreach (var result in results)
+            {
+                if (result != null)
+                {
+                    return result;
+                }
             }
+
+
+            foreach (var serviceOffer in appointment.ServiceOffers)
+            {
+                bool isAssistantAvailableInTimeRange = await schedulerMgr.IsAssistantAvailableInTimeRange(range, serviceOffer.Assistant!.Id!.Value);
+                if (!isAssistantAvailableInTimeRange)
+                {
+                    return new OperationResult<Guid?>(false, MessageCodeType.ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE);
+                }
+            }
+
+
+
             Guid? UuidRegistered = await schedulerMgr.ScheduleAppointment(appointment);
             if (UuidRegistered == null)
             {
