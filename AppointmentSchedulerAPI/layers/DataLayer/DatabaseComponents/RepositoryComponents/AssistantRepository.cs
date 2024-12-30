@@ -15,6 +15,54 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             this.context = context;
         }
 
+        public async Task<bool> AddAssistantAsync(BusinessLogicLayer.Model.Assistant assistant)
+        {
+            bool isRegistered = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var userAccount = new UserAccount
+                {
+                    Email = assistant.Email,
+                    Password = assistant.Password,
+                    Username = assistant.Username,
+                    Role = RoleType.ASSISTANT,
+                    Uuid = assistant.Uuid
+                };
+                dbContext.UserAccounts.Add(userAccount);
+                await dbContext.SaveChangesAsync();
+
+                var userInformation = new UserInformation
+                {
+                    Name = assistant.Name,
+                    PhoneNumber = assistant.PhoneNumber,
+                    Filepath = null,
+                    IdUser = userAccount.Id
+                };
+
+                dbContext.UserInformations.Add(userInformation);
+                await dbContext.SaveChangesAsync();
+
+                var newAssistant = new Assistant
+                {
+                    IdUserAccount = userAccount.Id,
+                    Status = AssistantStatusType.ENABLED
+                };
+
+                dbContext.Assistants.Add(newAssistant);
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isRegistered = true;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isRegistered;
+        }
+
         public async Task<bool> AddServicesToAssistantAsync(Guid assistantUuid, List<Guid?> servicesUuid)
         {
             bool isRegistered = false;
@@ -60,6 +108,49 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 throw;
             }
             return isRegistered;
+        }
+
+        public async Task<bool> IsUsernameRegisteredAsync(string username)
+        {
+            using var dbContext = context.CreateDbContext();
+            var usernameDB = await dbContext.UserAccounts
+                .Where(a => a.Username.ToLower() == username)
+                .Select(a => a.Username)
+                .FirstOrDefaultAsync();
+
+            return usernameDB != null;
+        }
+
+        public async Task<bool> IsEmailRegisteredAsync(string email)
+        {
+            using var dbContext = context.CreateDbContext();
+            var emailDB = await dbContext.UserAccounts
+                .Where(a => a.Email.ToLower() == email)
+                .Select(a => a.Email)
+                .FirstOrDefaultAsync();
+
+            return emailDB != null;
+        }
+
+        public async Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber)
+        {
+            using var dbContext = context.CreateDbContext();
+            var phoneNumberDB = await dbContext.UserInformations
+                .Where(a => a.PhoneNumber == phoneNumber)
+                .Select(a => a.PhoneNumber)
+                .FirstOrDefaultAsync();
+
+            return phoneNumberDB != null;
+        }
+
+        public async Task<int?> GetAssistantIdByUuidAsync(Guid uuid)
+        {
+            using var dbContext = context.CreateDbContext();
+            var assistantId = await dbContext.Assistants
+                .Where(a => a.UserAccount.Uuid == uuid)
+                .Select(a => a.IdUserAccount)
+                .FirstOrDefaultAsync();
+            return assistantId;
         }
 
         public async Task<BusinessLogicLayer.Model.Assistant?> GetAssistantByUuidAsync(Guid uuid)
@@ -115,52 +206,14 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return businessAssistants;
         }
 
-        public async Task<bool> AddAssistantAsync(BusinessLogicLayer.Model.Assistant assistant)
+        public async Task<int?> GetServiceIdByAssistantServiceUuid(Guid uuid)
         {
-            bool isRegistered = false;
             using var dbContext = context.CreateDbContext();
-            using var transaction = await dbContext.Database.BeginTransactionAsync();
-            try
-            {
-                var userAccount = new UserAccount
-                {
-                    Email = assistant.Email,
-                    Password = assistant.Password,
-                    Username = assistant.Username,
-                    Role = RoleType.ASSISTANT,
-                    Uuid = assistant.Uuid
-                };
-                dbContext.UserAccounts.Add(userAccount);
-                await dbContext.SaveChangesAsync();
-
-                var userInformation = new UserInformation
-                {
-                    Name = assistant.Name,
-                    PhoneNumber = assistant.PhoneNumber,
-                    Filepath = null,
-                    IdUser = userAccount.Id
-                };
-
-                dbContext.UserInformations.Add(userInformation);
-                await dbContext.SaveChangesAsync();
-
-                var newAssistant = new Assistant
-                {
-                    IdUserAccount = userAccount.Id,
-                    Status = AssistantStatusType.ENABLED
-                };
-
-                dbContext.Assistants.Add(newAssistant);
-                await dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-                isRegistered = true;
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-            return isRegistered;
+            var serviceId = await dbContext.ServiceOffers
+                .Where(a => a.Uuid == uuid)
+                .Select(a => a.Service.Id)
+                .FirstOrDefaultAsync();
+            return serviceId;
         }
 
         public async Task<List<BusinessLogicLayer.Model.Service>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid)
@@ -193,59 +246,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .ToList();
 
             return (List<BusinessLogicLayer.Model.Service>)businessService;
-        }
-
-        public async Task<int?> GetAssistantIdByUuidAsync(Guid uuid)
-        {
-            using var dbContext = context.CreateDbContext();
-            var assistantId = await dbContext.Assistants
-                .Where(a => a.UserAccount.Uuid == uuid)
-                .Select(a => a.IdUserAccount)
-                .FirstOrDefaultAsync();
-            return assistantId;
-        }
-
-        public async Task<bool> IsUsernameRegisteredAsync(string username)
-        {
-            using var dbContext = context.CreateDbContext();
-            var usernameDB = await dbContext.UserAccounts
-                .Where(a => a.Username.ToLower() == username)
-                .Select(a => a.Username)
-                .FirstOrDefaultAsync();
-
-            return usernameDB != null;
-        }
-
-        public async Task<bool> IsEmailRegisteredAsync(string email)
-        {
-            using var dbContext = context.CreateDbContext();
-            var emailDB = await dbContext.UserAccounts
-                .Where(a => a.Email.ToLower() == email)
-                .Select(a => a.Email)
-                .FirstOrDefaultAsync();
-
-            return emailDB != null;
-        }
-
-        public async Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber)
-        {
-            using var dbContext = context.CreateDbContext();
-            var phoneNumberDB = await dbContext.UserInformations
-                .Where(a => a.PhoneNumber == phoneNumber)
-                .Select(a => a.PhoneNumber)
-                .FirstOrDefaultAsync();
-
-            return phoneNumberDB != null;
-        }
-
-        public async Task<int?> GetServiceIdByAssistantServiceUuid(Guid uuid)
-        {
-            using var dbContext = context.CreateDbContext();
-            var serviceId = await dbContext.ServiceOffers
-                .Where(a => a.Uuid == uuid)
-                .Select(a => a.Service.Id)
-                .FirstOrDefaultAsync();
-            return serviceId;
         }
 
         public async Task<BusinessLogicLayer.Model.ServiceOffer?> GetServiceOfferByUuid(Guid uuid)
