@@ -62,7 +62,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             appointment.Uuid = Guid.CreateVersion7();
 
             bool isRegistered = await schedulerRepository.AddAppointmentAsync(appointment);
-            if (isRegistered)
+            if (!isRegistered)
             {
                 appointment.Uuid = null;
                 return null;

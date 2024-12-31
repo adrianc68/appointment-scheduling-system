@@ -39,7 +39,13 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpRes
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status403Forbidden };
         }
 
-        public IActionResult Conflict(string version, string message = "Conflict")
+        public IActionResult Conflict<T>(T data, string version, string message = "Conflict")
+        {
+            var payload = new ApiResponse<T>(StatusCodes.Status409Conflict, message, version, data);
+            return new ObjectResult(payload) { StatusCode = StatusCodes.Status409Conflict };
+        }
+
+           public IActionResult Conflict(string version, string message = "Conflict")
         {
             var payload = new ApiResponse<object>(StatusCodes.Status409Conflict, message, version);
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status409Conflict };

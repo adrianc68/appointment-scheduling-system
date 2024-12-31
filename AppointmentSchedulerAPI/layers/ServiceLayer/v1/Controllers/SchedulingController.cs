@@ -2,6 +2,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfa
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -47,7 +48,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     };
                     appointment.ServiceOffers.Add(assistantService);
                 }
-
                 OperationResult<Guid?> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
                 if (result.IsSuccessful)
                 {
@@ -55,7 +55,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 }
                 else
                 {
-                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
+                    return httpResponseService.Conflict(result.Result!.Value, ApiVersionEnum.V1, result.Code.ToString());
                 }
 
             }
@@ -89,7 +89,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     }
                 };
                 OperationResult<Guid?> result = await systemFacade.RegisterAvailabilityTimeSlotAsync(availabilityTimeSlot);
-                if(result.IsSuccessful)
+                if (result.IsSuccessful)
                 {
                     guid = result.Result;
                 }

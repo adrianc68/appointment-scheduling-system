@@ -258,22 +258,18 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<bool> IsAssistantAvailableInTimeRange(DateTimeRange range, int idAssistant)
         {
             using var dbContext = context.CreateDbContext();
-
             var availableSlots = await dbContext.AvailabilityTimeSlots
                 .Where(ats => ats.IdAssistant == idAssistant && ats.Date == range.Date)
                 .ToListAsync();
+            bool isCoveredByAnySlot = availableSlots.Any(slot => range.StartTime >= slot.StartTime && range.EndTime <= slot.EndTime);
 
-            foreach (var slot in availableSlots)
+            if (!isCoveredByAnySlot)
             {
-                if (!(range.StartTime >= slot.EndTime || range.EndTime <= slot.StartTime))
-                {
-                    return false;
-                }
+                return false;
             }
 
             var conflictingAppointments = await dbContext.Appointments
-                .Where(appointment => appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED
-                                    && appointment.IdClient != null
+                .Where(appointment => (appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED || appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED)
                                     && appointment.Date == range.Date
                                     && appointment.AppointmentServiceOffers
                                         .Any(serviceOffer => serviceOffer.ServiceOffer.IdAssistant == idAssistant
@@ -281,10 +277,22 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                                                                 && range.EndTime > appointment.StartTime))
                 .ToListAsync();
 
+            foreach (var appointment in conflictingAppointments)
+            {
+                Console.WriteLine("Conflicto con cita: Id={0}, StartTime={1}, EndTime={2}",
+                                  appointment.Id, appointment.StartTime, appointment.EndTime);
+            }
+
+            System.Console.WriteLine("**** LLEGAMOS");
+
+
             if (conflictingAppointments.Any())
             {
+                Console.WriteLine("Conflictos encontrados con citas existentes.");
+
                 return false;
             }
+
             return true;
         }
     }

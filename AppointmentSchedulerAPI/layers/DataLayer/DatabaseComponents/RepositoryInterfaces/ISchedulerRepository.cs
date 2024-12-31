@@ -19,7 +19,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         // Appointment GetAppointmentDetails(int idAppointment);
         // List<int> GetAvailableServices(DateTimeRange range);
         // bool IsAppointmentInSpecificState(int idAppointment, AppointmentStatusType expected);
-        // bool IsAssistantAvailableInTimeRange(int idAssistant, DateTimeRange range);
         // bool IsAvailabilityTimeSlotAvailable(DateTimeRange range);
         Task<IEnumerable<AssistantService>> GetAvailableServicesAsync(DateOnly date);
         Task<IEnumerable<AvailabilityTimeSlot>> GetAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate);
