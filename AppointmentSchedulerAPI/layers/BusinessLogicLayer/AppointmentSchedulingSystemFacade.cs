@@ -317,7 +317,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
                 if (!isAssistantAvailableInAvailabilityTimeSlots)
                 {
-                    GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is not available during the requested time range", new Dictionary<string, object>());
+                    GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is not available during the requested time range", []);
                     error.AddData("uuid", serviceOffer.Uuid!.Value);
                     error.AddData("startTime", serviceRange.StartTime);
                     return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE);
@@ -326,7 +326,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 bool hasAssistantConflictingAppoinments = await schedulerMgr.HasAssistantConflictingAppoinments(serviceRange, serviceOffer.Assistant!.Id!.Value);
                 if (!hasAssistantConflictingAppoinments)
                 {
-                    GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is attending another appointment during the requested time range", new Dictionary<string, object>());
+                    GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is attending another appointment during the requested time range", []);
                     error.AddData("uuid", serviceOffer.Uuid!.Value);
                     error.AddData("startTime", serviceRange.StartTime);
                     return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.SELECTED_SERVICE_HAS_CONFLICTING_APPOINTMENT_TIME_SLOT);
