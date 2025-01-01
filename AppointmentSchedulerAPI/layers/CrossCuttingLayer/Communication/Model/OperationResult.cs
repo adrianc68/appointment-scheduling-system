@@ -1,16 +1,28 @@
 namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
 {
-    public class OperationResult<T>
+    public class OperationResult<T, TError>
     {
         public bool IsSuccessful { get; set; }
         public MessageCodeType Code { get; set; }
         public T? Result { get; set; }
+        public TError? Error { get; set; }
 
-        public OperationResult(bool isSuccessful, MessageCodeType code, T? result = default)
+        private OperationResult(bool isSuccessful, MessageCodeType code, T? result = default, TError? error = default)
         {
             IsSuccessful = isSuccessful;
             Code = code;
             Result = result;
+            Error = error;
+        }
+
+        public static OperationResult<T, TError> Success(T result, MessageCodeType code = MessageCodeType.OK)
+        {
+            return new OperationResult<T, TError>(true, code, result, default);
+        }
+
+        public static OperationResult<T, TError> Failure(TError error, MessageCodeType code = MessageCodeType.ERROR)
+        {
+            return new OperationResult<T, TError>(false, code, default, error);
         }
 
         public OperationResult() { }

@@ -25,42 +25,28 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return client;
         }
 
-        public async Task<OperationResult<bool?>> IsAccountDataRegisteredAsync(Client client)
-        {
-            // 1. Check if username is is registered
-            if (string.IsNullOrWhiteSpace(client.Username) ||
-                 string.IsNullOrWhiteSpace(client.Email) ||
-                 string.IsNullOrWhiteSpace(client.PhoneNumber))
-            {
-                return new OperationResult<bool?>(false, MessageCodeType.NULL_VALUE_IS_PRESENT);
-            }
-
-            bool isUsernameRegistered = await clientRepository.IsUsernameRegisteredAsync(client.Username);
-            if (isUsernameRegistered)
-            {
-                return new OperationResult<bool?>(true, MessageCodeType.USERNAME_ALREADY_REGISTERED, isUsernameRegistered);
-            }
-
-            // 2. Check if email is registered
-            bool isEmailRegistered = await clientRepository.IsEmailRegisteredAsync(client.Email);
-            if (isEmailRegistered)
-            {
-                return new OperationResult<bool?>(true, MessageCodeType.EMAIL_ALREADY_REGISTERED, isEmailRegistered);
-            }
-
-            // 3. Check if phoneNumber is registered
-            bool isPhoneNumberRegistered = await clientRepository.IsPhoneNumberRegisteredAsync(client.PhoneNumber);
-            if (isPhoneNumberRegistered)
-            {
-                return new OperationResult<bool?>(true, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED, isPhoneNumberRegistered);
-            }
-            return new OperationResult<bool?>(true, MessageCodeType.OK, false);
-        }
-
         public async Task<bool> IsClientRegisteredByUuidAsync(Guid uuid)
         {
             int? clientId = await clientRepository.GetClientIdByUuidAsync(uuid);
             return clientId != null;
+        }
+
+        public async Task<bool> IsEmailRegisteredAsync(string email)
+        {
+            bool isEmailRegistered = await clientRepository.IsEmailRegisteredAsync(email);
+            return isEmailRegistered;
+        }
+
+        public async Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber)
+        {
+            bool isPhoneNumberRegistered = await clientRepository.IsPhoneNumberRegisteredAsync(phoneNumber);
+            return isPhoneNumberRegistered;
+        }
+
+        public async Task<bool> IsUsernameRegisteredAsync(string username)
+        {
+            bool isUsernameRegistered = await clientRepository.IsUsernameRegisteredAsync(username);
+            return isUsernameRegistered;
         }
 
         public async Task<Guid?> RegisterClientAsync(Client client)

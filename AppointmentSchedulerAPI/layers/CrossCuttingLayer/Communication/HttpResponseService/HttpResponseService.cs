@@ -21,31 +21,31 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpRes
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status200OK };
         }
 
-        public IActionResult BadRequest(string version, string message = "Bad request")
+        public IActionResult BadRequest(string version, string message)
         {
             var payload = new ApiResponse<object>(StatusCodes.Status400BadRequest, message, version);
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status400BadRequest };
         }
 
-        public IActionResult Unauthorized(string version, string message = "Unauthorized")
+        public IActionResult Unauthorized(string version, string message)
         {
             var payload = new ApiResponse<object>(StatusCodes.Status401Unauthorized, message, version);
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status401Unauthorized };
         }
 
-        public IActionResult Forbidden(string version, string message = "Forbidden")
+        public IActionResult Forbidden(string version, string message)
         {
             var payload = new ApiResponse<object>(StatusCodes.Status403Forbidden, message, version);
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status403Forbidden };
         }
 
-        public IActionResult Conflict<T>(T data, string version, string message = "Conflict")
+        public IActionResult Conflict<T>(T data, string version, string message)
         {
             var payload = new ApiResponse<T>(StatusCodes.Status409Conflict, message, version, data);
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status409Conflict };
         }
 
-           public IActionResult Conflict(string version, string message = "Conflict")
+        public IActionResult Conflict(string version, string message)
         {
             var payload = new ApiResponse<object>(StatusCodes.Status409Conflict, message, version);
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status409Conflict };

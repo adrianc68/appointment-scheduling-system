@@ -1,5 +1,6 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AssistantInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
@@ -80,14 +81,14 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Password = assistantDTO.Password,
                     Username = assistantDTO.Username
                 };
-                CrossCuttingLayer.Communication.Model.OperationResult<Guid?> result = await systemFacade.RegisterAssistant(assistant);
-                if(result.IsSuccessful)
+                OperationResult<Guid, GenericError> result = await systemFacade.RegisterAssistant(assistant);
+                if (result.IsSuccessful)
                 {
                     guid = result.Result;
                 }
-                else 
+                else
                 {
-                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
                 }
             }
             catch (System.Exception ex)

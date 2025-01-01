@@ -1,5 +1,6 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -21,13 +22,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
-        [HttpDelete("{idService}")]
-        public IActionResult DeleteService(int idService)
-        {
-            var appointments = systemFacade.DeleteService(idService);
-            return Ok(appointments);
-        }
-
         // public IActionResult DisableService()
         // {
         //     throw new NotImplementedException();
@@ -42,38 +36,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         // {
         //     throw new NotImplementedException();
         // }
-
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> RegisterService([FromBody] CreateServiceDTO serviceDTO)
-        {
-            Guid? guid;
-            try
-            {
-                BusinessLogicLayer.Model.Service service = new()
-                {
-                    Description = serviceDTO.Description,
-                    Minutes = serviceDTO.Minutes,
-                    Name = serviceDTO.Name,
-                    Price = serviceDTO.Price
-                };
-
-                CrossCuttingLayer.Communication.Model.OperationResult<Guid?> result = await systemFacade.RegisterService(service);
-                if (result.IsSuccessful)
-                {
-                    guid = result.Result;
-                }
-                else
-                {
-                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
-                }
-            }
-            catch (System.Exception ex)
-            {
-                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
-            }
-            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
-        }
 
 
         [HttpGet]
@@ -101,6 +63,46 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             }
             return httpResponseService.OkResponse(serviceDtos, ApiVersionEnum.V1);
         }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterService([FromBody] CreateServiceDTO serviceDTO)
+        {
+            Guid? guid;
+            try
+            {
+                BusinessLogicLayer.Model.Service service = new()
+                {
+                    Description = serviceDTO.Description,
+                    Minutes = serviceDTO.Minutes,
+                    Name = serviceDTO.Name,
+                    Price = serviceDTO.Price
+                };
+
+                OperationResult<Guid, GenericError> result = await systemFacade.RegisterService(service);
+                if (result.IsSuccessful)
+                {
+                    guid = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+        }
+
+        [HttpDelete("{idService}")]
+        public IActionResult DeleteService(int idService)
+        {
+            var appointments = systemFacade.DeleteService(idService);
+            return Ok(appointments);
+        }
+
 
         // public IActionResult EditService()
         // {

@@ -4,6 +4,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IRegisterService
     {
-        Task<OperationResult<Guid?>> RegisterService(Model.Service service);
+        Task<OperationResult<Guid,GenericError>> RegisterService(Model.Service service);
     }
 }

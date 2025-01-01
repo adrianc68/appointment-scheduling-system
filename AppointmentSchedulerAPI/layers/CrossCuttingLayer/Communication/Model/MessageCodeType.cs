@@ -3,6 +3,7 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
     public enum MessageCodeType
     {
         OK,
+        ERROR,
         SUCCESS_OPERATION,
         DATA_FOUND,
         DATA_NOT_FOUND,

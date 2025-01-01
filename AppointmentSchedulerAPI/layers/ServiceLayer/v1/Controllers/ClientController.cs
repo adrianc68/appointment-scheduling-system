@@ -1,5 +1,6 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ClientInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -19,39 +20,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         {
             this.systemFacade = systemFacade;
             this.httpResponseService = httpResponseService;
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> RegisterClient([FromBody] CreateClientDTO clientDTO)
-        {
-            Guid? guid;
-            try
-            {
-                BusinessLogicLayer.Model.Client client = new()
-                {
-                    Name = clientDTO.Name,
-                    Email = clientDTO.Email,
-                    PhoneNumber = clientDTO.PhoneNumber,
-                    Password = clientDTO.Password,
-                    Username = clientDTO.Username
-                };
-
-                CrossCuttingLayer.Communication.Model.OperationResult<Guid?> result = await systemFacade.RegisterClientAsync(client);
-                if (result.IsSuccessful)
-                {
-                    guid = result.Result;
-                }
-                else
-                {
-                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
-                }
-            }
-            catch (System.Exception ex)
-            {
-                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
-            }
-            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
 
         [HttpGet]
@@ -78,6 +46,39 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
             }
             return httpResponseService.OkResponse(clientDTO, ApiVersionEnum.V1);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterClient([FromBody] CreateClientDTO clientDTO)
+        {
+            Guid? guid;
+            try
+            {
+                BusinessLogicLayer.Model.Client client = new()
+                {
+                    Name = clientDTO.Name,
+                    Email = clientDTO.Email,
+                    PhoneNumber = clientDTO.PhoneNumber,
+                    Password = clientDTO.Password,
+                    Username = clientDTO.Username
+                };
+
+                OperationResult<Guid, GenericError> result = await systemFacade.RegisterClientAsync(client);
+                if (result.IsSuccessful)
+                {
+                    guid = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
 
 

@@ -33,7 +33,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 Appointment appointment = new Appointment
                 {
-                    // StartTime = dto.StartTime,
                     Date = dto.Date,
                     Client = new Client { Uuid = dto.ClientUuid },
                     ServiceOffers = [],
@@ -43,7 +42,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 var selectedServicesStartTimes = dto.SelectedServices
                 .Select(service => service.StartTime)
                 .ToList();
-                appointment.StartTime = selectedServicesStartTimes.Min(); 
+                appointment.StartTime = selectedServicesStartTimes.Min();
 
                 foreach (var serviceOfferUuid in dto.SelectedServices)
                 {
@@ -55,14 +54,14 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     PropToString.PrintData(serviceOffers);
                     appointment.ServiceOffers.Add(serviceOffers);
                 }
-                OperationResult<Guid?> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
+                OperationResult<Guid, GenericError> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
                 if (result.IsSuccessful)
                 {
                     guid = result.Result;
                 }
                 else
                 {
-                    return httpResponseService.Conflict(result.Result!.Value, ApiVersionEnum.V1, result.Code.ToString());
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
                 }
 
             }
@@ -95,7 +94,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         Uuid = availabilityDTO.AssistantUuid
                     }
                 };
-                OperationResult<Guid?> result = await systemFacade.RegisterAvailabilityTimeSlotAsync(availabilityTimeSlot);
+                OperationResult<Guid, GenericError> result = await systemFacade.RegisterAvailabilityTimeSlotAsync(availabilityTimeSlot);
                 if (result.IsSuccessful)
                 {
                     guid = result.Result;

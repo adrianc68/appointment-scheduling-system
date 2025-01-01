@@ -45,42 +45,28 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return serviceOffer;
         }
 
-        public async Task<OperationResult<bool?>> IsAccountDataRegisteredAsync(Assistant assistant)
-        {
-            if (string.IsNullOrWhiteSpace(assistant.Username) ||
-                 string.IsNullOrWhiteSpace(assistant.Email) ||
-                 string.IsNullOrWhiteSpace(assistant.PhoneNumber))
-            {
-                return new OperationResult<bool?>(false, MessageCodeType.NULL_VALUE_IS_PRESENT);
-            }
-
-            // 1. Check if username is is registered
-            bool isUsernameRegistered = await assistantRepository.IsUsernameRegisteredAsync(assistant.Username);
-            if (isUsernameRegistered)
-            {
-                return new OperationResult<bool?>(true, MessageCodeType.USERNAME_ALREADY_REGISTERED, isUsernameRegistered);
-            }
-
-            // 2. Check if email is registered
-            bool isEmailRegistered = await assistantRepository.IsEmailRegisteredAsync(assistant.Email);
-            if (isEmailRegistered)
-            {
-                return new OperationResult<bool?>(true, MessageCodeType.EMAIL_ALREADY_REGISTERED, isEmailRegistered);
-            }
-
-            // 3. Check if phoneNumber is registered
-            bool isPhoneNumberRegistered = await assistantRepository.IsPhoneNumberRegisteredAsync(assistant.PhoneNumber);
-            if (isPhoneNumberRegistered)
-            {
-                return new OperationResult<bool?>(true, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED, isPhoneNumberRegistered);
-            }
-            return new OperationResult<bool?>(true, MessageCodeType.OK, false);
-        }
-
         public async Task<bool> IsAssistantRegisteredByUuidAsync(Guid uuid)
         {
             int? assistantId = await assistantRepository.GetAssistantIdByUuidAsync(uuid);
             return assistantId != null;
+        }
+
+        public async Task<bool> IsEmailRegisteredAsync(string email)
+        {
+            bool isEmailRegistered = await assistantRepository.IsEmailRegisteredAsync(email);
+            return isEmailRegistered;
+        }
+
+        public async Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber)
+        {
+            bool isPhoneNumberRegistered = await assistantRepository.IsPhoneNumberRegisteredAsync(phoneNumber);
+            return isPhoneNumberRegistered;
+        }
+
+        public async Task<bool> IsUsernameRegisteredAsync(string username)
+        {
+            bool isUsernameRegistered = await assistantRepository.IsUsernameRegisteredAsync(username);
+            return isUsernameRegistered;
         }
 
         public async Task<Guid?> RegisterAssistantAsync(Assistant assistant)
