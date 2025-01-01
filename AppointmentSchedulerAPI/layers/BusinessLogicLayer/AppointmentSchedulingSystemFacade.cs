@@ -287,12 +287,43 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 ServiceOffer? serviceOfferData = await assistantMgr.GetServiceOfferByUuidAsync(serviceOffer.Uuid!.Value);
                 if (serviceOfferData == null)
                 {
-                    return OperationResult<Guid, GenericError>.Failure(new GenericError($"Service <{serviceOffer.Uuid.Value}> is not registered"), MessageCodeType.NULL_VALUE_IS_PRESENT);
+                    return OperationResult<Guid, GenericError>.Failure(new GenericError($"Service <{serviceOffer.Uuid.Value}> is not registered"), MessageCodeType.SERVICE_NOT_FOUND);
                 }
                 appointment.ServiceOffers[i] = serviceOfferData;
                 appointment.ServiceOffers[i].StartTime = proposedStartTime;
                 appointment.ServiceOffers[i].EndTime = proposedStartTime!.Value.AddMinutes(serviceOfferData.Service!.Minutes!.Value);
             }
+
+
+            appointment.ServiceOffers = appointment.ServiceOffers.OrderBy(so => so.StartTime).ToList();
+            // Validate if the services are scheduled consecutively without gaps
+            List<GenericError> errorMessages = [];
+            for (int i = 1; i < appointment.ServiceOffers.Count; i++)
+            {
+                var prevService = appointment.ServiceOffers[i - 1];
+                var currentService = appointment.ServiceOffers[i];
+
+                if (currentService.StartTime != prevService.EndTime)
+                {
+                    GenericError genericError = new GenericError($"Service with UUID <{currentService!.Uuid!.Value}> is not contiguous with the previous service. <{prevService!.Uuid!.Value}>", []);
+                    genericError.AddData($"Suggered for: <{currentService.Uuid.Value}>", prevService.EndTime!.Value);
+                    errorMessages.Add(genericError);
+                }
+            }
+            if (errorMessages.Any())
+            {
+                return OperationResult<Guid, GenericError>.Failure(errorMessages, MessageCodeType.SERVICES_ARE_NOT_CONTIGUOUS);
+            }
+
+
+
+        // Error aqui
+
+
+
+
+
+
 
             // 0.2. Calculate cost and endtime
             appointment.TotalCost = appointment.ServiceOffers.Sum(service => service.Service!.Price!.Value);
@@ -341,11 +372,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.REGISTER_ERROR);
             }
             return OperationResult<Guid, GenericError>.Success(UuidRegistered.Value);
-        }
-
-        Task<IEnumerable<AvailabilityTimeSlot>> IGetAvailabilityTimeSlot.GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
