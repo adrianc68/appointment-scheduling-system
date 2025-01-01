@@ -138,7 +138,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             bool IsPhoneNumberRegistered = await assistantMgr.IsPhoneNumberRegisteredAsync(assistant.PhoneNumber!);
             if (IsPhoneNumberRegistered)
             {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError($"PhoneNumber <{assistant.PhoneNumber}> is already registered"), MessageCodeType.EMAIL_ALREADY_REGISTERED);
+                return OperationResult<Guid, GenericError>.Failure(new GenericError($"PhoneNumber <{assistant.PhoneNumber}> is already registered"), MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
             }
             Guid? uuidNewAssistant = await assistantMgr.RegisterAssistantAsync(assistant);
             if (uuidNewAssistant == null)
@@ -168,7 +168,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<Guid, GenericError>.Failure(new GenericError($"Assistant UUID <{availabilityTimeSlot.Assistant!.Uuid!.Value}>"), MessageCodeType.ASSISTANT_NOT_FOUND);
             }
             availabilityTimeSlot.Assistant = assistantData;
-            // 2. Check if there is no slot already registered
+            // 2. Verify that no existing slot conflicts with the provided time range
             DateTimeRange range = new()
             {
                 Date = availabilityTimeSlot.Date!.Value,
@@ -209,7 +209,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             bool IsPhoneNumberRegistered = await clientMgr.IsPhoneNumberRegisteredAsync(client.PhoneNumber!);
             if (IsPhoneNumberRegistered)
             {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError($"PhoneNumber <{client.PhoneNumber}> is already registered"), MessageCodeType.EMAIL_ALREADY_REGISTERED);
+                return OperationResult<Guid, GenericError>.Failure(new GenericError($"PhoneNumber <{client.PhoneNumber}> is already registered"), MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
             }
             Guid? uuidNewClient = await clientMgr.RegisterClientAsync(client);
             if (uuidNewClient == null)
@@ -312,14 +312,27 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     EndTime = proposedEndTime,
                     Date = appointment.Date!.Value
                 };
-                var IsAssistantAvailableToOfferService = await schedulerMgr.IsAssistantAvailableInTimeRange(serviceRange, serviceOffer.Assistant!.Id!.Value);
-                if (!IsAssistantAvailableToOfferService)
+
+                bool isAssistantAvailableInAvailabilityTimeSlots = await schedulerMgr.IsAssistantAvailableInAvailabilityTimeSlots(serviceRange, serviceOffer.Assistant!.Id!.Value);
+
+                if (!isAssistantAvailableInAvailabilityTimeSlots)
                 {
-                    return OperationResult<Guid, GenericError>.Failure(new GenericError($"Assistant uuid: <{serviceOffer.Assistant!.Uuid!.Value}> is not registered"), MessageCodeType.NULL_VALUE_IS_PRESENT);
+                    GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is not available during the requested time range", new Dictionary<string, object>());
+                    error.AddData("uuid", serviceOffer.Uuid!.Value);
+                    error.AddData("startTime", serviceRange.StartTime);
+                    return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE);
+                }
+
+                bool hasAssistantConflictingAppoinments = await schedulerMgr.HasAssistantConflictingAppoinments(serviceRange, serviceOffer.Assistant!.Id!.Value);
+                if (!hasAssistantConflictingAppoinments)
+                {
+                    GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is attending another appointment during the requested time range", new Dictionary<string, object>());
+                    error.AddData("uuid", serviceOffer.Uuid!.Value);
+                    error.AddData("startTime", serviceRange.StartTime);
+                    return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.SELECTED_SERVICE_HAS_CONFLICTING_APPOINTMENT_TIME_SLOT);
                 }
             }
 
-            // 1.1. Check if availability time slot available
             Guid? UuidRegistered = await schedulerMgr.ScheduleAppointment(appointment);
             if (UuidRegistered == null)
             {

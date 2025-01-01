@@ -101,7 +101,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 }
                 else
                 {
-                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
                 }
             }
             catch (System.Exception ex)

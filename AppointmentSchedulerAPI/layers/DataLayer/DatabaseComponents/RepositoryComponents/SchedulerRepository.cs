@@ -254,10 +254,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return !isAvailable;
         }
 
-
-
-
-        public async Task<bool> IsAssistantAvailableInTimeRange(DateTimeRange range, int idAssistant)
+        public async Task<bool> IsAssistantAvailableInAvailabilityTimeSlotsAsync(DateTimeRange range, int idAssistant)
         {
             using var dbContext = context.CreateDbContext();
             var availableSlots = await dbContext.AvailabilityTimeSlots
@@ -269,15 +266,20 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             {
                 return false;
             }
+            return true;
+        }
 
+        public async Task<bool> HasAssistantConflictingAppoinmentsAsync(DateTimeRange range, int idAssistant)
+        {
+            using var dbContext = context.CreateDbContext();
             var conflictingOffers = await dbContext.AppointmentServiceOffers
-              .Where(aso =>
-                  aso.ServiceOffer.IdAssistant == idAssistant &&
-                  aso.Appointment.Date == range.Date &&
-                  !(range.EndTime <= aso.StartTime || range.StartTime >= aso.EndTime) && 
-                  (aso.Appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED ||
-                   aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED))
-              .ToListAsync();
+                .Where(aso =>
+                    aso.ServiceOffer.IdAssistant == idAssistant &&
+                    aso.Appointment.Date == range.Date &&
+                    !(range.EndTime <= aso.StartTime || range.StartTime >= aso.EndTime) &&
+                    (aso.Appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED ||
+                    aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED))
+                .ToListAsync();
 
             if (conflictingOffers.Any())
             {
@@ -288,7 +290,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 }
                 return false;
             }
-
             return true;
         }
     }

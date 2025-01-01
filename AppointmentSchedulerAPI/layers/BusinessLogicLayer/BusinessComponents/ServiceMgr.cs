@@ -39,7 +39,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public async Task<bool> IsServiceNameRegistered(string serviceName)
         {
-            bool isServiceNameRegistered = await serviceRepository.IsServiceNameRegistered(serviceName);
+            bool isServiceNameRegistered = await serviceRepository.IsServiceNameRegisteredAsync(serviceName);
             return isServiceNameRegistered;
         }
 

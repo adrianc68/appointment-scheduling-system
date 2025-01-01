@@ -22,15 +22,14 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         // bool IsAvailabilityTimeSlotAvailable(DateTimeRange range);
         Task<IEnumerable<AssistantService>> GetAvailableServicesAsync(DateOnly date);
         Task<IEnumerable<AvailabilityTimeSlot>> GetAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate);
+        Task<IEnumerable<Appointment>> GetAppointmentsAsync(DateOnly startDate, DateOnly endDate);
         Task<int?> GetAvailabilityTimeSlotIdByUuidAsync(Guid uuid);
         Task<int?> GetAppointmentIdByUuidAsync(Guid uuid);
-        Task<IEnumerable<Appointment>> GetAppointmentsAsync(DateOnly startDate, DateOnly endDate);
-
+        Task<bool> IsAssistantAvailableInAvailabilityTimeSlotsAsync(DateTimeRange range, int idAssistant);
+        Task<bool> HasAssistantConflictingAppoinmentsAsync(DateTimeRange range, int idAssistant);
         Task<bool> IsAppointmentTimeSlotAvailableAsync(DateTimeRange range);
         Task<bool> IsAvailabilityTimeSlotRegisteredAsync(DateTimeRange range, int idAssistant);
-        Task<bool> IsAssistantAvailableInTimeRange(DateTimeRange range, int idAssistant);
         Task<bool> AddAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot);
-        // bool ScheduleAppointment(DateTimeRange range, List<Service> services, Client client);
         Task<bool> AddAppointmentAsync(Appointment appointment);
 
     }

@@ -117,7 +117,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return serviceId;
         }
 
-        public async Task<bool> IsServiceNameRegistered(string name)
+        public async Task<bool> IsServiceNameRegisteredAsync(string name)
         {
             using var dbContext = context.CreateDbContext();
             var serviceName = await dbContext.Services
