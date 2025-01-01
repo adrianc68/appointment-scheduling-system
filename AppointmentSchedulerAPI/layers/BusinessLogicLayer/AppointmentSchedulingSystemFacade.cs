@@ -6,8 +6,6 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
-
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 {
@@ -106,19 +104,44 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public List<Appointment> GetAppoinments(DateTime startDate, DateTime endDate)
+        // public List<Appointment> GetAppoinments(DateTime startDate, DateTime endDate)
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public Appointment GetAppointmentDetails(int idAppointment)
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        public Task<List<Assistant>> GetAllAssistantsAsync()
         {
-            throw new NotImplementedException();
+            return assistantMgr.GetAllAssistantsAsync();
         }
 
-        public Appointment GetAppointmentDetails(int idAppointment)
+        public Task<List<Service>> GetAllServicesAsync()
         {
-            throw new NotImplementedException();
+            return serviceMgr.GetAllServicesAsync();
         }
 
-        public List<Appointment> GetAppointments(DateTime startDate, DateTime endDate)
+        public Task<List<Client>> GetAllClientsAsync()
         {
-            throw new NotImplementedException();
+            return clientMgr.GetAllClientsAsync();
+        }
+
+        public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
+        {
+            return schedulerMgr.GetAvailableServicesAsync(date);
+        }
+
+        public Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
+        {
+            return schedulerMgr.GetAllAvailabilityTimeSlotsAsync(startDate, endDate);
+        }
+
+        public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
+        {
+            return await schedulerMgr.GetConflictingServicesByDateTimeRangeAsync(range);
         }
 
         public async Task<OperationResult<Guid, GenericError>> RegisterAssistant(Assistant assistant)
@@ -187,11 +210,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(uuidNewClient.Value);
         }
 
-        public Task<List<Assistant>> GetAllAssistantsAsync()
-        {
-            return assistantMgr.GetAllAssistantsAsync();
-        }
-
         public async Task<OperationResult<Guid, GenericError>> RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot)
         {
             // 0. Check valid range time
@@ -234,8 +252,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(uuid.Value);
         }
 
-
-
         public async Task<OperationResult<Guid, GenericError>> RegisterService(Service service)
         {
             bool isServiceNameRegistered = await serviceMgr.IsServiceNameRegisteredAsync(service.Name!);
@@ -252,47 +268,58 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(UuidNewservice.Value);
         }
 
-        public Task<List<Service>> GetAllServicesAsync()
+        public async Task<OperationResult<bool, GenericError>> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
         {
-            return serviceMgr.GetAllServicesAsync();
-        }
 
-        public bool ScheduleAppointmentAsStaff(DateTimeRange range, List<Service> services, int idClient)
-        {
-            throw new NotImplementedException();
-        }
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistantUuid);
+            if (assistantData == null)
+            {
+                GenericError genericError = new GenericError($"Asssistant with UUID <{assistantUuid}> is not found", []);
+                genericError.AddData("assistantUuid", assistantUuid);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+            }
 
-        public Task<List<Client>> GetAllClientsAsync()
-        {
-            return clientMgr.GetAllClientsAsync();
-        }
-
-        public Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
-        {
-            return assistantMgr.AssignServicesToAssistantAsync(assistantUuid, servicesUuid);
-        }
-
-        public Task<List<AssistantService>> GetAvailableServices(DateOnly date)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
-        {
-            return schedulerMgr.GetAvailableServicesAsync(date);
-        }
-
-        public Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
-        {
-            return schedulerMgr.GetAllAvailabilityTimeSlotsAsync(startDate, endDate);
-        }
-
-        public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
-        {
-            return await schedulerMgr.GetConflictingServicesByDateTimeRangeAsync(range);
+            List<int> idServices = [];
+            foreach (var serviceUuid in servicesUuid)
+            {
+                Service? serviceData = await serviceMgr.GetServiceByUuidAsync(serviceUuid!.Value);
+                if (serviceData == null)
+                {
+                    GenericError genericError = new GenericError($"Service with UUID <{serviceUuid}> is not found", []);
+                    genericError.AddData("serviceUuid", servicesUuid);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
+                }
+                bool isAlreadyRegistered = await assistantMgr.IsAssistantOfferingServiceByUuidAsync(serviceData.Id!.Value, assistantData.Id!.Value );
+                if (isAlreadyRegistered)
+                {
+                    GenericError genericError = new GenericError($"Service with UUID <{serviceUuid}> is already assigned to assistant {assistantUuid}", []);
+                    genericError.AddData("assistantUuid", assistantUuid);
+                    genericError.AddData("conflictingServiceUuid", serviceUuid);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_ALREADY_ASSIGNED_TO_ASSISTANT);
+                }
+                idServices.Add(serviceData.Id.Value);
+            }
+            bool areAllServicesAssigned = await assistantMgr.AssignServicesToAssistantAsync(assistantData.Id!.Value, idServices);
+            if (!areAllServicesAssigned)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has occurred"), MessageCodeType.REGISTER_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
         }
 
         public async Task<OperationResult<Guid, GenericError>> ScheduleAppointmentAsClientAsync(Appointment appointment)
+        {
+            appointment.Status = AppointmentStatusType.SCHEDULED;
+            return await ScheduleAppointment(appointment);
+        }
+
+        public async Task<OperationResult<Guid, GenericError>> ScheduleAppointmentAsStaffAsync(Appointment appointment)
+        {
+            appointment.Status = AppointmentStatusType.CONFIRMED;
+            return await ScheduleAppointmentAsClientAsync(appointment);
+        }
+
+        private async Task<OperationResult<Guid, GenericError>> ScheduleAppointment(Appointment appointment)
         {
             // Get Client data
             var clientData = await clientMgr.GetClientByUuidAsync(appointment.Client.Uuid!.Value);
@@ -347,8 +374,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             // Calculate cost and endtime
             appointment.TotalCost = appointment.ServiceOffers.Sum(service => service.Service!.Price!.Value);
             appointment.EndTime = appointment.StartTime!.Value.AddMinutes(appointment.ServiceOffers.Sum(service => service.Service!.Minutes!.Value));
-            appointment.Status = AppointmentStatusType.SCHEDULED;
-
 
             // 1. Check for each service if it's Assistant is available in time range
             foreach (var serviceOffer in appointment.ServiceOffers)
@@ -395,9 +420,5 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(UuidRegistered.Value);
         }
 
-
     }
-
-
-
 }

@@ -105,7 +105,15 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isAssigned = false;
             try
             {
-                isAssigned = await systemFacade.AssignServicesToAssistant(assignServiceDTO.assistantUuid, assignServiceDTO.servicesUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.AssignServicesToAssistant(assignServiceDTO.assistantUuid, assignServiceDTO.servicesUuid);
+                if (result.IsSuccessful)
+                {
+                    isAssigned = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
             }
             catch (System.Exception ex)
             {

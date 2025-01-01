@@ -63,36 +63,16 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isRegistered;
         }
 
-        public async Task<bool> AddServicesToAssistantAsync(Guid assistantUuid, List<Guid?> servicesUuid)
+        public async Task<bool> AddServicesToAssistantAsync(int idAssistant, List<int> idServices)
         {
             bool isRegistered = false;
             using var dbContext = context.CreateDbContext();
             using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
             {
-                var assistantId = await dbContext.Assistants
-                    .Where(a => a.UserAccount.Uuid == assistantUuid)
-                    .Select(a => a.IdUserAccount)
-                    .FirstOrDefaultAsync();
-
-                if (assistantId == null)
+                var assistantServices = idServices.Select(serviceId => new ServiceOffer
                 {
-                    return false;
-                }
-
-                var serviceIds = await dbContext.Services
-                    .Where(s => servicesUuid.Contains(s.Uuid))
-                    .Select(s => s.Id)
-                    .ToListAsync();
-
-                if (!serviceIds.Any())
-                {
-                    return false;
-                }
-
-                var assistantServices = serviceIds.Select(serviceId => new ServiceOffer
-                {
-                    IdAssistant = assistantId,
+                    IdAssistant = idAssistant,
                     IdService = serviceId,
                     Uuid = Guid.CreateVersion7()
                 }).ToList();
@@ -289,6 +269,16 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     CreatedAt = dbServiceOffer.Assistant.UserAccount.CreatedAt
                 }
             };
+        }
+
+        public async Task<bool> IsAssistantOfferingServiceByUuidAsync(int idService, int idAssistant)
+        {
+            using var dbContext = context.CreateDbContext();
+            var serviceOfferDB = await dbContext.ServiceOffers
+                .Where(a => a.IdService == idService && a.IdAssistant == idAssistant)
+                .FirstOrDefaultAsync();
+
+            return serviceOfferDB != null;
         }
     }
 }

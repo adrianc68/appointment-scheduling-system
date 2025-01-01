@@ -3,7 +3,6 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -76,10 +75,56 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
 
-        // public IActionResult ScheduleAppointmentAsStaff()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPost("appointment/asStaff")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ScheduleAppointmentAsStaff([FromBody] CreateAppointmentAsStaffDTO dto)
+        {
+            Guid? guid;
+            try
+            {
+                Appointment appointment = new Appointment
+                {
+                    Date = dto.Date,
+                    Client = new Client { Uuid = dto.ClientUuid },
+                    ServiceOffers = [],
+                    Uuid = Guid.CreateVersion7()
+                };
+
+                var selectedServicesStartTimes = dto.SelectedServices
+                .Select(service => service.StartTime)
+                .ToList();
+                appointment.StartTime = selectedServicesStartTimes.Min();
+
+                foreach (var serviceOfferUuid in dto.SelectedServices)
+                {
+                    var serviceOffers = new ServiceOffer
+                    {
+                        Uuid = serviceOfferUuid.Uuid,
+                        StartTime = serviceOfferUuid.StartTime
+                    };
+                    appointment.ServiceOffers.Add(serviceOffers);
+                }
+                OperationResult<Guid, GenericError> result = await systemFacade.ScheduleAppointmentAsStaffAsync(appointment);
+                if (result.IsSuccessful)
+                {
+                    guid = result.Result;
+                }
+                else
+                {
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        return httpResponseService.Conflict(result.Errors, ApiVersionEnum.V1, result.Code.ToString());
+                    }
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+        }
 
         [HttpPost("availabilityTimeSlot")]
         [AllowAnonymous]

@@ -90,20 +90,26 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<BusinessLogicLayer.Model.Service?> GetServiceByUuidAsync(Guid uuid)
         {
             using var dbContext = context.CreateDbContext();
-            var service = await dbContext.Services
-            .Where(serviceDB => serviceDB.Uuid == uuid)
-            .Select(serviceDB => new BusinessLogicLayer.Model.Service
+            var serviceDB = await dbContext.Services
+       .FirstOrDefaultAsync(s => s.Uuid == uuid);
+
+            if (serviceDB == null)
+            {
+                return null; 
+            }
+
+            var service = new BusinessLogicLayer.Model.Service
             {
                 Description = serviceDB.Description,
                 Name = serviceDB.Name,
                 Minutes = serviceDB.Minutes,
                 Price = serviceDB.Price,
                 Uuid = serviceDB.Uuid,
-                Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)serviceDB.Status,
                 CreatedAt = serviceDB.CreatedAt,
-                Id = serviceDB.Id
-            })
-            .FirstOrDefaultAsync();
+                Id = serviceDB.Id,
+                Status = (BusinessLogicLayer.Model.Types.ServiceStatusType)serviceDB.Status!.Value
+            };
+
             return service;
         }
 

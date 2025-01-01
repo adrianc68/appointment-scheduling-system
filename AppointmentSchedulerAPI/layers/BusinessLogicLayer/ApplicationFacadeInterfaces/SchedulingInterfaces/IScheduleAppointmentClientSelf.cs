@@ -8,9 +8,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
     public interface IScheduleAppointmentClientSelf
     {
         bool ConfirmAppointment(int idAppointment);
-        Appointment GetAppointmentDetails(int idAppointment);
-        List<Appointment> GetAppoinments(DateTime startDate, DateTime endDate);
-        Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date);
         Task<OperationResult<Guid, GenericError>> ScheduleAppointmentAsClientAsync(Appointment appointment);
     }
 }
