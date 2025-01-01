@@ -126,19 +126,25 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             bool IsUsernameRegistered = await assistantMgr.IsUsernameRegisteredAsync(assistant.Username!);
             if (IsUsernameRegistered)
             {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError($"Username <{assistant.Username}> is already registered"), MessageCodeType.USERNAME_ALREADY_REGISTERED);
+                GenericError genericError = new GenericError($"Username <{assistant.Username}> is already registered", []);
+                genericError.AddData("username", assistant.Username!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
             }
 
             bool IsEmailRegistered = await assistantMgr.IsEmailRegisteredAsync(assistant.Email!);
             if (IsEmailRegistered)
             {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError($"Email <{assistant.Email}> is already registered"), MessageCodeType.EMAIL_ALREADY_REGISTERED);
+                GenericError genericError = new GenericError($"Email <{assistant.Email}> is already registered", []);
+                genericError.AddData("email", assistant.Email!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
             }
 
             bool IsPhoneNumberRegistered = await assistantMgr.IsPhoneNumberRegisteredAsync(assistant.PhoneNumber!);
             if (IsPhoneNumberRegistered)
             {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError($"PhoneNumber <{assistant.PhoneNumber}> is already registered"), MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
+                GenericError genericError = new GenericError($"PhoneNumber <{assistant.PhoneNumber}> is already registered", []);
+                genericError.AddData("phoneNumber", assistant.PhoneNumber!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
             }
             Guid? uuidNewAssistant = await assistantMgr.RegisterAssistantAsync(assistant);
             if (uuidNewAssistant == null)
@@ -146,6 +152,39 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.REGISTER_ERROR);
             }
             return OperationResult<Guid, GenericError>.Success(uuidNewAssistant.Value);
+        }
+
+        public async Task<OperationResult<Guid, GenericError>> RegisterClientAsync(Client client)
+        {
+            bool IsUsernameRegistered = await clientMgr.IsUsernameRegisteredAsync(client.Username!);
+            if (IsUsernameRegistered)
+            {
+                GenericError genericError = new GenericError($"Username <{client.Username}> is already registered", []);
+                genericError.AddData("username", client.Username!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
+            }
+
+            bool IsEmailRegistered = await clientMgr.IsEmailRegisteredAsync(client.Email!);
+            if (IsEmailRegistered)
+            {
+                GenericError genericError = new GenericError($"Email <{client.Email}> is already registered", []);
+                genericError.AddData("email", client.Email!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
+            }
+
+            bool IsPhoneNumberRegistered = await clientMgr.IsPhoneNumberRegisteredAsync(client.PhoneNumber!);
+            if (IsPhoneNumberRegistered)
+            {
+                GenericError genericError = new GenericError($"PhoneNumber <{client.PhoneNumber}> is already registered", []);
+                genericError.AddData("phoneNumber", client.PhoneNumber!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
+            }
+            Guid? uuidNewClient = await clientMgr.RegisterClientAsync(client);
+            if (uuidNewClient == null)
+            {
+                return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.REGISTER_ERROR);
+            }
+            return OperationResult<Guid, GenericError>.Success(uuidNewClient.Value);
         }
 
         public Task<List<Assistant>> GetAllAssistantsAsync()
@@ -165,9 +204,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(availabilityTimeSlot.Assistant!.Uuid!.Value);
             if (assistantData == null)
             {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError($"Assistant UUID <{availabilityTimeSlot.Assistant!.Uuid!.Value}>"), MessageCodeType.ASSISTANT_NOT_FOUND);
+                GenericError genericError = new GenericError($"Assistant UUID <{availabilityTimeSlot.Assistant!.Uuid!.Value}>", []);
+                genericError.AddData("AssistantUuid", availabilityTimeSlot.Assistant!.Uuid!.Value);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
             availabilityTimeSlot.Assistant = assistantData;
+
             // 2. Verify that no existing slot conflicts with the provided time range
             DateTimeRange range = new()
             {
@@ -180,7 +222,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             if (!isAvailabilityTimeSlotAvailable)
             {
                 GenericError genericError = new("Time range is not available", new Dictionary<string, object>());
-                genericError.AdditionalData!.Add("range", range);
+                genericError.AdditionalData!.Add("Range", range);
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_AVAILABLE);
             }
             // 3. Register availability time slot
@@ -192,32 +234,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(uuid.Value);
         }
 
-        public async Task<OperationResult<Guid, GenericError>> RegisterClientAsync(Client client)
-        {
-            bool IsUsernameRegistered = await clientMgr.IsUsernameRegisteredAsync(client.Username!);
-            if (IsUsernameRegistered)
-            {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError($"Username <{client.Username}> is already registered"), MessageCodeType.USERNAME_ALREADY_REGISTERED);
-            }
 
-            bool IsEmailRegistered = await clientMgr.IsEmailRegisteredAsync(client.Email!);
-            if (IsEmailRegistered)
-            {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError($"Email <{client.Email}> is already registered"), MessageCodeType.EMAIL_ALREADY_REGISTERED);
-            }
-
-            bool IsPhoneNumberRegistered = await clientMgr.IsPhoneNumberRegisteredAsync(client.PhoneNumber!);
-            if (IsPhoneNumberRegistered)
-            {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError($"PhoneNumber <{client.PhoneNumber}> is already registered"), MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
-            }
-            Guid? uuidNewClient = await clientMgr.RegisterClientAsync(client);
-            if (uuidNewClient == null)
-            {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.REGISTER_ERROR);
-            }
-            return OperationResult<Guid, GenericError>.Success(uuidNewClient.Value);
-        }
 
         public async Task<OperationResult<Guid, GenericError>> RegisterService(Service service)
         {
@@ -268,6 +285,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         public Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
         {
             return schedulerMgr.GetAllAvailabilityTimeSlotsAsync(startDate, endDate);
+        }
+
+        public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
+        {
+            return await schedulerMgr.GetConflictingServicesByDateTimeRangeAsync(range);
         }
 
         public async Task<OperationResult<Guid, GenericError>> ScheduleAppointmentAsClientAsync(Appointment appointment)
@@ -347,9 +369,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 {
                     GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is not available during the requested time range", []);
                     error.AddData("SelectedServiceUuid", serviceOffer.Uuid!.Value);
-                    error.AddData("startTime", serviceRange.StartTime);
-                    error.AddData("endTime", serviceRange.EndTime);
-                    error.AddData("assistantUuid", serviceOffer.Assistant!.Uuid!.Value);
+                    error.AddData("StartTime", serviceRange.StartTime);
+                    error.AddData("EndTime", serviceRange.EndTime);
+                    error.AddData("AssistantUuid", serviceOffer.Assistant!.Uuid!.Value);
                     return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE);
                 }
 
@@ -358,9 +380,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 {
                     GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is attending another appointment during the requested time range", []);
                     error.AddData("SelectedServiceUuid", serviceOffer.Uuid!.Value);
-                    error.AddData("startTime", serviceRange.StartTime);
-                    error.AddData("endTime", serviceRange.EndTime);
-                    error.AddData("assistantUuid", serviceOffer.Assistant!.Uuid!.Value);
+                    error.AddData("StartTime", serviceRange.StartTime);
+                    error.AddData("EndTime", serviceRange.EndTime);
+                    error.AddData("AssistantUuid", serviceOffer.Assistant!.Uuid!.Value);
                     return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.SELECTED_SERVICE_HAS_CONFLICTING_APPOINTMENT_TIME_SLOT);
                 }
             }
@@ -373,10 +395,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(UuidRegistered.Value);
         }
 
-        public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
-        {
-            return await schedulerMgr.GetConflictingServicesByDateTimeRangeAsync(range);
-        }
+
     }
 
 
