@@ -16,7 +16,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             this.assistantRepository = assistantRepository;
         }
 
-        public async Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
+        public async Task<bool> AssignServicesToAssistantAsync(Guid assistantUuid, List<Guid?> servicesUuid)
         {
             bool areAllServicesRegistered = await assistantRepository.AddServicesToAssistantAsync(assistantUuid, servicesUuid);
             return areAllServicesRegistered;

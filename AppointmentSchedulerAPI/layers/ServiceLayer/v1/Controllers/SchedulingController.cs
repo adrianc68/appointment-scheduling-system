@@ -1,5 +1,6 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
@@ -51,7 +52,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         Uuid = serviceOfferUuid.Uuid,
                         StartTime = serviceOfferUuid.StartTime
                     };
-                    PropToString.PrintData(serviceOffers);
                     appointment.ServiceOffers.Add(serviceOffers);
                 }
                 OperationResult<Guid, GenericError> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
@@ -170,6 +170,32 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
             }
             return httpResponseService.OkResponse(availabilityTimeslotsDTO, ApiVersionEnum.V1);
+        }
+
+
+        [HttpGet("appointment/conflict")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetConflictingServiceAppointmentFromRange([FromQuery] DateTimeRangeDTO rangeDTO)
+        {
+            List<ConflictingServiceOfferDTO> conflictingServiceOfferDTOs = [];
+            try
+            {
+                DateTimeRange range = new DateTimeRange(rangeDTO.Date, rangeDTO.StartTime, rangeDTO.EndTime);
+                var conflictingServiceOffers = await systemFacade.GetConflictingServicesByDateTimeRangeAsync(range);
+               conflictingServiceOfferDTOs = conflictingServiceOffers.Select(a => new ConflictingServiceOfferDTO
+               {
+                    ConflictingServiceOfferUuid = a.Uuid,
+                    StartTime = a.StartTime,
+                    EndTime = a.EndTime,
+                    AssistantName = a.Assistant!.Name,
+                    AssistantUuid = a.Assistant!.Uuid!.Value
+               }).ToList();
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
+            }
+            return httpResponseService.OkResponse(conflictingServiceOfferDTOs, ApiVersionEnum.V1);
         }
 
 

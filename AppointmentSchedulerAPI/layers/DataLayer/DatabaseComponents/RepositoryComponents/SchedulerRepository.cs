@@ -283,14 +283,34 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
             if (conflictingOffers.Any())
             {
-                Console.WriteLine("Conflictos encontrados con AppointmentServiceOffers existentes.");
-                foreach (var conflict in conflictingOffers)
-                {
-                    Console.WriteLine($"Conflicto con ServiceOffer: Id={conflict.IdServiceOffer}, StartTime={conflict.StartTime}, EndTime={conflict.EndTime}");
-                }
                 return false;
             }
             return true;
+        }
+
+        public async Task<IEnumerable<BusinessLogicLayer.Model.ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
+        {
+            using var dbContext = context.CreateDbContext();
+            var conflictingOffers = await dbContext.AppointmentServiceOffers
+                .Where(aso =>
+                    aso.Appointment.Date == range.Date &&
+                    !(range.EndTime <= aso.StartTime || range.StartTime >= aso.EndTime) &&
+                    (aso.Appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED ||
+                    aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED))
+                .Select(aso => new BusinessLogicLayer.Model.ServiceOffer
+                {
+                    Id = aso.ServiceOffer.Id,
+                    Uuid = aso.ServiceOffer.Uuid,
+                    StartTime = aso.StartTime,
+                    EndTime = aso.EndTime,
+                    Assistant = new BusinessLogicLayer.Model.Assistant
+                    {
+                        Uuid = aso.ServiceOffer.Assistant.UserAccount.Uuid,
+                        Name = aso.ServiceOffer.Assistant.UserAccount.UserInformation.Name
+                    }
+                })
+                .ToListAsync();
+            return conflictingOffers;
         }
     }
 }

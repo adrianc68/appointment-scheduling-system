@@ -37,7 +37,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return serviceId;
         }
 
-        public async Task<bool> IsServiceNameRegistered(string serviceName)
+        public async Task<bool> IsServiceNameRegisteredAsync(string serviceName)
         {
             bool isServiceNameRegistered = await serviceRepository.IsServiceNameRegisteredAsync(serviceName);
             return isServiceNameRegistered;
@@ -49,7 +49,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return serviceId != null;
         }
 
-        public async Task<Guid?> RegisterService(Service service)
+        public async Task<Guid?> RegisterServiceAsync(Service service)
         {
             service.Uuid = Guid.CreateVersion7();
             bool isRegistered = await serviceRepository.AddServiceAsync(service);

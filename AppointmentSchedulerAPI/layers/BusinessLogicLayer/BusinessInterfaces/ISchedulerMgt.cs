@@ -22,15 +22,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         // bool IsAppointmentInSpecificState(int idAppointment, AppointmentStatusType expected);
         // bool IsAssistantAvailableInTimeRange(int idAssistant, DateTimeRange range);
         // bool IsAvailabilityTimeSlotAvailable(DateTimeRange range);
-        Task<IEnumerable<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate);
+        Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate);
         Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date);
-        Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot);
-        Task<Guid?> ScheduleAppointment(Appointment appointment);
-        Task<bool> IsAppointmentTimeSlotAvailable(DateTimeRange range);
-        Task<bool> IsAvailabilityTimeSlotAvailable(DateTimeRange range, int idAssistant);
-
-        Task<bool> IsAssistantAvailableInAvailabilityTimeSlots(DateTimeRange range, int idAssistant);
-        Task<bool> HasAssistantConflictingAppoinments(DateTimeRange range, int idAssistant);
+        Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
+        Task<Guid?> RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot);
+        Task<Guid?> ScheduleAppointmentAsync(Appointment appointment);
+        Task<bool> IsAppointmentTimeSlotAvailableAsync(DateTimeRange range);
+        Task<bool> IsAvailabilityTimeSlotAvailableAsync(DateTimeRange range, int idAssistant);
+        Task<bool> IsAssistantAvailableInAvailabilityTimeSlotsAsync(DateTimeRange range, int idAssistant);
+        Task<bool> HasAssistantConflictingAppoinmentsAsync(DateTimeRange range, int idAssistant);
 
 
     }

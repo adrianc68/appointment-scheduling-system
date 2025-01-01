@@ -16,7 +16,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             this.schedulerRepository = SchedulerRepository;
         }
 
-        public async Task<IEnumerable<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
+        public async Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate)
         {
             return (List<AvailabilityTimeSlot>)await schedulerRepository.GetAvailabilityTimeSlotsAsync(startDate, endDate);
         }
@@ -27,32 +27,37 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         }
 
-        public async Task<bool> HasAssistantConflictingAppoinments(DateTimeRange range, int idAssistant)
+        public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
+        {
+            return (List<ServiceOffer>)await schedulerRepository.GetConflictingServicesByDateTimeRangeAsync(range);
+        }
+
+        public async Task<bool> HasAssistantConflictingAppoinmentsAsync(DateTimeRange range, int idAssistant)
         {
             bool HasAssistantConflictingAppoinments = await schedulerRepository.HasAssistantConflictingAppoinmentsAsync(range, idAssistant);
             return HasAssistantConflictingAppoinments;
         }
 
-        public async Task<bool> IsAssistantAvailableInAvailabilityTimeSlots(DateTimeRange range, int idAssistant)
+        public async Task<bool> IsAssistantAvailableInAvailabilityTimeSlotsAsync(DateTimeRange range, int idAssistant)
         {
             bool isAssistantAvailableInAvailabilityTimeSlots = await schedulerRepository.IsAssistantAvailableInAvailabilityTimeSlotsAsync(range, idAssistant);
             return isAssistantAvailableInAvailabilityTimeSlots;
         }
 
 
-        public async Task<bool> IsAppointmentTimeSlotAvailable(DateTimeRange range)
+        public async Task<bool> IsAppointmentTimeSlotAvailableAsync(DateTimeRange range)
         {
             bool isTimeSlotAvailable = await schedulerRepository.IsAppointmentTimeSlotAvailableAsync(range);
             return isTimeSlotAvailable;
         }
 
-        public async Task<bool> IsAvailabilityTimeSlotAvailable(DateTimeRange range, int idAssistant)
+        public async Task<bool> IsAvailabilityTimeSlotAvailableAsync(DateTimeRange range, int idAssistant)
         {
             bool isAvailabilityTimeSlotRegistered = await schedulerRepository.IsAvailabilityTimeSlotRegisteredAsync(range, idAssistant);
             return isAvailabilityTimeSlotRegistered;
         }
 
-        public async Task<Guid?> RegisterAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot)
+        public async Task<Guid?> RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot)
         {
             availabilityTimeSlot.Uuid = Guid.CreateVersion7();
             bool isRegistered = await schedulerRepository.AddAvailabilityTimeSlotAsync(availabilityTimeSlot);
@@ -64,7 +69,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return availabilityTimeSlot.Uuid.Value;
         }
 
-        public async Task<Guid?> ScheduleAppointment(Appointment appointment)
+        public async Task<Guid?> ScheduleAppointmentAsync(Appointment appointment)
         {
             appointment.Uuid = Guid.CreateVersion7();
 
@@ -76,5 +81,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             }
             return appointment.Uuid;
         }
+
     }
 }
