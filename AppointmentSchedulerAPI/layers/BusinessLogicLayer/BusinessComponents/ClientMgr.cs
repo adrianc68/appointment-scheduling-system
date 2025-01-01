@@ -52,7 +52,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool isPhoneNumberRegistered = await clientRepository.IsPhoneNumberRegisteredAsync(client.PhoneNumber);
             if (isPhoneNumberRegistered)
             {
-                return new OperationResult<bool?>(true, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
+                return new OperationResult<bool?>(true, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED, isPhoneNumberRegistered);
             }
             return new OperationResult<bool?>(true, MessageCodeType.OK, false);
         }

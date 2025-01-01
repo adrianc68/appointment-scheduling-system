@@ -261,18 +261,19 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return new OperationResult<Guid?>(false, MessageCodeType.NULL_VALUE_IS_PRESENT);
 
             }
-            // 0. Get Client data
+            // Get Client data
             var clientData = await clientMgr.GetClientByUuidAsync(appointment.Client.Uuid.Value);
             if (clientData == null)
             {
-                return new OperationResult<Guid?>(false, MessageCodeType.CLIENT_NOT_FOUND);
+                return new OperationResult<Guid?>(false, MessageCodeType.CLIENT_NOT_FOUND, appointment.Client.Uuid);
             }
             appointment.Client = clientData;
 
-            // 0.1. Get Services data
+            // Get Services data
             for (int i = 0; i < appointment.ServiceOffers.Count; i++)
             {
                 var serviceOffer = appointment.ServiceOffers[i];
+                var proposedStartTime = serviceOffer.StartTime;
                 if (serviceOffer.Uuid == null)
                 {
                     return new OperationResult<Guid?>(false, MessageCodeType.NULL_VALUE_IS_PRESENT);
@@ -284,6 +285,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return new OperationResult<Guid?>(false, MessageCodeType.SERVICE_NOT_FOUND, serviceOffer.Uuid.Value);
                 }
                 appointment.ServiceOffers[i] = serviceOfferData;
+                appointment.ServiceOffers[i].StartTime = proposedStartTime;
+                appointment.ServiceOffers[i].EndTime = proposedStartTime!.Value.AddMinutes(serviceOfferData.Service!.Minutes!.Value);
             }
 
             // 0.2. Calculate cost and endtime
@@ -292,82 +295,31 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             appointment.Status = AppointmentStatusType.SCHEDULED;
 
 
-            List<(TimeOnly StartTime, TimeOnly EndTime)> adjustedTimeRanges = new();
-            TimeOnly currentAdjustedStartTime = appointment.StartTime!.Value;
-            foreach (var serviceOffer in appointment.ServiceOffers)
+            // 1. Check for each service if it's Assistant is available in service time range
+            foreach ( var serviceOffer in appointment.ServiceOffers)
             {
-                var serviceDuration = TimeSpan.FromMinutes(serviceOffer.Service!.Minutes!.Value);
-                TimeOnly proposedStartTime = currentAdjustedStartTime;
-                TimeOnly proposedEndTime = proposedStartTime.Add(serviceDuration);
-                while (true)
+                TimeOnly proposedStartTime = TimeOnly.Parse(serviceOffer.StartTime!.Value.ToString());
+                TimeOnly proposedEndTime = proposedStartTime.AddMinutes(serviceOffer.Service!.Minutes!.Value);
+
+                System.Console.WriteLine(proposedStartTime);
+                System.Console.WriteLine(proposedEndTime);
+
+                DateTimeRange serviceRange = new()
                 {
-                    int idAssistant = serviceOffer.Assistant!.Id!.Value;
-                    bool isAssistantAvailable = await schedulerMgr.IsAssistantAvailableInTimeRange(
-                        new DateTimeRange
-                        {
-                            Date = appointment.Date!.Value,
-                            StartTime = proposedStartTime,
-                            EndTime = proposedEndTime
-                        },
-                        idAssistant
-                    );
-                    if (isAssistantAvailable)
-                    {
-                        adjustedTimeRanges.Add((proposedStartTime, proposedEndTime));
-                        currentAdjustedStartTime = proposedEndTime;
-                        break;
-                    }
-                    else
-                    {
-                        proposedStartTime = proposedStartTime.AddMinutes(60);
-                        if (proposedStartTime > TimeOnly.MaxValue)
-                        {
-                            return new OperationResult<Guid?>(false, MessageCodeType.NO_AVAILABLE_TIME_SLOT, serviceOffer.Uuid);
-                        }
-                        proposedEndTime = proposedStartTime.Add(serviceDuration);
-                    }
+                    StartTime = serviceOffer.StartTime.Value,
+                    EndTime = proposedEndTime,
+                    Date = appointment.Date!.Value
+                };
+                var IsAssistantAvailableToOfferService = await schedulerMgr.IsAssistantAvailableInTimeRange(serviceRange, serviceOffer.Assistant!.Id!.Value);
+                if(!IsAssistantAvailableToOfferService)
+                {
+                    return new OperationResult<Guid?>(false, MessageCodeType.ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE, serviceOffer!.Uuid!.Value);
                 }
             }
-
-
-
-
-
-
 
 
 
             // 1.1. Check if availability time slot available
-            DateTimeRange range = new()
-            {
-                Date = appointment.Date!.Value,
-                StartTime = appointment.StartTime.Value,
-                EndTime = appointment.EndTime.Value
-
-            };
-
-
-            var tasks = appointment.ServiceOffers.Select(async serviceOffer =>
-            {
-                int idAssistant = serviceOffer.Assistant!.Id!.Value;
-                bool isAssistantAvailableInTimeRange = await schedulerMgr.IsAssistantAvailableInTimeRange(range, idAssistant);
-                if (!isAssistantAvailableInTimeRange)
-                {
-                    return new OperationResult<Guid?>(false, MessageCodeType.SERVICE_NOT_PROVIDED_BY_ASSISTANT_IN_TIME_RANGE, serviceOffer.Uuid);
-                }
-                return null;
-            }).ToList();
-
-            var results = await Task.WhenAll(tasks);
-
-            foreach (var result in results)
-            {
-                if (result != null)
-                {
-                    return result;
-                }
-            }
-
             Guid? UuidRegistered = await schedulerMgr.ScheduleAppointment(appointment);
             if (UuidRegistered == null)
             {

@@ -40,7 +40,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     var appointmentAssistantService = new AppointmentServiceOffer
                     {
                         IdAppointment = appointmentDB.Id,
-                        IdServiceOffer = serviceOffer.Id
+                        IdServiceOffer = serviceOffer.Id,
+                        StartTime = serviceOffer.StartTime!.Value,
+                        EndTime = serviceOffer.EndTime!.Value
                     };
                     dbContext.AppointmentServiceOffers.Add(appointmentAssistantService);
                 }
@@ -124,9 +126,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     .ThenInclude(serv => serv.ServiceOffer)
                     .ThenInclude(assService => assService.Service)
                 .ToListAsync();
-
-            PropToString.PrintData(appointmentDB[0].AppointmentServiceOffers.First().ServiceOffer);
-
 
             var appointmentsModel = appointmentDB.Select(app => new BusinessLogicLayer.Model.Appointment
             {
@@ -255,6 +254,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return !isAvailable;
         }
 
+
+
+
         public async Task<bool> IsAssistantAvailableInTimeRange(DateTimeRange range, int idAssistant)
         {
             using var dbContext = context.CreateDbContext();
@@ -268,28 +270,22 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 return false;
             }
 
-            var conflictingAppointments = await dbContext.Appointments
-                .Where(appointment => (appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED || appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED)
-                                    && appointment.Date == range.Date
-                                    && appointment.AppointmentServiceOffers
-                                        .Any(serviceOffer => serviceOffer.ServiceOffer.IdAssistant == idAssistant
-                                                                && range.StartTime < appointment.EndTime
-                                                                && range.EndTime > appointment.StartTime))
-                .ToListAsync();
+            var conflictingOffers = await dbContext.AppointmentServiceOffers
+              .Where(aso =>
+                  aso.ServiceOffer.IdAssistant == idAssistant &&
+                  aso.Appointment.Date == range.Date &&
+                  !(range.EndTime <= aso.StartTime || range.StartTime >= aso.EndTime) && 
+                  (aso.Appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED ||
+                   aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED))
+              .ToListAsync();
 
-            foreach (var appointment in conflictingAppointments)
+            if (conflictingOffers.Any())
             {
-                Console.WriteLine("Conflicto con cita: Id={0}, StartTime={1}, EndTime={2}",
-                                  appointment.Id, appointment.StartTime, appointment.EndTime);
-            }
-
-            System.Console.WriteLine("**** LLEGAMOS");
-
-
-            if (conflictingAppointments.Any())
-            {
-                Console.WriteLine("Conflictos encontrados con citas existentes.");
-
+                Console.WriteLine("Conflictos encontrados con AppointmentServiceOffers existentes.");
+                foreach (var conflict in conflictingOffers)
+                {
+                    Console.WriteLine($"Conflicto con ServiceOffer: Id={conflict.IdServiceOffer}, StartTime={conflict.StartTime}, EndTime={conflict.EndTime}");
+                }
                 return false;
             }
 

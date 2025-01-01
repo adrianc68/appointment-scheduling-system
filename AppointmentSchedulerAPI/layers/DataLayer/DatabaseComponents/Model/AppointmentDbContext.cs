@@ -190,7 +190,7 @@ public partial class AppointmentDbContext : DbContext
             entity.ToTable("ServiceOffer");
             entity.HasKey(e => e.Id);
 
-            
+
             entity.Property(e => e.IdAssistant)
                 .HasColumnName("id_assistant");
             entity.Property(e => e.IdService)
@@ -218,6 +218,10 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnName("id_appointment");
             entity.Property(e => e.IdServiceOffer)
                 .HasColumnName("id_serviceOffer");
+            entity.Property(e => e.StartTime)
+                .HasColumnName("start_time");
+            entity.Property(e => e.EndTime)
+                .HasColumnName("end_time");
 
             entity.HasOne(e => e.Appointment)
                 .WithMany(a => a.AppointmentServiceOffers)

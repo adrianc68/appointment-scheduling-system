@@ -33,20 +33,27 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 Appointment appointment = new Appointment
                 {
-                    StartTime = dto.StartTime,
+                    // StartTime = dto.StartTime,
                     Date = dto.Date,
                     Client = new Client { Uuid = dto.ClientUuid },
                     ServiceOffers = [],
                     Uuid = Guid.CreateVersion7()
                 };
 
+                var selectedServicesStartTimes = dto.SelectedServices
+                .Select(service => service.StartTime)
+                .ToList();
+                appointment.StartTime = selectedServicesStartTimes.Min(); 
+
                 foreach (var serviceOfferUuid in dto.SelectedServices)
                 {
-                    var assistantService = new ServiceOffer
+                    var serviceOffers = new ServiceOffer
                     {
-                        Uuid = serviceOfferUuid,
+                        Uuid = serviceOfferUuid.Uuid,
+                        StartTime = serviceOfferUuid.StartTime
                     };
-                    appointment.ServiceOffers.Add(assistantService);
+                    PropToString.PrintData(serviceOffers);
+                    appointment.ServiceOffers.Add(serviceOffers);
                 }
                 OperationResult<Guid?> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
                 if (result.IsSuccessful)
