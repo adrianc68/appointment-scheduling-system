@@ -9,6 +9,7 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpRes
         IActionResult Unauthorized(string version, string message);
         IActionResult Forbidden(string version, string message);
         IActionResult Conflict<T>(T data, string version, string message);
+        IActionResult Conflict<T>(List<T> data, string version, string message);
         IActionResult Conflict(string version, string message);
         IActionResult InternalServerErrorResponse(Exception error, string version, string? customMessage = null);
         

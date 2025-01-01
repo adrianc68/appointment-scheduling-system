@@ -1,3 +1,5 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
+
 namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
 {
     public class OperationResult<T, TError>
@@ -14,10 +16,8 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
             Code = code;
             Result = result;
             Error = error;
-            Errors = errors ?? new List<TError>();
+            Errors = errors;
         }
-
-
 
         public static OperationResult<T, TError> Success(T result, MessageCodeType code = MessageCodeType.OK)
         {

@@ -296,6 +296,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
 
             appointment.ServiceOffers = appointment.ServiceOffers.OrderBy(so => so.StartTime).ToList();
+
             // Validate if the services are scheduled consecutively without gaps
             List<GenericError> errorMessages = [];
             for (int i = 1; i < appointment.ServiceOffers.Count; i++)
@@ -305,25 +306,17 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
                 if (currentService.StartTime != prevService.EndTime)
                 {
-                    GenericError genericError = new GenericError($"Service with UUID <{currentService!.Uuid!.Value}> is not contiguous with the previous service. <{prevService!.Uuid!.Value}>", []);
-                    genericError.AddData($"Suggered for: <{currentService.Uuid.Value}>", prevService.EndTime!.Value);
+                    GenericError genericError = new GenericError($"Service with UUID <{currentService!.Uuid!.Value}> is not contiguous with the previous service. <{prevService!.Uuid!.Value}>. Suggestions <ServiceOfferUuid>:<StartTime>:", []);
+                    genericError.AddData($"{currentService.Uuid.Value}", prevService.EndTime!.Value);
                     errorMessages.Add(genericError);
                 }
             }
+
             if (errorMessages.Any())
             {
-                return OperationResult<Guid, GenericError>.Failure(errorMessages, MessageCodeType.SERVICES_ARE_NOT_CONTIGUOUS);
+                var result = OperationResult<Guid, GenericError>.Failure(errorMessages, MessageCodeType.SERVICES_ARE_NOT_CONTIGUOUS);
+                return result;
             }
-
-
-
-        // Error aqui
-
-
-
-
-
-
 
             // 0.2. Calculate cost and endtime
             appointment.TotalCost = appointment.ServiceOffers.Sum(service => service.Service!.Price!.Value);

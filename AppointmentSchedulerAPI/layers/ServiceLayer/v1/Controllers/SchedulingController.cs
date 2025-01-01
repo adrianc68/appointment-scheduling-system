@@ -61,6 +61,10 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 }
                 else
                 {
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        return httpResponseService.Conflict(result.Errors, ApiVersionEnum.V1, result.Code.ToString());
+                    }
                     return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
                 }
 
@@ -182,14 +186,14 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 DateTimeRange range = new DateTimeRange(rangeDTO.Date, rangeDTO.StartTime, rangeDTO.EndTime);
                 var conflictingServiceOffers = await systemFacade.GetConflictingServicesByDateTimeRangeAsync(range);
-               conflictingServiceOfferDTOs = conflictingServiceOffers.Select(a => new ConflictingServiceOfferDTO
-               {
+                conflictingServiceOfferDTOs = conflictingServiceOffers.Select(a => new ConflictingServiceOfferDTO
+                {
                     ConflictingServiceOfferUuid = a.Uuid,
                     StartTime = a.StartTime,
                     EndTime = a.EndTime,
                     AssistantName = a.Assistant!.Name,
                     AssistantUuid = a.Assistant!.Uuid!.Value
-               }).ToList();
+                }).ToList();
             }
             catch (System.Exception ex)
             {
