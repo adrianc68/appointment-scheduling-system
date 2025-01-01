@@ -25,7 +25,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
-        [HttpPost("appointment")]
+        [HttpPost("appointment/asClient")]
         [AllowAnonymous]
         public async Task<IActionResult> ScheduleAppointmentAsClientAsync([FromBody] CreateAppointmentAsClientDTO dto)
         {

@@ -276,7 +276,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             var clientData = await clientMgr.GetClientByUuidAsync(appointment.Client.Uuid!.Value);
             if (clientData == null)
             {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError($"Client UUID: <{appointment.Client.Uuid.Value}> is not registered"), MessageCodeType.CLIENT_NOT_FOUND);
+                GenericError genericError = new GenericError($"Client UUID: <{appointment.Client.Uuid.Value}> is not registered", []);
+                genericError.AddData("ClientUuid", appointment.Client.Uuid.Value);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
             }
             appointment.Client = clientData;
             // Get Services data
@@ -287,7 +289,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 ServiceOffer? serviceOfferData = await assistantMgr.GetServiceOfferByUuidAsync(serviceOffer.Uuid!.Value);
                 if (serviceOfferData == null)
                 {
-                    return OperationResult<Guid, GenericError>.Failure(new GenericError($"Service <{serviceOffer.Uuid.Value}> is not registered"), MessageCodeType.SERVICE_NOT_FOUND);
+                    GenericError genericError = new GenericError($"Service <{serviceOffer.Uuid.Value}> is not registered", []);
+                    genericError.AddData("SelectedServiceUuid", serviceOffer.Uuid.Value);
+                    return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
                 }
                 appointment.ServiceOffers[i] = serviceOfferData;
                 appointment.ServiceOffers[i].StartTime = proposedStartTime;
@@ -318,7 +322,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return result;
             }
 
-            // 0.2. Calculate cost and endtime
+            // Calculate cost and endtime
             appointment.TotalCost = appointment.ServiceOffers.Sum(service => service.Service!.Price!.Value);
             appointment.EndTime = appointment.StartTime!.Value.AddMinutes(appointment.ServiceOffers.Sum(service => service.Service!.Minutes!.Value));
             appointment.Status = AppointmentStatusType.SCHEDULED;
@@ -342,9 +346,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 if (!isAssistantAvailableInAvailabilityTimeSlots)
                 {
                     GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is not available during the requested time range", []);
-                    error.AddData("uuid", serviceOffer.Uuid!.Value);
+                    error.AddData("SelectedServiceUuid", serviceOffer.Uuid!.Value);
                     error.AddData("startTime", serviceRange.StartTime);
                     error.AddData("endTime", serviceRange.EndTime);
+                    error.AddData("assistantUuid", serviceOffer.Assistant!.Uuid!.Value);
                     return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE);
                 }
 
@@ -352,9 +357,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 if (!hasAssistantConflictingAppoinments)
                 {
                     GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is attending another appointment during the requested time range", []);
-                    error.AddData("uuid", serviceOffer.Uuid!.Value);
+                    error.AddData("SelectedServiceUuid", serviceOffer.Uuid!.Value);
                     error.AddData("startTime", serviceRange.StartTime);
                     error.AddData("endTime", serviceRange.EndTime);
+                    error.AddData("assistantUuid", serviceOffer.Assistant!.Uuid!.Value);
                     return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.SELECTED_SERVICE_HAS_CONFLICTING_APPOINTMENT_TIME_SLOT);
                 }
             }
