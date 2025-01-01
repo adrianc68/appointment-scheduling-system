@@ -35,13 +35,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public async Task<int?> GetServiceIdByServiceOfferUuidAsync(Guid uuid)
         {
-            int? assistantId = await assistantRepository.GetServiceIdByAssistantServiceUuid(uuid);
+            int? assistantId = await assistantRepository.GetServiceIdByAssistantServiceUuidAsync(uuid);
             return assistantId;
         }
 
         public async Task<ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid)
         {
-            ServiceOffer? serviceOffer = await assistantRepository.GetServiceOfferByUuid(uuid);
+            ServiceOffer? serviceOffer = await assistantRepository.GetServiceOfferByUuidAsync(uuid);
             return serviceOffer;
         }
 

@@ -206,7 +206,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return businessAssistants;
         }
 
-        public async Task<int?> GetServiceIdByAssistantServiceUuid(Guid uuid)
+        public async Task<int?> GetServiceIdByAssistantServiceUuidAsync(Guid uuid)
         {
             using var dbContext = context.CreateDbContext();
             var serviceId = await dbContext.ServiceOffers
@@ -248,7 +248,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return (List<BusinessLogicLayer.Model.Service>)businessService;
         }
 
-        public async Task<BusinessLogicLayer.Model.ServiceOffer?> GetServiceOfferByUuid(Guid uuid)
+        public async Task<BusinessLogicLayer.Model.ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid)
         {
             using var dbContext = context.CreateDbContext();
 
