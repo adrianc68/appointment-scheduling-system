@@ -49,6 +49,30 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
         }
 
+        [HttpPost("enable")]
+        [AllowAnonymous]
+        public async Task<IActionResult> EnableAssistant([FromBody] EnableAssistantDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.EnableAssistantAsync(dto.AssistantUuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
+
         // public IActionResult EnableAssistant()
         // {
         //     throw new NotImplementedException();

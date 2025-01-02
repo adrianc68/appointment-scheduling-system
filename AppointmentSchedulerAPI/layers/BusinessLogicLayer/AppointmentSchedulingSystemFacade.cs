@@ -76,16 +76,56 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-
-
-        public bool EnableAssistant(int idAssistant)
+        public async Task<OperationResult<bool, GenericError>> EnableAssistantAsync(Guid uuidAssistant)
         {
-            throw new NotImplementedException();
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(uuidAssistant);
+            if (assistantData == null)
+            {
+                GenericError genericError = new GenericError($"Assistant with UUID: <{uuidAssistant}> is not found", []);
+                genericError.AddData("AssistantUuid", uuidAssistant);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+            }
+
+            if (assistantData.Status == AssistantStatusType.ENABLED)
+            {
+                GenericError genericError = new GenericError($"Assistant with UUID: <{uuidAssistant}> is already enabled", []);
+                genericError.AddData("AssistantUuid", uuidAssistant);
+                genericError.AddData("Status", assistantData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_ENABLED);
+            }
+
+            bool isStatusChanged = await assistantMgr.ChangeAssistantStatusAsync(assistantData.Id!.Value, AssistantStatusType.ENABLED);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public bool EnableClient(int idClient)
+        public async Task<OperationResult<bool, GenericError>> EnableClientAsync(Guid uuidClient)
         {
-            throw new NotImplementedException();
+            Client? clientData = await clientMgr.GetClientByUuidAsync(uuidClient);
+            if (clientData == null)
+            {
+                GenericError genericError = new GenericError($"Client with UUID: <{uuidClient}> is not found", []);
+                genericError.AddData("ClientUuid", uuidClient);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
+            }
+
+            if (clientData.Status == ClientStatusType.ENABLED)
+            {
+                GenericError genericError = new GenericError($"Client with UUID: <{uuidClient}> is already enabled", []);
+                genericError.AddData("ClientUuid", uuidClient);
+                genericError.AddData("Status", clientData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_IS_ALREADY_ENABLED);
+            }
+
+            bool isStatusChanged = await clientMgr.ChangeClientStatusTypeAsync(clientData.Id!.Value, ClientStatusType.ENABLED);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
         }
 
         public bool EnableService(int idService)
