@@ -313,6 +313,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return conflictingOffers;
         }
 
+
         public async Task<BusinessLogicLayer.Model.Appointment?> GetAppointmentByUuidAsync(Guid uuid)
         {
             using var dbContext = context.CreateDbContext();
@@ -346,6 +347,83 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Email = appointmentDB.Client.UserAccount.Email,
                     PhoneNumber = appointmentDB.Client.UserAccount.UserInformation.PhoneNumber
                 },
+            };
+            return appointment;
+        }
+
+        public async Task<BusinessLogicLayer.Model.Appointment?> GetAppointmentFullDetailsByUuidAsync(Guid uuid)
+        {
+            using var dbContext = context.CreateDbContext();
+
+            var appointmentDB = await dbContext.Appointments
+            .Include(ap => ap.Client)
+                .ThenInclude(ac => ac.UserAccount)
+                .ThenInclude(ua => ua.UserInformation)
+            .Include(s => s.AppointmentServiceOffers)
+                .ThenInclude(ser => ser.ServiceOffer)
+                .ThenInclude(so => so.Service)
+            .Include(s => s.AppointmentServiceOffers)
+                .ThenInclude(ser => ser.ServiceOffer)
+                .ThenInclude(so => so.Assistant)
+                .ThenInclude(ac => ac.UserAccount)
+                .ThenInclude(ua => ua.UserInformation)
+            .FirstOrDefaultAsync(ap => ap.Uuid == uuid);
+
+
+            if (appointmentDB == null)
+            {
+                return null;
+            }
+
+            var appointment = new BusinessLogicLayer.Model.Appointment
+            {
+                Id = appointmentDB.Id,
+                Uuid = appointmentDB.Uuid,
+                Date = appointmentDB.Date,
+                StartTime = appointmentDB.StartTime,
+                EndTime = appointmentDB.EndTime,
+                TotalCost = appointmentDB.TotalCost,
+                CreatedAt = appointmentDB.CreatedAt,
+                Status = (AppointmentStatusType)appointmentDB.Status!.Value,
+                Client = new BusinessLogicLayer.Model.Client
+                {
+                    Id = appointmentDB.Client.IdUserAccount,
+                    Uuid = appointmentDB.Client.UserAccount.Uuid,
+                    Name = appointmentDB.Client.UserAccount.UserInformation.Name,
+                    Email = appointmentDB.Client.UserAccount.Email,
+                    PhoneNumber = appointmentDB.Client.UserAccount.UserInformation.PhoneNumber
+                },
+                ServiceOffers = appointmentDB.AppointmentServiceOffers
+                .Select(aso => new BusinessLogicLayer.Model.ServiceOffer
+                {
+                    Id = aso.ServiceOffer.Id,
+                    Uuid = aso.ServiceOffer.Uuid,
+                    StartTime = aso.StartTime,
+                    EndTime = aso.EndTime,
+                    Assistant = aso.ServiceOffer.Assistant != null
+                        ? new BusinessLogicLayer.Model.Assistant
+                        {
+                            Id = aso.ServiceOffer.Assistant.IdUserAccount,
+                            Uuid = aso.ServiceOffer.Assistant.UserAccount.Uuid,
+                            Name = aso.ServiceOffer.Assistant.UserAccount.UserInformation.Name,
+                            Email = aso.ServiceOffer.Assistant.UserAccount.Email,
+                            PhoneNumber = aso.ServiceOffer.Assistant.UserAccount.UserInformation.PhoneNumber
+                        }
+                        : null,
+                    Service = aso.ServiceOffer.Service != null
+                        ? new BusinessLogicLayer.Model.Service
+                        {
+                            Id = aso.ServiceOffer.Service.Id,
+                            Uuid = aso.ServiceOffer.Service.Uuid,
+                            Name = aso.ServiceOffer.Service.Name,
+                            Description = aso.ServiceOffer.Service.Description,
+                            Minutes = aso.ServiceOffer.Service.Minutes,
+                            Price = aso.ServiceOffer.Service.Price,
+                            Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)aso.ServiceOffer.Service.Status,
+                            CreatedAt = aso.ServiceOffer.Service.CreatedAt
+                        }
+                        : null
+                }).ToList()
             };
             return appointment;
         }

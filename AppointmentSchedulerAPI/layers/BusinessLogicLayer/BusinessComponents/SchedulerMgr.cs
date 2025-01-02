@@ -22,7 +22,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date)
         {
             return (List<AssistantService>)await schedulerRepository.GetAvailableServicesAsync(date);
-
         }
 
         public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
@@ -41,7 +40,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool isAssistantAvailableInAvailabilityTimeSlots = await schedulerRepository.IsAssistantAvailableInAvailabilityTimeSlotsAsync(range, idAssistant);
             return isAssistantAvailableInAvailabilityTimeSlots;
         }
-
 
         public async Task<bool> IsAppointmentTimeSlotAvailableAsync(DateTimeRange range)
         {
@@ -95,6 +93,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public Task<bool> IsAppointmentInSpecificStatusType(int idAppointment, AppointmentStatusType expectedStatus)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Appointment?> GetAppointmentDetailsByUuidAsync(Guid uuid)
+        {
+            Appointment? appointment = await schedulerRepository.GetAppointmentFullDetailsByUuidAsync(uuid);
+            return appointment;
         }
     }
 }

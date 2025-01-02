@@ -10,7 +10,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
     {
         // bool AreServicesAvailable(List<int> services, DateTimeRange range);
         // bool BlockTimeRange(DateTimeRange range);
-        // bool ChangeAppointmentStatus(int idAppointment, AppointmentStatusType status);
         // bool DeleteAssistantAppointments(int idAssistant);
         // bool DeleteAvailabilityTimeSlot(int idAvailabilityTimeSlot);
         // bool DeleteAssistantAvailabilityTimeSlots(int idAssistant);
@@ -26,6 +25,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date);
         Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
         Task<Appointment?> GetAppointmentByUuidAsync(Guid uuid); 
+        Task<Appointment?> GetAppointmentDetailsByUuidAsync(Guid uuid); 
         Task<Guid?> RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot);
         Task<Guid?> ScheduleAppointmentAsync(Appointment appointment);
         Task<bool> ChangeAppointmentStatusTypeAsync(int idAppointment, AppointmentStatusType status);
