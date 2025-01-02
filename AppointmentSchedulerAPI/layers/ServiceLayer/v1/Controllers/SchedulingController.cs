@@ -297,16 +297,65 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isConfirmed, ApiVersionEnum.V1);
         }
 
+        [HttpPost("appointment/cancel/asClient")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CancelAppointment([FromBody] CancelAppointmentAsClientDTO dto)
+        {
+            bool isConfirmed = false;
+            try
+            {
+                // $$$> Get client uuid from authentication service
+                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelf(dto.AppointmentUuid, dto.ClientUuid);
+                if (result.IsSuccessful)
+                {
+                    isConfirmed = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+                throw;
+            }
+            return httpResponseService.OkResponse(isConfirmed, ApiVersionEnum.V1);
+        }
+
+        [HttpPost("appointment/cancel/asStaff")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CancelAppointmentAsStaff([FromBody] CancelAppointmentAsStaffDTO dto)
+        {
+            bool isConfirmed = false;
+            try
+            {
+                // $$$> Get client uuid from authentication service
+                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentStaffAssisted(dto.AppointmentUuid);
+                if (result.IsSuccessful)
+                {
+                    isConfirmed = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+                throw;
+            }
+            return httpResponseService.OkResponse(isConfirmed, ApiVersionEnum.V1);
+        }
+
+
 
         // public IActionResult EditAppointment()
         // {
         //     throw new NotImplementedException();
         // }
 
-        // public IActionResult FinalizeAppointment()
-        // {
-        //     throw new NotImplementedException();
-        // }
 
         // public IActionResult CancelAppointClientSelf()
         // {

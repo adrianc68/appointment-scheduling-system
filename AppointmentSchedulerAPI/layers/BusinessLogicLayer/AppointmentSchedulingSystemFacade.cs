@@ -24,15 +24,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             this.clientMgr = clientMgr;
         }
 
-        public bool CancelAppointmentClientSelf(int idAppointment)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CancelAppointmentStaffAssisted(int idAppointment)
-        {
-            throw new NotImplementedException();
-        }
 
         public bool DeleteClient(int idClient)
         {
@@ -320,7 +311,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is already finished", []);
                 genericError.AddData("AppointmentUuid", uuidAppointment);
                 genericError.AddData("Status", appointment.Status.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREAEDY_FINISHED);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
             }
 
             bool isStatusOfAppointmentChanged = await schedulerMgr.ChangeAppointmentStatusTypeAsync(appointment.Id!.Value, AppointmentStatusType.FINISHED);
@@ -343,7 +334,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
             if (appointment.Status == AppointmentStatusType.CONFIRMED)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is already confrimed", []);
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is already confirmed", []);
                 genericError.AddData("AppointmentUuid", uuidAppointment);
                 genericError.AddData("Status", appointment.Status.ToString());
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_CONFIRMED);
@@ -354,6 +345,90 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
             }
             return OperationResult<bool, GenericError>.Success(true);
+        }
+
+        public async Task<OperationResult<bool, GenericError>> CancelAppointmentClientSelf(Guid uuidAppointment, Guid UuidClient)
+        {
+            Client? clientData = await clientMgr.GetClientByUuidAsync(UuidClient);
+            if (clientData == null)
+            {
+                GenericError genericError = new GenericError($"Client UUID <{UuidClient}> is not found");
+                genericError.AddData("ClientUuid", uuidAppointment);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
+            }
+
+            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(uuidAppointment);
+            if (appointment == null)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID <{uuidAppointment}> is not registered", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
+            }
+
+            if (appointment.Client.Id != clientData.Id)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID <{uuidAppointment}> belongs to another user");
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_BELONGS_TO_ANOTHER_USER);
+            }
+
+            if (appointment.Status == AppointmentStatusType.FINISHED)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID <{uuidAppointment}> is already finished", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                genericError.AddData("Status", appointment.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
+            }
+
+            if (appointment.Status == AppointmentStatusType.CANCELED)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID <{uuidAppointment}> is already canceled", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                genericError.AddData("Status", appointment.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREDY_CANCELED);
+            }
+
+            bool isStatusOfAppointmentChanged = await schedulerMgr.ChangeAppointmentStatusTypeAsync(appointment.Id!.Value, AppointmentStatusType.CANCELED);
+            if (!isStatusOfAppointmentChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
+        }
+
+        public async Task<OperationResult<bool, GenericError>> CancelAppointmentStaffAssisted(Guid uuidAppointment)
+        {
+            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(uuidAppointment);
+            if (appointment == null)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID <{uuidAppointment}> is not registered", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
+            }
+
+            if (appointment.Status == AppointmentStatusType.FINISHED)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID <{uuidAppointment}> is already finished", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                genericError.AddData("Status", appointment.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
+            }
+
+            if (appointment.Status == AppointmentStatusType.CANCELED)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID <{uuidAppointment}> is already canceled", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                genericError.AddData("Status", appointment.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREDY_CANCELED);
+            }
+
+            bool isStatusOfAppointmentChanged = await schedulerMgr.ChangeAppointmentStatusTypeAsync(appointment.Id!.Value, AppointmentStatusType.CANCELED);
+            if (!isStatusOfAppointmentChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
+
         }
 
         public async Task<OperationResult<Guid, GenericError>> ScheduleAppointmentAsClientAsync(Appointment appointment)
