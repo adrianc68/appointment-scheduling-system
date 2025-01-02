@@ -1,4 +1,5 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 
 
@@ -6,10 +7,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
 {
     public interface IAssistantMgt
     {
-        // bool ChangeAssistantStatus(int idAssistant, AssistantStatusType status);
-        // AssistantStatusType GetAssistantStatus(int idAssistant);
-        // bool GetServicesAssignedToAssistant(int idAssistant);
-        // bool UpdateAssistant(int idAssistant, Assistant assistant);
+        // Task<bool> UpdateAssistant(Assistant assistant);
+        Task<bool> ChangeAssistantStatusAsync(int idAssistant, AssistantStatusType status);
         Task<List<Assistant>> GetAllAssistantsAsync();
         Task<Assistant?> GetAssistantByUuidAsync(Guid uuid);
         Task<int?> GetServiceIdByServiceOfferUuidAsync(Guid uuid);

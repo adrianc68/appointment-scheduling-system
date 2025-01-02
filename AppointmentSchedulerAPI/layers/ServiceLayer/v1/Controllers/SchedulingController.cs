@@ -356,17 +356,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         //     throw new NotImplementedException();
         // }
 
-
-        // public IActionResult CancelAppointClientSelf()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult CancelAppointmentStaffAssisted()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
         // public IActionResult DeleteAvailabilityTimeSlot()
         // {
         //     throw new NotImplementedException();

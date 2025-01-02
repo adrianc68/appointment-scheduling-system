@@ -22,6 +22,31 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
+        [HttpPost("disable")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DisableClient([FromBody] DisableClientDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DisableClientAsync(dto.ClientUuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
+
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllClient()

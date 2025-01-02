@@ -24,51 +24,59 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             this.clientMgr = clientMgr;
         }
 
-
-        public bool DeleteClient(int idClient)
+        public async Task<OperationResult<bool, GenericError>> DisableAssistantAsync(Guid uuidAssistant)
         {
-            throw new NotImplementedException();
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(uuidAssistant);
+            if (assistantData == null)
+            {
+                GenericError genericError = new GenericError($"Assistant with UUID: <{uuidAssistant}> is not found", []);
+                genericError.AddData("AssistantUuid", uuidAssistant);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+            }
+
+            if (assistantData.Status == AssistantStatusType.DISABLED)
+            {
+                GenericError genericError = new GenericError($"Assistant with UUID: <{uuidAssistant}> is already disabled", []);
+                genericError.AddData("AssistantUuid", uuidAssistant);
+                genericError.AddData("Status", assistantData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_DISABLED);
+            }
+
+            bool isStatusChanged = await assistantMgr.ChangeAssistantStatusAsync(assistantData.Id!.Value, AssistantStatusType.DISABLED);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public bool DeleteService(int idService)
+        public async Task<OperationResult<bool, GenericError>> DisableClientAsync(Guid uuidClient)
         {
-            return true;
+            Client? clientData = await clientMgr.GetClientByUuidAsync(uuidClient);
+            if (clientData == null)
+            {
+                GenericError genericError = new GenericError($"Client with UUID: <{uuidClient}> is not found", []);
+                genericError.AddData("ClientUuid", uuidClient);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
+            }
+
+            if (clientData.Status == ClientStatusType.DISABLED)
+            {
+                GenericError genericError = new GenericError($"Client with UUID: <{uuidClient}> is already disabled", []);
+                genericError.AddData("ClientUuid", uuidClient);
+                genericError.AddData("Status", clientData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_IS_ALREADY_DISABLED);
+            }
+
+            bool isStatusChanged = await clientMgr.ChangeClientStatusTypeAsync(clientData.Id!.Value, ClientStatusType.DISABLED);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public bool DisableAssistant(int dAssistant)
-        {
-            throw new NotImplementedException();
-        }
 
-        public bool DisableClient(int idClient)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool DisableService(int idService)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool EditAppointment(Appointment appointment)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool EditAssistant(Assistant assistant)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool EditClient(Client client)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool EditService(Service service)
-        {
-            throw new NotImplementedException();
-        }
 
         public bool EnableAssistant(int idAssistant)
         {
@@ -84,6 +92,46 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         {
             throw new NotImplementedException();
         }
+
+        public bool DisableService(int idService)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        public bool DeleteClient(int idClient)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool DeleteService(int idService)
+        {
+            return true;
+        }
+
+
+
+        public bool EditAssistant(Assistant assistant)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool EditClient(Client client)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool EditService(Service service)
+        {
+            throw new NotImplementedException();
+        }
+        public bool EditAppointment(Appointment appointment)
+        {
+            throw new NotImplementedException();
+        }
+
+
 
         // public List<Appointment> GetAppoinments(DateTime startDate, DateTime endDate)
         // {

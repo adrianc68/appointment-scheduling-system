@@ -1,8 +1,7 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
-
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
@@ -14,6 +13,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             this.clientRepository = clientRepository;
         }
+
         public async Task<List<Client>> GetAllClientsAsync()
         {
             return (List<Client>)await clientRepository.GetAllClientsAsync();
@@ -47,6 +47,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             bool isUsernameRegistered = await clientRepository.IsUsernameRegisteredAsync(username);
             return isUsernameRegistered;
+        }
+
+        public async Task<bool> ChangeClientStatusTypeAsync(int idClient, ClientStatusType status)
+        {
+            bool isStatusChanged = await clientRepository.ChangeClientStatusTypeAsync(idClient, status);
+            return isStatusChanged;
         }
 
         public async Task<Guid?> RegisterClientAsync(Client client)

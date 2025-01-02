@@ -1,5 +1,6 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 
@@ -12,12 +13,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public AssistantMgr(IAssistantRepository assistantRepository)
         {
             this.assistantRepository = assistantRepository;
-        }
-
-        public async Task<bool> AssignListServicesToAssistantAsync(int idAssistant, List<int> idServices)
-        {
-            bool areAllServicesRegistered = await assistantRepository.AddServicesToAssistantAsync(idAssistant, idServices);
-            return areAllServicesRegistered;
         }
 
         public async Task<List<Assistant>> GetAllAssistantsAsync()
@@ -45,8 +40,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public async Task<bool> IsAssistantOfferingServiceByUuidAsync(int idService, int idAssistant)
         {
-           bool isAssistantOfferingService = await assistantRepository.IsAssistantOfferingServiceByUuidAsync(idService, idAssistant);
-           return isAssistantOfferingService;
+            bool isAssistantOfferingService = await assistantRepository.IsAssistantOfferingServiceByUuidAsync(idService, idAssistant);
+            return isAssistantOfferingService;
         }
 
         public async Task<bool> IsAssistantRegisteredByUuidAsync(Guid uuid)
@@ -71,6 +66,18 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             bool isUsernameRegistered = await assistantRepository.IsUsernameRegisteredAsync(username);
             return isUsernameRegistered;
+        }
+
+        public async Task<bool> AssignListServicesToAssistantAsync(int idAssistant, List<int> idServices)
+        {
+            bool areAllServicesRegistered = await assistantRepository.AddServicesToAssistantAsync(idAssistant, idServices);
+            return areAllServicesRegistered;
+        }
+
+        public async Task<bool> ChangeAssistantStatusAsync(int idAssistant, AssistantStatusType status)
+        {
+            bool isStatusChanged = await assistantRepository.ChangeAssistantStatus(idAssistant, status);
+            return isStatusChanged;
         }
 
         public async Task<Guid?> RegisterAssistantAsync(Assistant assistant)

@@ -1,15 +1,12 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
 {
     public interface IClientMgt
     {
-        // bool ChangeClientStatusType(int idClient, ClientStatusType status);
-        // Client GetClientDetails(int idClient);
-        // ClientStatusType GetClientStatusType(int idClient);
-        // bool IsClientAvailable(int idClient);
+        // Task<bool> UpdateClient(Client client);
+        Task<bool> ChangeClientStatusTypeAsync(int idClient, ClientStatusType status);
         Task<Client?> GetClientByUuidAsync(Guid uuid);
         Task<bool> IsUsernameRegisteredAsync(string username);
         Task<bool> IsEmailRegisteredAsync(string email);

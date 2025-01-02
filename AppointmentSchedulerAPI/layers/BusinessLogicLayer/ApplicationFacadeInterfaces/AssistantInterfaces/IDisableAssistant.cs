@@ -1,7 +1,9 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AssistantInterfaces
 {
     public interface IDisableAssistant
     {
-        bool DisableAssistant(int dAssistant);
+        Task<OperationResult<bool,GenericError>> DisableAssistantAsync(Guid uuidAssistant);
     }
 }

@@ -156,5 +156,33 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }
             return client;
         }
+
+        public async Task<bool> ChangeClientStatusTypeAsync(int idClient, BusinessLogicLayer.Model.Types.ClientStatusType status)
+        {
+            bool isStatusChanged = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var clientDb = await dbContext.Clients
+                     .FirstOrDefaultAsync(ac => ac.UserAccount.Id == idClient);
+
+                if (clientDb == null)
+                {
+                    return false;
+                }
+
+                clientDb.Status = (ClientStatusType)status;
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isStatusChanged = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isStatusChanged;
+        }
     }
 }

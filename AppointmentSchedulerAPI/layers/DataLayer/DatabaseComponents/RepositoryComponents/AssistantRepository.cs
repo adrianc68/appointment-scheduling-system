@@ -1,5 +1,3 @@
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
@@ -279,6 +277,34 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .FirstOrDefaultAsync();
 
             return serviceOfferDB != null;
+        }
+
+        public async Task<bool> ChangeAssistantStatus(int idAssistant, BusinessLogicLayer.Model.Types.AssistantStatusType status)
+        {
+            bool isStatusChanged = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var assistantDb = await dbContext.Assistants
+                     .FirstOrDefaultAsync(ac => ac.UserAccount.Id == idAssistant);
+
+                if (assistantDb == null)
+                {
+                    return false;
+                }
+
+                assistantDb.Status = (AssistantStatusType)status;
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isStatusChanged = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isStatusChanged;
         }
     }
 }
