@@ -24,7 +24,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             this.clientMgr = clientMgr;
         }
 
-        public async Task<OperationResult<bool, GenericError>> EditAssistant(Assistant assistant)
+        public bool EditAppointment(Appointment appointment)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public async Task<OperationResult<bool, GenericError>> UpdateAssistant(Assistant assistant)
         {
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistant.Uuid!.Value);
             if (assistantData == null)
@@ -64,7 +70,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(isUpdated);
         }
 
-        public async Task<OperationResult<bool, GenericError>> EditClient(Client client)
+        public async Task<OperationResult<bool, GenericError>> UpdateClient(Client client)
         {
             Client? clientData = await clientMgr.GetClientByUuidAsync(client.Uuid!.Value);
             if (clientData == null)
@@ -104,14 +110,33 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(isUpdated);
         }
 
-        public bool EditService(Service service)
+        public async Task<OperationResult<bool, GenericError>> UpdateService(Service service)
         {
-            throw new NotImplementedException();
+            Service? serviceData = await serviceMgr.GetServiceByUuidAsync(service.Uuid!.Value);
+            if (service == null)
+            {
+                GenericError genericError = new GenericError($"Service with UUID <{service!.Uuid.Value}> is not registered", []);
+                genericError.AddData("ServiceUuid", service.Uuid.Value);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
+            }
+
+            if (serviceData!.Name != service.Name)
+            {
+                bool isServiceNameRegistered = await serviceMgr.IsServiceNameRegisteredAsync(service.Name!);
+                if (isServiceNameRegistered)
+                {
+                    return OperationResult<bool, GenericError>.Failure(new GenericError($"Service name <{service.Name}> is already registered"), MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED);
+                }
+            }
+            bool isUpdated = await serviceMgr.UpdateService(service);
+            if (!isUpdated)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has occurred"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
+
         }
-        public bool EditAppointment(Appointment appointment)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public Task<List<Assistant>> GetAllAssistantsAsync()
         {

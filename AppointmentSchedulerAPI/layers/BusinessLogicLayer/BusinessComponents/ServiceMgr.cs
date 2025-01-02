@@ -42,9 +42,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return serviceId;
         }
 
-        public async Task<bool> IsServiceNameRegisteredAsync(string serviceName)
+        public async Task<bool> IsServiceNameRegisteredAsync(string name)
         {
-            bool isServiceNameRegistered = await serviceRepository.IsServiceNameRegisteredAsync(serviceName);
+            bool isServiceNameRegistered = await serviceRepository.IsServiceNameRegisteredAsync(name);
             return isServiceNameRegistered;
         }
 
@@ -64,5 +64,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             }
             return null;
         }
+
+        public async Task<bool> UpdateService(Service service)
+        {
+            bool isUpdated = await serviceRepository.UpdateService(service);
+            return isUpdated;
+        }
+
     }
 }

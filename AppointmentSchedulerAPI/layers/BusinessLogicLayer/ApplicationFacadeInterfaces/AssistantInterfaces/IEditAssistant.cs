@@ -6,6 +6,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IEditAssistant
     {
-        Task<OperationResult<bool, GenericError>> EditAssistant(Assistant assistant);
+        Task<OperationResult<bool, GenericError>> UpdateAssistant(Assistant assistant);
     }
 }

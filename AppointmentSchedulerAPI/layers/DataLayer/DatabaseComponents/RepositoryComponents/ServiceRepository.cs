@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -147,7 +148,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     return false;
                 }
 
-                assistantDb.Status = (Model.Types.ServiceStatusType) status;
+                assistantDb.Status = (Model.Types.ServiceStatusType)status;
                 await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
                 isStatusChanged = true;
@@ -160,5 +161,37 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isStatusChanged;
         }
 
+        public async Task<bool> UpdateService(BusinessLogicLayer.Model.Service service)
+        {
+            bool isRegistered = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var existingService = await dbContext.Services
+                    .FirstOrDefaultAsync(s => s.Uuid == service.Uuid);
+
+                if (existingService == null)
+                {
+                    return false; 
+                }
+                
+                existingService.Description = service.Description;
+                existingService.Minutes = service.Minutes;
+                existingService.Name = service.Name;
+                existingService.Price = service.Price;
+                
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isRegistered = true;
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine(ex);
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isRegistered;
+        }
     }
 }

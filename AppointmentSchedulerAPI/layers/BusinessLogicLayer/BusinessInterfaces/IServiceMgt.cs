@@ -5,10 +5,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
 {
     public interface IServiceMgt
     {
-        // bool EditService(Service service);
+        Task<bool> UpdateService(Service service);
         Task<bool> ChangeServiceStatusType(int idService, ServiceStatusType status);
-        
-        Task<bool> IsServiceNameRegisteredAsync(string serviceName);
+        Task<bool> IsServiceNameRegisteredAsync(string name);
         Task<bool> IsServiceRegisteredByUuidAsync(Guid uuid);
         Task<List<Service>> GetAllServicesAsync();
         Task<Service?> GetServiceByUuidAsync(Guid uuid);

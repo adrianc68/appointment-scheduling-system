@@ -1,7 +1,9 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces
 {
     public interface IEditService
     {
-        bool EditService(Model.Service service);
+        Task<OperationResult<bool, GenericError>> UpdateService(Model.Service service);
     }
 }

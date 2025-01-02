@@ -127,17 +127,17 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterService([FromBody] CreateServiceDTO serviceDTO)
+        public async Task<IActionResult> RegisterService([FromBody] CreateServiceDTO dto)
         {
             Guid? guid;
             try
             {
                 BusinessLogicLayer.Model.Service service = new()
                 {
-                    Description = serviceDTO.Description,
-                    Minutes = serviceDTO.Minutes,
-                    Name = serviceDTO.Name,
-                    Price = serviceDTO.Price
+                    Description = dto.Description,
+                    Minutes = dto.Minutes,
+                    Name = dto.Name,
+                    Price = dto.Price
                 };
 
                 OperationResult<Guid, GenericError> result = await systemFacade.RegisterService(service);
@@ -157,6 +157,39 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
 
+
+        [HttpPut]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateService([FromBody] UpdateServiceDTO dto)
+        {
+            bool isUpdated = false;
+            try
+            {
+                BusinessLogicLayer.Model.Service service = new()
+                {
+                    Description = dto.Description,
+                    Minutes = dto.Minutes,
+                    Name = dto.Name,
+                    Price = dto.Price,
+                    Uuid = dto.Uuid
+                };
+
+                OperationResult<bool, GenericError> result = await systemFacade.UpdateService(service);
+                if (result.IsSuccessful)
+                {
+                    isUpdated = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isUpdated, ApiVersionEnum.V1);
+        }
 
     }
 }
