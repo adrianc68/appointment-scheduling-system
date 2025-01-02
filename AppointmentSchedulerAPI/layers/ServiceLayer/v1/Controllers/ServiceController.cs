@@ -22,20 +22,82 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
-        // public IActionResult DisableService()
+        // public IActionResult EditService()
         // {
         //     throw new NotImplementedException();
         // }
 
-        // public IActionResult EnableService()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPost("enable")]
+        [AllowAnonymous]
+        public async Task<IActionResult> EnableService([FromBody] EnableServiceDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.EnableServiceAsync(dto.ServiceUuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
 
-        // public IActionResult DeleteService()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPost("disable")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DisableService([FromBody] DisableServiceDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DisableServiceAsync(dto.ServiceUuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
+
+        [HttpPost("delete")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeleteService([FromBody] DeleteServiceDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DeleteServiceAsync(dto.ServiceUuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
 
 
         [HttpGet]
@@ -95,20 +157,5 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             }
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
-
-        [HttpDelete("{idService}")]
-        public IActionResult DeleteService(int idService)
-        {
-            var appointments = systemFacade.DeleteService(idService);
-            return Ok(appointments);
-        }
-
-
-        // public IActionResult EditService()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-
     }
 }

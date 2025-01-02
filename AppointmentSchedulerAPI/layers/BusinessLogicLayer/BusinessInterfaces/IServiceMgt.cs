@@ -1,12 +1,11 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
 {
     public interface IServiceMgt
     {
-        // bool ChangeServiceStatusType(ServiceStatusType status);
+        Task<bool> ChangeServiceStatusType(int idService, ServiceStatusType status);
         // bool DeleteService(int idService);
         // bool EditService(Service service);
         

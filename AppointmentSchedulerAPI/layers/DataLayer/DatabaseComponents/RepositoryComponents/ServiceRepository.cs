@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
@@ -95,7 +96,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
             if (serviceDB == null)
             {
-                return null; 
+                return null;
             }
 
             var service = new BusinessLogicLayer.Model.Service
@@ -132,5 +133,34 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .FirstOrDefaultAsync();
             return serviceName != null;
         }
+
+        public async Task<bool> ChangeServiceStatusType(int idService, BusinessLogicLayer.Model.Types.ServiceStatusType status)
+        {
+            bool isStatusChanged = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var assistantDb = await dbContext.Services
+                     .FirstOrDefaultAsync(ac => ac.Id == idService);
+
+                if (assistantDb == null)
+                {
+                    return false;
+                }
+
+                assistantDb.Status = (Model.Types.ServiceStatusType) status;
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isStatusChanged = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isStatusChanged;
+        }
+
     }
 }

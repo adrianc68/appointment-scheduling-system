@@ -1,4 +1,5 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
 
 namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces
@@ -11,12 +12,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<int?> GetServiceIdByUuidAsync(Guid uuid);
         Task<bool> IsServiceNameRegisteredAsync(string name);
         Task<bool> AddServiceAsync(Service service);
-        // bool ChangeServiceStatusType(ServiceStatusType status);
+        Task<bool> ChangeServiceStatusType(int idService, ServiceStatusType status);
         // bool DeleteService(int idService);
         // bool EditService(Service service);
-        // List<Service> GetServices();
-        // List<Service> GetServicesDetailsByIds(List<int> serviceIds);
-        // ServiceStatusType GetServiceStatusType(int idService);
-        // bool IsServiceInSpecificStatusType(int idService, ServiceStatusType expected);
     }
 }

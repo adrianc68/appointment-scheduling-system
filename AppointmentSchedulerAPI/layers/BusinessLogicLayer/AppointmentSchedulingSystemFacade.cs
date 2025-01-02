@@ -180,21 +180,82 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public bool EnableService(int idService)
+        public async Task<OperationResult<bool, GenericError>> EnableServiceAsync(Guid uuidService)
         {
-            throw new NotImplementedException();
+            Service? serviceData = await serviceMgr.GetServiceByUuidAsync(uuidService);
+            if (serviceData == null)
+            {
+                GenericError genericError = new GenericError($"Service with UUID: <{uuidService}> is not found", []);
+                genericError.AddData("ServiceUuid", uuidService);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
+            }
+
+            if (serviceData.Status == ServiceStatusType.ENABLED)
+            {
+                GenericError genericError = new GenericError($"Service with UUID: <{uuidService}> is already enabled", []);
+                genericError.AddData("ServiceUuid", uuidService);
+                genericError.AddData("Status", serviceData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_IS_ALREADY_ENABLED);
+            }
+
+            bool isStatusChanged = await serviceMgr.ChangeServiceStatusType(serviceData.Id!.Value, ServiceStatusType.ENABLED);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public bool DisableService(int idService)
+        public async Task<OperationResult<bool, GenericError>> DisableServiceAsync(Guid uuidService)
         {
-            throw new NotImplementedException();
+            Service? serviceData = await serviceMgr.GetServiceByUuidAsync(uuidService);
+            if (serviceData == null)
+            {
+                GenericError genericError = new GenericError($"Service with UUID: <{uuidService}> is not found", []);
+                genericError.AddData("ServiceUuid", uuidService);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
+            }
+
+            if (serviceData.Status == ServiceStatusType.DISABLED)
+            {
+                GenericError genericError = new GenericError($"Service with UUID: <{uuidService}> is already disabled", []);
+                genericError.AddData("ServiceUuid", uuidService);
+                genericError.AddData("Status", serviceData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_IS_ALREADY_DISABLED);
+            }
+
+            bool isStatusChanged = await serviceMgr.ChangeServiceStatusType(serviceData.Id!.Value, ServiceStatusType.DISABLED);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
         }
 
-
-
-        public bool DeleteService(int idService)
+        public async Task<OperationResult<bool, GenericError>> DeleteServiceAsync(Guid uuidService)
         {
-            return true;
+            Service? serviceData = await serviceMgr.GetServiceByUuidAsync(uuidService);
+            if (serviceData == null)
+            {
+                GenericError genericError = new GenericError($"Service with UUID: <{uuidService}> is not found", []);
+                genericError.AddData("ServiceUuid", uuidService);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
+            }
+
+            if (serviceData.Status == ServiceStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Service with UUID: <{uuidService}> is already deleted", []);
+                genericError.AddData("ServiceUuid", uuidService);
+                genericError.AddData("Status", serviceData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_IS_ALREADY_DELETED);
+            }
+
+            bool isStatusChanged = await serviceMgr.ChangeServiceStatusType(serviceData.Id!.Value, ServiceStatusType.DELETED);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
         }
 
 

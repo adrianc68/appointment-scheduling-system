@@ -1,7 +1,7 @@
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
 {
-    public class DisableAssistantDTO
+    public class DeleteServiceDTO
     {
-        public Guid AssistantUuid { get; set; }
+        public Guid ServiceUuid { get; set; }
     }
 }

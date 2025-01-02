@@ -1,7 +1,9 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces
 {
     public interface IDisableService
     {
-        bool DisableService(int idService);
+        Task<OperationResult<bool, GenericError>> DisableServiceAsync(Guid uuidService);
     }
 }

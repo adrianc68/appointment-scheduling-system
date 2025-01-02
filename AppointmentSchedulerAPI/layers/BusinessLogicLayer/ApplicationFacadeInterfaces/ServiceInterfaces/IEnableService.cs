@@ -1,7 +1,9 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces
 {
     public interface IEnableService
     {
-        bool EnableService(int idService);
+        Task<OperationResult<bool, GenericError>> EnableServiceAsync(Guid uuidService);
     }
 }

@@ -40,5 +40,8 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         CLIENT_IS_ALREADY_ENABLED,
         CLIENT_IS_ALREADY_DELETED,
         ASSISTANT_IS_ALREADY_DELETED,
+        SERVICE_IS_ALREADY_ENABLED,
+        SERVICE_IS_ALREADY_DISABLED,
+        SERVICE_IS_ALREADY_DELETED,
     }
 }

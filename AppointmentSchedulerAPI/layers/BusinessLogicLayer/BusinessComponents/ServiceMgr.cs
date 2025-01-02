@@ -1,5 +1,6 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
@@ -10,6 +11,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public ServiceMgr(IServiceRepository serviceRepository)
         {
             this.serviceRepository = serviceRepository;
+        }
+
+        public async Task<bool> ChangeServiceStatusType(int idService, ServiceStatusType status)
+        {
+            bool isStatusChanged = await serviceRepository.ChangeServiceStatusType(idService, status);
+            return isStatusChanged;
         }
 
         public async Task<List<Service>> GetAllServicesAsync()
