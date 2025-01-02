@@ -60,7 +60,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isRegistered;
         }
 
-
         public async Task<bool> AddAvailabilityTimeSlotAsync(BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot)
         {
             bool isRegistered = false;
@@ -110,21 +109,16 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return appointmentId;
         }
 
-        public async Task<IEnumerable<BusinessLogicLayer.Model.Appointment>> GetAppointmentsAsync(DateOnly startDate, DateOnly endDate)
+        public async Task<IEnumerable<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppoinmentsAsync(DateOnly startDate, DateOnly endDate)
         {
             using var dbContext = context.CreateDbContext();
             var appointmentDB = await dbContext.Appointments
-                .Where(app => app.Date >= startDate && app.Date <= endDate)
+                .Where(app => app.Date >= startDate && app.Date <= endDate && (app.Status == Model.Types.AppointmentStatusType.CONFIRMED || app.Status == Model.Types.AppointmentStatusType.SCHEDULED))
                 .Include(appAssSer => appAssSer.AppointmentServiceOffers)
                     .ThenInclude(assisServ => assisServ.ServiceOffer)
                         .ThenInclude(assis => assis.Assistant)
                             .ThenInclude(asacc => asacc.UserAccount)
-                .Include(client => client.Client)
-                    .ThenInclude(clientAcc => clientAcc.UserAccount)
-                    .ThenInclude(clientaccinf => clientaccinf.UserInformation)
-                .Include(appAssSer => appAssSer.AppointmentServiceOffers)
-                    .ThenInclude(serv => serv.ServiceOffer)
-                    .ThenInclude(assService => assService.Service)
+                            .ThenInclude(asinf => asinf.UserInformation)
                 .ToListAsync();
 
             var appointmentsModel = appointmentDB.Select(app => new BusinessLogicLayer.Model.Appointment
@@ -136,27 +130,29 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 Uuid = app.Uuid,
                 Id = app.Id,
                 CreatedAt = app.CreatedAt,
-
-                Client = new BusinessLogicLayer.Model.Client
+                Client = null,
+                ServiceOffers = app.AppointmentServiceOffers.Select(aso => new BusinessLogicLayer.Model.ServiceOffer
                 {
-                    Name = app.Client.UserAccount.UserInformation.Name,
-                    Uuid = app.Client.UserAccount.Uuid,
-                    Id = app.Client.IdUserAccount,
-                },
-                // ServiceOffers = app.AppointmentServiceOffers.Select(aas => new BusinessLogicLayer.Model.Service
-                // {
-                //     Id = aas.ServiceOffer.Service.Id,
-                //     Description = aas.ServiceOffer.Service.Description,
-                //     Minutes = aas.ServiceOffer.Service.Minutes,
-                //     // Warning! we are returning the assistantservice uuid instead of the service uuid
-                //     // This is intended to simplify communication and validation of selected services between the client and backend.
-                //     Uuid = aas.ServiceOffer.Uuid,
-                //     CreatedAt = aas.ServiceOffer.Service.CreatedAt,
-                //     Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)aas.ServiceOffer.Service.Status,
-                //     Name = aas.ServiceOffer.Service.Name,
-                //     Price = aas.ServiceOffer.Service.Price,
-                // }).ToList()
+                    Id = aso.ServiceOffer.Id,
+                    Uuid = aso.ServiceOffer.Uuid,
+                    StartTime = aso.StartTime,
+                    EndTime = aso.EndTime,
+                    Service = null,
+                    Assistant = new BusinessLogicLayer.Model.Assistant
+                    {
+                        Id = aso.ServiceOffer.Assistant.IdUserAccount,
+                        Uuid = aso.ServiceOffer.Assistant.UserAccount.Uuid,
+                        Name = aso.ServiceOffer.Assistant.UserAccount.UserInformation.Name,
+                        Email = aso.ServiceOffer.Assistant.UserAccount.Email,
+                        Username = aso.ServiceOffer.Assistant.UserAccount.Username,
+                        CreatedAt = aso.ServiceOffer.Assistant.UserAccount.CreatedAt,
+                        Status = (AssistantStatusType?)aso.ServiceOffer.Assistant.Status,
+                        PhoneNumber = aso.ServiceOffer.Assistant.UserAccount.UserInformation.PhoneNumber
+                    },
+                }).ToList()
+
             }).ToList();
+
             return appointmentsModel;
         }
 

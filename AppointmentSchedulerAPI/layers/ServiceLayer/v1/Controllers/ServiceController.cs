@@ -27,6 +27,32 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         //     throw new NotImplementedException();
         // }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllServices()
+        {
+            List<ServiceDTO> serviceDtos = [];
+            try
+            {
+                var services = await systemFacade.GetAllServicesAsync();
+                serviceDtos = services.Select(a => new ServiceDTO
+                {
+                    Uuid = a.Uuid,
+                    Status = a.Status.ToString(),
+                    Description = a.Description,
+                    Name = a.Name,
+                    Minutes = a.Minutes,
+                    Price = a.Price,
+                    CreatedAt = a.CreatedAt
+                }).ToList();
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
+            }
+            return httpResponseService.OkResponse(serviceDtos, ApiVersionEnum.V1);
+        }
+
         [HttpPost("enable")]
         [AllowAnonymous]
         public async Task<IActionResult> EnableService([FromBody] EnableServiceDTO dto)
@@ -99,33 +125,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
         }
 
-
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetAllServices()
-        {
-            List<ServiceDTO> serviceDtos = [];
-            try
-            {
-                var services = await systemFacade.GetAllServicesAsync();
-                serviceDtos = services.Select(a => new ServiceDTO
-                {
-                    Uuid = a.Uuid,
-                    Status = a.Status.ToString(),
-                    Description = a.Description,
-                    Name = a.Name,
-                    Minutes = a.Minutes,
-                    Price = a.Price,
-                    CreatedAt = a.CreatedAt
-                }).ToList();
-            }
-            catch (System.Exception ex)
-            {
-                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
-            }
-            return httpResponseService.OkResponse(serviceDtos, ApiVersionEnum.V1);
-        }
-
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterService([FromBody] CreateServiceDTO serviceDTO)
@@ -157,5 +156,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             }
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
+
+
     }
 }

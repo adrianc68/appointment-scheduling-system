@@ -67,7 +67,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 // result = client;
 
 
-                var data = await schedulerRepository.GetAppointmentsAsync(DateOnly.Parse("2024-12-26"), DateOnly.Parse("2024-12-26"));
+                var data = await schedulerRepository.GetScheduledOrConfirmedAppoinmentsAsync(DateOnly.Parse("2024-12-26"), DateOnly.Parse("2024-12-26"));
 
                 PropToString.PrintListData(data);
                 result = data;

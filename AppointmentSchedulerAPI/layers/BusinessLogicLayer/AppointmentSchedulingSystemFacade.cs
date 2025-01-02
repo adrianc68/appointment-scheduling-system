@@ -24,6 +24,198 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             this.clientMgr = clientMgr;
         }
 
+        public bool EditAssistant(Assistant assistant)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool EditClient(Client client)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool EditService(Service service)
+        {
+            throw new NotImplementedException();
+        }
+        public bool EditAppointment(Appointment appointment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Assistant>> GetAllAssistantsAsync()
+        {
+            return assistantMgr.GetAllAssistantsAsync();
+        }
+
+        public Task<List<Service>> GetAllServicesAsync()
+        {
+            return serviceMgr.GetAllServicesAsync();
+        }
+
+        public Task<List<Client>> GetAllClientsAsync()
+        {
+            return clientMgr.GetAllClientsAsync();
+        }
+
+        public async Task<OperationResult<Appointment, GenericError>> GetAppointmentDetailsAsync(Guid uuidAppointment)
+        {
+            Appointment? appointment = await schedulerMgr.GetAppointmentDetailsByUuidAsync(uuidAppointment);
+            if (appointment == null)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is not registered", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                return OperationResult<Appointment, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
+            }
+            return OperationResult<Appointment, GenericError>.Success(appointment);
+        }
+
+        public async Task<List<Appointment>> GetScheduledOrConfirmedAppoinmentsAsync(DateOnly startDate, DateOnly endDate)
+        {
+            List<Appointment>? appointment = await schedulerMgr.GetScheduledOrConfirmedAppointmentsAsync(startDate, endDate);
+            return appointment;
+        }
+
+        public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
+        {
+            return schedulerMgr.GetAvailableServicesAsync(date);
+        }
+
+        public Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
+        {
+            return schedulerMgr.GetAllAvailabilityTimeSlotsAsync(startDate, endDate);
+        }
+
+        public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
+        {
+            return await schedulerMgr.GetConflictingServicesByDateTimeRangeAsync(range);
+        }
+
+        public async Task<OperationResult<Guid, GenericError>> RegisterAssistant(Assistant assistant)
+        {
+            bool IsUsernameRegistered = await assistantMgr.IsUsernameRegisteredAsync(assistant.Username!);
+            if (IsUsernameRegistered)
+            {
+                GenericError genericError = new GenericError($"Username <{assistant.Username}> is already registered", []);
+                genericError.AddData("username", assistant.Username!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
+            }
+
+            bool IsEmailRegistered = await assistantMgr.IsEmailRegisteredAsync(assistant.Email!);
+            if (IsEmailRegistered)
+            {
+                GenericError genericError = new GenericError($"Email <{assistant.Email}> is already registered", []);
+                genericError.AddData("email", assistant.Email!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
+            }
+
+            bool IsPhoneNumberRegistered = await assistantMgr.IsPhoneNumberRegisteredAsync(assistant.PhoneNumber!);
+            if (IsPhoneNumberRegistered)
+            {
+                GenericError genericError = new GenericError($"PhoneNumber <{assistant.PhoneNumber}> is already registered", []);
+                genericError.AddData("phoneNumber", assistant.PhoneNumber!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
+            }
+            Guid? uuidNewAssistant = await assistantMgr.RegisterAssistantAsync(assistant);
+            if (uuidNewAssistant == null)
+            {
+                return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.REGISTER_ERROR);
+            }
+            return OperationResult<Guid, GenericError>.Success(uuidNewAssistant.Value);
+        }
+
+        public async Task<OperationResult<Guid, GenericError>> RegisterClientAsync(Client client)
+        {
+            bool IsUsernameRegistered = await clientMgr.IsUsernameRegisteredAsync(client.Username!);
+            if (IsUsernameRegistered)
+            {
+                GenericError genericError = new GenericError($"Username <{client.Username}> is already registered", []);
+                genericError.AddData("username", client.Username!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
+            }
+
+            bool IsEmailRegistered = await clientMgr.IsEmailRegisteredAsync(client.Email!);
+            if (IsEmailRegistered)
+            {
+                GenericError genericError = new GenericError($"Email <{client.Email}> is already registered", []);
+                genericError.AddData("email", client.Email!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
+            }
+
+            bool IsPhoneNumberRegistered = await clientMgr.IsPhoneNumberRegisteredAsync(client.PhoneNumber!);
+            if (IsPhoneNumberRegistered)
+            {
+                GenericError genericError = new GenericError($"PhoneNumber <{client.PhoneNumber}> is already registered", []);
+                genericError.AddData("phoneNumber", client.PhoneNumber!);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
+            }
+            Guid? uuidNewClient = await clientMgr.RegisterClientAsync(client);
+            if (uuidNewClient == null)
+            {
+                return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.REGISTER_ERROR);
+            }
+            return OperationResult<Guid, GenericError>.Success(uuidNewClient.Value);
+        }
+
+        public async Task<OperationResult<Guid, GenericError>> RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot)
+        {
+            // 0. Check valid range time
+            if (!(availabilityTimeSlot.StartTime < availabilityTimeSlot.EndTime || availabilityTimeSlot.StartTime == TimeOnly.MinValue))
+            {
+                return OperationResult<Guid, GenericError>.Failure(new GenericError("Range provided is not valid"), MessageCodeType.INVALID_RANGE_TIME);
+            }
+
+            // 1. Get account data
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(availabilityTimeSlot.Assistant!.Uuid!.Value);
+            if (assistantData == null)
+            {
+                GenericError genericError = new GenericError($"Assistant UUID <{availabilityTimeSlot.Assistant!.Uuid!.Value}>", []);
+                genericError.AddData("AssistantUuid", availabilityTimeSlot.Assistant!.Uuid!.Value);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+            }
+            availabilityTimeSlot.Assistant = assistantData;
+
+            // 2. Verify that no existing slot conflicts with the provided time range
+            DateTimeRange range = new()
+            {
+                Date = availabilityTimeSlot.Date!.Value,
+                StartTime = availabilityTimeSlot.StartTime!.Value,
+                EndTime = availabilityTimeSlot.EndTime!.Value
+            };
+
+            bool isAvailabilityTimeSlotAvailable = await schedulerMgr.IsAvailabilityTimeSlotAvailableAsync(range, assistantData.Id!.Value);
+            if (!isAvailabilityTimeSlotAvailable)
+            {
+                GenericError genericError = new("Time range is not available", new Dictionary<string, object>());
+                genericError.AdditionalData!.Add("Range", range);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_AVAILABLE);
+            }
+            // 3. Register availability time slot
+            Guid? uuid = await schedulerMgr.RegisterAvailabilityTimeSlotAsync(availabilityTimeSlot);
+            if (uuid == null)
+            {
+                return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has ocurred"), MessageCodeType.REGISTER_ERROR);
+            }
+            return OperationResult<Guid, GenericError>.Success(uuid.Value);
+        }
+
+        public async Task<OperationResult<Guid, GenericError>> RegisterService(Service service)
+        {
+            bool isServiceNameRegistered = await serviceMgr.IsServiceNameRegisteredAsync(service.Name!);
+            if (isServiceNameRegistered)
+            {
+                return OperationResult<Guid, GenericError>.Failure(new GenericError($"Service name <{service.Name}> is already registered"), MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED);
+            }
+
+            Guid? UuidNewservice = await serviceMgr.RegisterServiceAsync(service);
+            if (UuidNewservice == null)
+            {
+                return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has occurred"), MessageCodeType.REGISTER_ERROR);
+            }
+            return OperationResult<Guid, GenericError>.Success(UuidNewservice.Value);
+        }
+
+
         public async Task<OperationResult<bool, GenericError>> DisableAssistantAsync(Guid uuidAssistant)
         {
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(uuidAssistant);
@@ -256,193 +448,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
             }
             return OperationResult<bool, GenericError>.Success(true);
-        }
-
-
-
-        public bool EditAssistant(Assistant assistant)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool EditClient(Client client)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool EditService(Service service)
-        {
-            throw new NotImplementedException();
-        }
-        public bool EditAppointment(Appointment appointment)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
-        // public List<Appointment> GetAppoinments(DateTime startDate, DateTime endDate)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public Appointment GetAppointmentDetails(int idAppointment)
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        public Task<List<Assistant>> GetAllAssistantsAsync()
-        {
-            return assistantMgr.GetAllAssistantsAsync();
-        }
-
-        public Task<List<Service>> GetAllServicesAsync()
-        {
-            return serviceMgr.GetAllServicesAsync();
-        }
-
-        public Task<List<Client>> GetAllClientsAsync()
-        {
-            return clientMgr.GetAllClientsAsync();
-        }
-
-        public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
-        {
-            return schedulerMgr.GetAvailableServicesAsync(date);
-        }
-
-        public Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
-        {
-            return schedulerMgr.GetAllAvailabilityTimeSlotsAsync(startDate, endDate);
-        }
-
-        public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
-        {
-            return await schedulerMgr.GetConflictingServicesByDateTimeRangeAsync(range);
-        }
-
-        public async Task<OperationResult<Guid, GenericError>> RegisterAssistant(Assistant assistant)
-        {
-            bool IsUsernameRegistered = await assistantMgr.IsUsernameRegisteredAsync(assistant.Username!);
-            if (IsUsernameRegistered)
-            {
-                GenericError genericError = new GenericError($"Username <{assistant.Username}> is already registered", []);
-                genericError.AddData("username", assistant.Username!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
-            }
-
-            bool IsEmailRegistered = await assistantMgr.IsEmailRegisteredAsync(assistant.Email!);
-            if (IsEmailRegistered)
-            {
-                GenericError genericError = new GenericError($"Email <{assistant.Email}> is already registered", []);
-                genericError.AddData("email", assistant.Email!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
-            }
-
-            bool IsPhoneNumberRegistered = await assistantMgr.IsPhoneNumberRegisteredAsync(assistant.PhoneNumber!);
-            if (IsPhoneNumberRegistered)
-            {
-                GenericError genericError = new GenericError($"PhoneNumber <{assistant.PhoneNumber}> is already registered", []);
-                genericError.AddData("phoneNumber", assistant.PhoneNumber!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
-            }
-            Guid? uuidNewAssistant = await assistantMgr.RegisterAssistantAsync(assistant);
-            if (uuidNewAssistant == null)
-            {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.REGISTER_ERROR);
-            }
-            return OperationResult<Guid, GenericError>.Success(uuidNewAssistant.Value);
-        }
-
-        public async Task<OperationResult<Guid, GenericError>> RegisterClientAsync(Client client)
-        {
-            bool IsUsernameRegistered = await clientMgr.IsUsernameRegisteredAsync(client.Username!);
-            if (IsUsernameRegistered)
-            {
-                GenericError genericError = new GenericError($"Username <{client.Username}> is already registered", []);
-                genericError.AddData("username", client.Username!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
-            }
-
-            bool IsEmailRegistered = await clientMgr.IsEmailRegisteredAsync(client.Email!);
-            if (IsEmailRegistered)
-            {
-                GenericError genericError = new GenericError($"Email <{client.Email}> is already registered", []);
-                genericError.AddData("email", client.Email!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
-            }
-
-            bool IsPhoneNumberRegistered = await clientMgr.IsPhoneNumberRegisteredAsync(client.PhoneNumber!);
-            if (IsPhoneNumberRegistered)
-            {
-                GenericError genericError = new GenericError($"PhoneNumber <{client.PhoneNumber}> is already registered", []);
-                genericError.AddData("phoneNumber", client.PhoneNumber!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
-            }
-            Guid? uuidNewClient = await clientMgr.RegisterClientAsync(client);
-            if (uuidNewClient == null)
-            {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.REGISTER_ERROR);
-            }
-            return OperationResult<Guid, GenericError>.Success(uuidNewClient.Value);
-        }
-
-        public async Task<OperationResult<Guid, GenericError>> RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot)
-        {
-            // 0. Check valid range time
-            if (!(availabilityTimeSlot.StartTime < availabilityTimeSlot.EndTime || availabilityTimeSlot.StartTime == TimeOnly.MinValue))
-            {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError("Range provided is not valid"), MessageCodeType.INVALID_RANGE_TIME);
-            }
-
-            // 1. Get account data
-            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(availabilityTimeSlot.Assistant!.Uuid!.Value);
-            if (assistantData == null)
-            {
-                GenericError genericError = new GenericError($"Assistant UUID <{availabilityTimeSlot.Assistant!.Uuid!.Value}>", []);
-                genericError.AddData("AssistantUuid", availabilityTimeSlot.Assistant!.Uuid!.Value);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
-            }
-            availabilityTimeSlot.Assistant = assistantData;
-
-            // 2. Verify that no existing slot conflicts with the provided time range
-            DateTimeRange range = new()
-            {
-                Date = availabilityTimeSlot.Date!.Value,
-                StartTime = availabilityTimeSlot.StartTime!.Value,
-                EndTime = availabilityTimeSlot.EndTime!.Value
-            };
-
-            bool isAvailabilityTimeSlotAvailable = await schedulerMgr.IsAvailabilityTimeSlotAvailableAsync(range, assistantData.Id!.Value);
-            if (!isAvailabilityTimeSlotAvailable)
-            {
-                GenericError genericError = new("Time range is not available", new Dictionary<string, object>());
-                genericError.AdditionalData!.Add("Range", range);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_AVAILABLE);
-            }
-            // 3. Register availability time slot
-            Guid? uuid = await schedulerMgr.RegisterAvailabilityTimeSlotAsync(availabilityTimeSlot);
-            if (uuid == null)
-            {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has ocurred"), MessageCodeType.REGISTER_ERROR);
-            }
-            return OperationResult<Guid, GenericError>.Success(uuid.Value);
-        }
-
-        public async Task<OperationResult<Guid, GenericError>> RegisterService(Service service)
-        {
-            bool isServiceNameRegistered = await serviceMgr.IsServiceNameRegisteredAsync(service.Name!);
-            if (isServiceNameRegistered)
-            {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError($"Service name <{service.Name}> is already registered"), MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED);
-            }
-
-            Guid? UuidNewservice = await serviceMgr.RegisterServiceAsync(service);
-            if (UuidNewservice == null)
-            {
-                return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has occurred"), MessageCodeType.REGISTER_ERROR);
-            }
-            return OperationResult<Guid, GenericError>.Success(UuidNewservice.Value);
         }
 
         public async Task<OperationResult<bool, GenericError>> AssignListServicesToAssistantAsync(Guid assistantUuid, List<Guid?> servicesUuid)

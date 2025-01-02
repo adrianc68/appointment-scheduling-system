@@ -1,8 +1,5 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-
-
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
 {
@@ -18,6 +15,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
         Task<Appointment?> GetAppointmentByUuidAsync(Guid uuid); 
         Task<Appointment?> GetAppointmentDetailsByUuidAsync(Guid uuid); 
+        Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsAsync(DateOnly startDate, DateOnly endDate); 
         Task<Guid?> RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot);
         Task<Guid?> ScheduleAppointmentAsync(Appointment appointment);
         Task<bool> ChangeAppointmentStatusTypeAsync(int idAppointment, AppointmentStatusType status);

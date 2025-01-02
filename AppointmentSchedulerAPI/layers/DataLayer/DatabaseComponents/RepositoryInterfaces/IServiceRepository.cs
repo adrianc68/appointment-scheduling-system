@@ -6,6 +6,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 {
     public interface IServiceRepository
     {
+        // bool EditService(Service service);
         Task<IEnumerable<Service>> GetAllServicesAsync();
         Task<Service?> GetServiceByUuidAsync(Guid uuid);
         Task<Service?> GetServiceByIdAsync(int id);
@@ -13,7 +14,5 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<bool> IsServiceNameRegisteredAsync(string name);
         Task<bool> AddServiceAsync(Service service);
         Task<bool> ChangeServiceStatusType(int idService, ServiceStatusType status);
-        // bool DeleteService(int idService);
-        // bool EditService(Service service);
     }
 }

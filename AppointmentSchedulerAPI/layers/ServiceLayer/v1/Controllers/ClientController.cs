@@ -22,6 +22,11 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
+        // public IActionResult EditClient()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
         [HttpPost("disable")]
         [AllowAnonymous]
         public async Task<IActionResult> DisableClient([FromBody] DisableClientDTO dto)
@@ -154,40 +159,5 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             }
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
-
-
-        // public IActionResult DisableClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult EnableClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult DeleteClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult GetClientStatusType()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-
-        // public IActionResult RegisterClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult EditClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-
-
     }
 }
