@@ -128,6 +128,58 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
+        public async Task<OperationResult<bool, GenericError>> DeleteAssistantAsync(Guid uuidAssistant)
+        {
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(uuidAssistant);
+            if (assistantData == null)
+            {
+                GenericError genericError = new GenericError($"Assistant with UUID: <{uuidAssistant}> is not found", []);
+                genericError.AddData("AssistantUuid", uuidAssistant);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+            }
+
+            if (assistantData.Status == AssistantStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Assistant with UUID: <{uuidAssistant}> is already disabled", []);
+                genericError.AddData("AssistantUuid", uuidAssistant);
+                genericError.AddData("Status", assistantData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_DELETED);
+            }
+
+            bool isStatusChanged = await assistantMgr.ChangeAssistantStatusAsync(assistantData.Id!.Value, AssistantStatusType.DELETED);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
+        }
+
+        public async Task<OperationResult<bool, GenericError>> DeleteClientAsync(Guid uuidClient)
+        {
+            Client? clientData = await clientMgr.GetClientByUuidAsync(uuidClient);
+            if (clientData == null)
+            {
+                GenericError genericError = new GenericError($"Client with UUID: <{uuidClient}> is not found", []);
+                genericError.AddData("ClientUuid", uuidClient);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
+            }
+
+            if (clientData.Status == ClientStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Client with UUID: <{uuidClient}> is already deleted", []);
+                genericError.AddData("ClientUuid", uuidClient);
+                genericError.AddData("Status", clientData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_IS_ALREADY_DELETED);
+            }
+
+            bool isStatusChanged = await clientMgr.ChangeClientStatusTypeAsync(clientData.Id!.Value, ClientStatusType.DELETED);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
+        }
+
         public bool EnableService(int idService)
         {
             throw new NotImplementedException();
@@ -139,11 +191,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         }
 
 
-
-        public bool DeleteClient(int idClient)
-        {
-            throw new NotImplementedException();
-        }
 
         public bool DeleteService(int idService)
         {
@@ -631,6 +678,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
             return OperationResult<Guid, GenericError>.Success(UuidRegistered.Value);
         }
+
 
     }
 }

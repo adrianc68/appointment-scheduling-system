@@ -73,15 +73,29 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
         }
 
-        // public IActionResult EnableAssistant()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult DeleteAssistant()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPost("delete")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeleteAssistant([FromBody] DeleteAssistantDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DeleteAssistantAsync(dto.AssistantUuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
 
         [HttpGet]
         [AllowAnonymous]
