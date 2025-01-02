@@ -90,11 +90,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return isAppointmentStatusChanged;
         }
 
-        public Task<bool> IsAppointmentInSpecificStatusType(int idAppointment, AppointmentStatusType expectedStatus)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Appointment?> GetAppointmentDetailsByUuidAsync(Guid uuid)
         {
             Appointment? appointment = await schedulerRepository.GetAppointmentFullDetailsByUuidAsync(uuid);

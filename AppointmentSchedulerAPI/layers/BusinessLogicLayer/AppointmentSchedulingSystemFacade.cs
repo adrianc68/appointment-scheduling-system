@@ -94,11 +94,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public bool FinalizeAppointment(int idAppointment)
-        {
-            throw new NotImplementedException();
-        }
-
         // public List<Appointment> GetAppoinments(DateTime startDate, DateTime endDate)
         // {
         //     throw new NotImplementedException();
@@ -302,20 +297,54 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> ConfirmAppointment(Guid uuid)
+        public async Task<OperationResult<bool, GenericError>> FinalizeAppointment(Guid uuidAppointment)
         {
-            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(uuid);
+            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(uuidAppointment);
             if (appointment == null)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID {uuid} is not registered", []);
-                genericError.AddData("AppointmentUuid", uuid);
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is not registered", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
+            }
+
+            if (appointment.Status == AppointmentStatusType.SCHEDULED)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} must be confirmed before proceeding", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                genericError.AddData("Status", appointment.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NEEDS_TO_BE_CONFIRMED);
+            }
+
+            if (appointment.Status == AppointmentStatusType.FINISHED)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is already finished", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                genericError.AddData("Status", appointment.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREAEDY_FINISHED);
+            }
+
+            bool isStatusOfAppointmentChanged = await schedulerMgr.ChangeAppointmentStatusTypeAsync(appointment.Id!.Value, AppointmentStatusType.FINISHED);
+            if (!isStatusOfAppointmentChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
+        }
+
+        public async Task<OperationResult<bool, GenericError>> ConfirmAppointment(Guid uuidAppointment)
+        {
+            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(uuidAppointment);
+            if (appointment == null)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is not registered", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
             }
 
             if (appointment.Status == AppointmentStatusType.CONFIRMED)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID {uuid} is already confrimed", []);
-                genericError.AddData("AppointmentUuid", uuid);
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is already confrimed", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
                 genericError.AddData("Status", appointment.Status.ToString());
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_CONFIRMED);
             }

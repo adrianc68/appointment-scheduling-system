@@ -1,7 +1,9 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces
 {
     public interface IFinalizeAppointment
     {
-        bool FinalizeAppointment(int idAppointment);
+        Task<OperationResult<bool, GenericError>> FinalizeAppointment(Guid uuidAppointment);
     }
 }

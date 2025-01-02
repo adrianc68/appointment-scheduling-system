@@ -249,13 +249,38 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpPost("appointment/confirm")]
         [AllowAnonymous]
-        public async Task<IActionResult> ConfirmAppointment([FromBody] ConfirmAppointmentDTO dto )
+        public async Task<IActionResult> ConfirmAppointment([FromBody] ConfirmAppointmentDTO dto)
         {
             bool isConfirmed = false;
             try
             {
                 OperationResult<bool, GenericError> result = await systemFacade.ConfirmAppointment(dto.AppointmentUuid);
-                if(result.IsSuccessful)
+                if (result.IsSuccessful)
+                {
+                    isConfirmed = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+                throw;
+            }
+            return httpResponseService.OkResponse(isConfirmed, ApiVersionEnum.V1);
+        }
+
+        [HttpPost("appointment/finalize")]
+        [AllowAnonymous]
+        public async Task<IActionResult> FinalizeAppointment([FromBody] FinalizeAppointmentDTO dto)
+        {
+            bool isConfirmed = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.FinalizeAppointment(dto.AppointmentUuid);
+                if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;
                 }

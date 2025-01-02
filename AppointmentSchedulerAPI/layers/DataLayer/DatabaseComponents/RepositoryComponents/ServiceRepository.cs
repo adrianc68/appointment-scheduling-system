@@ -81,7 +81,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 Minutes = serviceDB.Minutes,
                 Price = serviceDB.Price,
                 Uuid = serviceDB.Uuid,
-                Status = (BusinessLogicLayer.Model.Types.ServiceStatusType)serviceDB.Status,
+                Status = (BusinessLogicLayer.Model.Types.ServiceStatusType)serviceDB.Status!.Value,
                 CreatedAt = serviceDB.CreatedAt,
                 Id = serviceDB.Id
             };
@@ -127,7 +127,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var serviceName = await dbContext.Services
-                .Where(a => a.Name.ToLower() == name.ToLower())
+                .Where(a => a.Name!.ToLower() == name.ToLower())
                 .Select(a => a.Name)
                 .FirstOrDefaultAsync();
             return serviceName != null;

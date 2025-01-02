@@ -1,5 +1,4 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 
 
@@ -7,7 +6,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IScheduleAppointmentClientSelf
     {
-        Task<OperationResult<bool, GenericError>> ConfirmAppointment(Guid uuid);
+        Task<OperationResult<bool, GenericError>> ConfirmAppointment(Guid uuidAppointment);
         Task<OperationResult<Guid, GenericError>> ScheduleAppointmentAsClientAsync(Appointment appointment);
     }
 }
