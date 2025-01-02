@@ -184,5 +184,40 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }
             return isStatusChanged;
         }
+
+        public async Task<bool> UpdateClientAsync(BusinessLogicLayer.Model.Client client)
+        {
+             bool isUpdated = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                var userAccount = await dbContext.UserAccounts
+                    .Include(ua => ua.UserInformation)
+                    .FirstOrDefaultAsync(ua => ua.Uuid == client.Uuid);
+
+                if (userAccount == null)
+                {
+                    return false;
+                }
+
+                userAccount.Email = client.Email;
+                userAccount.Username = client.Username;
+                userAccount.Role = RoleType.CLIENT;
+                userAccount.UserInformation.Name = client.Name;
+                userAccount.UserInformation.PhoneNumber = client.PhoneNumber;
+
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isUpdated = true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isUpdated;
+        }
     }
 }

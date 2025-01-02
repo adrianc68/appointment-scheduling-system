@@ -29,7 +29,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistant.Uuid!.Value);
             if (assistantData == null)
             {
-                GenericError genericError = new GenericError($"Assistant UUID <{assistant.Uuid.Value}> is not registered", []);
+                GenericError genericError = new GenericError($"Assistant with UUID <{assistant.Uuid.Value}> is not registered", []);
                 genericError.AddData("AssistantUuid", assistant.Uuid.Value);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
@@ -64,9 +64,44 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(isUpdated);
         }
 
-        public bool EditClient(Client client)
+        public async Task<OperationResult<bool, GenericError>> EditClient(Client client)
         {
-            throw new NotImplementedException();
+            Client? clientData = await clientMgr.GetClientByUuidAsync(client.Uuid!.Value);
+            if (clientData == null)
+            {
+                GenericError genericError = new GenericError($"Client with UUID <{client.Uuid.Value}> is not registered", []);
+                genericError.AddData("ClientUuid", client.Uuid.Value);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
+            }
+
+            if (client.Username != clientData.Username)
+            {
+                bool newUsernameIsRegistered = await clientMgr.IsUsernameRegisteredAsync(client.Username!);
+                if (newUsernameIsRegistered)
+                {
+                    GenericError genericError = new GenericError($"Username <{client.Username}> is already registered", []);
+                    genericError.AddData("username", client.Username!);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
+                }
+            }
+
+            if (client.Email != clientData.Email)
+            {
+                bool newEmailRegistered = await clientMgr.IsEmailRegisteredAsync(client.Email!);
+                if (newEmailRegistered)
+                {
+                    GenericError genericError = new GenericError($"Email <{client.Email}> is already registered", []);
+                    genericError.AddData("email", client.Email!);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
+                }
+            }
+
+            bool isUpdated = await clientMgr.UpdateClient(client);
+            if (!isUpdated)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(isUpdated);
         }
 
         public bool EditService(Service service)

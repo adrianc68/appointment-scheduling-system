@@ -159,5 +159,41 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             }
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
+
+
+        [HttpPut]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateClient([FromBody] UpdateClientDTO dto)
+        {
+            bool isUpdated = false;
+            try
+            {
+                BusinessLogicLayer.Model.Client client = new()
+                {
+                    Uuid = dto.Uuid,
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    PhoneNumber = dto.PhoneNumber,
+                    Password = dto.Password,
+                    Username = dto.Username
+                };
+                OperationResult<bool, GenericError> result = await systemFacade.EditClient(client);
+                if (result.IsSuccessful)
+                {
+                    isUpdated = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isUpdated, ApiVersionEnum.V1);
+        }
+
+
     }
 }

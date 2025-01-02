@@ -5,7 +5,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
 {
     public interface IClientMgt
     {
-        // Task<bool> UpdateClient(Client client);
+        Task<bool> UpdateClient(Client client);
         Task<bool> ChangeClientStatusTypeAsync(int idClient, ClientStatusType status);
         Task<Client?> GetClientByUuidAsync(Guid uuid);
         Task<bool> IsUsernameRegisteredAsync(string username);
