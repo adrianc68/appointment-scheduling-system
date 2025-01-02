@@ -8,6 +8,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
     {
         Task<OperationResult<Appointment,GenericError>> GetAppointmentDetailsAsync(Guid uuidAppointment);
         Task<List<Appointment>> GetScheduledOrConfirmedAppoinmentsAsync(DateOnly startDate, DateOnly endDate);
+        Task<List<Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate);
         Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date);
         Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
     }

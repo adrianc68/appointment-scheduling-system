@@ -26,7 +26,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpGet("appointment/scheduler")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllAppointments([FromQuery] GetAllAppointmentsDTO dto)
+        public async Task<IActionResult> GetAppointmentsFromScheduler([FromQuery] GetAllAppointmentsDTO dto)
         {
             List<AppointmentDTO> appointments = [];
             try
@@ -47,6 +47,38 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         StartTimeOfAssistantOfferingService = se.StartTime!.Value,
                         EndTimeOfAsisstantOfferingService = se.EndTime!.Value
                     }).ToList()
+                }).ToList();
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(appointments, ApiVersionEnum.V1);
+        }
+
+              [HttpGet("appointment/")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllAppoinments([FromQuery] GetAllAppointmentsDTO dto)
+        {
+            List<AppointmentDTO> appointments = [];
+            try
+            {
+                List<Appointment> result = await systemFacade.GetAllAppoinments(dto.StartDate, dto.EndDate);
+                appointments = result.Select(app => new AppointmentDTO
+                {
+                    Uuid = app.Uuid,
+                    StartTime = app.StartTime,
+                    EndTime = app.EndTime,
+                    Date = app.Date,
+                    Status = app.Status.ToString(), 
+                    CreatedAt = app.CreatedAt!.Value,
+                    Client = new ClientDTO 
+                    {
+                        Name = app.Client.Name,
+                        Uuid = app.Client.Uuid,
+                        PhoneNumber = app.Client.PhoneNumber,
+                        Email = app.Client.Email
+                    }
                 }).ToList();
             }
             catch (System.Exception ex)

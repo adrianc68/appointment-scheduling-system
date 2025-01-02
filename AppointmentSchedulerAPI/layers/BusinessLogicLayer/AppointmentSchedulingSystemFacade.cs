@@ -76,6 +76,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return appointment;
         }
 
+        public async Task<List<Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate)
+        {
+            List<Appointment>? appointment = await schedulerMgr.GetAllAppoinments(startDate, endDate);
+            return appointment;
+        }
+
         public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
         {
             return schedulerMgr.GetAvailableServicesAsync(date);

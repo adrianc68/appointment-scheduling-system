@@ -156,7 +156,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return appointmentsModel;
         }
 
-
         public async Task<IEnumerable<BusinessLogicLayer.Model.AvailabilityTimeSlot>> GetAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate)
         {
             using var dbContext = context.CreateDbContext();
@@ -450,6 +449,38 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 throw;
             }
             return isStatusChanged;
+        }
+
+        public async Task<IEnumerable<BusinessLogicLayer.Model.Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate)
+        {
+            using var dbContext = context.CreateDbContext();
+            var appointmentDB = await dbContext.Appointments
+                .Where(app => app.Date >= startDate && app.Date <= endDate)
+                .Include(c => c.Client)
+                    .ThenInclude(ua => ua.UserAccount)
+                    .ThenInclude(ui => ui.UserInformation)
+                .ToListAsync();
+
+            var appointmentsModel = appointmentDB.Select(app => new BusinessLogicLayer.Model.Appointment
+            {
+                Date = app.Date,
+                EndTime = app.EndTime,
+                StartTime = app.StartTime,
+                TotalCost = app.TotalCost,
+                Uuid = app.Uuid,
+                Id = app.Id,
+                CreatedAt = app.CreatedAt,
+                Client = new BusinessLogicLayer.Model.Client
+                {
+                    Id = app.Client.IdUserAccount,
+                    Uuid = app.Client.UserAccount.Uuid,
+                    Name = app.Client.UserAccount.UserInformation.Name,
+                    Email = app.Client.UserAccount.Email,
+                    PhoneNumber = app.Client.UserAccount.UserInformation.PhoneNumber
+                },
+            }).ToList();
+
+            return appointmentsModel;
         }
     }
 }
