@@ -105,7 +105,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isAssigned = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.AssignServicesToAssistant(assignServiceDTO.assistantUuid, assignServiceDTO.servicesUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.AssignListServicesToAssistantAsync(assignServiceDTO.assistantUuid, assignServiceDTO.servicesUuid);
                 if (result.IsSuccessful)
                 {
                     isAssigned = result.Result;

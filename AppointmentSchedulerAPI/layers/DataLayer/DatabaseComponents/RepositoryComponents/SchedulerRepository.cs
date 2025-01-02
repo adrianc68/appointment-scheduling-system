@@ -312,5 +312,70 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .ToListAsync();
             return conflictingOffers;
         }
+
+        public async Task<BusinessLogicLayer.Model.Appointment?> GetAppointmentByUuidAsync(Guid uuid)
+        {
+            using var dbContext = context.CreateDbContext();
+
+            var appointmentDB = await dbContext.Appointments
+            .Include(ap => ap.Client)
+                .ThenInclude(ac => ac.UserAccount)
+                .ThenInclude(ua => ua.UserInformation)
+            .FirstOrDefaultAsync(ap => ap.Uuid == uuid);
+
+            if (appointmentDB == null)
+            {
+                return null;
+            }
+
+            var appointment = new BusinessLogicLayer.Model.Appointment
+            {
+                Id = appointmentDB.Id,
+                Uuid = appointmentDB.Uuid,
+                Date = appointmentDB.Date,
+                StartTime = appointmentDB.StartTime,
+                EndTime = appointmentDB.EndTime,
+                TotalCost = appointmentDB.TotalCost,
+                CreatedAt = appointmentDB.CreatedAt,
+                Status = (AppointmentStatusType)appointmentDB.Status!.Value,
+                Client = new BusinessLogicLayer.Model.Client
+                {
+                    Id = appointmentDB.Client.IdUserAccount,
+                    Uuid = appointmentDB.Client.UserAccount.Uuid,
+                    Name = appointmentDB.Client.UserAccount.UserInformation.Name,
+                    Email = appointmentDB.Client.UserAccount.Email,
+                    PhoneNumber = appointmentDB.Client.UserAccount.UserInformation.PhoneNumber
+                },
+            };
+            return appointment;
+        }
+
+        public async Task<bool> ChangeAppointmentStatusTypeAsync(int idAppointment, AppointmentStatusType status)
+        {
+            bool isStatusChanged = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var appointment = await dbContext.Appointments
+                     .FirstOrDefaultAsync(ap => ap.Id == idAppointment);
+
+                if (appointment == null)
+                {
+                    return false;
+                }
+
+                appointment.Status = (DataLayer.DatabaseComponents.Model.Types.AppointmentStatusType)status;
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isStatusChanged = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isStatusChanged;
+        }
     }
 }

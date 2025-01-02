@@ -80,5 +80,21 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return appointment.Uuid;
         }
 
+        public async Task<Appointment?> GetAppointmentByUuidAsync(Guid uuid)
+        {
+            Appointment? appointment = await schedulerRepository.GetAppointmentByUuidAsync(uuid);
+            return appointment;
+        }
+
+        public async Task<bool> ChangeAppointmentStatusTypeAsync(int idAppointment, AppointmentStatusType status)
+        {
+            bool isAppointmentStatusChanged = await schedulerRepository.ChangeAppointmentStatusTypeAsync(idAppointment, status);
+            return isAppointmentStatusChanged;
+        }
+
+        public Task<bool> IsAppointmentInSpecificStatusType(int idAppointment, AppointmentStatusType expectedStatus)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

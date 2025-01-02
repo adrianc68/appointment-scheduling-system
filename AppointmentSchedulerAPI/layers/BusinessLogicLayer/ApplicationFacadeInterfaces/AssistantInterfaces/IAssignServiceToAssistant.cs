@@ -4,6 +4,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IAssignServiceToAssistant
     {
-        Task<OperationResult<bool, GenericError>> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid);
+        Task<OperationResult<bool, GenericError>> AssignListServicesToAssistantAsync(Guid assistantUuid, List<Guid?> servicesUuid);
     }
 }

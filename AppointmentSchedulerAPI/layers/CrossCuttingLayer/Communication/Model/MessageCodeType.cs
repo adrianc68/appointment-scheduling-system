@@ -10,6 +10,7 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         DATA_UPDATED,
         SERVER_ERROR,
         REGISTER_ERROR,
+        UPDATE_ERROR,
         INVALID_CREDENTIALS,
         INVALID_RANGE_TIME,
         UNAUTHORIZED,
@@ -26,6 +27,8 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE,
         NO_AVAILABLE_TIME_SLOT,
         SERVICES_ARE_NOT_CONTIGUOUS,
-        SERVICE_ALREADY_ASSIGNED_TO_ASSISTANT
+        SERVICE_ALREADY_ASSIGNED_TO_ASSISTANT,
+        APPOINTMENT_NOT_FOUND,
+        APPOINTMENT_IS_ALREADY_CONFIRMED
     }
 }

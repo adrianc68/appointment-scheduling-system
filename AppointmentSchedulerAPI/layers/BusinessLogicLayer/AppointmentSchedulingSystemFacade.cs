@@ -34,11 +34,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public bool ConfirmAppointment(int idAppointment)
-        {
-            throw new NotImplementedException();
-        }
-
         public bool DeleteClient(int idClient)
         {
             throw new NotImplementedException();
@@ -268,7 +263,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(UuidNewservice.Value);
         }
 
-        public async Task<OperationResult<bool, GenericError>> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
+        public async Task<OperationResult<bool, GenericError>> AssignListServicesToAssistantAsync(Guid assistantUuid, List<Guid?> servicesUuid)
         {
 
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistantUuid);
@@ -289,7 +284,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     genericError.AddData("serviceUuid", servicesUuid);
                     return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
                 }
-                bool isAlreadyRegistered = await assistantMgr.IsAssistantOfferingServiceByUuidAsync(serviceData.Id!.Value, assistantData.Id!.Value );
+                bool isAlreadyRegistered = await assistantMgr.IsAssistantOfferingServiceByUuidAsync(serviceData.Id!.Value, assistantData.Id!.Value);
                 if (isAlreadyRegistered)
                 {
                     GenericError genericError = new GenericError($"Service with UUID <{serviceUuid}> is already assigned to assistant {assistantUuid}", []);
@@ -299,10 +294,35 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 }
                 idServices.Add(serviceData.Id.Value);
             }
-            bool areAllServicesAssigned = await assistantMgr.AssignServicesToAssistantAsync(assistantData.Id!.Value, idServices);
+            bool areAllServicesAssigned = await assistantMgr.AssignListServicesToAssistantAsync(assistantData.Id!.Value, idServices);
             if (!areAllServicesAssigned)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has occurred"), MessageCodeType.REGISTER_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
+        }
+
+        public async Task<OperationResult<bool, GenericError>> ConfirmAppointment(Guid uuid)
+        {
+            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(uuid);
+            if (appointment == null)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID {uuid} is not registered", []);
+                genericError.AddData("AppointmentUuid", uuid);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
+            }
+
+            if (appointment.Status == AppointmentStatusType.CONFIRMED)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID {uuid} is already confrimed", []);
+                genericError.AddData("AppointmentUuid", uuid);
+                genericError.AddData("Status", appointment.Status);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_CONFIRMED);
+            }
+            bool isStatusOfAppointmentChanged = await schedulerMgr.ChangeAppointmentStatusTypeAsync(appointment.Id!.Value, AppointmentStatusType.CONFIRMED);
+            if (!isStatusOfAppointmentChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
             }
             return OperationResult<bool, GenericError>.Success(true);
         }

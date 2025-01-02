@@ -25,8 +25,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate);
         Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date);
         Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
+        Task<Appointment?> GetAppointmentByUuidAsync(Guid uuid); 
         Task<Guid?> RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot);
         Task<Guid?> ScheduleAppointmentAsync(Appointment appointment);
+        Task<bool> ChangeAppointmentStatusTypeAsync(int idAppointment, AppointmentStatusType status);
+        Task<bool> IsAppointmentInSpecificStatusType(int idAppointment, AppointmentStatusType expectedStatus);
         Task<bool> IsAppointmentTimeSlotAvailableAsync(DateTimeRange range);
         Task<bool> IsAvailabilityTimeSlotAvailableAsync(DateTimeRange range, int idAssistant);
         Task<bool> IsAssistantAvailableInAvailabilityTimeSlotsAsync(DateTimeRange range, int idAssistant);
