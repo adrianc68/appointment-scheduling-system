@@ -5,7 +5,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
 {
     public interface IAssistantMgt
     {
-        // Task<bool> UpdateAssistant(Assistant assistant);
+        Task<bool> UpdateAssistant(Assistant assistant);
         Task<bool> ChangeAssistantStatusAsync(int idAssistant, AssistantStatusType status);
         Task<List<Assistant>> GetAllAssistantsAsync();
         Task<Assistant?> GetAssistantByUuidAsync(Guid uuid);

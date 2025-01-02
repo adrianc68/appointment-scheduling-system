@@ -92,5 +92,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return assistant.Uuid.Value;
         }
 
+        public async Task<bool> UpdateAssistant(Assistant assistant)
+        {
+            bool isUpdated = await assistantRepository.UpdateAssistantAsync(assistant);
+            return isUpdated;
+        }
     }
 }

@@ -24,9 +24,44 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             this.clientMgr = clientMgr;
         }
 
-        public bool EditAssistant(Assistant assistant)
+        public async Task<OperationResult<bool, GenericError>> EditAssistant(Assistant assistant)
         {
-            throw new NotImplementedException();
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistant.Uuid!.Value);
+            if (assistantData == null)
+            {
+                GenericError genericError = new GenericError($"Assistant UUID <{assistant.Uuid.Value}> is not registered", []);
+                genericError.AddData("AssistantUuid", assistant.Uuid.Value);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+            }
+
+            if (assistant.Username != assistantData.Username)
+            {
+                bool newUsernameIsRegistered = await assistantMgr.IsUsernameRegisteredAsync(assistant.Username!);
+                if (newUsernameIsRegistered)
+                {
+                    GenericError genericError = new GenericError($"Username <{assistant.Username}> is already registered", []);
+                    genericError.AddData("username", assistant.Username!);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
+                }
+            }
+
+            if (assistant.Email != assistantData.Email)
+            {
+                bool newEmailRegistered = await assistantMgr.IsEmailRegisteredAsync(assistant.Email!);
+                if (newEmailRegistered)
+                {
+                    GenericError genericError = new GenericError($"Email <{assistant.Email}> is already registered", []);
+                    genericError.AddData("email", assistant.Email!);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
+                }
+            }
+
+            bool isUpdated = await assistantMgr.UpdateAssistant(assistant);
+            if (!isUpdated)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(isUpdated);
         }
 
         public bool EditClient(Client client)
@@ -58,18 +93,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return clientMgr.GetAllClientsAsync();
         }
 
-        public async Task<OperationResult<Appointment, GenericError>> GetAppointmentDetailsAsync(Guid uuidAppointment)
-        {
-            Appointment? appointment = await schedulerMgr.GetAppointmentDetailsByUuidAsync(uuidAppointment);
-            if (appointment == null)
-            {
-                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is not registered", []);
-                genericError.AddData("AppointmentUuid", uuidAppointment);
-                return OperationResult<Appointment, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
-            }
-            return OperationResult<Appointment, GenericError>.Success(appointment);
-        }
-
         public async Task<List<Appointment>> GetScheduledOrConfirmedAppoinmentsAsync(DateOnly startDate, DateOnly endDate)
         {
             List<Appointment>? appointment = await schedulerMgr.GetScheduledOrConfirmedAppointmentsAsync(startDate, endDate);
@@ -85,6 +108,18 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
         {
             return schedulerMgr.GetAvailableServicesAsync(date);
+        }
+
+        public async Task<OperationResult<Appointment, GenericError>> GetAppointmentDetailsAsync(Guid uuidAppointment)
+        {
+            Appointment? appointment = await schedulerMgr.GetAppointmentDetailsByUuidAsync(uuidAppointment);
+            if (appointment == null)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is not registered", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                return OperationResult<Appointment, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
+            }
+            return OperationResult<Appointment, GenericError>.Success(appointment);
         }
 
         public Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
@@ -175,7 +210,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(availabilityTimeSlot.Assistant!.Uuid!.Value);
             if (assistantData == null)
             {
-                GenericError genericError = new GenericError($"Assistant UUID <{availabilityTimeSlot.Assistant!.Uuid!.Value}>", []);
+                GenericError genericError = new GenericError($"Assistant UUID <{availabilityTimeSlot.Assistant!.Uuid!.Value}> is not registered", []);
                 genericError.AddData("AssistantUuid", availabilityTimeSlot.Assistant!.Uuid!.Value);
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }

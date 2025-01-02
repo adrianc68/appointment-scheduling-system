@@ -24,6 +24,21 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
+        // public IActionResult EditAppointment()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult DeleteAvailabilityTimeSlot()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
+        // public IActionResult EditAvailabilityTimeSlot()
+        // {
+        //     throw new NotImplementedException();
+        // }
+
         [HttpGet("appointment/scheduler")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAppointmentsFromScheduler([FromQuery] GetAllAppointmentsDTO dto)
@@ -40,7 +55,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Date = app.Date,
                     Status = app.Status.ToString(), 
                     CreatedAt = app.CreatedAt!.Value,
-                    AssistantOffer = app.ServiceOffers.Select(se => new AsisstantOfferDTO 
+                    Assistants = app.ServiceOffers.Select(se => new AsisstantOfferDTO 
                     {
                         AssistantName = se.Assistant!.Name,
                         AssistantUuid = se.Assistant!.Uuid!.Value,
@@ -437,22 +452,5 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             }
             return httpResponseService.OkResponse(isConfirmed, ApiVersionEnum.V1);
         }
-
-
-
-        // public IActionResult EditAppointment()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult DeleteAvailabilityTimeSlot()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult EditAvailabilityTimeSlot()
-        // {
-        //     throw new NotImplementedException();
-        // }
     }
 }

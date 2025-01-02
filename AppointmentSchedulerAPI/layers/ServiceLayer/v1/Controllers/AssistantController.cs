@@ -125,18 +125,18 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterAssistant([FromBody] CreateAssistantDTO assistantDTO)
+        public async Task<IActionResult> RegisterAssistant([FromBody] CreateAssistantDTO dto)
         {
             Guid? guid;
             try
             {
                 BusinessLogicLayer.Model.Assistant assistant = new()
                 {
-                    Name = assistantDTO.Name,
-                    Email = assistantDTO.Email,
-                    PhoneNumber = assistantDTO.PhoneNumber,
-                    Password = assistantDTO.Password,
-                    Username = assistantDTO.Username
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    PhoneNumber = dto.PhoneNumber,
+                    Password = dto.Password,
+                    Username = dto.Username
                 };
                 OperationResult<Guid, GenericError> result = await systemFacade.RegisterAssistant(assistant);
                 if (result.IsSuccessful)
@@ -153,6 +153,39 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
             }
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+        }
+
+        [HttpPut]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateAssistant([FromBody] UpdateAssistantDTO dto)
+        {
+            bool isUpdated = false;
+            try
+            {
+                BusinessLogicLayer.Model.Assistant assistant = new()
+                {
+                    Uuid = dto.Uuid,
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    PhoneNumber = dto.PhoneNumber,
+                    Password = dto.Password,
+                    Username = dto.Username
+                };
+                OperationResult<bool, GenericError> result = await systemFacade.EditAssistant(assistant);
+                if (result.IsSuccessful)
+                {
+                    isUpdated = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isUpdated, ApiVersionEnum.V1);
         }
 
         [HttpPost("service")]

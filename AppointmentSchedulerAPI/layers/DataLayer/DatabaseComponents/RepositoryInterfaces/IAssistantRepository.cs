@@ -19,7 +19,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber);
         Task<bool> IsAssistantOfferingServiceByUuidAsync(int idService, int idAssistant);
         Task<bool> ChangeAssistantStatus(int idAssistant, AssistantStatusType status);
-        // Task<bool> UpdateAssistantAsync(Assistant assistant);
+        Task<bool> UpdateAssistantAsync(Assistant assistant);
         // Task<bool> DeleteAssistantAsync(Guid uuid);
     }
 }
