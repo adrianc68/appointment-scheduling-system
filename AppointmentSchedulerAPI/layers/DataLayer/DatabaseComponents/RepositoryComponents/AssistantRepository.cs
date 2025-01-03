@@ -72,6 +72,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     IdAssistant = idAssistant,
                     IdService = serviceId,
+                    Status = ServiceOfferStatusType.AVAILABLE,
                     Uuid = Guid.CreateVersion7()
                 }).ToList();
 
@@ -229,13 +230,12 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<BusinessLogicLayer.Model.ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid)
         {
             using var dbContext = context.CreateDbContext();
-
             var dbServiceOffer = await dbContext.ServiceOffers
                 .Include(a => a.Service)
                 .Include(a => a.Assistant)
                     .ThenInclude(asi => asi.UserAccount)
                     .ThenInclude(asc => asc.UserInformation)
-                .FirstOrDefaultAsync(a => a.Uuid == uuid && a.Assistant.Status == AssistantStatusType.ENABLED && a.Service.Status == ServiceStatusType.ENABLED );
+                .FirstOrDefaultAsync(a => a.Uuid == uuid);
 
             if (dbServiceOffer == null)
                 return null;
@@ -255,6 +255,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 },
                 Id = dbServiceOffer.Id,
                 Uuid = dbServiceOffer.Uuid,
+                Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType?)dbServiceOffer.Status,
                 Assistant = new BusinessLogicLayer.Model.Assistant
                 {
                     Id = dbServiceOffer.Assistant.IdUserAccount,

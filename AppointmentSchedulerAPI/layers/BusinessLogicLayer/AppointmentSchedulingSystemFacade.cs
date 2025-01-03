@@ -297,12 +297,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
-            if (assistantData.Status == AssistantStatusType.DELETED)
+            if (assistantData.Status != AssistantStatusType.ENABLED)
             {
-                GenericError genericError = new GenericError($"Cannot assign slot. Assistant with UUID <{assistantData!.Uuid!.Value}>. Assistant was deleted!", []);
+                GenericError genericError = new GenericError($"Cannot assign slot. Assistant with UUID <{assistantData!.Uuid!.Value}>. Assistant is unavailable!", []);
                 genericError.AddData("AssistantUuid", assistantData!.Uuid.Value);
-                genericError.AddData("Status", AssistantStatusType.DELETED.ToString());
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
+                genericError.AddData("Status", assistantData.Status!.Value.ToString());
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_UNAVAILABLE);
             }
 
             availabilityTimeSlot.Assistant = assistantData;
@@ -661,12 +661,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
                 }
 
-                if (serviceData.Status == ServiceStatusType.DELETED)
+                if (serviceData.Status != ServiceStatusType.ENABLED)
                 {
-                    GenericError genericError = new GenericError($"Cannot assign Service with UUID <{serviceData.Uuid}>. Service was deleted!", []);
+                    GenericError genericError = new GenericError($"Cannot assign Service with UUID <{serviceData.Uuid}>. Service is unavailable", []);
                     genericError.AddData("ServiceUuid", serviceData.Uuid!.Value);
-                    genericError.AddData("Status", ServiceStatusType.DELETED.ToString());
-                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_WAS_DELETED);
+                    genericError.AddData("Status", serviceData.Status!.Value.ToString());
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_UNAVAILABLE);
                 }
 
 
@@ -702,15 +702,23 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} must be confirmed before proceeding", []);
                 genericError.AddData("AppointmentUuid", uuidAppointment);
-                genericError.AddData("Status", appointment.Status.ToString());
+                genericError.AddData("AppointmentStatus", appointment.Status.ToString());
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NEEDS_TO_BE_CONFIRMED);
+            }
+
+            if (appointment.Status == AppointmentStatusType.CANCELED)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} was cancelled before.", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                genericError.AddData("AppointmentStatus", appointment.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREDY_CANCELED);
             }
 
             if (appointment.Status == AppointmentStatusType.FINISHED)
             {
                 GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is already finished", []);
                 genericError.AddData("AppointmentUuid", uuidAppointment);
-                genericError.AddData("Status", appointment.Status.ToString());
+                genericError.AddData("AppointmentStatus", appointment.Status.ToString());
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
             }
 
@@ -731,6 +739,23 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 genericError.AddData("AppointmentUuid", uuidAppointment);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
             }
+
+            if (appointment.Status == AppointmentStatusType.CANCELED)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} was cancelled before.", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                genericError.AddData("AppointmentStatus", appointment.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREDY_CANCELED);
+            }
+
+            if (appointment.Status == AppointmentStatusType.FINISHED)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is finished.", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                genericError.AddData("AppointmentStatus", appointment.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
+            }
+
 
             if (appointment.Status == AppointmentStatusType.CONFIRMED)
             {
@@ -877,8 +902,19 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
                 if (serviceOfferData.Assistant!.Status != AssistantStatusType.ENABLED || serviceOfferData.Service!.Status != ServiceStatusType.ENABLED)
                 {
-                    GenericError genericError = new GenericError($"Service or assistant is deleted or disabled <{serviceOffer.Uuid.Value}>. ServiceOffer is unavailable", []);
+                    GenericError genericError = new GenericError($"Service or assistant is deleted or disabled. ServiceOffer with UUID <{serviceOffer.Uuid.Value}> is unavailable", []);
+                    genericError.AddData("SelectedServiceUuid", serviceOfferData.Uuid!.Value);
+                    genericError.AddData("AssistantStatus", serviceOfferData.Assistant!.Status!.Value.ToString());
+                    genericError.AddData("ServiceStatus", serviceOfferData.Service!.Status!.Value.ToString());
+                    genericError.AddData("SelectedServiceStatus", serviceOfferData.Status!.Value.ToString());
+                    return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_UNAVAILABLE);
+                }
+
+                if (serviceOfferData.Status == ServiceOfferStatusType.NOT_AVAILABLE)
+                {
+                    GenericError genericError = new GenericError($"ServiceOffer with UUID <{serviceOffer.Uuid.Value}> is unavailable", []);
                     genericError.AddData("SelectedServiceUuid", serviceOffer.Uuid.Value);
+                    genericError.AddData("ServiceOfferStatus", serviceOfferData.Status);
                     return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_UNAVAILABLE);
                 }
 
@@ -933,9 +969,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 {
                     GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is not available during the requested time range", []);
                     error.AddData("SelectedServiceUuid", serviceOffer.Uuid!.Value);
-                    error.AddData("StartTime", serviceRange.StartTime);
-                    error.AddData("EndTime", serviceRange.EndTime);
+                    error.AddData("SelectedServiceStartTime", serviceRange.StartTime);
+                    error.AddData("SelectedServiceEndTime", serviceRange.EndTime);
                     error.AddData("AssistantUuid", serviceOffer.Assistant!.Uuid!.Value);
+                    error.AddData("AssistantName", serviceOffer.Assistant!.Name!);
                     return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE);
                 }
 
@@ -944,9 +981,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 {
                     GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is attending another appointment during the requested time range", []);
                     error.AddData("SelectedServiceUuid", serviceOffer.Uuid!.Value);
-                    error.AddData("StartTime", serviceRange.StartTime);
-                    error.AddData("EndTime", serviceRange.EndTime);
+                    error.AddData("SelectedServiceStartTime", serviceRange.StartTime);
+                    error.AddData("SelectedServiceEndTime", serviceRange.EndTime);
                     error.AddData("AssistantUuid", serviceOffer.Assistant!.Uuid!.Value);
+                    error.AddData("AssistantName", serviceOffer.Assistant!.Name!);
                     return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.SELECTED_SERVICE_HAS_CONFLICTING_APPOINTMENT_TIME_SLOT);
                 }
             }

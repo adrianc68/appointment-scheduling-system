@@ -46,6 +46,9 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         SERVICE_WAS_DELETED,
         CLIENT_WAS_DELETED,
         ASSISTANT_WAS_DELETED,
-        SERVICE_OFFER_UNAVAILABLE
+        SERVICE_OFFER_UNAVAILABLE,
+        ASSISTANT_UNAVAILABLE,
+        CLIENT_UNAVAILABLE,
+        SERVICE_UNAVAILABLE
     }
 }

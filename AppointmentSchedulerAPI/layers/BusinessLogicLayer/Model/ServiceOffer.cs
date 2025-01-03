@@ -1,4 +1,4 @@
-using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
 {
@@ -10,5 +10,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
         public Guid? Uuid { get; set; }
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
+        public ServiceOfferStatusType? Status { get; set; }
     }
 }
