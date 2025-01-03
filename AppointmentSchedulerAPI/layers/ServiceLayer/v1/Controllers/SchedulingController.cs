@@ -39,197 +39,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         //     throw new NotImplementedException();
         // }
 
-        [HttpGet("appointment/scheduler")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetAppointmentsFromScheduler([FromQuery] GetAllAppointmentsDTO dto)
-        {
-            List<AppointmentDTO> appointments = [];
-            try
-            {
-                List<Appointment> result = await systemFacade.GetScheduledOrConfirmedAppoinmentsAsync(dto.StartDate, dto.EndDate);
-                appointments = result.Select(app => new AppointmentDTO
-                {
-                    Uuid = app.Uuid,
-                    StartTime = app.StartTime,
-                    EndTime = app.EndTime,
-                    Date = app.Date,
-                    Status = app.Status.ToString(), 
-                    CreatedAt = app.CreatedAt!.Value,
-                    Assistants = app.ServiceOffers.Select(se => new AsisstantOfferDTO 
-                    {
-                        AssistantName = se.Assistant!.Name,
-                        AssistantUuid = se.Assistant!.Uuid!.Value,
-                        StartTimeOfAssistantOfferingService = se.StartTime!.Value,
-                        EndTimeOfAsisstantOfferingService = se.EndTime!.Value
-                    }).ToList()
-                }).ToList();
-            }
-            catch (System.Exception ex)
-            {
-                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
-            }
-            return httpResponseService.OkResponse(appointments, ApiVersionEnum.V1);
-        }
-
-              [HttpGet("appointment/")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetAllAppoinments([FromQuery] GetAllAppointmentsDTO dto)
-        {
-            List<AppointmentDTO> appointments = [];
-            try
-            {
-                List<Appointment> result = await systemFacade.GetAllAppoinments(dto.StartDate, dto.EndDate);
-                appointments = result.Select(app => new AppointmentDTO
-                {
-                    Uuid = app.Uuid,
-                    StartTime = app.StartTime,
-                    EndTime = app.EndTime,
-                    Date = app.Date,
-                    Status = app.Status.ToString(), 
-                    CreatedAt = app.CreatedAt!.Value,
-                    Client = new ClientDTO 
-                    {
-                        Name = app.Client.Name,
-                        Uuid = app.Client.Uuid,
-                        PhoneNumber = app.Client.PhoneNumber,
-                        Email = app.Client.Email
-                    }
-                }).ToList();
-            }
-            catch (System.Exception ex)
-            {
-                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
-            }
-            return httpResponseService.OkResponse(appointments, ApiVersionEnum.V1);
-        }
-
-        [HttpGet("appointment/{uuid}")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetAppointmentsDetails(Guid uuid)
-        {
-            Appointment appointment;
-            try
-            {
-                OperationResult<Appointment, GenericError> result = await systemFacade.GetAppointmentDetailsAsync(uuid);
-                if (result.IsSuccessful)
-                {
-                    appointment = result.Result!;
-                }
-                else
-                {
-                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
-                }
-            }
-            catch (System.Exception ex)
-            {
-                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
-            }
-            return httpResponseService.OkResponse(appointment, ApiVersionEnum.V1);
-        }
-
-
-        [HttpPost("appointment/asClient")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ScheduleAppointmentAsClientAsync([FromBody] CreateAppointmentAsClientDTO dto)
-        {
-            Guid? guid;
-            try
-            {
-                Appointment appointment = new Appointment
-                {
-                    Date = dto.Date,
-                    Client = new Client { Uuid = dto.ClientUuid },
-                    ServiceOffers = [],
-                    Uuid = Guid.CreateVersion7()
-                };
-
-                var selectedServicesStartTimes = dto.SelectedServices
-                .Select(service => service.StartTime)
-                .ToList();
-                appointment.StartTime = selectedServicesStartTimes.Min();
-
-                foreach (var serviceOfferUuid in dto.SelectedServices)
-                {
-                    var serviceOffers = new ServiceOffer
-                    {
-                        Uuid = serviceOfferUuid.Uuid,
-                        StartTime = serviceOfferUuid.StartTime
-                    };
-                    appointment.ServiceOffers.Add(serviceOffers);
-                }
-                OperationResult<Guid, GenericError> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
-                if (result.IsSuccessful)
-                {
-                    guid = result.Result;
-                }
-                else
-                {
-                    if (result.Errors != null && result.Errors.Any())
-                    {
-                        return httpResponseService.Conflict(result.Errors, ApiVersionEnum.V1, result.Code.ToString());
-                    }
-                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
-                }
-
-            }
-            catch (System.Exception ex)
-            {
-                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
-            }
-            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
-        }
-
-        [HttpPost("appointment/asStaff")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ScheduleAppointmentAsStaff([FromBody] CreateAppointmentAsStaffDTO dto)
-        {
-            Guid? guid;
-            try
-            {
-                Appointment appointment = new Appointment
-                {
-                    Date = dto.Date,
-                    Client = new Client { Uuid = dto.ClientUuid },
-                    ServiceOffers = [],
-                    Uuid = Guid.CreateVersion7()
-                };
-
-                var selectedServicesStartTimes = dto.SelectedServices
-                .Select(service => service.StartTime)
-                .ToList();
-                appointment.StartTime = selectedServicesStartTimes.Min();
-
-                foreach (var serviceOfferUuid in dto.SelectedServices)
-                {
-                    var serviceOffers = new ServiceOffer
-                    {
-                        Uuid = serviceOfferUuid.Uuid,
-                        StartTime = serviceOfferUuid.StartTime
-                    };
-                    appointment.ServiceOffers.Add(serviceOffers);
-                }
-                OperationResult<Guid, GenericError> result = await systemFacade.ScheduleAppointmentAsStaffAsync(appointment);
-                if (result.IsSuccessful)
-                {
-                    guid = result.Result;
-                }
-                else
-                {
-                    if (result.Errors != null && result.Errors.Any())
-                    {
-                        return httpResponseService.Conflict(result.Errors, ApiVersionEnum.V1, result.Code.ToString());
-                    }
-                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
-                }
-
-            }
-            catch (System.Exception ex)
-            {
-                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
-            }
-            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
-        }
-
         [HttpPost("availabilityTimeSlot")]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterAvailabilityTimeSlot([FromBody] CreateAvailabilityTimeSlotDTO availabilityDTO)
@@ -326,7 +135,202 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
 
-        [HttpGet("appointment/conflict")]
+        [HttpGet("appointment/scheduler")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAppointmentsFromScheduler([FromQuery] GetAllAppointmentsDTO dto)
+        {
+            List<AppointmentDTO> appointments = [];
+            try
+            {
+                List<Appointment> result = await systemFacade.GetScheduledOrConfirmedAppoinmentsAsync(dto.StartDate, dto.EndDate);
+                appointments = result.Select(app => new AppointmentDTO
+                {
+                    Uuid = app.Uuid,
+                    StartTime = app.StartTime,
+                    EndTime = app.EndTime,
+                    Date = app.Date,
+                    Status = app.Status.ToString(),
+                    CreatedAt = app.CreatedAt!.Value,
+                    Assistants = app.ServiceOffers.Select(se => new AsisstantOfferDTO
+                    {
+                        AssistantName = se.Assistant!.Name,
+                        AssistantUuid = se.Assistant!.Uuid!.Value,
+                        StartTimeOfAssistantOfferingService = se.ServiceStartTime!.Value,
+                        EndTimeOfAsisstantOfferingService = se.ServiceEndTime!.Value
+                    }).ToList()
+                }).ToList();
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(appointments, ApiVersionEnum.V1);
+        }
+
+        [HttpGet("appointment/staffOnly")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllAppoinments([FromQuery] GetAllAppointmentsDTO dto)
+        {
+            List<AppointmentDTO> appointments = [];
+            try
+            {
+                List<Appointment> result = await systemFacade.GetAllAppoinments(dto.StartDate, dto.EndDate);
+                appointments = result.Select(app => new AppointmentDTO
+                {
+                    Uuid = app.Uuid,
+                    StartTime = app.StartTime,
+                    EndTime = app.EndTime,
+                    Date = app.Date,
+                    TotalCost = app.TotalCost,
+                    Status = app.Status.ToString(),
+                    CreatedAt = app.CreatedAt!.Value,
+                    Client = new ClientDTO
+                    {
+                        Name = app.Client.Name,
+                        Uuid = app.Client.Uuid,
+                        PhoneNumber = app.Client.PhoneNumber,
+                        Email = app.Client.Email,
+                        Status = app.Client.Status!.Value.ToString(),
+                        Username = app.Client.Username,
+                        CreatedAt = app.Client.CreatedAt
+                    }
+                }).ToList();
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(appointments, ApiVersionEnum.V1);
+        }
+
+        [HttpGet("appointment/staffOnly/{uuid}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAppointmentsDetails(Guid uuid)
+        {
+            Appointment appointment;
+            try
+            {
+                OperationResult<Appointment, GenericError> result = await systemFacade.GetAppointmentDetailsAsync(uuid);
+                if (result.IsSuccessful)
+                {
+                    appointment = result.Result!;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(appointment, ApiVersionEnum.V1);
+        }
+
+
+        [HttpPost("appointment/scheduler/asClient")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ScheduleAppointmentAsClientAsync([FromBody] CreateAppointmentAsClientDTO dto)
+        {
+            Guid? guid;
+            try
+            {
+                Appointment appointment = new Appointment
+                {
+                    Date = dto.Date,
+                    Client = new Client { Uuid = dto.ClientUuid },
+                    ServiceOffers = [],
+                    Uuid = Guid.CreateVersion7()
+                };
+
+                var selectedServicesStartTimes = dto.SelectedServices
+                .Select(service => service.StartTime)
+                .ToList();
+                appointment.StartTime = selectedServicesStartTimes.Min();
+
+                foreach (var serviceOfferUuid in dto.SelectedServices)
+                {
+                    var serviceOffers = new ServiceOffer
+                    {
+                        Uuid = serviceOfferUuid.Uuid,
+                        ServiceStartTime = serviceOfferUuid.StartTime
+                    };
+                    appointment.ServiceOffers.Add(serviceOffers);
+                }
+                OperationResult<Guid, GenericError> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
+                if (result.IsSuccessful)
+                {
+                    guid = result.Result;
+                }
+                else
+                {
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        return httpResponseService.Conflict(result.Errors, ApiVersionEnum.V1, result.Code.ToString());
+                    }
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+        }
+
+        [HttpPost("appointment/scheduler/asStaff")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ScheduleAppointmentAsStaff([FromBody] CreateAppointmentAsStaffDTO dto)
+        {
+            Guid? guid;
+            try
+            {
+                Appointment appointment = new Appointment
+                {
+                    Date = dto.Date,
+                    Client = new Client { Uuid = dto.ClientUuid },
+                    ServiceOffers = [],
+                    Uuid = Guid.CreateVersion7()
+                };
+
+                var selectedServicesStartTimes = dto.SelectedServices
+                .Select(service => service.StartTime)
+                .ToList();
+                appointment.StartTime = selectedServicesStartTimes.Min();
+
+                foreach (var serviceOfferUuid in dto.SelectedServices)
+                {
+                    var serviceOffers = new ServiceOffer
+                    {
+                        Uuid = serviceOfferUuid.Uuid,
+                        ServiceStartTime = serviceOfferUuid.StartTime
+                    };
+                    appointment.ServiceOffers.Add(serviceOffers);
+                }
+                OperationResult<Guid, GenericError> result = await systemFacade.ScheduleAppointmentAsStaffAsync(appointment);
+                if (result.IsSuccessful)
+                {
+                    guid = result.Result;
+                }
+                else
+                {
+                    if (result.Errors != null && result.Errors.Any())
+                    {
+                        return httpResponseService.Conflict(result.Errors, ApiVersionEnum.V1, result.Code.ToString());
+                    }
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+        }
+
+        [HttpGet("appointment/scheduler/conflict")]
         [AllowAnonymous]
         public async Task<IActionResult> GetConflictingServiceAppointmentFromRange([FromQuery] DateTimeRangeDTO rangeDTO)
         {
@@ -338,8 +342,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 conflictingServiceOfferDTOs = conflictingServiceOffers.Select(a => new ConflictingServiceOfferDTO
                 {
                     ConflictingServiceOfferUuid = a.Uuid,
-                    StartTime = a.StartTime,
-                    EndTime = a.EndTime,
+                    StartTime = a.ServiceStartTime,
+                    EndTime = a.ServiceEndTime,
                     AssistantName = a.Assistant!.Name,
                     AssistantUuid = a.Assistant!.Uuid!.Value
                 }).ToList();
@@ -351,7 +355,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(conflictingServiceOfferDTOs, ApiVersionEnum.V1);
         }
 
-        [HttpPost("appointment/confirm")]
+        [HttpPost("appointment/scheduler/confirm")]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmAppointment([FromBody] ConfirmAppointmentDTO dto)
         {
@@ -376,7 +380,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isConfirmed, ApiVersionEnum.V1);
         }
 
-        [HttpPost("appointment/finalize")]
+        [HttpPost("appointment/scheduler/finalize")]
         [AllowAnonymous]
         public async Task<IActionResult> FinalizeAppointment([FromBody] FinalizeAppointmentDTO dto)
         {
@@ -401,7 +405,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isConfirmed, ApiVersionEnum.V1);
         }
 
-        [HttpPost("appointment/cancel/asClient")]
+        [HttpPost("appointment/scheduler/cancel/asClient")]
         [AllowAnonymous]
         public async Task<IActionResult> CancelAppointment([FromBody] CancelAppointmentAsClientDTO dto)
         {
@@ -427,7 +431,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isConfirmed, ApiVersionEnum.V1);
         }
 
-        [HttpPost("appointment/cancel/asStaff")]
+        [HttpPost("appointment/scheduler/cancel/asStaff")]
         [AllowAnonymous]
         public async Task<IActionResult> CancelAppointmentAsStaff([FromBody] CancelAppointmentAsStaffDTO dto)
         {

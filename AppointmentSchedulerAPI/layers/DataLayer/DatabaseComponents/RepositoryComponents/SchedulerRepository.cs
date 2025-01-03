@@ -41,8 +41,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     {
                         IdAppointment = appointmentDB.Id,
                         IdServiceOffer = serviceOffer.Id,
-                        ServiceStartTime = serviceOffer.StartTime!.Value,
-                        ServiceEndTime = serviceOffer.EndTime!.Value
+                        ServiceStartTime = serviceOffer.ServiceStartTime!.Value,
+                        ServiceEndTime = serviceOffer.ServiceEndTime!.Value,
+                        ServicePrice = serviceOffer.ServicePrice!.Value,
+                        ServicesMinutes = serviceOffer.ServicesMinutes!.Value,
+                        ServiceName = serviceOffer.ServiceName
                     };
                     dbContext.AppointmentServiceOffers.Add(appointmentAssistantService);
                 }
@@ -135,8 +138,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Id = aso.ServiceOffer.Id,
                     Uuid = aso.ServiceOffer.Uuid,
-                    StartTime = aso.ServiceStartTime,
-                    EndTime = aso.ServiceEndTime,
+                    ServiceStartTime = aso.ServiceStartTime,
+                    ServiceEndTime = aso.ServiceEndTime,
+                    ServicePrice = aso.ServicePrice,
+                    ServiceName = aso.ServiceName,
+                    ServicesMinutes = aso.ServicesMinutes,
                     Service = null,
                     Assistant = new BusinessLogicLayer.Model.Assistant
                     {
@@ -296,8 +302,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Id = aso.ServiceOffer.Id,
                     Uuid = aso.ServiceOffer.Uuid,
-                    StartTime = aso.ServiceStartTime,
-                    EndTime = aso.ServiceEndTime,
+                    ServiceStartTime = aso.ServiceStartTime,
+                    ServiceEndTime = aso.ServiceEndTime,
+                    ServicePrice = aso.ServicePrice,
+                    ServiceName = aso.ServiceName,
+                    ServicesMinutes = aso.ServicesMinutes,
                     Assistant = new BusinessLogicLayer.Model.Assistant
                     {
                         Uuid = aso.ServiceOffer.Assistant.UserAccount.Uuid,
@@ -393,8 +402,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Id = aso.ServiceOffer.Id,
                     Uuid = aso.ServiceOffer.Uuid,
-                    StartTime = aso.ServiceStartTime,
-                    EndTime = aso.ServiceEndTime,
+                    ServiceStartTime = aso.ServiceStartTime,
+                    ServiceEndTime = aso.ServiceEndTime,
+                    ServicePrice = aso.ServicePrice,
+                    ServiceName = aso.ServiceName,
+                    ServicesMinutes = aso.ServicesMinutes,
                     Assistant = aso.ServiceOffer.Assistant != null
                         ? new BusinessLogicLayer.Model.Assistant
                         {
@@ -405,19 +417,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             PhoneNumber = aso.ServiceOffer.Assistant.UserAccount.UserInformation.PhoneNumber
                         }
                         : null,
-                    Service = aso.ServiceOffer.Service != null
-                        ? new BusinessLogicLayer.Model.Service
-                        {
-                            Id = aso.ServiceOffer.Service.Id,
-                            Uuid = aso.ServiceOffer.Service.Uuid,
-                            Name = aso.ServiceOffer.Service.Name,
-                            Description = aso.ServiceOffer.Service.Description,
-                            Minutes = aso.ServiceOffer.Service.Minutes,
-                            Price = aso.ServiceOffer.Service.Price,
-                            Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)aso.ServiceOffer.Service.Status,
-                            CreatedAt = aso.ServiceOffer.Service.CreatedAt
-                        }
-                        : null
+                    Service = null
                 }).ToList()
             };
             return appointment;
@@ -468,6 +468,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 StartTime = app.StartTime,
                 TotalCost = app.TotalCost,
                 Uuid = app.Uuid,
+                Status = (AppointmentStatusType)app.Status!.Value,
                 Id = app.Id,
                 CreatedAt = app.CreatedAt,
                 Client = new BusinessLogicLayer.Model.Client
@@ -476,7 +477,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Uuid = app.Client.UserAccount.Uuid,
                     Name = app.Client.UserAccount.UserInformation.Name,
                     Email = app.Client.UserAccount.Email,
-                    PhoneNumber = app.Client.UserAccount.UserInformation.PhoneNumber
+                    PhoneNumber = app.Client.UserAccount.UserInformation.PhoneNumber,
+                    Status = (ClientStatusType?)app.Client.Status,
+                    Username = app.Client.UserAccount.Username,
+                    CreatedAt = app.Client.UserAccount.CreatedAt
                 },
             }).ToList();
 

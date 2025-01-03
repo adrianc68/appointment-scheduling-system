@@ -29,7 +29,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-
         public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
         {
             return schedulerMgr.GetAvailableServicesAsync(date);
@@ -97,7 +96,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             if (assistantData.Status == AssistantStatusType.DELETED)
             {
                 GenericError genericError = new GenericError($"Cannot modify Assistant with UUID <{assistantData.Uuid}>. Assistant was deleted!", []);
-                genericError.AddData("AssistantUuid", assistantData.Uuid);
+                genericError.AddData("AssistantUuid", assistantData.Uuid!.Value);
                 genericError.AddData("Status", AssistantStatusType.DELETED.ToString());
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
             }
@@ -891,7 +890,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             for (int i = 0; i < appointment.ServiceOffers.Count; i++)
             {
                 var serviceOffer = appointment.ServiceOffers[i];
-                var proposedStartTime = serviceOffer.StartTime;
+                var proposedStartTime = serviceOffer.ServiceStartTime;
                 ServiceOffer? serviceOfferData = await assistantMgr.GetServiceOfferByUuidAsync(serviceOffer.Uuid!.Value);
                 if (serviceOfferData == null)
                 {
@@ -919,11 +918,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 }
 
                 appointment.ServiceOffers[i] = serviceOfferData;
-                appointment.ServiceOffers[i].StartTime = proposedStartTime;
-                appointment.ServiceOffers[i].EndTime = proposedStartTime!.Value.AddMinutes(serviceOfferData.Service!.Minutes!.Value);
+                appointment.ServiceOffers[i].ServiceStartTime = proposedStartTime;
+                appointment.ServiceOffers[i].ServiceEndTime = proposedStartTime!.Value.AddMinutes(serviceOfferData.Service!.Minutes!.Value);
+                appointment.ServiceOffers[i].ServiceName = serviceOfferData.Service.Name;
+                appointment.ServiceOffers[i].ServicesMinutes = serviceOfferData.Service.Minutes;
+                appointment.ServiceOffers[i].ServicePrice = serviceOfferData.Service.Price;
+
             }
 
-            appointment.ServiceOffers = appointment.ServiceOffers.OrderBy(so => so.StartTime).ToList();
+            appointment.ServiceOffers = appointment.ServiceOffers.OrderBy(so => so.ServiceStartTime).ToList();
 
             // Validate if the services are scheduled consecutively without gaps
             List<GenericError> errorMessages = [];
@@ -932,10 +935,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 var prevService = appointment.ServiceOffers[i - 1];
                 var currentService = appointment.ServiceOffers[i];
 
-                if (currentService.StartTime != prevService.EndTime)
+                if (currentService.ServiceStartTime != prevService.ServiceEndTime)
                 {
                     GenericError genericError = new GenericError($"Service with UUID <{currentService!.Uuid!.Value}> is not contiguous with the previous service. <{prevService!.Uuid!.Value}>. Suggestions <ServiceOfferUuid>:<StartTime>:", []);
-                    genericError.AddData($"{currentService.Uuid.Value}", prevService.EndTime!.Value);
+                    genericError.AddData($"{currentService.Uuid.Value}", prevService.ServiceEndTime!.Value);
                     errorMessages.Add(genericError);
                 }
             }
@@ -953,14 +956,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             // 1. Check for each service if it's Assistant is available in time range
             foreach (var serviceOffer in appointment.ServiceOffers)
             {
-                TimeOnly proposedStartTime = TimeOnly.Parse(serviceOffer.StartTime!.Value.ToString());
+                TimeOnly proposedStartTime = TimeOnly.Parse(serviceOffer.ServiceStartTime!.Value.ToString());
                 TimeOnly proposedEndTime = proposedStartTime.AddMinutes(serviceOffer.Service!.Minutes!.Value);
 
                 DateTimeRange serviceRange = new()
                 {
-                    StartTime = serviceOffer.StartTime.Value,
+                    StartTime = serviceOffer.ServiceStartTime.Value,
                     EndTime = proposedEndTime,
-                    Date = appointment.Date!.Value
+                    Date = appointment.Date!.Value,
                 };
 
                 bool isAssistantAvailableInAvailabilityTimeSlots = await schedulerMgr.IsAssistantAvailableInAvailabilityTimeSlotsAsync(serviceRange, serviceOffer.Assistant!.Id!.Value);
