@@ -879,12 +879,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
             }
 
-            if (clientData.Status == ClientStatusType.DELETED)
+            if (clientData.Status != ClientStatusType.ENABLED)
             {
-                GenericError genericError = new GenericError($"Client with UUID <{clientData.Uuid}> is not available. Client was deleted!", []);
+                GenericError genericError = new GenericError($"Client with UUID <{clientData.Uuid}> is not available. Client was disabled or deleted!", []);
                 genericError.AddData("ClientUuid", clientData.Uuid!.Value);
-                genericError.AddData("Status", ClientStatusType.DELETED.ToString());
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CLIENT_WAS_DELETED);
+                genericError.AddData("Status", clientData.Status!.Value.ToString());
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CLIENT_UNAVAILABLE);
             }
             appointment.Client = clientData;
             // Get Services data
