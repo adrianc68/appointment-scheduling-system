@@ -48,7 +48,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             IEnumerable<BusinessLogicLayer.Model.Service> services = [];
             using var dbContext = context.CreateDbContext();
-            var servicesdb = await dbContext.Services.ToListAsync();
+            var servicesdb = await dbContext.Services
+                .Where(s => s.Status != Model.Types.ServiceStatusType.DELETED)
+                .ToListAsync();
 
             services = servicesdb
                 .Select(a => new BusinessLogicLayer.Model.Service
@@ -91,7 +93,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var serviceDB = await dbContext.Services
-       .FirstOrDefaultAsync(s => s.Uuid == uuid);
+                .FirstOrDefaultAsync(s => s.Uuid == uuid);
 
             if (serviceDB == null)
             {
@@ -117,7 +119,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var serviceId = await dbContext.Services
-                .Where(a => a.Uuid == uuid)
+                .Where(a => a.Uuid == uuid )
                 .Select(a => a.Id)
                 .FirstOrDefaultAsync();
             return serviceId;
@@ -127,7 +129,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var serviceName = await dbContext.Services
-                .Where(a => a.Name!.ToLower() == name.ToLower())
+                .Where(a => a.Name!.ToLower() == name.ToLower() && a.Status != Model.Types.ServiceStatusType.DELETED)
                 .Select(a => a.Name)
                 .FirstOrDefaultAsync();
             return serviceName != null;
@@ -140,15 +142,14 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
             {
-                var assistantDb = await dbContext.Services
+                var serviceDb = await dbContext.Services
                      .FirstOrDefaultAsync(ac => ac.Id == idService);
 
-                if (assistantDb == null)
+                if (serviceDb == null)
                 {
                     return false;
                 }
-
-                assistantDb.Status = (Model.Types.ServiceStatusType)status;
+                serviceDb.Status = (Model.Types.ServiceStatusType)status;
                 await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
                 isStatusChanged = true;

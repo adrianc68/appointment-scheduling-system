@@ -43,5 +43,6 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         SERVICE_IS_ALREADY_ENABLED,
         SERVICE_IS_ALREADY_DISABLED,
         SERVICE_IS_ALREADY_DELETED,
+        CANNOT_UPDATE_SERVICE_WITH_SAME_NAME_IS_REGISTERED
     }
 }

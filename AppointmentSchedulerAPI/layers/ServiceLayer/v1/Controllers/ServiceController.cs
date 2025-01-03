@@ -22,11 +22,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
-        // public IActionResult EditService()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllServices()

@@ -30,6 +30,60 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         }
 
 
+        public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
+        {
+            return schedulerMgr.GetAvailableServicesAsync(date);
+        }
+
+        public Task<List<Assistant>> GetAllAssistantsAsync()
+        {
+            return assistantMgr.GetAllAssistantsAsync();
+        }
+
+        public Task<List<Service>> GetAllServicesAsync()
+        {
+            return serviceMgr.GetAllServicesAsync();
+        }
+
+        public Task<List<Client>> GetAllClientsAsync()
+        {
+            return clientMgr.GetAllClientsAsync();
+        }
+
+        public async Task<List<Appointment>> GetScheduledOrConfirmedAppoinmentsAsync(DateOnly startDate, DateOnly endDate)
+        {
+            List<Appointment>? appointment = await schedulerMgr.GetScheduledOrConfirmedAppointmentsAsync(startDate, endDate);
+            return appointment;
+        }
+
+        public async Task<List<Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate)
+        {
+            List<Appointment>? appointment = await schedulerMgr.GetAllAppoinments(startDate, endDate);
+            return appointment;
+        }
+
+        public async Task<OperationResult<Appointment, GenericError>> GetAppointmentDetailsAsync(Guid uuidAppointment)
+        {
+            Appointment? appointment = await schedulerMgr.GetAppointmentDetailsByUuidAsync(uuidAppointment);
+            if (appointment == null)
+            {
+                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is not registered", []);
+                genericError.AddData("AppointmentUuid", uuidAppointment);
+                return OperationResult<Appointment, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
+            }
+            return OperationResult<Appointment, GenericError>.Success(appointment);
+        }
+
+        public Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
+        {
+            return schedulerMgr.GetAllAvailabilityTimeSlotsAsync(startDate, endDate);
+        }
+
+        public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
+        {
+            return await schedulerMgr.GetConflictingServicesByDateTimeRangeAsync(range);
+        }
+
         public async Task<OperationResult<bool, GenericError>> UpdateAssistant(Assistant assistant)
         {
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistant.Uuid!.Value);
@@ -134,62 +188,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has occurred"), MessageCodeType.UPDATE_ERROR);
             }
             return OperationResult<bool, GenericError>.Success(true);
-
-        }
-
-
-        public Task<List<Assistant>> GetAllAssistantsAsync()
-        {
-            return assistantMgr.GetAllAssistantsAsync();
-        }
-
-        public Task<List<Service>> GetAllServicesAsync()
-        {
-            return serviceMgr.GetAllServicesAsync();
-        }
-
-        public Task<List<Client>> GetAllClientsAsync()
-        {
-            return clientMgr.GetAllClientsAsync();
-        }
-
-        public async Task<List<Appointment>> GetScheduledOrConfirmedAppoinmentsAsync(DateOnly startDate, DateOnly endDate)
-        {
-            List<Appointment>? appointment = await schedulerMgr.GetScheduledOrConfirmedAppointmentsAsync(startDate, endDate);
-            return appointment;
-        }
-
-        public async Task<List<Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate)
-        {
-            List<Appointment>? appointment = await schedulerMgr.GetAllAppoinments(startDate, endDate);
-            return appointment;
-        }
-
-        public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
-        {
-            return schedulerMgr.GetAvailableServicesAsync(date);
-        }
-
-        public async Task<OperationResult<Appointment, GenericError>> GetAppointmentDetailsAsync(Guid uuidAppointment)
-        {
-            Appointment? appointment = await schedulerMgr.GetAppointmentDetailsByUuidAsync(uuidAppointment);
-            if (appointment == null)
-            {
-                GenericError genericError = new GenericError($"Appointment with UUID {uuidAppointment} is not registered", []);
-                genericError.AddData("AppointmentUuid", uuidAppointment);
-                return OperationResult<Appointment, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
-            }
-            return OperationResult<Appointment, GenericError>.Success(appointment);
-        }
-
-        public Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
-        {
-            return schedulerMgr.GetAllAvailabilityTimeSlotsAsync(startDate, endDate);
-        }
-
-        public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
-        {
-            return await schedulerMgr.GetConflictingServicesByDateTimeRangeAsync(range);
         }
 
         public async Task<OperationResult<Guid, GenericError>> RegisterAssistant(Assistant assistant)
@@ -483,6 +481,18 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
             }
 
+            if (serviceData.Status == ServiceStatusType.DELETED)
+            {
+                bool isServiceDisabledOrEnabledWithSameName = await serviceMgr.IsServiceNameRegisteredAsync(serviceData.Name!);
+                if (isServiceDisabledOrEnabledWithSameName)
+                {
+                    GenericError genericError = new GenericError($"Cannot change status of Service <{uuidService}>. Another service has the same name: <{serviceData.Name}>", []);
+                    genericError.AddData("ServiceUuid", uuidService);
+                    genericError.AddData("ServiceNmae", serviceData.Name!);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED);
+                }
+            }
+
             if (serviceData.Status == ServiceStatusType.ENABLED)
             {
                 GenericError genericError = new GenericError($"Service with UUID: <{uuidService}> is already enabled", []);
@@ -507,6 +517,18 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"Service with UUID: <{uuidService}> is not found", []);
                 genericError.AddData("ServiceUuid", uuidService);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
+            }
+
+            if (serviceData.Status == ServiceStatusType.DELETED)
+            {
+                bool isServiceDisabledOrEnabledWithSameName = await serviceMgr.IsServiceNameRegisteredAsync(serviceData.Name!);
+                if (isServiceDisabledOrEnabledWithSameName)
+                {
+                    GenericError genericError = new GenericError($"Cannot change status of Service <{uuidService}>. Another service has the same name: <{serviceData.Name}>", []);
+                    genericError.AddData("ServiceUuid", uuidService);
+                    genericError.AddData("ServiceNmae", serviceData.Name!);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED);
+                }
             }
 
             if (serviceData.Status == ServiceStatusType.DISABLED)
