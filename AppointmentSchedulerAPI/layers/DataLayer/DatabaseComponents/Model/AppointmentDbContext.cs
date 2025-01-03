@@ -33,7 +33,8 @@ public partial class AppointmentDbContext : DbContext
             .HasPostgresEnum<ClientStatusType>("ClientStatusType")
             .HasPostgresEnum<AssistantStatusType>("AssistantType")
             .HasPostgresEnum<RoleType>("RoleType")
-            .HasPostgresEnum<ServiceStatusType>("ServiceStatusType");
+            .HasPostgresEnum<ServiceStatusType>("ServiceStatusType")
+            .HasPostgresEnum<ServiceOfferStatusType>("ServiceOfferStatusType");
 
         modelBuilder.Entity<UserAccount>(entity =>
         {
@@ -200,6 +201,10 @@ public partial class AppointmentDbContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("nextval(('\"service_id_seq\"'::text)::regclass)")
                 .HasColumnName("id");
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasColumnType("ServiceOfferStatusType");
+
             entity.HasOne(e => e.Assistant)
                 .WithMany(a => a.ServiceOffers)
                 .HasForeignKey(ase => ase.IdAssistant);
@@ -218,10 +223,16 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnName("id_appointment");
             entity.Property(e => e.IdServiceOffer)
                 .HasColumnName("id_serviceOffer");
-            entity.Property(e => e.StartTime)
+            entity.Property(e => e.ServiceStartTime)
                 .HasColumnName("start_time");
-            entity.Property(e => e.EndTime)
+            entity.Property(e => e.ServiceEndTime)
                 .HasColumnName("end_time");
+            entity.Property(e => e.ServicePrice)
+                .HasColumnName("service_price");
+            entity.Property(e => e.ServiceName)
+                .HasColumnName("service_name");
+            entity.Property(e => e.ServicesMinutes)
+                .HasColumnName("service_minutes");
 
             entity.HasOne(e => e.Appointment)
                 .WithMany(a => a.AppointmentServiceOffers)

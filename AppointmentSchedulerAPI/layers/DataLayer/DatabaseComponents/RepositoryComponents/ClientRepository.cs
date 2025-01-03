@@ -65,7 +65,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var usernameDB = await dbContext.UserAccounts
-                .Where(a => a.Username!.ToLower() == username)
+                .Where(a => a.Username!.ToLower() == username && a.Client!.Status != ClientStatusType.DELETED)
                 .Select(a => a.Username)
                 .FirstOrDefaultAsync();
 
@@ -76,7 +76,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var emailDB = await dbContext.UserAccounts
-                .Where(a => a.Email!.ToLower() == email)
+                .Where(a => a.Email!.ToLower() == email && a.Client!.Status != ClientStatusType.DELETED)
                 .Select(a => a.Email)
                 .FirstOrDefaultAsync();
 
@@ -87,7 +87,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var phoneNumberDB = await dbContext.UserInformations
-                .Where(a => a.PhoneNumber == phoneNumber)
+                .Where(a => a.PhoneNumber == phoneNumber && a.UserAccount!.Client!.Status != ClientStatusType.DELETED)
                 .Select(a => a.PhoneNumber)
                 .FirstOrDefaultAsync();
 
@@ -111,7 +111,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             var clientsDB = await dbContext.Clients
                 .Include(a => a.UserAccount)
                   .ThenInclude(ua => ua.UserInformation)
-                  .Where(c => c.UserAccount.Role == RoleType.CLIENT)
+                  .Where(c => c.UserAccount.Role == RoleType.CLIENT && c.Status != ClientStatusType.DELETED)
               .ToListAsync();
 
             businessClient = clientsDB

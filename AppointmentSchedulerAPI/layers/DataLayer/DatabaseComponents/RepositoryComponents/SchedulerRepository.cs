@@ -41,8 +41,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     {
                         IdAppointment = appointmentDB.Id,
                         IdServiceOffer = serviceOffer.Id,
-                        StartTime = serviceOffer.StartTime!.Value,
-                        EndTime = serviceOffer.EndTime!.Value
+                        ServiceStartTime = serviceOffer.StartTime!.Value,
+                        ServiceEndTime = serviceOffer.EndTime!.Value
                     };
                     dbContext.AppointmentServiceOffers.Add(appointmentAssistantService);
                 }
@@ -135,8 +135,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Id = aso.ServiceOffer.Id,
                     Uuid = aso.ServiceOffer.Uuid,
-                    StartTime = aso.StartTime,
-                    EndTime = aso.EndTime,
+                    StartTime = aso.ServiceStartTime,
+                    EndTime = aso.ServiceEndTime,
                     Service = null,
                     Assistant = new BusinessLogicLayer.Model.Assistant
                     {
@@ -271,7 +271,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .Where(aso =>
                     aso.ServiceOffer.IdAssistant == idAssistant &&
                     aso.Appointment.Date == range.Date &&
-                    !(range.EndTime <= aso.StartTime || range.StartTime >= aso.EndTime) &&
+                    !(range.EndTime <= aso.ServiceStartTime || range.StartTime >= aso.ServiceEndTime) &&
                     (aso.Appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED ||
                     aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED))
                 .ToListAsync();
@@ -289,15 +289,15 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             var conflictingOffers = await dbContext.AppointmentServiceOffers
                 .Where(aso =>
                     aso.Appointment.Date == range.Date &&
-                    !(range.EndTime <= aso.StartTime || range.StartTime >= aso.EndTime) &&
+                    !(range.EndTime <= aso.ServiceStartTime || range.StartTime >= aso.ServiceEndTime) &&
                     (aso.Appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED ||
                     aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED))
                 .Select(aso => new BusinessLogicLayer.Model.ServiceOffer
                 {
                     Id = aso.ServiceOffer.Id,
                     Uuid = aso.ServiceOffer.Uuid,
-                    StartTime = aso.StartTime,
-                    EndTime = aso.EndTime,
+                    StartTime = aso.ServiceStartTime,
+                    EndTime = aso.ServiceEndTime,
                     Assistant = new BusinessLogicLayer.Model.Assistant
                     {
                         Uuid = aso.ServiceOffer.Assistant.UserAccount.Uuid,
@@ -393,8 +393,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Id = aso.ServiceOffer.Id,
                     Uuid = aso.ServiceOffer.Uuid,
-                    StartTime = aso.StartTime,
-                    EndTime = aso.EndTime,
+                    StartTime = aso.ServiceStartTime,
+                    EndTime = aso.ServiceEndTime,
                     Assistant = aso.ServiceOffer.Assistant != null
                         ? new BusinessLogicLayer.Model.Assistant
                         {

@@ -92,7 +92,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var usernameDB = await dbContext.UserAccounts
-                .Where(a => a.Username!.ToLower() == username)
+                .Where(a => a.Username!.ToLower() == username && a.Assistant!.Status != AssistantStatusType.DELETED)
                 .Select(a => a.Username)
                 .FirstOrDefaultAsync();
 
@@ -103,7 +103,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var emailDB = await dbContext.UserAccounts
-                .Where(a => a.Email!.ToLower() == email)
+                .Where(a => a.Email!.ToLower() == email && a.Assistant!.Status != AssistantStatusType.DELETED)
                 .Select(a => a.Email)
                 .FirstOrDefaultAsync();
 
@@ -114,7 +114,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var phoneNumberDB = await dbContext.UserInformations
-                .Where(a => a.PhoneNumber == phoneNumber)
+                .Where(a => a.PhoneNumber == phoneNumber && a.UserAccount!.Assistant!.Status != AssistantStatusType.DELETED)
                 .Select(a => a.PhoneNumber)
                 .FirstOrDefaultAsync();
 
@@ -164,7 +164,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             var assistantsDB = await dbContext.Assistants
               .Include(a => a.UserAccount)
                   .ThenInclude(ua => ua.UserInformation)
-                  .Where(c => c.UserAccount.Role == RoleType.ASSISTANT)
+                  .Where(c => c.UserAccount.Role == RoleType.ASSISTANT && c.Status != AssistantStatusType.DELETED)
               .ToListAsync();
 
             businessAssistants = assistantsDB
@@ -209,7 +209,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }
 
             businessService = assistantDB.ServiceOffers
-                .Where(ase => ase.Service != null)
+                .Where(ase => ase.Service.Status == ServiceStatusType.ENABLED)
                 .Select(ase => new BusinessLogicLayer.Model.Service
                 {
                     Id = ase.Service.Id,
@@ -235,7 +235,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .Include(a => a.Assistant)
                     .ThenInclude(asi => asi.UserAccount)
                     .ThenInclude(asc => asc.UserInformation)
-                .FirstOrDefaultAsync(a => a.Uuid == uuid);
+                .FirstOrDefaultAsync(a => a.Uuid == uuid && a.Assistant.Status == AssistantStatusType.ENABLED && a.Service.Status == ServiceStatusType.ENABLED );
 
             if (dbServiceOffer == null)
                 return null;
@@ -273,7 +273,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var serviceOfferDB = await dbContext.ServiceOffers
-                .Where(a => a.IdService == idService && a.IdAssistant == idAssistant)
+                .Where(a => a.IdService == idService && a.IdAssistant == idAssistant && a.Assistant.Status != AssistantStatusType.DELETED && a.Service.Status != ServiceStatusType.DELETED)
                 .FirstOrDefaultAsync();
 
             return serviceOfferDB != null;

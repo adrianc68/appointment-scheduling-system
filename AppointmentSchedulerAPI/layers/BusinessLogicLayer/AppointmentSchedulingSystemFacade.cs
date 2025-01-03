@@ -94,6 +94,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
+            if (assistantData.Status == AssistantStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Cannot modify Assistant with UUID <{assistantData.Uuid}>. Assistant was deleted!", []);
+                genericError.AddData("AssistantUuid", assistantData.Uuid);
+                genericError.AddData("Status", AssistantStatusType.DELETED.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
+            }
+
             if (assistant.Username != assistantData.Username)
             {
                 bool newUsernameIsRegistered = await assistantMgr.IsUsernameRegisteredAsync(assistant.Username!);
@@ -134,6 +142,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
             }
 
+            if (clientData.Status == ClientStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Cannot modify Client with UUID <{clientData.Uuid}>. Client was deleted!", []);
+                genericError.AddData("ClientUuid", clientData.Uuid!.Value);
+                genericError.AddData("Status", ClientStatusType.DELETED.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_WAS_DELETED);
+            }
+
             if (client.Username != clientData.Username)
             {
                 bool newUsernameIsRegistered = await clientMgr.IsUsernameRegisteredAsync(client.Username!);
@@ -172,6 +188,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"Service with UUID <{service!.Uuid.Value}> is not registered", []);
                 genericError.AddData("ServiceUuid", service.Uuid.Value);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
+            }
+
+            if (serviceData!.Status == ServiceStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Cannot modify Service with UUID <{service.Uuid}>. Services was deleted!", []);
+                genericError.AddData("ServiceUuid", service.Uuid);
+                genericError.AddData("Status", ServiceStatusType.DELETED.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_WAS_DELETED);
             }
 
             if (serviceData!.Name != service.Name)
@@ -272,6 +296,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 genericError.AddData("AssistantUuid", availabilityTimeSlot.Assistant!.Uuid!.Value);
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
+
+            if (assistantData.Status == AssistantStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Cannot assign slot. Assistant with UUID <{assistantData!.Uuid!.Value}>. Assistant was deleted!", []);
+                genericError.AddData("AssistantUuid", assistantData!.Uuid.Value);
+                genericError.AddData("Status", AssistantStatusType.DELETED.ToString());
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
+            }
+
             availabilityTimeSlot.Assistant = assistantData;
 
             // 2. Verify that no existing slot conflicts with the provided time range
@@ -325,6 +358,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
+            if (assistantData.Status == AssistantStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Cannot change status of Assistant <{uuidAssistant}>. Assistant was deleted!", []);
+                genericError.AddData("AssistantUuid", uuidAssistant);
+                genericError.AddData("Status", AssistantStatusType.DELETED.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
+            }
+
             if (assistantData.Status == AssistantStatusType.DISABLED)
             {
                 GenericError genericError = new GenericError($"Assistant with UUID: <{uuidAssistant}> is already disabled", []);
@@ -349,6 +390,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"Client with UUID: <{uuidClient}> is not found", []);
                 genericError.AddData("ClientUuid", uuidClient);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
+            }
+
+            if (clientData.Status == ClientStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Cannot change status of Client <{uuidClient}>. Client was deleted!", []);
+                genericError.AddData("ClientUuid", uuidClient);
+                genericError.AddData("Status", ClientStatusType.DELETED.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_WAS_DELETED);
             }
 
             if (clientData.Status == ClientStatusType.DISABLED)
@@ -377,6 +426,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
+            if (assistantData.Status == AssistantStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Cannot change status of Assistant <{uuidAssistant}>. Assistant was deleted!", []);
+                genericError.AddData("AssistantUuid", uuidAssistant);
+                genericError.AddData("Status", AssistantStatusType.DELETED.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
+            }
+
             if (assistantData.Status == AssistantStatusType.ENABLED)
             {
                 GenericError genericError = new GenericError($"Assistant with UUID: <{uuidAssistant}> is already enabled", []);
@@ -401,6 +458,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"Client with UUID: <{uuidClient}> is not found", []);
                 genericError.AddData("ClientUuid", uuidClient);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
+            }
+
+            if (clientData.Status == ClientStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Cannot change status of Client <{uuidClient}>. Client was deleted!", []);
+                genericError.AddData("ClientUuid", uuidClient);
+                genericError.AddData("Status", ClientStatusType.DELETED.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_WAS_DELETED);
             }
 
             if (clientData.Status == ClientStatusType.ENABLED)
@@ -483,14 +548,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
             if (serviceData.Status == ServiceStatusType.DELETED)
             {
-                bool isServiceDisabledOrEnabledWithSameName = await serviceMgr.IsServiceNameRegisteredAsync(serviceData.Name!);
-                if (isServiceDisabledOrEnabledWithSameName)
-                {
-                    GenericError genericError = new GenericError($"Cannot change status of Service <{uuidService}>. Another service has the same name: <{serviceData.Name}>", []);
-                    genericError.AddData("ServiceUuid", uuidService);
-                    genericError.AddData("ServiceNmae", serviceData.Name!);
-                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED);
-                }
+                GenericError genericError = new GenericError($"Cannot change status of Service with UUID <{uuidService}>. Service was deleted!", []);
+                genericError.AddData("ServiceUuid", uuidService);
+                genericError.AddData("Status", ServiceStatusType.DELETED.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_WAS_DELETED);
             }
 
             if (serviceData.Status == ServiceStatusType.ENABLED)
@@ -521,14 +582,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
             if (serviceData.Status == ServiceStatusType.DELETED)
             {
-                bool isServiceDisabledOrEnabledWithSameName = await serviceMgr.IsServiceNameRegisteredAsync(serviceData.Name!);
-                if (isServiceDisabledOrEnabledWithSameName)
-                {
-                    GenericError genericError = new GenericError($"Cannot change status of Service <{uuidService}>. Another service has the same name: <{serviceData.Name}>", []);
-                    genericError.AddData("ServiceUuid", uuidService);
-                    genericError.AddData("ServiceNmae", serviceData.Name!);
-                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED);
-                }
+                GenericError genericError = new GenericError($"Cannot change status of Service with UUID <{uuidService}>. Service was deleted!", []);
+                genericError.AddData("ServiceUuid", uuidService);
+                genericError.AddData("Status", ServiceStatusType.DELETED.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_WAS_DELETED);
             }
 
             if (serviceData.Status == ServiceStatusType.DISABLED)
@@ -584,6 +641,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
+            if (assistantData.Status == AssistantStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Cannot modify Assistant with UUID <{assistantData.Uuid}>. Assistant was deleted!", []);
+                genericError.AddData("AssistantUuid", assistantData.Uuid!.Value);
+                genericError.AddData("Status", AssistantStatusType.DELETED.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
+            }
+
+
             List<int> idServices = [];
             foreach (var serviceUuid in servicesUuid)
             {
@@ -594,6 +660,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     genericError.AddData("serviceUuid", servicesUuid);
                     return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
                 }
+
+                if (serviceData.Status == ServiceStatusType.DELETED)
+                {
+                    GenericError genericError = new GenericError($"Cannot assign Service with UUID <{serviceData.Uuid}>. Service was deleted!", []);
+                    genericError.AddData("ServiceUuid", serviceData.Uuid!.Value);
+                    genericError.AddData("Status", ServiceStatusType.DELETED.ToString());
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_WAS_DELETED);
+                }
+
+
                 bool isAlreadyRegistered = await assistantMgr.IsAssistantOfferingServiceByUuidAsync(serviceData.Id!.Value, assistantData.Id!.Value);
                 if (isAlreadyRegistered)
                 {
@@ -777,6 +853,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 genericError.AddData("ClientUuid", appointment.Client.Uuid.Value);
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
             }
+
+            if (clientData.Status == ClientStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Client with UUID <{clientData.Uuid}> is not available. Client was deleted!", []);
+                genericError.AddData("ClientUuid", clientData.Uuid!.Value);
+                genericError.AddData("Status", ClientStatusType.DELETED.ToString());
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CLIENT_WAS_DELETED);
+            }
             appointment.Client = clientData;
             // Get Services data
             for (int i = 0; i < appointment.ServiceOffers.Count; i++)
@@ -790,11 +874,18 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     genericError.AddData("SelectedServiceUuid", serviceOffer.Uuid.Value);
                     return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
                 }
+
+                if (serviceOfferData.Assistant!.Status != AssistantStatusType.ENABLED || serviceOfferData.Service!.Status != ServiceStatusType.ENABLED)
+                {
+                    GenericError genericError = new GenericError($"Service or assistant is deleted or disabled <{serviceOffer.Uuid.Value}>. ServiceOffer is unavailable", []);
+                    genericError.AddData("SelectedServiceUuid", serviceOffer.Uuid.Value);
+                    return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_UNAVAILABLE);
+                }
+
                 appointment.ServiceOffers[i] = serviceOfferData;
                 appointment.ServiceOffers[i].StartTime = proposedStartTime;
                 appointment.ServiceOffers[i].EndTime = proposedStartTime!.Value.AddMinutes(serviceOfferData.Service!.Minutes!.Value);
             }
-
 
             appointment.ServiceOffers = appointment.ServiceOffers.OrderBy(so => so.StartTime).ToList();
 

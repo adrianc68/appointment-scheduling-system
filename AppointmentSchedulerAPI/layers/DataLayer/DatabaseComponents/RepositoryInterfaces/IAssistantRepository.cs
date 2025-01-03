@@ -6,7 +6,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 {
     public interface IAssistantRepository
     {
-        // Task<bool> DeleteAssistantAsync(Guid uuid);
         Task<IEnumerable<Assistant>> GetAllAssistantsAsync();
         Task<Assistant?> GetAssistantByUuidAsync(Guid uuid);
         Task<List<Service>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid);
