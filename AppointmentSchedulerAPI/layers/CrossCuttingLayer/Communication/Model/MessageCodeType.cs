@@ -49,6 +49,8 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         SERVICE_OFFER_UNAVAILABLE,
         ASSISTANT_UNAVAILABLE,
         CLIENT_UNAVAILABLE,
-        SERVICE_UNAVAILABLE
+        SERVICE_UNAVAILABLE,
+        CANNOT_SCHEDULE_APPOINTMENT_IN_THE_PAST,
+        CANNOT_SCHEDULE_APPOINTMENT_BEYOND_X,
     }
 }

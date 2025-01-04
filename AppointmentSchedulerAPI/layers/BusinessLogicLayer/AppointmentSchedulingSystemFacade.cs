@@ -6,6 +6,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 {
@@ -15,13 +16,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         private readonly ISchedulerMgt schedulerMgr;
         private readonly IAssistantMgt assistantMgr;
         private readonly IClientMgt clientMgr;
+        private readonly EnvironmentVariableService envService;
 
-        public AppointmentSchedulingSystemFacade(IServiceMgt serviceMgr, IAssistantMgt assistantMgr, IClientMgt clientMgr, ISchedulerMgt schedulerMgr)
+        public AppointmentSchedulingSystemFacade(IServiceMgt serviceMgr, IAssistantMgt assistantMgr, IClientMgt clientMgr, ISchedulerMgt schedulerMgr, EnvironmentVariableService envService)
         {
             this.serviceMgr = serviceMgr;
             this.schedulerMgr = schedulerMgr;
             this.assistantMgr = assistantMgr;
             this.clientMgr = clientMgr;
+            this.envService = envService;
         }
 
         public bool EditAppointment(Appointment appointment)
@@ -869,6 +872,34 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
         private async Task<OperationResult<Guid, GenericError>> ScheduleAppointment(Appointment appointment)
         {
+            DateTime currentDateTime = DateTime.Now;
+            int MAX_DAYS_FROM_NOW = int.Parse(envService.Get("MAX_DAYS_FOR_SCHEDULE"));
+            int MAX_WEEKS_FOR_SCHEDULE = int.Parse(envService.Get("MAX_WEEKS_FOR_SCHEDULE"));
+            int MAX_MONTHS_FOR_SCHEDULE = int.Parse(envService.Get("MAX_MONTHS_FOR_SCHEDULE"));
+            bool IsPastSchedulingAllowed = bool.Parse(envService.Get("ALLOW_SCHEDULE_IN_THE_PAST"));
+
+            DateTime maxDate = currentDateTime
+                .AddMonths(MAX_MONTHS_FOR_SCHEDULE)
+                .AddDays(MAX_WEEKS_FOR_SCHEDULE * 7)
+                .AddDays(MAX_DAYS_FROM_NOW);
+            DateTime startDateTime = appointment.Date!.Value.ToDateTime(appointment.StartTime!.Value);
+
+            if (!IsPastSchedulingAllowed && startDateTime < currentDateTime)
+            {
+                GenericError genericError = new GenericError($"You cannot schedule an appoinment in the past. You can only schedule from the current time", []);
+                genericError.AddData("SelectedDateTime", startDateTime.ToUniversalTime());
+                genericError.AddData("SuggestedDateTime", currentDateTime.AddMinutes(1).ToUniversalTime());
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CANNOT_SCHEDULE_APPOINTMENT_IN_THE_PAST);
+            }
+
+            if (startDateTime > maxDate)
+            {
+                GenericError genericError = new GenericError($"You cannot schedule an appoinment beyond {maxDate}.", []);
+                genericError.AddData("SelectedDateTime", startDateTime.ToUniversalTime());
+                genericError.AddData("SuggestedDateTime", currentDateTime.AddMinutes(5).ToUniversalTime());
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CANNOT_SCHEDULE_APPOINTMENT_BEYOND_X);
+            }
+
             // Get Client data
             var clientData = await clientMgr.GetClientByUuidAsync(appointment.Client.Uuid!.Value);
             if (clientData == null)
