@@ -10,7 +10,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    [ApiVersion(ApiVersionEnum.V1)]
+    [ApiVersion("1")]
     public class ServiceController : ControllerBase
     {
         private readonly IServiceInterfaces systemFacade;

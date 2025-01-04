@@ -1,8 +1,8 @@
 namespace AppointmentSchedulerAPI.layers.ServiceLayer
 {
-    public static class ApiVersionEnum
+    public enum ApiVersionEnum
     {
-        public const string V1 = "1";
-        public const string V2 = "2";
+        V1,
+        V2
     }
 }

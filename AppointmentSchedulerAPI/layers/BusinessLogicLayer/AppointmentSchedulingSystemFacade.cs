@@ -632,7 +632,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> AssignListServicesToAssistantAsync(Guid assistantUuid, List<Guid> ServicesUuids)
+        public async Task<OperationResult<bool, GenericError>> AssignListServicesToAssistantAsync(Guid assistantUuid, List<Guid> servicesUuids)
         {
 
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistantUuid);
@@ -653,13 +653,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
 
             List<int> idServices = [];
-            foreach (var serviceUuid in ServicesUuids)
+            foreach (var serviceUuid in servicesUuids)
             {
                 Service? serviceData = await serviceMgr.GetServiceByUuidAsync(serviceUuid);
                 if (serviceData == null)
                 {
                     GenericError genericError = new GenericError($"Service with UUID <{serviceUuid}> is not found", []);
-                    genericError.AddData("serviceUuid", ServicesUuids);
+                    genericError.AddData("serviceUuid", servicesUuids);
                     return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
                 }
 
