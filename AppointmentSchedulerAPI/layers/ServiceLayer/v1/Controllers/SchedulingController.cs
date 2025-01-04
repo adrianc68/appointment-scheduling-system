@@ -114,7 +114,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             List<AvailabilityTimeSlotDTO> availabilityTimeslotsDTO = [];
             try
             {
-                var availabilityTimeSlots = await systemFacade.GetAllAvailabilityTimeSlots(rangeDTO.StartDate, rangeDTO.EndDate);
+                var availabilityTimeSlots = await systemFacade.GetAllAvailabilityTimeSlotsAsync(rangeDTO.StartDate, rangeDTO.EndDate);
 
                 availabilityTimeslotsDTO = availabilityTimeSlots.Select(a => new AvailabilityTimeSlotDTO
                 {
@@ -174,7 +174,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             List<AppointmentDTO> appointments = [];
             try
             {
-                List<Appointment> result = await systemFacade.GetAllAppoinments(dto.StartDate, dto.EndDate);
+                List<Appointment> result = await systemFacade.GetAllAppoinmentsAsync(dto.StartDate, dto.EndDate);
                 appointments = result.Select(app => new AppointmentDTO
                 {
                     Uuid = app.Uuid,
@@ -387,7 +387,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isConfirmed = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.FinalizeAppointment(dto.AppointmentUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.FinalizeAppointmentAsync(dto.AppointmentUuid);
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;

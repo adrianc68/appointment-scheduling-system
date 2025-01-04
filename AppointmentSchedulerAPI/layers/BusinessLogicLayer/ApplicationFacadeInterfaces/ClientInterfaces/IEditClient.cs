@@ -6,6 +6,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IEditClient
     {
-        Task<OperationResult<bool, GenericError>> UpdateClient(Client client);
+        Task<OperationResult<bool, GenericError>> UpdateClientAsync(Client client);
     }
 }

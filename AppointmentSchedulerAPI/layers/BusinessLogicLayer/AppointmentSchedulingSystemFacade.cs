@@ -58,7 +58,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return appointment;
         }
 
-        public async Task<List<Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate)
+        public async Task<List<Appointment>> GetAllAppoinmentsAsync(DateOnly startDate, DateOnly endDate)
         {
             List<Appointment>? appointment = await schedulerMgr.GetAllAppoinments(startDate, endDate);
             return appointment;
@@ -76,7 +76,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Appointment, GenericError>.Success(appointment);
         }
 
-        public Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlots(DateOnly startDate, DateOnly endDate)
+        public Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate)
         {
             return schedulerMgr.GetAllAvailabilityTimeSlotsAsync(startDate, endDate);
         }
@@ -134,7 +134,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(isUpdated);
         }
 
-        public async Task<OperationResult<bool, GenericError>> UpdateClient(Client client)
+        public async Task<OperationResult<bool, GenericError>> UpdateClientAsync(Client client)
         {
             Client? clientData = await clientMgr.GetClientByUuidAsync(client.Uuid!.Value);
             if (clientData == null)
@@ -182,7 +182,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(isUpdated);
         }
 
-        public async Task<OperationResult<bool, GenericError>> UpdateService(Service service)
+        public async Task<OperationResult<bool, GenericError>> UpdateServiceAsync(Service service)
         {
             Service? serviceData = await serviceMgr.GetServiceByUuidAsync(service.Uuid!.Value);
             if (service == null)
@@ -333,7 +333,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(uuid.Value);
         }
 
-        public async Task<OperationResult<Guid, GenericError>> RegisterService(Service service)
+        public async Task<OperationResult<Guid, GenericError>> RegisterServiceAsync(Service service)
         {
             bool isServiceNameRegistered = await serviceMgr.IsServiceNameRegisteredAsync(service.Name!);
             if (isServiceNameRegistered)
@@ -632,14 +632,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> AssignListServicesToAssistantAsync(Guid assistantUuid, List<Guid?> servicesUuid)
+        public async Task<OperationResult<bool, GenericError>> AssignListServicesToAssistantAsync(Guid uuidAssistant, List<Guid> uuidServices)
         {
 
-            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistantUuid);
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(uuidAssistant);
             if (assistantData == null)
             {
-                GenericError genericError = new GenericError($"Asssistant with UUID <{assistantUuid}> is not found", []);
-                genericError.AddData("assistantUuid", assistantUuid);
+                GenericError genericError = new GenericError($"Asssistant with UUID <{uuidAssistant}> is not found", []);
+                genericError.AddData("assistantUuid", uuidAssistant);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
@@ -653,13 +653,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
 
             List<int> idServices = [];
-            foreach (var serviceUuid in servicesUuid)
+            foreach (var serviceUuid in uuidServices)
             {
                 Service? serviceData = await serviceMgr.GetServiceByUuidAsync(serviceUuid!.Value);
                 if (serviceData == null)
                 {
                     GenericError genericError = new GenericError($"Service with UUID <{serviceUuid}> is not found", []);
-                    genericError.AddData("serviceUuid", servicesUuid);
+                    genericError.AddData("serviceUuid", uuidServices);
                     return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
                 }
 
@@ -675,8 +675,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 bool isAlreadyRegistered = await assistantMgr.IsAssistantOfferingServiceByUuidAsync(serviceData.Id!.Value, assistantData.Id!.Value);
                 if (isAlreadyRegistered)
                 {
-                    GenericError genericError = new GenericError($"Service with UUID <{serviceUuid}> is already assigned to assistant {assistantUuid}", []);
-                    genericError.AddData("assistantUuid", assistantUuid);
+                    GenericError genericError = new GenericError($"Service with UUID <{serviceUuid}> is already assigned to assistant {uuidAssistant}", []);
+                    genericError.AddData("assistantUuid", uuidAssistant);
                     genericError.AddData("conflictingServiceUuid", serviceUuid);
                     return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_ALREADY_ASSIGNED_TO_ASSISTANT);
                 }
@@ -690,7 +690,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> FinalizeAppointment(Guid uuidAppointment)
+        public async Task<OperationResult<bool, GenericError>> FinalizeAppointmentAsync(Guid uuidAppointment)
         {
             Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(uuidAppointment);
             if (appointment == null)

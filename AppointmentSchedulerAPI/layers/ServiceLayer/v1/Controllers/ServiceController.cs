@@ -135,7 +135,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Price = dto.Price
                 };
 
-                OperationResult<Guid, GenericError> result = await systemFacade.RegisterService(service);
+                OperationResult<Guid, GenericError> result = await systemFacade.RegisterServiceAsync(service);
                 if (result.IsSuccessful)
                 {
                     guid = result.Result;
@@ -169,7 +169,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Uuid = dto.Uuid
                 };
 
-                OperationResult<bool, GenericError> result = await systemFacade.UpdateService(service);
+                OperationResult<bool, GenericError> result = await systemFacade.UpdateServiceAsync(service);
                 if (result.IsSuccessful)
                 {
                     isUpdated = result.Result;

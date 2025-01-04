@@ -45,6 +45,25 @@
 - `Pending`
 
 
+#### Server Side Artifacts
+
+##### Module View
+
+![](images/any/server%20side%20module%20view%20allocation.png)
+
+##### Component Architecture
+
+![](images/any/Component%20Architecture%20Refined.png)
+
+##### Interface Responsibility Diagram or Logical Data Model
+
+![](images/any/Interface%20Responsibility%20Diagram%20refined.png)
+
+##### Physical Data Model
+
+![](images/any/physical%20data%20model.png)
+
+
 # Software Process
 
 ## Requirements
@@ -698,8 +717,6 @@ Also, information about relationships between some elements in the diagram that 
 |               | QA-10                                                                     |           | Techniques were identified, but further details are needed.                                                                                                                                                                                          |
 ### Iteration 2: Identifying Structures to Support Primary Functionality
 
-
-
 #### Step 2. Establish Iteration Goal by Selecting Drivers
 
 In this iteration, the design focuses on the back-end of the application. The goal is to identify structures that support primary functionality. The first use cases considered are:
@@ -708,7 +725,6 @@ In this iteration, the design focuses on the back-end of the application. The go
 * CC-1 Register assistant
 * CD-1 Register service
 Since these use case and its modules are CRUD-based and share related behavior, I chose to apply domain decomposition to create components and accommodate the functionality within the architecture. This approach follows the reference method describe by John Chessman in "A Simple Process for Specifying Component-Based Software".
-
 #### Step 3. Choose Elements of the System to Refine
 
 In this iteration, the elements to be refined are the modules located across the different layers defined by the two reference architectures established in the previous iteration. The functionality needed to support the system’s use cases will require the collaboration of components located in these different layers, ensuring they work together to provide the necessary services.
@@ -719,31 +735,42 @@ The following table summarizes the design decisions.
 | Design Decision and Location                             | Rational and Assumptions                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Select Domain-Decomposition for Component-Based Software | Domain decomposition is selected as the primary approach for defining the system’s components because the core functionality is centered around CRUD operations that share related business behavior. By organizing components based on business domains, each module can encapsulate related logic, making the system more maintainable and scalable. This also enables better isolation of concerns, allowing each domain to evolve independently while still maintaining clear boundaries between the components. Domain decomposition provides a natural mapping to the system’s use cases. |
-| Select Repository Pattern                                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| Select Observer Pattern                                  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Select Repository Pattern                                | The repository pattern is selected to abstract the data access logic, providing a consistent and clean interface for CRUD operations while decoupling business logic from persistente concerns. This improves maintainability by centralizing queries and enhances reusability and separation of responsibilities, aligning with SOLID principles.                                                                                                                                                                                                                                              |
+| Select Observer Pattern                                  | The observer pattern is selected to enable reactive notifications between components, ensuring data consistency and integrity when entities are modified. It decouples emitters from observers, promoting modularity and scalability by allowing new observer to be added without altering existing logic.                                                                                                                                                                                                                                                                                      |
+| Select Mapping Strategy for Database Model               | A mapping strategy is selected to bridge the gap between the business logic model and the database model, to allow clear separation of concerns, where the business model focuses on domain logic while the database model optimizes persistence. This strategy is used with an ORM tool using the Repository pattern to streamline the mapping process and manage complex relationships or queries.                                                                                                                                                                                            |
+| Use Data Transfer Objects (DTOs)                         | DTOs are used to decouple the data representation from the business logic, optimizing the transfer of data between layers or external clients. It is used to allow the system to expose only the required fields while hiding internal structures, enhancing security and reducing payload size in API responses. They also enable flexibility in data formatting without affecting the core logic or persistence models.                                                                                                                                                                       |
+| Create REST API Controllers                              | REST API controllers are created to handle client request and serve as the entry point to the system. They ensure a clear separation between the presentation layer and business logic, making the API more maintainable and testable. Controllers are used for mapping HTTP requests to appropriate Application Facade methods, validating inputs, and formatting responses, enabling efficient and scalable communication between the client and the system.                                                                                                                                  |
 
 #### Step 5. Instantiate Architectural Elements, Allocate Responsibilities and Define Interfaces
 
 The instantiation design decisions considered and made are summarized in the following table:
 
-| Design Decision and Location                                   | Rational and Assumptions |
-| -------------------------------------------------------------- | ------------------------ |
-| Locate System Interfaces into Services Interfaces              |                          |
-| Locaate Business Interfaces into Business Interfaces           |                          |
-| Create an Application Facade to coordinate business components |                          |
-
-
+| Design Decision and Location                                                                      | Rational and Assumptions                                                                                                                                                                                                                                             |
+| ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Locate Controllers and DTOS into Services Layer                                                   | Controllers and DTOs are placed in the Service Layer to handle interactions between clients and the business logic. This ensures a clear separation of concerns, allowing the layer to focus on input validation, data transformation, and communication.            |
+| Locate System Interfaces into Business Logic Layer                                                | System interfaces are located in the Business Logic Layer to define the contracts that encapsulate the core functionality. This allows the business logic to evolve independently while providing a clear API for the service and data layers.                       |
+| Locate Business Interfaces and Business Components into Business Logic Layer                      | Business Interfaces and Components are placed in the Business Logic Layer to centralize domain-specific operations and encapsulate the core business rules, promoting modularity, reusability, and separation of concerns.                                           |
+| Create an Application Facade implementing System Interfaces and coordinate Business Components    | The Application Facade provides a unified interface to the Business Logic Layer by implementing system interfaces and coordinating the interaction between the Business Components, simplifying client interactions and reducing coupling with the underlying logic. |
+| Locate Repository Interfaces and Repository Components with its Database Entities into Data Layer | Repository interfaces and Components, along with database entities, are placed in the Data Layer to encapsulate persistence logic, abstract data access details, and promote maintainability and testability.                                                        |
 #### Step 6. Sketch Views and Record Design Decisions
 
 ##### Component Architecture
 
 ![](images/any/Component%20Architecture%20Refined.png)
 
-##### Interface Responsibility Diagram
+##### Interface Responsibility Diagram or Logic Data Model
 
 ![](images/any/Interface%20Responsibility%20Diagram%20refined.png)
 
+##### Module View Allocation
+
+![](images/any/module%20view%20allocate%20refined.png)
+
+##### Server Side Module View
+
 ![](images/any/server%20side%20module%20view%20allocation.png)
+##### Physical Data Model
+
 ![](images/any/physical%20data%20model.png)
 
 
@@ -796,9 +823,13 @@ The instantiation design decisions considered and made are summarized in the fol
 | editAssistant()                              | ![](images/any/interaction%20editAssistant().png)                       |
 | IDisableAssistant                            | ![](images/any/systeminterface%20IDisableAssistant.png)                 |
 | dissableAssistant()                          | ![](images/any/interaction%20disableAssistant().png)                    |
+| IDeleteAssistant                             | ![](images/any/systeminterface%20IDeleteAssistant.png)                  |
 | IEnableAssistant                             | ![](images/any/systeminterface%20IEnableAssistant.png)                  |
 | enableAssistant()                            | ![](images/any/interaction%20enableAssistant().png)                     |
+| IGetAssistant                                | ![](images/any/systeminterface%20IGetAssistant.png)                     |
 | IDisableClient                               | ![](images/any/systeminterface%20IDisableClient.png)                    |
+| IDeleteClient                                | ![](images/any/systeminterface%20IDeleteClient.png)                     |
+| IEditClient                                  | ![](images/any/systeminterface%20IEditClient.png)                       |
 | disableClient()                              | ![](images/any/interaction%20disableClient().png)                       |
 | IEnableClient                                | ![](images/any/systeminterface%20IEnableClient.png)                     |
 | enableClient()                               | ![](images/any/interaction%20enableClient().png)                        |
@@ -816,11 +847,12 @@ The instantiation design decisions considered and made are summarized in the fol
 
 
 
+
+
 Initial elements allocation is in process...
 
 
 * Consider implementing an Idempotent Receiver and Replay Protection to ensure that duplicate messages are not processed.
-* The Observer Pattern is being applied. Some diagrams need to be updated.
 * "Apply communication between components using a notification system (app, email or messaging)."
 
 
