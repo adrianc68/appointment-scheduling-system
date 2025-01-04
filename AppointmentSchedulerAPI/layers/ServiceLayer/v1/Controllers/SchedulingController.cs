@@ -355,7 +355,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(conflictingServiceOfferDTOs, ApiVersionEnum.V1);
         }
 
-        [HttpPost("appointment/confirm")]
+        [HttpPatch("appointment/confirm")]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmAppointment([FromBody] ConfirmAppointmentDTO dto)
         {
@@ -380,7 +380,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isConfirmed, ApiVersionEnum.V1);
         }
 
-        [HttpPost("appointment/finalize")]
+        [HttpPatch("appointment/finalize")]
         [AllowAnonymous]
         public async Task<IActionResult> FinalizeAppointment([FromBody] FinalizeAppointmentDTO dto)
         {
@@ -405,7 +405,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isConfirmed, ApiVersionEnum.V1);
         }
 
-        [HttpPost("appointment/cancel/asClient")]
+        [HttpPatch("appointment/cancel/asClient")]
         [AllowAnonymous]
         public async Task<IActionResult> CancelAppointment([FromBody] CancelAppointmentAsClientDTO dto)
         {
@@ -431,7 +431,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isConfirmed, ApiVersionEnum.V1);
         }
 
-        [HttpPost("appointment/cancel/asStaff")]
+        [HttpPatch("appointment/cancel/asStaff")]
         [AllowAnonymous]
         public async Task<IActionResult> CancelAppointmentAsStaff([FromBody] CancelAppointmentAsStaffDTO dto)
         {
