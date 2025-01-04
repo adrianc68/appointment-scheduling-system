@@ -13,7 +13,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
         public AppointmentStatusType Status { get; set; }
         public double? TotalCost { get; set; }
         public DateTime? CreatedAt { get; set;}
-        public Client Client { get; set; } = new Client();
+        public Client? Client { get; set; } = new Client();
         public List<ServiceOffer> ServiceOffers { get; set;}
     }
 }

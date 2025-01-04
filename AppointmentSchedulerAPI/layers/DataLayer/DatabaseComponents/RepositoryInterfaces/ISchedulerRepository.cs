@@ -12,7 +12,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         // bool DeleteAvailabilityTimeSlot(int idAvailabilityTimeSlot);
         // bool DeleteAssistantAvailabilityTimeSlots(int idAssistant);
         // bool EditAvailabilityTimeSlot(int idAvailabilityTimeSlot, AvailabilityTimeSlot newAvailabilityTimeSlot);
-        Task<IEnumerable<AssistantService>> GetAvailableServicesAsync(DateOnly date);
+        Task<IEnumerable<ServiceOffer>> GetAvailableServicesAsync(DateOnly date);
         Task<Appointment?> GetAppointmentFullDetailsByUuidAsync(Guid uuid);
         Task<Appointment?> GetAppointmentByUuidAsync(Guid uuid);
         Task<int?> GetAppointmentIdByUuidAsync(Guid uuid);

@@ -78,25 +78,19 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllAvailableServicesByDate([FromQuery] AvailableServicesByDateDTO getByDateDTO)
         {
-            List<AssistantServiceDTO> assistantServiceDTO = [];
+            List<ServiceOfferDTO> assistantServiceDTO = [];
             try
             {
                 var assistantsAvailable = await systemFacade.GetAvailableServicesClientAsync(getByDateDTO.Date);
 
-                assistantServiceDTO = assistantsAvailable.Select(a => new AssistantServiceDTO
+                assistantServiceDTO = assistantsAvailable.Select(a => new ServiceOfferDTO
                 {
-                    Assistant = new AssistantDTO
-                    {
-                        Uuid = a.Assistant?.Uuid,
-                        Name = a.Assistant?.Name,
-                    },
-                    Services = a.Services?.Select(service => new ServiceDTO
-                    {
-                        Uuid = service.Uuid,
-                        Name = service.Name,
-                        Price = service.Price,
-                        Minutes = service.Minutes
-                    }).ToList()
+                    AssistantUuid = a.Assistant!.Uuid!.Value,
+                    AssistantName = a.Assistant!.Name,
+                    ServiceUuid = a.Uuid,
+                    ServiceName = a.ServiceName,
+                    ServicePrice = a.ServicePrice,
+                    ServiceMinutes = a.ServicesMinutes
                 }).ToList();
             }
             catch (System.Exception ex)

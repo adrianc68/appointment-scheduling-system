@@ -32,7 +32,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date)
+        public Task<List<ServiceOffer>> GetAvailableServicesClientAsync(DateOnly date)
         {
             return schedulerMgr.GetAvailableServicesAsync(date);
         }

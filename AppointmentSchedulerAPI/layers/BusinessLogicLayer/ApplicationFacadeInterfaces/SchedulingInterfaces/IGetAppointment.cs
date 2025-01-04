@@ -9,7 +9,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
         Task<OperationResult<Appointment,GenericError>> GetAppointmentDetailsAsync(Guid appointmentUuid);
         Task<List<Appointment>> GetScheduledOrConfirmedAppoinmentsAsync(DateOnly startDate, DateOnly endDate);
         Task<List<Appointment>> GetAllAppoinmentsAsync(DateOnly startDate, DateOnly endDate);
-        Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date);
+        Task<List<ServiceOffer>> GetAvailableServicesClientAsync(DateOnly date);
         Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
     }
 }

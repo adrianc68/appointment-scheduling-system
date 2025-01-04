@@ -1,4 +1,3 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
@@ -30,7 +29,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     TotalCost = appointment.TotalCost,
                     Uuid = appointment.Uuid,
                     Status = (Model.Types.AppointmentStatusType?)appointment.Status,
-                    IdClient = appointment.Client.Id
+                    IdClient = appointment.Client!.Id
                 };
                 dbContext.Appointments.Add(appointmentDB);
                 await dbContext.SaveChangesAsync();
@@ -152,7 +151,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                         Email = aso.ServiceOffer.Assistant.UserAccount.Email,
                         Username = aso.ServiceOffer.Assistant.UserAccount.Username,
                         CreatedAt = aso.ServiceOffer.Assistant.UserAccount.CreatedAt,
-                        Status = (AssistantStatusType?)aso.ServiceOffer.Assistant.Status,
+                        Status = (BusinessLogicLayer.Model.Types.AssistantStatusType?)aso.ServiceOffer.Assistant.Status,
                         PhoneNumber = aso.ServiceOffer.Assistant.UserAccount.UserInformation.PhoneNumber
                     },
                 }).ToList()
@@ -192,7 +191,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return availabilityTimeSlotsModel;
         }
 
-        public async Task<IEnumerable<BusinessLogicLayer.Model.AssistantService>> GetAvailableServicesAsync(DateOnly date)
+        public async Task<IEnumerable<BusinessLogicLayer.Model.ServiceOffer>> GetAvailableServicesAsync(DateOnly date)
         {
             using var dbContext = context.CreateDbContext();
             var availableServices = await dbContext.AvailabilityTimeSlots
@@ -205,35 +204,28 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                         .ThenInclude(asService => asService.Service)
                 .ToListAsync();
 
-            var businessLogicAssistantServices = availableServices
-                    .GroupBy(slot => slot.Assistant?.IdUserAccount)
-                    .Select(group => new BusinessLogicLayer.Model.AssistantService
+            var serviceOffers = availableServices
+                    .SelectMany(slot => slot.Assistant?.ServiceOffers.Select(asService => new BusinessLogicLayer.Model.ServiceOffer
                     {
                         Assistant = new BusinessLogicLayer.Model.Assistant
                         {
-                            Id = group.Key,
-                            Uuid = group.FirstOrDefault()?.Assistant?.UserAccount?.Uuid,
-                            Name = group.FirstOrDefault()?.Assistant?.UserAccount?.UserInformation?.Name
+                            Id = slot.Assistant!.UserAccount!.Id,
+                            Uuid = slot.Assistant!.UserAccount!.Uuid,
+                            Name = slot.Assistant!.UserAccount!.UserInformation!.Name
                         },
-                        Services = group
-                            .SelectMany(slot => slot.Assistant?.ServiceOffers?.Select(asService => new BusinessLogicLayer.Model.Service
-                            {
-                                Id = asService.IdService,
-                                Name = asService.Service?.Name,
-                                Price = asService.Service?.Price,
-                                Minutes = asService.Service?.Minutes,
-                                // warning! we are returning the assistantservice uuid instead of the service uuid
-                                // This is intended to simplify communication and validation of selected services between the client and backend.
-                                Uuid = asService.Uuid
-                            }) ?? new List<BusinessLogicLayer.Model.Service>())
-                            .GroupBy(service => new { service.Name, service.Price, service.Minutes })
-                            .Select(groupedService => groupedService.First())
-                            .ToList()
-                    })
-                    .Where(assistantService => assistantService.Services.Any())
+                        Service = null,
+                        Id = asService.Id,
+                        Uuid = asService.Uuid,
+                        ServiceName = asService.Service?.Name,
+                        ServicePrice = asService.Service?.Price,
+                        ServicesMinutes = asService.Service?.Minutes,
+                        ServiceStartTime = slot.StartTime,
+                        ServiceEndTime = slot.EndTime,
+                        Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType)asService.Status
+                    }) ?? [])
                     .ToList();
 
-            return businessLogicAssistantServices;
+            return serviceOffers;
         }
 
         public async Task<bool> IsAppointmentTimeSlotAvailableAsync(BusinessLogicLayer.Model.Types.DateTimeRange range)
@@ -246,7 +238,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return !isAvailable;
         }
 
-        public async Task<bool> IsAvailabilityTimeSlotRegisteredAsync(DateTimeRange range, int idAssistant)
+        public async Task<bool> IsAvailabilityTimeSlotRegisteredAsync(BusinessLogicLayer.Model.Types.DateTimeRange range, int idAssistant)
         {
             using var dbContext = context.CreateDbContext();
             bool isAvailable = await dbContext.AvailabilityTimeSlots
@@ -255,7 +247,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return !isAvailable;
         }
 
-        public async Task<bool> IsAssistantAvailableInAvailabilityTimeSlotsAsync(DateTimeRange range, int idAssistant)
+        public async Task<bool> IsAssistantAvailableInAvailabilityTimeSlotsAsync(BusinessLogicLayer.Model.Types.DateTimeRange range, int idAssistant)
         {
             using var dbContext = context.CreateDbContext();
             var availableSlots = await dbContext.AvailabilityTimeSlots
@@ -270,7 +262,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return true;
         }
 
-        public async Task<bool> HasAssistantConflictingAppoinmentsAsync(DateTimeRange range, int idAssistant)
+        public async Task<bool> HasAssistantConflictingAppoinmentsAsync(BusinessLogicLayer.Model.Types.DateTimeRange range, int idAssistant)
         {
             using var dbContext = context.CreateDbContext();
             var conflictingOffers = await dbContext.AppointmentServiceOffers
@@ -289,7 +281,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return true;
         }
 
-        public async Task<IEnumerable<BusinessLogicLayer.Model.ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
+        public async Task<IEnumerable<BusinessLogicLayer.Model.ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(BusinessLogicLayer.Model.Types.DateTimeRange range)
         {
             using var dbContext = context.CreateDbContext();
             var conflictingOffers = await dbContext.AppointmentServiceOffers
@@ -342,7 +334,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 EndTime = appointmentDB.EndTime,
                 TotalCost = appointmentDB.TotalCost,
                 CreatedAt = appointmentDB.CreatedAt,
-                Status = (AppointmentStatusType)appointmentDB.Status!.Value,
+                Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)appointmentDB.Status!.Value,
                 Client = new BusinessLogicLayer.Model.Client
                 {
                     Id = appointmentDB.Client.IdUserAccount,
@@ -388,7 +380,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 EndTime = appointmentDB.EndTime,
                 TotalCost = appointmentDB.TotalCost,
                 CreatedAt = appointmentDB.CreatedAt,
-                Status = (AppointmentStatusType)appointmentDB.Status!.Value,
+                Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)appointmentDB.Status!.Value,
                 Client = new BusinessLogicLayer.Model.Client
                 {
                     Id = appointmentDB.Client.IdUserAccount,
@@ -423,7 +415,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return appointment;
         }
 
-        public async Task<bool> ChangeAppointmentStatusTypeAsync(int idAppointment, AppointmentStatusType status)
+        public async Task<bool> ChangeAppointmentStatusTypeAsync(int idAppointment, BusinessLogicLayer.Model.Types.AppointmentStatusType status)
         {
             bool isStatusChanged = false;
             using var dbContext = context.CreateDbContext();
@@ -468,7 +460,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 StartTime = app.StartTime,
                 TotalCost = app.TotalCost,
                 Uuid = app.Uuid,
-                Status = (AppointmentStatusType)app.Status!.Value,
+                Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)app.Status!.Value,
                 Id = app.Id,
                 CreatedAt = app.CreatedAt,
                 Client = new BusinessLogicLayer.Model.Client
@@ -478,7 +470,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Name = app.Client.UserAccount.UserInformation.Name,
                     Email = app.Client.UserAccount.Email,
                     PhoneNumber = app.Client.UserAccount.UserInformation.PhoneNumber,
-                    Status = (ClientStatusType?)app.Client.Status,
+                    Status = (BusinessLogicLayer.Model.Types.ClientStatusType)app.Client.Status!.Value,
                     Username = app.Client.UserAccount.Username,
                     CreatedAt = app.Client.UserAccount.CreatedAt
                 },

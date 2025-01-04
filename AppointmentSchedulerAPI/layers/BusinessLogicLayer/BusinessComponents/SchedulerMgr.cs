@@ -29,9 +29,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<Appointment>)await schedulerRepository.GetAllAppoinments(startDate, endDate);
         }
 
-        public async Task<List<AssistantService>> GetAvailableServicesAsync(DateOnly date)
+        public async Task<List<ServiceOffer>> GetAvailableServicesAsync(DateOnly date)
         {
-            return (List<AssistantService>)await schedulerRepository.GetAvailableServicesAsync(date);
+            return (List<ServiceOffer>)await schedulerRepository.GetAvailableServicesAsync(date);
         }
 
         public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
