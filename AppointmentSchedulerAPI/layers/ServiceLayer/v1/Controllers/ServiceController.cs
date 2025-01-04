@@ -48,7 +48,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(serviceDtos, ApiVersionEnum.V1);
         }
 
-        [HttpPost("enable")]
+        [HttpPatch("enable")]
         [AllowAnonymous]
         public async Task<IActionResult> EnableService([FromBody] EnableServiceDTO dto)
         {
@@ -72,7 +72,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
         }
 
-        [HttpPost("disable")]
+        [HttpPatch("disable")]
         [AllowAnonymous]
         public async Task<IActionResult> DisableService([FromBody] DisableServiceDTO dto)
         {
@@ -96,7 +96,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
         }
 
-        [HttpPost("delete")]
+        [HttpDelete("delete")]
         [AllowAnonymous]
         public async Task<IActionResult> DeleteService([FromBody] DeleteServiceDTO dto)
         {

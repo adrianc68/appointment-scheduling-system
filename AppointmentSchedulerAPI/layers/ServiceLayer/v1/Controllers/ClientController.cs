@@ -27,7 +27,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         //     throw new NotImplementedException();
         // }
 
-        [HttpPost("disable")]
+        [HttpPatch("disable")]
         [AllowAnonymous]
         public async Task<IActionResult> DisableClient([FromBody] DisableClientDTO dto)
         {
@@ -51,7 +51,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
         }
 
-        [HttpPost("enable")]
+        [HttpPatch("enable")]
         [AllowAnonymous]
         public async Task<IActionResult> EnableClient([FromBody] EnableClientDTO dto)
         {
@@ -76,7 +76,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
 
-        [HttpPost("delete")]
+        [HttpDelete("delete")]
         [AllowAnonymous]
         public async Task<IActionResult> DeleteClient([FromBody] DeleteClientDTO dto)
         {

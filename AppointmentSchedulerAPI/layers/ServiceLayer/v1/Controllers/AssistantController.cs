@@ -25,7 +25,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.db = db;
         }
 
-        [HttpPost("disable")]
+        [HttpPatch("disable")]
         [AllowAnonymous]
         public async Task<IActionResult> DisableAssistant([FromBody] DisableAssistantDTO dto)
         {
@@ -49,7 +49,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
         }
 
-        [HttpPost("enable")]
+        [HttpPatch("enable")]
         [AllowAnonymous]
         public async Task<IActionResult> EnableAssistant([FromBody] EnableAssistantDTO dto)
         {
@@ -73,7 +73,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
         }
 
-        [HttpPost("delete")]
+        [HttpDelete("delete")]
         [AllowAnonymous]
         public async Task<IActionResult> DeleteAssistant([FromBody] DeleteAssistantDTO dto)
         {
