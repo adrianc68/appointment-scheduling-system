@@ -655,7 +655,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             List<int> idServices = [];
             foreach (var serviceUuid in uuidServices)
             {
-                Service? serviceData = await serviceMgr.GetServiceByUuidAsync(serviceUuid!.Value);
+                Service? serviceData = await serviceMgr.GetServiceByUuidAsync(serviceUuid);
                 if (serviceData == null)
                 {
                     GenericError genericError = new GenericError($"Service with UUID <{serviceUuid}> is not found", []);
