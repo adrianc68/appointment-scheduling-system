@@ -9,6 +9,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
         ICancelAppointmentStaffAssisted,
         ICancelAppointmentClientSelf,
         IGetAvailabilityTimeSlot,
+        IDisableServiceOffer,
+        IEnableServiceOffer,
         IGetAppointment
     {
     }

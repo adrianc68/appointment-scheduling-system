@@ -350,6 +350,55 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         }
 
 
+        public async Task<OperationResult<bool, GenericError>> DisableServiceOfferAsync(Guid serviceOfferUuid)
+        {
+            ServiceOffer? serviceOffer = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
+            if (serviceOffer == null)
+            {
+                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> is not found", []);
+                genericError.AddData("ServiceUuid", serviceOfferUuid);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_NOT_FOUND);
+            }
+
+            if (serviceOffer.Status == ServiceOfferStatusType.NOT_AVAILABLE)
+            {
+                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> is already disabled", []);
+                genericError.AddData("ServiceUuid", serviceOfferUuid);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_IS_ALREADY_UNAVAILABLE);
+            }
+            bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOffer.Id!.Value, ServiceOfferStatusType.NOT_AVAILABLE);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
+        }
+
+        public async Task<OperationResult<bool, GenericError>> EnableServiceOfferAsync(Guid serviceOfferUuid)
+        {
+            ServiceOffer? serviceOffer = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
+            if (serviceOffer == null)
+            {
+                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> is not found", []);
+                genericError.AddData("ServiceUuid", serviceOfferUuid);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_NOT_FOUND);
+            }
+
+            if (serviceOffer.Status == ServiceOfferStatusType.AVAILABLE)
+            {
+                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> is already enabled", []);
+                genericError.AddData("ServiceUuid", serviceOfferUuid);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_IS_ALREADY_AVAILABLE);
+            }
+            bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOffer.Id!.Value, ServiceOfferStatusType.NOT_AVAILABLE);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
+        }
+
+
         public async Task<OperationResult<bool, GenericError>> DisableAssistantAsync(Guid assistantUuid)
         {
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistantUuid);
@@ -792,7 +841,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
             }
 
-            if (appointment.Client.Id != clientData.Id)
+            if (appointment.Client!.Id != clientData.Id)
             {
                 GenericError genericError = new GenericError($"Appointment with UUID <{appointmentUuid}> belongs to another user");
                 genericError.AddData("AppointmentUuid", appointmentUuid);
@@ -901,7 +950,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
 
             // Get Client data
-            var clientData = await clientMgr.GetClientByUuidAsync(appointment.Client.Uuid!.Value);
+            var clientData = await clientMgr.GetClientByUuidAsync(appointment.Client!.Uuid!.Value);
             if (clientData == null)
             {
                 GenericError genericError = new GenericError($"Client UUID: <{appointment.Client.Uuid.Value}> is not registered", []);
@@ -1030,7 +1079,5 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
             return OperationResult<Guid, GenericError>.Success(UuidRegistered.Value);
         }
-
-
     }
 }

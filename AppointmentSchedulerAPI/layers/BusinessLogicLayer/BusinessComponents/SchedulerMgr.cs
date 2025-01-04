@@ -106,6 +106,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return appointment;
         }
 
+        public async Task<bool> ChangeServiceOfferStatusTypeAsync(int idServiceOffer, ServiceOfferStatusType status)
+        {
+            bool isUpdated = await schedulerRepository.ChangeServiceOfferStatusTypeAsync(idServiceOffer, status);
+            return isUpdated;
+        }
 
+        public async Task<ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid)
+        {
+            ServiceOffer? serviceOffer = await schedulerRepository.GetServiceOfferByUuidAsync(uuid);
+            return serviceOffer;
+        }
     }
 }

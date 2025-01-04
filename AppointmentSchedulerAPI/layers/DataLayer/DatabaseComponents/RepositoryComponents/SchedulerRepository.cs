@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
@@ -477,6 +478,58 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }).ToList();
 
             return appointmentsModel;
+        }
+
+        public async Task<bool> ChangeServiceOfferStatusTypeAsync(int idServiceOffer, ServiceOfferStatusType status)
+        {
+            bool isStatusChanged = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var appointment = await dbContext.ServiceOffers
+                     .FirstOrDefaultAsync(ap => ap.Id == idServiceOffer);
+
+                if (appointment == null)
+                {
+                    return false;
+                }
+
+                appointment.Status = (DataLayer.DatabaseComponents.Model.Types.ServiceOfferStatusType)status;
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isStatusChanged = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isStatusChanged;
+        }
+
+        public async Task<BusinessLogicLayer.Model.ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid)
+        {
+            using var dbContext = context.CreateDbContext();
+            var serviceOfferDb = await dbContext.ServiceOffers
+                    .Include(ser => ser.Service)
+                .FirstOrDefaultAsync(a => a.Uuid == uuid);
+
+            if (serviceOfferDb == null)
+            {
+                return null;
+            }
+
+            var serviceOffers = new BusinessLogicLayer.Model.ServiceOffer
+            {
+                Id = serviceOfferDb.Id,
+                Uuid = serviceOfferDb.Uuid,
+                Status = (ServiceOfferStatusType?)serviceOfferDb.Status,
+                ServicePrice = serviceOfferDb.Service.Price,
+                ServiceName = serviceOfferDb.Service.Name,
+                ServicesMinutes = serviceOfferDb.Service.Minutes,
+            };
+            return serviceOffers;
         }
     }
 }

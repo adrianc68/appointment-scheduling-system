@@ -129,6 +129,57 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
 
+        [HttpPatch("appointment/serviceOffer/disable")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DisableServiceOffer([FromBody] DisableServiceOfferDTO dto)
+        {
+            bool isDisabled = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DisableServiceOfferAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isDisabled = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+                throw;
+            }
+            return httpResponseService.OkResponse(isDisabled, ApiVersionEnum.V1);
+        }
+
+        [HttpPatch("appointment/serviceOffer/enable")]
+        [AllowAnonymous]
+        public async Task<IActionResult> EnableServiceOffer([FromBody] EnableServiceOfferDTO dto)
+        {
+            bool isEnabled = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.EnableServiceOfferAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isEnabled = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+                throw;
+            }
+            return httpResponseService.OkResponse(isEnabled, ApiVersionEnum.V1);
+        }
+
+
         [HttpGet("appointment/")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAppointmentsFromScheduler([FromQuery] GetAllAppointmentsDTO dto)
@@ -180,7 +231,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     CreatedAt = app.CreatedAt!.Value,
                     Client = new ClientDTO
                     {
-                        Name = app.Client.Name,
+                        Name = app.Client!.Name,
                         Uuid = app.Client.Uuid,
                         PhoneNumber = app.Client.PhoneNumber,
                         Email = app.Client.Email,
