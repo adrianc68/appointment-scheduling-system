@@ -4,6 +4,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IFinalizeAppointment
     {
-        Task<OperationResult<bool, GenericError>> FinalizeAppointmentAsync(Guid uuidAppointment);
+        Task<OperationResult<bool, GenericError>> FinalizeAppointmentAsync(Guid appointmentUuid);
     }
 }

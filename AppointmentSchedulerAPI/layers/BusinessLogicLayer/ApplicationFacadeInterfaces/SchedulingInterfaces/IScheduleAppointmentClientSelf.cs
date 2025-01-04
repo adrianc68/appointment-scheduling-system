@@ -6,7 +6,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IScheduleAppointmentClientSelf
     {
-        Task<OperationResult<bool, GenericError>> ConfirmAppointment(Guid uuidAppointment);
+        Task<OperationResult<bool, GenericError>> ConfirmAppointment(Guid appointmentUuid);
         Task<OperationResult<Guid, GenericError>> ScheduleAppointmentAsClientAsync(Appointment appointment);
     }
 }

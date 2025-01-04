@@ -238,7 +238,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 Appointment appointment = new Appointment
                 {
                     Date = dto.Date,
-                    Client = new Client { Uuid = dto.ClientUuid },
+                    Client = new Client { Uuid = dto.clientUuid },
                     ServiceOffers = [],
                     Uuid = Guid.CreateVersion7()
                 };
@@ -289,7 +289,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 Appointment appointment = new Appointment
                 {
                     Date = dto.Date,
-                    Client = new Client { Uuid = dto.ClientUuid },
+                    Client = new Client { Uuid = dto.clientUuid },
                     ServiceOffers = [],
                     Uuid = Guid.CreateVersion7()
                 };
@@ -413,7 +413,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             try
             {
                 // $$$> Get client uuid from authentication service
-                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelf(dto.AppointmentUuid, dto.ClientUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelf(dto.AppointmentUuid, dto.clientUuid);
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;

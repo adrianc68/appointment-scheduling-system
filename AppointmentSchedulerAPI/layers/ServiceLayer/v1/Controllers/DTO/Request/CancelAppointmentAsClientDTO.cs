@@ -5,6 +5,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
         public Guid AppointmentUuid { get; set; }
         // Get from the Authentication Service
         // $$$> THIS MUST BE REMOVED FROM HERE
-        public Guid ClientUuid { get; set; }
+        public Guid clientUuid { get; set; }
     }
 }

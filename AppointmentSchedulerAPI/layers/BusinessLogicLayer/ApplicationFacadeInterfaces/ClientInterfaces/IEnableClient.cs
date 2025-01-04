@@ -4,6 +4,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IEnableClient
     {
-        Task<OperationResult<bool,GenericError>> EnableClientAsync(Guid uuidClient);
+        Task<OperationResult<bool,GenericError>> EnableClientAsync(Guid clientUuid);
     }
 }

@@ -4,6 +4,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface ICancelAppointmentStaffAssisted
     {
-        Task<OperationResult<bool,GenericError>> CancelAppointmentStaffAssisted(Guid uuidAppointment);
+        Task<OperationResult<bool,GenericError>> CancelAppointmentStaffAssisted(Guid appointmentUuid);
     }
 }

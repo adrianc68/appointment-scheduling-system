@@ -49,7 +49,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 //     Date = dto.Date,
                 //     Status = BusinessLogicLayer.Model.Types.AppointmentStatusType.SCHEDULED,
                 //     TotalCost = 500,
-                //     Client = new Client { Uuid = dto.ClientUuid },
+                //     Client = new Client { Uuid = dto.clientUuid },
                 //     AssistantService = [],
                 //     Uuid = Guid.CreateVersion7()
                 // };

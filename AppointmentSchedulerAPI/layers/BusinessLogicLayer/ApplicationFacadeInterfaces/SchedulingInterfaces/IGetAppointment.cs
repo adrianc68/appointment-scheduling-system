@@ -6,7 +6,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IGetAppointment
     {
-        Task<OperationResult<Appointment,GenericError>> GetAppointmentDetailsAsync(Guid uuidAppointment);
+        Task<OperationResult<Appointment,GenericError>> GetAppointmentDetailsAsync(Guid appointmentUuid);
         Task<List<Appointment>> GetScheduledOrConfirmedAppoinmentsAsync(DateOnly startDate, DateOnly endDate);
         Task<List<Appointment>> GetAllAppoinmentsAsync(DateOnly startDate, DateOnly endDate);
         Task<List<AssistantService>> GetAvailableServicesClientAsync(DateOnly date);
