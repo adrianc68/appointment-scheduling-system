@@ -837,7 +837,6 @@ The instantiation design decisions considered and made are summarized in the fol
 | registerClient()                             | ![](images/any/interaction%20registerClient().png)                      |
 |                                              |                                                                         |
 | IAssignServiceToAssistant                    | ![](images/any/systeminterface%20IAssignServiceToAssistant.png)         |
-|                                              |                                                                         |
 |                                              | ![](images/any/systeminterface%20IGetAssistant.png)                     |
 |                                              | ![](images/any/systeminterface%20IGetClient.png)                        |
 |                                              | ![](images/any/systeminterface%20IGetService.png)                       |
