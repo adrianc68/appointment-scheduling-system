@@ -81,7 +81,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return schedulerMgr.GetAllAvailabilityTimeSlotsAsync(startDate, endDate);
         }
 
-        public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
+        public async Task<List<ScheduledService>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
         {
             return await schedulerMgr.GetConflictingServicesByDateTimeRangeAsync(range);
         }
@@ -967,9 +967,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
             appointment.Client = clientData;
             // Get Services data
-            for (int i = 0; i < appointment.ServiceOffers.Count; i++)
+            for (int i = 0; i < appointment.ScheduledServices!.Count; i++)
             {
-                var serviceOffer = appointment.ServiceOffers[i];
+                var serviceOffer = appointment.ScheduledServices[i];
                 var proposedStartTime = serviceOffer.ServiceStartTime;
                 ServiceOffer? serviceOfferData = await assistantMgr.GetServiceOfferByUuidAsync(serviceOffer.Uuid!.Value);
                 if (serviceOfferData == null)
@@ -997,23 +997,23 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_UNAVAILABLE);
                 }
 
-                appointment.ServiceOffers[i] = serviceOfferData;
-                appointment.ServiceOffers[i].ServiceStartTime = proposedStartTime;
-                appointment.ServiceOffers[i].ServiceEndTime = proposedStartTime!.Value.AddMinutes(serviceOfferData.Service!.Minutes!.Value);
-                appointment.ServiceOffers[i].ServiceName = serviceOfferData.Service.Name;
-                appointment.ServiceOffers[i].ServicesMinutes = serviceOfferData.Service.Minutes;
-                appointment.ServiceOffers[i].ServicePrice = serviceOfferData.Service.Price;
+                appointment.ScheduledServices[i].ServiceOffer = serviceOfferData;
+                appointment.ScheduledServices[i].ServiceStartTime = proposedStartTime;
+                appointment.ScheduledServices[i].ServiceEndTime = proposedStartTime!.Value.AddMinutes(serviceOfferData.Service!.Minutes!.Value);
+                appointment.ScheduledServices[i].ServiceName = serviceOfferData.Service.Name;
+                appointment.ScheduledServices[i].ServicesMinutes = serviceOfferData.Service.Minutes;
+                appointment.ScheduledServices[i].ServicePrice = serviceOfferData.Service.Price;
 
             }
 
-            appointment.ServiceOffers = appointment.ServiceOffers.OrderBy(so => so.ServiceStartTime).ToList();
+            appointment.ScheduledServices = appointment.ScheduledServices.OrderBy(so => so.ServiceStartTime).ToList();
 
             // Validate if the services are scheduled consecutively without gaps
             List<GenericError> errorMessages = [];
-            for (int i = 1; i < appointment.ServiceOffers.Count; i++)
+            for (int i = 1; i < appointment.ScheduledServices.Count; i++)
             {
-                var prevService = appointment.ServiceOffers[i - 1];
-                var currentService = appointment.ServiceOffers[i];
+                var prevService = appointment.ScheduledServices[i - 1];
+                var currentService = appointment.ScheduledServices[i];
 
                 if (currentService.ServiceStartTime != prevService.ServiceEndTime)
                 {
@@ -1030,44 +1030,44 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
 
             // Calculate cost and endtime
-            appointment.TotalCost = appointment.ServiceOffers.Sum(service => service.Service!.Price!.Value);
-            appointment.EndTime = appointment.StartTime!.Value.AddMinutes(appointment.ServiceOffers.Sum(service => service.Service!.Minutes!.Value));
+            appointment.TotalCost = appointment.ScheduledServices.Sum(service => service.ServicePrice!.Value);
+            appointment.EndTime = appointment.StartTime!.Value.AddMinutes(appointment.ScheduledServices.Sum(service => service.ServicesMinutes!.Value));
 
             // 1. Check for each service if it's Assistant is available in time range
-            foreach (var serviceOffer in appointment.ServiceOffers)
+            foreach (var scheduledService in appointment.ScheduledServices)
             {
-                TimeOnly proposedStartTime = TimeOnly.Parse(serviceOffer.ServiceStartTime!.Value.ToString());
-                TimeOnly proposedEndTime = proposedStartTime.AddMinutes(serviceOffer.Service!.Minutes!.Value);
+                TimeOnly proposedStartTime = TimeOnly.Parse(scheduledService.ServiceStartTime!.Value.ToString());
+                TimeOnly proposedEndTime = proposedStartTime.AddMinutes(scheduledService.ServicesMinutes!.Value);
 
                 DateTimeRange serviceRange = new()
                 {
-                    StartTime = serviceOffer.ServiceStartTime.Value,
+                    StartTime = scheduledService.ServiceStartTime.Value,
                     EndTime = proposedEndTime,
                     Date = appointment.Date!.Value,
                 };
 
-                bool isAssistantAvailableInAvailabilityTimeSlots = await schedulerMgr.IsAssistantAvailableInAvailabilityTimeSlotsAsync(serviceRange, serviceOffer.Assistant!.Id!.Value);
+                bool isAssistantAvailableInAvailabilityTimeSlots = await schedulerMgr.IsAssistantAvailableInAvailabilityTimeSlotsAsync(serviceRange, scheduledService.ServiceOffer!.Assistant!.Id!.Value);
 
                 if (!isAssistantAvailableInAvailabilityTimeSlots)
                 {
-                    GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is not available during the requested time range", []);
-                    error.AddData("SelectedServiceUuid", serviceOffer.Uuid!.Value);
+                    GenericError error = new GenericError($"Assistant: <{scheduledService.ServiceOffer.Assistant!.Uuid!.Value}> is not available during the requested time range", []);
+                    error.AddData("SelectedServiceUuid", scheduledService.Uuid!.Value);
                     error.AddData("SelectedServiceStartTime", serviceRange.StartTime);
                     error.AddData("SelectedServiceEndTime", serviceRange.EndTime);
-                    error.AddData("AssistantUuid", serviceOffer.Assistant!.Uuid!.Value);
-                    error.AddData("AssistantName", serviceOffer.Assistant!.Name!);
+                    error.AddData("AssistantUuid", scheduledService.ServiceOffer.Assistant!.Uuid!.Value);
+                    error.AddData("AssistantName", scheduledService.ServiceOffer.Assistant!.Name!);
                     return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE);
                 }
 
-                bool hasAssistantConflictingAppoinments = await schedulerMgr.HasAssistantConflictingAppoinmentsAsync(serviceRange, serviceOffer.Assistant!.Id!.Value);
+                bool hasAssistantConflictingAppoinments = await schedulerMgr.HasAssistantConflictingAppoinmentsAsync(serviceRange, scheduledService.ServiceOffer.Assistant!.Id!.Value);
                 if (!hasAssistantConflictingAppoinments)
                 {
-                    GenericError error = new GenericError($"Assistant: <{serviceOffer.Assistant!.Uuid!.Value}> is attending another appointment during the requested time range", []);
-                    error.AddData("SelectedServiceUuid", serviceOffer.Uuid!.Value);
+                    GenericError error = new GenericError($"Assistant: <{scheduledService.ServiceOffer.Assistant!.Uuid!.Value}> is attending another appointment during the requested time range", []);
+                    error.AddData("SelectedServiceUuid", scheduledService.Uuid!.Value);
                     error.AddData("SelectedServiceStartTime", serviceRange.StartTime);
                     error.AddData("SelectedServiceEndTime", serviceRange.EndTime);
-                    error.AddData("AssistantUuid", serviceOffer.Assistant!.Uuid!.Value);
-                    error.AddData("AssistantName", serviceOffer.Assistant!.Name!);
+                    error.AddData("AssistantUuid", scheduledService.ServiceOffer.Assistant!.Uuid!.Value);
+                    error.AddData("AssistantName", scheduledService.ServiceOffer.Assistant!.Name!);
                     return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.SELECTED_SERVICE_HAS_CONFLICTING_APPOINTMENT_TIME_SLOT);
                 }
             }

@@ -7,11 +7,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 {
     public interface ISchedulerRepository
     {
-        // bool BlockTimeRange(DateTimeRange range);
-        // bool DeleteAssistantAppointments(int idAssistant);
-        // bool DeleteAvailabilityTimeSlot(int idAvailabilityTimeSlot);
-        // bool DeleteAssistantAvailabilityTimeSlots(int idAssistant);
-        // bool EditAvailabilityTimeSlot(int idAvailabilityTimeSlot, AvailabilityTimeSlot newAvailabilityTimeSlot);
+        Task<bool> DeleteAvailabilityTimeSlot(int idAvailabilityTimeSlot);
+        Task<bool> EditAvailabilityTimeSlot(AvailabilityTimeSlot newAvailabilityTimeSlot);
         Task<IEnumerable<ServiceOffer>> GetAvailableServicesAsync(DateOnly date);
         Task<Appointment?> GetAppointmentFullDetailsByUuidAsync(Guid uuid);
         Task<Appointment?> GetAppointmentByUuidAsync(Guid uuid);
@@ -20,7 +17,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<IEnumerable<Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate);
         Task<IEnumerable<AvailabilityTimeSlot>> GetAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate);
         Task<int?> GetAvailabilityTimeSlotIdByUuidAsync(Guid uuid);
-        Task<IEnumerable<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
+        Task<IEnumerable<ScheduledService>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
         Task<ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid);
         Task<bool> ChangeAppointmentStatusTypeAsync(int idApointment, AppointmentStatusType status);
         Task<bool> ChangeServiceOfferStatusTypeAsync(int idServiceOffer, ServiceOfferStatusType status);

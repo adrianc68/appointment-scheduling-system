@@ -37,6 +37,7 @@ builder.Services.AddDbContextFactory<AppointmentDbContext>((provider, options) =
         o.MapEnum<AppointmentStatusType>("AppointmentStatusType");
         o.MapEnum<ServiceStatusType>("ServiceStatusType");
         o.MapEnum<ServiceOfferStatusType>("ServiceOfferStatusType");
+        o.MapEnum<AvailabilityTimeSlotStatusType>("AvailabilityTimeSlotStatusType");
     });
 });
 

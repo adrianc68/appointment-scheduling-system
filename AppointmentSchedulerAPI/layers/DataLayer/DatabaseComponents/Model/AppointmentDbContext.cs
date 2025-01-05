@@ -24,7 +24,7 @@ public partial class AppointmentDbContext : DbContext
     public required virtual DbSet<Service> Services { get; set; }
     public required virtual DbSet<ServiceOffer> ServiceOffers { get; set; }
     public required virtual DbSet<AvailabilityTimeSlot> AvailabilityTimeSlots { get; set; }
-    public required virtual DbSet<AppointmentServiceOffer> AppointmentServiceOffers { get; set; }
+    public required virtual DbSet<ScheduledService> ScheduledServices { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,7 +34,8 @@ public partial class AppointmentDbContext : DbContext
             .HasPostgresEnum<AssistantStatusType>("AssistantType")
             .HasPostgresEnum<RoleType>("RoleType")
             .HasPostgresEnum<ServiceStatusType>("ServiceStatusType")
-            .HasPostgresEnum<ServiceOfferStatusType>("ServiceOfferStatusType");
+            .HasPostgresEnum<ServiceOfferStatusType>("ServiceOfferStatusType")
+            .HasPostgresEnum<AvailabilityTimeSlotStatusType>("AvailabilityTimeSlotStatusType");
 
         modelBuilder.Entity<UserAccount>(entity =>
         {
@@ -214,7 +215,7 @@ public partial class AppointmentDbContext : DbContext
                 .HasForeignKey(sse => sse.IdService);
         });
 
-        modelBuilder.Entity<AppointmentServiceOffer>(entity =>
+        modelBuilder.Entity<ScheduledService>(entity =>
         {
             entity.ToTable("AppointmentServiceOffer");
             entity.HasKey(e => new { e.IdAppointment, e.IdServiceOffer });
@@ -235,7 +236,7 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnName("service_minutes");
 
             entity.HasOne(e => e.Appointment)
-                .WithMany(a => a.AppointmentServiceOffers)
+                .WithMany(a => a.ScheduledServices)
                 .HasForeignKey(ase => ase.IdAppointment);
 
             entity.HasOne(e => e.ServiceOffer)
@@ -266,6 +267,9 @@ public partial class AppointmentDbContext : DbContext
             entity.Property(e => e.StartTime)
                 .HasMaxLength(50)
                 .HasColumnName("start_time");
+            entity.Property(e => e.Status)
+                .HasColumnName("status");
+
             entity.Property(e => e.Uuid).HasColumnName("uuid");
 
             entity.HasOne(d => d.Assistant)

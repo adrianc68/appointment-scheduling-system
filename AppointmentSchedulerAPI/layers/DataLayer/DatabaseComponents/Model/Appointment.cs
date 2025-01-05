@@ -14,5 +14,5 @@ public partial class Appointment
     public int? IdClient { get; set; }
     public AppointmentStatusType? Status { get; set; }
     public virtual Client Client { get; set; }
-    public virtual IEnumerable<AppointmentServiceOffer> AppointmentServiceOffers { get; set; }
+    public virtual IEnumerable<ScheduledService> ScheduledServices { get; set; }
 }

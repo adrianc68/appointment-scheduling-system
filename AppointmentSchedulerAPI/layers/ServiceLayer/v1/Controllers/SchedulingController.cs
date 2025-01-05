@@ -88,9 +88,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     AssistantUuid = a.Assistant!.Uuid!.Value,
                     AssistantName = a.Assistant!.Name,
                     ServiceUuid = a.Uuid,
-                    ServiceName = a.ServiceName,
-                    ServicePrice = a.ServicePrice,
-                    ServiceMinutes = a.ServicesMinutes
+                    ServiceName = a.Service!.Name,
+                    ServicePrice = a.Service!.Price,
+                    ServiceMinutes = a.Service!.Minutes,
                 }).ToList();
             }
             catch (System.Exception ex)
@@ -196,10 +196,10 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Date = app.Date,
                     Status = app.Status.ToString(),
                     CreatedAt = app.CreatedAt!.Value,
-                    Assistants = app.ServiceOffers.Select(se => new AsisstantOfferDTO
+                    Assistants = app.ScheduledServices!.Select(se => new AsisstantOfferDTO
                     {
-                        AssistantName = se.Assistant!.Name,
-                        AssistantUuid = se.Assistant!.Uuid!.Value,
+                        AssistantName = se.ServiceOffer!.Assistant!.Name,
+                        AssistantUuid = se.ServiceOffer!.Assistant!.Uuid!.Value,
                         StartTimeOfAssistantOfferingService = se.ServiceStartTime!.Value,
                         EndTimeOfAsisstantOfferingService = se.ServiceEndTime!.Value
                     }).ToList()
@@ -284,23 +284,18 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 {
                     Date = dto.Date,
                     Client = new Client { Uuid = dto.clientUuid },
-                    ServiceOffers = [],
+                    ScheduledServices = [],
                     Uuid = Guid.CreateVersion7()
                 };
-
-                var selectedServicesStartTimes = dto.SelectedServices
-                .Select(service => service.StartTime)
-                .ToList();
-                appointment.StartTime = selectedServicesStartTimes.Min();
-
+                appointment.StartTime = dto.SelectedServices.Min(service => service.StartTime);
                 foreach (var serviceOfferUuid in dto.SelectedServices)
                 {
-                    var serviceOffers = new ServiceOffer
+                    var selectedService = new ScheduledService
                     {
                         Uuid = serviceOfferUuid.Uuid,
                         ServiceStartTime = serviceOfferUuid.StartTime
                     };
-                    appointment.ServiceOffers.Add(serviceOffers);
+                    appointment.ScheduledServices!.Add(selectedService);
                 }
                 OperationResult<Guid, GenericError> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
                 if (result.IsSuccessful)
@@ -335,23 +330,18 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 {
                     Date = dto.Date,
                     Client = new Client { Uuid = dto.clientUuid },
-                    ServiceOffers = [],
+                    ScheduledServices = [],
                     Uuid = Guid.CreateVersion7()
                 };
-
-                var selectedServicesStartTimes = dto.SelectedServices
-                .Select(service => service.StartTime)
-                .ToList();
-                appointment.StartTime = selectedServicesStartTimes.Min();
-
+                appointment.StartTime = dto.SelectedServices.Min(service => service.StartTime);
                 foreach (var serviceOfferUuid in dto.SelectedServices)
                 {
-                    var serviceOffers = new ServiceOffer
+                    var selectedService = new ScheduledService
                     {
                         Uuid = serviceOfferUuid.Uuid,
                         ServiceStartTime = serviceOfferUuid.StartTime
                     };
-                    appointment.ServiceOffers.Add(serviceOffers);
+                    appointment.ScheduledServices!.Add(selectedService);
                 }
                 OperationResult<Guid, GenericError> result = await systemFacade.ScheduleAppointmentAsStaffAsync(appointment);
                 if (result.IsSuccessful)
@@ -389,8 +379,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     ConflictingServiceOfferUuid = a.Uuid,
                     StartTime = a.ServiceStartTime,
                     EndTime = a.ServiceEndTime,
-                    AssistantName = a.Assistant!.Name,
-                    AssistantUuid = a.Assistant!.Uuid!.Value
+                    AssistantName = a.ServiceOffer!.Assistant!.Name,
+                    AssistantUuid = a.ServiceOffer!.Assistant!.Uuid!.Value
                 }).ToList();
             }
             catch (System.Exception ex)

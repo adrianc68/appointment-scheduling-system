@@ -7,6 +7,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Respons
         public string? ServiceName { get; set; }
         public double? ServicePrice { get; set; }
         public int? ServiceMinutes { get; set; }
+        public string? ServiceDescription { get; set; }
         public Guid? ServiceUuid { get; set; }
     }
 }

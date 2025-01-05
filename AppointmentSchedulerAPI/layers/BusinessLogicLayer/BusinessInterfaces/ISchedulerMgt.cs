@@ -5,14 +5,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
 {
     public interface ISchedulerMgt
     {
-        // bool BlockTimeRange(DateTimeRange range);
-        // bool DeleteAssistantAppointments(int idAssistant);
         // bool DeleteAvailabilityTimeSlot(int idAvailabilityTimeSlot);
-        // bool DeleteAssistantAvailabilityTimeSlots(int idAssistant);
         // bool EditAvailabilityTimeSlot(int idAvailabilityTimeSlot, AvailabilityTimeSlot newAvailabilityTimeSlot);
         Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate);
         Task<List<ServiceOffer>> GetAvailableServicesAsync(DateOnly date);
-        Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
+        Task<List<ScheduledService>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
         Task<Appointment?> GetAppointmentByUuidAsync(Guid uuid);
         Task<Appointment?> GetAppointmentDetailsByUuidAsync(Guid uuid);
         Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsAsync(DateOnly startDate, DateOnly endDate);

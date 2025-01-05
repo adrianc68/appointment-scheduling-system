@@ -1,6 +1,6 @@
 namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model
 {
-    public class AppointmentServiceOffer
+    public class ScheduledService
     {
         public int? IdServiceOffer { get; set; }
         public int? IdAppointment { get; set; }

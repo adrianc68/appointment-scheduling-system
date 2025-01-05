@@ -34,9 +34,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<ServiceOffer>)await schedulerRepository.GetAvailableServicesAsync(date);
         }
 
-        public async Task<List<ServiceOffer>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
+        public async Task<List<ScheduledService>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range)
         {
-            return (List<ServiceOffer>)await schedulerRepository.GetConflictingServicesByDateTimeRangeAsync(range);
+            return (List<ScheduledService>)await schedulerRepository.GetConflictingServicesByDateTimeRangeAsync(range);
         }
 
         public async Task<bool> HasAssistantConflictingAppoinmentsAsync(DateTimeRange range, int idAssistant)
