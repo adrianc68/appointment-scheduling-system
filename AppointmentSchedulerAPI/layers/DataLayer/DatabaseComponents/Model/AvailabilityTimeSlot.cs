@@ -12,5 +12,5 @@ public partial class AvailabilityTimeSlot
     public DateTime? CreatedAt { get; set; }
     public AvailabilityTimeSlotStatusType Status { get; set; }
     public int? IdAssistant { get; set; }
-    public virtual Assistant Assistant { get; set; }
+    public virtual Assistant? Assistant { get; set; }
 }

@@ -126,7 +126,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var assistantId = await dbContext.Assistants
-                .Where(a => a.UserAccount.Uuid == uuid)
+                .Where(a => a.UserAccount!.Uuid == uuid)
                 .Select(a => a.IdUserAccount)
                 .FirstOrDefaultAsync();
             return assistantId;
@@ -138,15 +138,15 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var dbContext = context.CreateDbContext();
             var assistantDB = await dbContext.Assistants
                  .Include(a => a.UserAccount)
-                     .ThenInclude(ua => ua.UserInformation)
-                 .FirstOrDefaultAsync(a => a.UserAccount.Uuid == uuid);
+                     .ThenInclude(ua => ua!.UserInformation)
+                 .FirstOrDefaultAsync(a => a.UserAccount!.Uuid == uuid);
 
             if (assistantDB != null)
             {
                 assistant = new BusinessLogicLayer.Model.Assistant
                 {
-                    Id = assistantDB.UserAccount.Id,
-                    Name = assistantDB.UserAccount.UserInformation.Name,
+                    Id = assistantDB.UserAccount!.Id,
+                    Name = assistantDB.UserAccount.UserInformation!.Name,
                     PhoneNumber = assistantDB.UserAccount.UserInformation.PhoneNumber,
                     Email = assistantDB.UserAccount.Email,
                     Username = assistantDB.UserAccount.Username,
@@ -164,8 +164,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var dbContext = context.CreateDbContext();
             var assistantsDB = await dbContext.Assistants
               .Include(a => a.UserAccount)
-                  .ThenInclude(ua => ua.UserInformation)
-                  .Where(c => c.UserAccount.Role == RoleType.ASSISTANT && c.Status != AssistantStatusType.DELETED)
+                  .ThenInclude(ua => ua!.UserInformation)
+                  .Where(c => c.UserAccount!.Role == RoleType.ASSISTANT && c.Status != AssistantStatusType.DELETED)
               .ToListAsync();
 
             businessAssistants = assistantsDB
@@ -190,7 +190,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var dbContext = context.CreateDbContext();
             var serviceId = await dbContext.ServiceOffers
                 .Where(a => a.Uuid == uuid)
-                .Select(a => a.Service.Id)
+                .Select(a => a.Service!.Id!.Value)
                 .FirstOrDefaultAsync();
             return serviceId;
         }
@@ -200,20 +200,20 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             IEnumerable<BusinessLogicLayer.Model.Service> businessService = [];
             using var dbContext = context.CreateDbContext();
             var assistantDB = await dbContext.Assistants
-                .Include(a => a.ServiceOffers)
+                .Include(a => a.ServiceOffers!)
                     .ThenInclude(ase => ase.Service)
-                .FirstOrDefaultAsync(a => a.UserAccount.Uuid == uuid);
+                .FirstOrDefaultAsync(a => a.UserAccount!.Uuid == uuid);
 
             if (assistantDB == null)
             {
                 return [];
             }
 
-            businessService = assistantDB.ServiceOffers
-                .Where(ase => ase.Service.Status == ServiceStatusType.ENABLED)
+            businessService = assistantDB.ServiceOffers!
+                .Where(ase => ase.Service!.Status == ServiceStatusType.ENABLED)
                 .Select(ase => new BusinessLogicLayer.Model.Service
                 {
-                    Id = ase.Service.Id,
+                    Id = ase.Service!.Id!.Value,
                     Name = ase.Service.Name,
                     Description = ase.Service.Description,
                     Minutes = ase.Service.Minutes,
@@ -233,8 +233,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             var dbServiceOffer = await dbContext.ServiceOffers
                 .Include(a => a.Service)
                 .Include(a => a.Assistant)
-                    .ThenInclude(asi => asi.UserAccount)
-                    .ThenInclude(asc => asc.UserInformation)
+                    .ThenInclude(asi => asi!.UserAccount)
+                    .ThenInclude(asc => asc!.UserInformation)
                 .FirstOrDefaultAsync(a => a.Uuid == uuid);
 
             if (dbServiceOffer == null)
@@ -244,7 +244,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             {
                 Service = new BusinessLogicLayer.Model.Service
                 {
-                    Id = dbServiceOffer.Service.Id,
+                    Id = dbServiceOffer!.Service!.Id,
                     Name = dbServiceOffer.Service.Name,
                     Description = dbServiceOffer.Service.Description,
                     Minutes = dbServiceOffer.Service.Minutes,
@@ -258,7 +258,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType?)dbServiceOffer.Status,
                 Assistant = new BusinessLogicLayer.Model.Assistant
                 {
-                    Id = dbServiceOffer.Assistant.IdUserAccount,
+                    Id = dbServiceOffer!.Assistant!.IdUserAccount,
                     Uuid = dbServiceOffer.Assistant.UserAccount!.Uuid,
                     Email = dbServiceOffer.Assistant.UserAccount.Email!,
                     Name = dbServiceOffer.Assistant.UserAccount.UserInformation!.Name!,
@@ -274,7 +274,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var serviceOfferDB = await dbContext.ServiceOffers
-                .Where(a => a.IdService == idService && a.IdAssistant == idAssistant && a.Assistant.Status != AssistantStatusType.DELETED && a.Service.Status != ServiceStatusType.DELETED)
+                .Where(a => a.IdService == idService && a.IdAssistant == idAssistant && a.Assistant!.Status != AssistantStatusType.DELETED && a.Service!.Status != ServiceStatusType.DELETED)
                 .FirstOrDefaultAsync();
 
             return serviceOfferDB != null;
@@ -288,7 +288,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             try
             {
                 var assistantDb = await dbContext.Assistants
-                     .FirstOrDefaultAsync(ac => ac.UserAccount.Id == idAssistant);
+                     .FirstOrDefaultAsync(ac => ac.UserAccount!.Id == idAssistant);
 
                 if (assistantDb == null)
                 {
@@ -328,7 +328,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 userAccount.Email = assistant.Email;
                 userAccount.Username = assistant.Username;
                 userAccount.Role = RoleType.ASSISTANT;
-                userAccount.UserInformation.Name = assistant.Name;
+                userAccount.UserInformation!.Name = assistant.Name;
                 userAccount.UserInformation.PhoneNumber = assistant.PhoneNumber;
 
                 await dbContext.SaveChangesAsync();

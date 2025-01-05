@@ -98,7 +98,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var clientID = await dbContext.Clients
-                .Where(a => a.UserAccount.Uuid == uuid)
+                .Where(a => a.UserAccount!.Uuid == uuid)
                 .Select(a => a.IdUserAccount)
                 .FirstOrDefaultAsync();
             return clientID;
@@ -110,8 +110,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var dbContext = context.CreateDbContext();
             var clientsDB = await dbContext.Clients
                 .Include(a => a.UserAccount)
-                  .ThenInclude(ua => ua.UserInformation)
-                  .Where(c => c.UserAccount.Role == RoleType.CLIENT && c.Status != ClientStatusType.DELETED)
+                  .ThenInclude(ua => ua!.UserInformation)
+                  .Where(c => c.UserAccount!.Role == RoleType.CLIENT && c.Status != ClientStatusType.DELETED)
               .ToListAsync();
 
             businessClient = clientsDB
@@ -137,15 +137,15 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var dbContext = context.CreateDbContext();
             var clientDB = await dbContext.Clients
                  .Include(a => a.UserAccount)
-                     .ThenInclude(ua => ua.UserInformation)
-                 .FirstOrDefaultAsync(a => a.UserAccount.Uuid == uuid);
+                     .ThenInclude(ua => ua!.UserInformation)
+                 .FirstOrDefaultAsync(a => a.UserAccount!.Uuid == uuid);
 
             if (clientDB != null)
             {
                 client = new BusinessLogicLayer.Model.Client
                 {
-                    Id = clientDB.UserAccount.Id,
-                    Name = clientDB.UserAccount.UserInformation.Name,
+                    Id = clientDB.UserAccount!.Id,
+                    Name = clientDB.UserAccount.UserInformation!.Name,
                     PhoneNumber = clientDB.UserAccount.UserInformation.PhoneNumber,
                     Email = clientDB.UserAccount.Email,
                     Username = clientDB.UserAccount.Username,
@@ -165,7 +165,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             try
             {
                 var clientDb = await dbContext.Clients
-                     .FirstOrDefaultAsync(ac => ac.UserAccount.Id == idClient);
+                     .FirstOrDefaultAsync(ac => ac.UserAccount!.Id == idClient);
 
                 if (clientDb == null)
                 {
@@ -205,7 +205,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 userAccount.Email = client.Email;
                 userAccount.Username = client.Username;
                 userAccount.Role = RoleType.CLIENT;
-                userAccount.UserInformation.Name = client.Name;
+                userAccount.UserInformation!.Name = client.Name;
                 userAccount.UserInformation.PhoneNumber = client.PhoneNumber;
 
                 await dbContext.SaveChangesAsync();
