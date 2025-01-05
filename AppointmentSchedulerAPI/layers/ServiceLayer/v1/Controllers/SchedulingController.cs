@@ -29,15 +29,62 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         //     throw new NotImplementedException();
         // }
 
-        // public IActionResult DeleteAvailabilityTimeSlot()
-        // {
-        //     throw new NotImplementedException();
-        // }
 
-        // public IActionResult EditAvailabilityTimeSlot()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPut("availabilityTimeSlot")]
+        [AllowAnonymous]
+        public async Task<IActionResult> EditAvailabilityTimeSlot([FromBody] UpdateAvailabilityTimeSlotDTO dto)
+        {
+            bool isUpdated = false;
+            try
+            {
+                AvailabilityTimeSlot availabilityTimeSlot = new AvailabilityTimeSlot
+                {
+                    Uuid = dto.Uuid,
+                    Date = dto.Date,
+                    EndTime = dto.EndTime,
+                    StartTime = dto.StartTime
+                };
+
+                OperationResult<bool, GenericError> result = await systemFacade.EditAvailabilityTimeSlot(availabilityTimeSlot);
+                if (result.IsSuccessful)
+                {
+                    isUpdated = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isUpdated, ApiVersionEnum.V1);
+        }
+
+        [HttpDelete("availabilityTimeSlot")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeleteAvailabilityTimeSlot([FromBody] DeleteAvailabilityTimeSlotDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DeleteAvailabilityTimeSlotAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
 
         [HttpPost("availabilityTimeSlot")]
         [AllowAnonymous]

@@ -5,12 +5,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
         IScheduleAppointmentClientSelf,
         IAssignAvailabilityTimeSlot,
         IEditAppointment,
+        IEditAvailabilityTimeSlot,
         IFinalizeAppointment,
         ICancelAppointmentStaffAssisted,
         ICancelAppointmentClientSelf,
         IGetAvailabilityTimeSlot,
         IDisableServiceOffer,
         IEnableServiceOffer,
+        IDeleteAvailabilityTimeSlot,
         IGetAppointment
     {
     }

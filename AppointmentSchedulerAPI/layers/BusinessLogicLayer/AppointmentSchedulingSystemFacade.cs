@@ -27,9 +27,78 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             this.envService = envService;
         }
 
-        public bool EditAppointment(Appointment appointment)
+        public Task<OperationResult<bool, GenericError>> EditAppointment(Appointment appointment)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<OperationResult<bool, GenericError>> EditAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot)
+        {
+            AvailabilityTimeSlot? slotData = await schedulerMgr.GetAvailabilityTimeSlotByUuidAsync(availabilityTimeSlot.Uuid!.Value);
+
+            if (slotData == null)
+            {
+                GenericError genericError = new GenericError($"Availability time slot with UUID: <{availabilityTimeSlot.Uuid}> is not registered", []);
+                genericError.AddData("AvailabilityTimeSlotUuid", availabilityTimeSlot.Uuid!.Value);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_FOUND);
+            }
+            availabilityTimeSlot.Id = slotData.Id;
+
+            if (slotData.Status == AvailabilityTimeSlotStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Cannot modify AvailabilityTimeSlot with UUID: <{availabilityTimeSlot.Uuid}> was deleted", []);
+                genericError.AddData("AvailabilityTimeSlotUuid", availabilityTimeSlot.Uuid!.Value);
+                genericError.AddData("Status", availabilityTimeSlot.Status);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_FOUND);
+            }
+
+            // 0. Check valid range time
+            if (!(availabilityTimeSlot.StartTime < availabilityTimeSlot.EndTime || availabilityTimeSlot.StartTime == TimeOnly.MinValue))
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("Range provided is not valid"), MessageCodeType.INVALID_RANGE_TIME);
+            }
+
+            // 1. Get account data
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(slotData.Assistant!.Uuid!.Value);
+            if (assistantData == null)
+            {
+                GenericError genericError = new GenericError($"Assistant UUID <{slotData.Assistant!.Uuid!.Value}> is not registered", []);
+                genericError.AddData("AssistantUuid", slotData.Assistant!.Uuid!.Value);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+            }
+
+            if (assistantData.Status != AssistantStatusType.ENABLED)
+            {
+                GenericError genericError = new GenericError($"Cannot assign slot. Assistant with UUID <{assistantData!.Uuid!.Value}>. Assistant is unavailable!", []);
+                genericError.AddData("AssistantUuid", assistantData!.Uuid.Value);
+                genericError.AddData("Status", assistantData.Status!.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_UNAVAILABLE);
+            }
+
+            availabilityTimeSlot.Assistant = assistantData;
+
+            // 2. Verify that no existing slot conflicts with the provided time range
+            DateTimeRange range = new()
+            {
+                Date = availabilityTimeSlot.Date!.Value,
+                StartTime = availabilityTimeSlot.StartTime!.Value,
+                EndTime = availabilityTimeSlot.EndTime!.Value
+            };
+
+            bool hasConflictWithAnotherSlot = await schedulerMgr.HasAvailabilityTimeSlotConflictingSlotsAsync(range, slotData!.Id!.Value, assistantData.Id!.Value);
+            if (hasConflictWithAnotherSlot)
+            {
+                GenericError genericError = new("Time range has conflicts with another slots", []);
+                genericError.AdditionalData!.Add("Range", range);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_HAS_CONFLICTS);
+            }
+
+            bool isUpdated = await schedulerMgr.UpdateAvailabilityTimeSlot(availabilityTimeSlot);
+            if (!isUpdated)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
         }
 
         public Task<List<ServiceOffer>> GetAvailableServicesClientAsync(DateOnly date)
@@ -348,7 +417,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
             return OperationResult<Guid, GenericError>.Success(UuidNewservice.Value);
         }
-
 
         public async Task<OperationResult<bool, GenericError>> DisableServiceOfferAsync(Guid serviceOfferUuid)
         {
@@ -679,6 +747,33 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
             }
             return OperationResult<bool, GenericError>.Success(true);
+        }
+
+        public async Task<OperationResult<bool, GenericError>> DeleteAvailabilityTimeSlotAsync(Guid uuid)
+        {
+            AvailabilityTimeSlot? slotData = await schedulerMgr.GetAvailabilityTimeSlotByUuidAsync(uuid);
+            if (slotData == null)
+            {
+                GenericError genericError = new GenericError($"Availability time slot with UUID: <{uuid}> is not registered", []);
+                genericError.AddData("AvailabilityTimeSlotUuid", uuid);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_FOUND);
+            }
+
+            if (slotData.Status == AvailabilityTimeSlotStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Availability time slot with UUID: <{uuid}> is already deleted", []);
+                genericError.AddData("AvailabilityTimeSlotUuid", uuid);
+                genericError.AddData("Status", slotData.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_DELETED);
+            }
+
+            bool isStatusChanged = await schedulerMgr.ChangeAvailabilityStatusTypeAsync(slotData.Id!.Value, AvailabilityTimeSlotStatusType.DELETED);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
+
         }
 
         public async Task<OperationResult<bool, GenericError>> AssignListServicesToAssistantAsync(Guid assistantUuid, List<Guid> servicesUuids)

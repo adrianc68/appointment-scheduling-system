@@ -1,10 +1,10 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces
 {
     public interface IEditAppointment
     {
-        bool EditAppointment(Appointment appointment);
+        Task<OperationResult<bool, GenericError>> EditAppointment(Appointment appointment);
     }
 }

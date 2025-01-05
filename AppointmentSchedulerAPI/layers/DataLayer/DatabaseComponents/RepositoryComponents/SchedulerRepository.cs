@@ -1,4 +1,3 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -179,7 +178,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Date = slot.Date,
                     StartTime = slot.StartTime,
                     EndTime = slot.EndTime,
-                    Status = (AvailabilityTimeSlotStatusType)slot.Status,
+                    Status = (BusinessLogicLayer.Model.Types.AvailabilityTimeSlotStatusType)slot.Status,
                     Assistant = new BusinessLogicLayer.Model.Assistant
                     {
                         Name = slot.Assistant!.UserAccount!.UserInformation!.Name,
@@ -568,16 +567,102 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 await transaction.RollbackAsync();
                 throw;
             }
-
             return true;
         }
 
-        public Task<bool> EditAvailabilityTimeSlot(BusinessLogicLayer.Model.AvailabilityTimeSlot newAvailabilityTimeSlot)
+        public async Task<BusinessLogicLayer.Model.AvailabilityTimeSlot?> GetAvailabilityTimeSlotByUuidAsync(Guid uuid)
         {
+            using var dbContext = context.CreateDbContext();
+            var availabilityTimeSlotDB = await dbContext.AvailabilityTimeSlots
+                    .Include(a => a.Assistant)
+                        .ThenInclude(ass => ass!.UserAccount)
+                        .ThenInclude(assc => assc!.UserInformation)
+                    .FirstOrDefaultAsync(a => a.Uuid == uuid);
 
-            throw new NotImplementedException();
+            var availabilityTimeSlotsModel = new BusinessLogicLayer.Model.AvailabilityTimeSlot
+            {
+                Id = availabilityTimeSlotDB!.Id,
+                Uuid = availabilityTimeSlotDB.Uuid,
+                Date = availabilityTimeSlotDB.Date,
+                StartTime = availabilityTimeSlotDB.StartTime,
+                EndTime = availabilityTimeSlotDB.EndTime,
+                Status = (BusinessLogicLayer.Model.Types.AvailabilityTimeSlotStatusType)availabilityTimeSlotDB.Status,
+                Assistant = new BusinessLogicLayer.Model.Assistant
+                {
+                    Name = availabilityTimeSlotDB.Assistant!.UserAccount!.UserInformation!.Name,
+                    Uuid = availabilityTimeSlotDB.Assistant.UserAccount.Uuid,
+                    Id = availabilityTimeSlotDB.Assistant.IdUserAccount
+                }
+            };
+
+            return availabilityTimeSlotsModel;
         }
 
+        public async Task<bool> ChangeAvailabilityStatusTypeAsync(int idAvailabilityTimeSlot, BusinessLogicLayer.Model.Types.AvailabilityTimeSlotStatusType status)
+        {
+            bool isStatusChanged = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
 
+            try
+            {
+                var timeSlot = await dbContext.AvailabilityTimeSlots.FirstOrDefaultAsync(a => a.Id == idAvailabilityTimeSlot);
+                if (timeSlot == null)
+                {
+                    return false;
+                }
+                timeSlot.Status = (Model.Types.AvailabilityTimeSlotStatusType)status;
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isStatusChanged = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isStatusChanged;
+        }
+
+        public async Task<bool> UpdateAvailabilityTimeSlot(BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot)
+        {
+            bool isUpdated = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var existingSlot = await dbContext.AvailabilityTimeSlots.FirstOrDefaultAsync(slot => slot.Id == availabilityTimeSlot.Id);
+                if (existingSlot == null)
+                {
+                    return false;
+                }
+
+                existingSlot.Date = availabilityTimeSlot.Date;
+                existingSlot.StartTime = availabilityTimeSlot.StartTime;
+                existingSlot.EndTime = availabilityTimeSlot.EndTime;
+
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isUpdated = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isUpdated;
+        }
+
+        public async Task<bool> HasAvailabilityTimeSlotConflictingSlotsAsync(BusinessLogicLayer.Model.Types.DateTimeRange range, int idAvailabilityTimeSlot, int idAssistant)
+        {
+            using var dbContext = context.CreateDbContext();
+            var availableServices = await dbContext.AvailabilityTimeSlots
+                .Where(slot => slot.Date == range.Date && slot.IdAssistant == idAssistant && slot.Status != Model.Types.AvailabilityTimeSlotStatusType.DELETED && slot.Id != idAvailabilityTimeSlot)
+                .ToListAsync();
+
+            bool hasConflict = availableServices.Any(slot => range.StartTime < slot.EndTime && range.EndTime > slot.StartTime);
+
+            return hasConflict;
+        }
     }
 }

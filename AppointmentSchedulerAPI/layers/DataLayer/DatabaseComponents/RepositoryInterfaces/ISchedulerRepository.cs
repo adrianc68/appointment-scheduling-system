@@ -8,7 +8,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
     public interface ISchedulerRepository
     {
         Task<bool> DeleteAvailabilityTimeSlot(int idAvailabilityTimeSlot);
-        Task<bool> EditAvailabilityTimeSlot(AvailabilityTimeSlot newAvailabilityTimeSlot);
+        Task<bool> UpdateAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot);
         Task<IEnumerable<ServiceOffer>> GetAvailableServicesAsync(DateOnly date);
         Task<Appointment?> GetAppointmentFullDetailsByUuidAsync(Guid uuid);
         Task<Appointment?> GetAppointmentByUuidAsync(Guid uuid);
@@ -16,11 +16,14 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<IEnumerable<Appointment>> GetScheduledOrConfirmedAppoinmentsAsync(DateOnly startDate, DateOnly endDate);
         Task<IEnumerable<Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate);
         Task<IEnumerable<AvailabilityTimeSlot>> GetAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate);
+        Task<bool> HasAvailabilityTimeSlotConflictingSlotsAsync(DateTimeRange date, int idAvailabilityTimeSlot, int idAssistant);
         Task<int?> GetAvailabilityTimeSlotIdByUuidAsync(Guid uuid);
+        Task<AvailabilityTimeSlot?> GetAvailabilityTimeSlotByUuidAsync(Guid uuid);
         Task<IEnumerable<ScheduledService>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
         Task<ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid);
         Task<bool> ChangeAppointmentStatusTypeAsync(int idApointment, AppointmentStatusType status);
         Task<bool> ChangeServiceOfferStatusTypeAsync(int idServiceOffer, ServiceOfferStatusType status);
+        Task<bool> ChangeAvailabilityStatusTypeAsync(int idAvailabilityTimeSlot, AvailabilityTimeSlotStatusType status);
         Task<bool> IsAssistantAvailableInAvailabilityTimeSlotsAsync(DateTimeRange range, int idAssistant);
         Task<bool> HasAssistantConflictingAppoinmentsAsync(DateTimeRange range, int idAssistant);
         Task<bool> IsAppointmentTimeSlotAvailableAsync(DateTimeRange range);
