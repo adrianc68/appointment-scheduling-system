@@ -12,7 +12,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model
         public ServiceOfferStatusType Status {get; set;}
         public virtual Assistant Assistant { get; set; }
         public virtual Service Service { get; set; }
-        public virtual IEnumerable<ScheduledService> AppointmentServiceOffer { get; set; }
+        public virtual IEnumerable<ScheduledService> ScheduledServices { get; set; }
 
     }
 }

@@ -217,7 +217,7 @@ public partial class AppointmentDbContext : DbContext
 
         modelBuilder.Entity<ScheduledService>(entity =>
         {
-            entity.ToTable("AppointmentServiceOffer");
+            entity.ToTable("ScheduledService");
             entity.HasKey(e => new { e.IdAppointment, e.IdServiceOffer });
 
             entity.Property(e => e.IdAppointment)
@@ -240,7 +240,7 @@ public partial class AppointmentDbContext : DbContext
                 .HasForeignKey(ase => ase.IdAppointment);
 
             entity.HasOne(e => e.ServiceOffer)
-                .WithMany(se => se.AppointmentServiceOffer)
+                .WithMany(se => se.ScheduledServices)
                 .HasForeignKey(sse => sse.IdServiceOffer);
         });
 
