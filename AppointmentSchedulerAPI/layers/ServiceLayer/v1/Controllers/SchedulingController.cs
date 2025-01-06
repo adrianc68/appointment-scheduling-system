@@ -30,6 +30,44 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         // }
 
 
+        [HttpPost("appointment/range/block")]
+        [AllowAnonymous]
+        public IActionResult BlockTimeRange([FromBody] BlockTimeRangeDTO dto)
+        {
+            DateTimeRange range = new DateTimeRange
+            {
+                Date = dto.Date,
+                StartTime = dto.StartTime,
+                EndTime = dto.EndTime
+            };
+            OperationResult<DateTime, GenericError> result = systemFacade.BlockTimeRange(range, dto.AccountUuid);
+            if (!result.IsSuccessful)
+            {
+                return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+            }
+            return httpResponseService.OkResponse(result.Result, ApiVersionEnum.V1);
+        }
+
+        [HttpDelete("appointment/range/unblock")]
+        [AllowAnonymous]
+        public IActionResult UnblockTimeRange([FromBody] BlockTimeRangeDTO dto)
+        {
+            DateTimeRange range = new DateTimeRange
+            {
+                Date = dto.Date,
+                StartTime = dto.StartTime,
+                EndTime = dto.EndTime
+            };
+            OperationResult<bool, GenericError> result = systemFacade.UnblockTimeRange(range, dto.AccountUuid);
+            if (!result.IsSuccessful)
+            {
+                return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+            }
+            return httpResponseService.OkResponse(result.Result, ApiVersionEnum.V1);
+        }
+
+
+
         [HttpPut("availabilityTimeSlot")]
         [AllowAnonymous]
         public async Task<IActionResult> EditAvailabilityTimeSlot([FromBody] UpdateAvailabilityTimeSlotDTO dto)

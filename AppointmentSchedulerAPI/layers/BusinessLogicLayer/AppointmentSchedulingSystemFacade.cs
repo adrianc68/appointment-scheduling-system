@@ -6,6 +6,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
@@ -18,6 +19,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         private readonly IClientMgt clientMgr;
         private readonly EnvironmentVariableService envService;
 
+        private static readonly Dictionary<DateOnly, List<UserSchedulingAppointment>> schedulingTimeRanges = new();
+        private static readonly Dictionary<Guid, DateTimeRange> activeSchedules = new();
+        private static readonly Dictionary<DateTimeRange, Timer> activeTimers = new();
+
+        private static readonly object scheduleLock = new();
+
+
         public AppointmentSchedulingSystemFacade(IServiceMgt serviceMgr, IAssistantMgt assistantMgr, IClientMgt clientMgr, ISchedulerMgt schedulerMgr, EnvironmentVariableService envService)
         {
             this.serviceMgr = serviceMgr;
@@ -26,6 +34,130 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             this.clientMgr = clientMgr;
             this.envService = envService;
         }
+
+        public OperationResult<DateTime, GenericError> BlockTimeRange(DateTimeRange range, Guid accountUuid)
+        {
+            lock (scheduleLock)
+            {
+                PropToString.PrintListData(schedulingTimeRanges);
+                if (activeSchedules.ContainsKey(accountUuid))
+                {
+                    GenericError genericError = new GenericError($"The user {accountUuid} has already blocked a time range.");
+                    genericError.AddData("AccountUuid", accountUuid);
+                    return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.USER_ALREADY_HAS_BLOCKED_RANGE);
+                }
+
+                if (range.StartTime >= range.EndTime)
+                {
+                    GenericError genericError = new GenericError($"Invalid range date time {range}. It must be StartTime > EndTime", []);
+                    genericError.AddData("Range", range);
+                    return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.INVALID_RANGE_TIME);
+                }
+
+                List<UserSchedulingAppointment> ranges = schedulingTimeRanges.ContainsKey(range.Date) ? schedulingTimeRanges[range.Date] : [];
+
+                if (!schedulingTimeRanges.ContainsKey(range.Date))
+                {
+                    schedulingTimeRanges[range.Date] = ranges;
+                }
+                foreach (var existingRange in ranges)
+                {
+                    if (range.StartTime < existingRange.Range.EndTime && range.EndTime > existingRange.Range.StartTime)
+                    {
+                        GenericError genericError = new GenericError($"Cannot block range time. Someone else is scheduling within range time", []);
+                        genericError.AddData("ExistingRange", existingRange.Range);
+                        genericError.AddData("SelectedRange", range);
+                        return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.SOMEONEONE_IS_SCHEDULING_IN_RANGE_TIME);
+                    }
+                }
+                activeSchedules[accountUuid] = range;
+                ranges.Add(new UserSchedulingAppointment(accountUuid, range));
+                int maxSecondschedulingLock = int.Parse(envService.Get("MAX_SECONDS_SCHEDULING_LOCK"));
+                DateTime lockDateTimeEnd = DateTime.Now.AddSeconds(maxSecondschedulingLock);
+
+                var timer = new Timer(state =>
+                {
+                    lock (scheduleLock)
+                    {
+                        System.Console.WriteLine("Timer is active and is runing !!!!");
+                        if (schedulingTimeRanges.TryGetValue(range.Date, out var todayRanges))
+                        {
+                            var rangeToRemove = todayRanges.FirstOrDefault(r => r.Range.StartTime == range.StartTime && r.Range.EndTime == range.EndTime);
+                            if (rangeToRemove != null)
+                            {
+                                todayRanges.Remove(rangeToRemove);
+                                if (todayRanges.Count == 0)
+                                {
+                                    schedulingTimeRanges.Remove(range.Date);
+                                }
+                                System.Console.WriteLine("Range found, Removing now!");
+                            }
+
+                            if (activeSchedules.ContainsKey(accountUuid) && activeSchedules[accountUuid] == range)
+                            {
+                                activeSchedules.Remove(accountUuid);
+                                System.Console.WriteLine($"User {accountUuid} unblocked now!");
+                            }
+                        }
+                    }
+                }, null, TimeSpan.FromSeconds(maxSecondschedulingLock), Timeout.InfiniteTimeSpan);
+                activeTimers[range] = timer;
+                return OperationResult<DateTime, GenericError>.Success(lockDateTimeEnd);
+            }
+        }
+
+        public OperationResult<bool, GenericError> UnblockTimeRange(DateTimeRange range, Guid accountUuid)
+        {
+            lock (scheduleLock)
+            {
+                PropToString.PrintListData(schedulingTimeRanges);
+
+                if (!schedulingTimeRanges.ContainsKey(range.Date))
+                {
+                    GenericError genericError = new GenericError($"No ranges found for the given date: {range.Date}");
+                    genericError.AddData("Date", range.Date);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.NO_DATE_LOCK_FOUND);
+                }
+
+                List<UserSchedulingAppointment> ranges = schedulingTimeRanges[range.Date];
+
+                var rangeToRemove = ranges.FirstOrDefault(r => r.Range.StartTime == range.StartTime && r.Range.EndTime == range.EndTime && r.AccountUuid == accountUuid);
+                if (rangeToRemove == null)
+                {
+                    GenericError genericError = new GenericError($"Range not found for removal: {range.StartTime} to {range.EndTime} in {range.Date}");
+                    genericError.AddData("Range", range);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.NO_DATE_TIME_RANGE_LOCK_FOUND);
+                }
+
+                PropToString.PrintListData(schedulingTimeRanges);
+                System.Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                PropToString.PrintListData(activeTimers);
+                System.Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+                System.Console.WriteLine("Trying to remove activeTimer!!");
+                if (activeTimers.TryGetValue(range, out var timer))
+                {
+                    timer.Dispose();
+                    activeTimers.Remove(range);
+                    System.Console.WriteLine("Timer active found!, Removing now!");
+                }
+                ranges.Remove(rangeToRemove);
+
+                if (activeSchedules.ContainsKey(accountUuid))
+                {
+                    activeSchedules.Remove(accountUuid);
+                    System.Console.WriteLine($"User {accountUuid} unblocked now!");
+                }
+
+                if (ranges.Count == 0)
+                {
+                    schedulingTimeRanges.Remove(range.Date);
+                }
+                return OperationResult<bool, GenericError>.Success(true);
+            }
+        }
+
+
 
         public Task<OperationResult<bool, GenericError>> EditAppointment(Appointment appointment)
         {
