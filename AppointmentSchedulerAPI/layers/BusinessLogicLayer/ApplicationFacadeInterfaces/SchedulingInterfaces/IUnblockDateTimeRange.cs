@@ -6,6 +6,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IUnblockDateTimeRange
     {
-      public OperationResult<bool, GenericError> UnblockTimeRange(DateTimeRange range, Guid accountUuid);
+      public OperationResult<bool, GenericError> UnblockTimeRange(Guid accountUuid);
     }
 }

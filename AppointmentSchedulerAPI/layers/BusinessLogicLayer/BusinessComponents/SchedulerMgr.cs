@@ -141,5 +141,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool hasConflict = await schedulerRepository.HasAvailabilityTimeSlotConflictingSlotsAsync(range, idAvailabilityTimeSlot, idAssistant);
             return hasConflict;
         }
+
+        public async Task<int> GetAppointmentsScheduledCountByClientUuid(int idClient)
+        {
+            int totalAppoinemnts = await schedulerRepository.GetAppointmentsScheduledCountByClientUuid(idClient);
+            return totalAppoinemnts;
+        }
     }
 }

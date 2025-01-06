@@ -30,6 +30,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<bool> IsAvailabilityTimeSlotRegisteredAsync(DateTimeRange range, int idAssistant);
         Task<bool> AddAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot);
         Task<bool> AddAppointmentAsync(Appointment appointment);
+        Task<int> GetAppointmentsScheduledCountByClientUuid(int idClient);
 
     }
 }

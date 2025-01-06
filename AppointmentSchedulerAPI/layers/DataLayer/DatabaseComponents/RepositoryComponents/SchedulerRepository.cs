@@ -664,5 +664,13 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
             return hasConflict;
         }
+
+        public async Task<int> GetAppointmentsScheduledCountByClientUuid(int idClient)
+        {
+            using var dbContext = context.CreateDbContext();
+            var count = await dbContext.Appointments
+                .Where(a => a.IdClient == idClient).CountAsync();
+            return count;
+        }
     }
 }

@@ -58,7 +58,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 StartTime = dto.StartTime,
                 EndTime = dto.EndTime
             };
-            OperationResult<bool, GenericError> result = systemFacade.UnblockTimeRange(range, dto.AccountUuid);
+            OperationResult<bool, GenericError> result = systemFacade.UnblockTimeRange(dto.AccountUuid);
             if (!result.IsSuccessful)
             {
                 return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
