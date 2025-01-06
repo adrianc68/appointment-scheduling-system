@@ -231,6 +231,27 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return serviceOffers;
         }
 
+        public async Task<IEnumerable<BusinessLogicLayer.Model.Types.DateTimeRange>> GetAppointmentDateTimeRangeConflictsByRange(BusinessLogicLayer.Model.Types.DateTimeRange range)
+        {
+            using var dbContext = context.CreateDbContext();
+            var conflicts = await dbContext.Appointments
+                .Where(a => a.Date == range.Date && a.StartTime < range.EndTime && a.EndTime > range.StartTime)
+                .ToListAsync();
+
+            if(conflicts == null)
+            {
+                return [];
+            }
+
+            List<BusinessLogicLayer.Model.Types.DateTimeRange> conflictingRanges = conflicts.Select(a => new BusinessLogicLayer.Model.Types.DateTimeRange {
+                StartTime = a.StartTime!.Value,
+                EndTime = a.EndTime!.Value,
+                Date = a.Date!.Value
+            }).ToList(); 
+
+            return conflictingRanges;
+        }
+
         public async Task<bool> IsAppointmentTimeSlotAvailableAsync(BusinessLogicLayer.Model.Types.DateTimeRange range)
         {
             using var dbContext = context.CreateDbContext();
@@ -669,7 +690,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var count = await dbContext.Appointments
-                .Where(a => a.IdClient == idClient).CountAsync();
+                .Where(a => a.IdClient == idClient && (a.Status == Model.Types.AppointmentStatusType.CONFIRMED || a.Status == Model.Types.AppointmentStatusType.SCHEDULED)).CountAsync();
             return count;
         }
     }

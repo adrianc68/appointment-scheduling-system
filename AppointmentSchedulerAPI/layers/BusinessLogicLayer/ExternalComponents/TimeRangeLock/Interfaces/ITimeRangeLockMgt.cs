@@ -8,6 +8,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
     {
         OperationResult<DateTime, GenericError> BlockTimeRange(DateTimeRange range, Guid accountUuid);
         OperationResult<bool, GenericError> UnblockTimeRange(Guid accountUuid);
+        OperationResult<bool, GenericError> ExtendTimeRange(DateTimeRange newRange, Guid accountUuid);
         OperationResult<DateTimeRange, GenericError> GetDateTimeRangeByAccountUuid(Guid accountUuid);
         OperationResult<Guid, GenericError> GetAccountUuidByDateTimeRange(DateTimeRange range);
     }

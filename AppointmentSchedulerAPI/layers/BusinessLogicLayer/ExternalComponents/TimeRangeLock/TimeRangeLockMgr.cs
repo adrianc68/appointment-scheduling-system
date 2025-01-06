@@ -39,7 +39,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                                               range.EndTime > b.Range.StartTime))
                 {
                     var error = new GenericError($"Cannot block range. Another range overlaps.");
-                    return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.SOMEONEONE_IS_SCHEDULING_IN_RANGE_TIME);
+                    return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.SOMEONE_ELSE_IS_SCHEDULING_IN_RANGE_TIME);
                 }
 
                 int maxSecondsLock = int.Parse(envService.Get("MAX_SECONDS_SCHEDULING_LOCK"));
@@ -60,6 +60,37 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                 return OperationResult<DateTime, GenericError>.Success(lockEndTime);
             }
         }
+
+
+        public OperationResult<bool, GenericError> ExtendTimeRange(DateTimeRange newRange, Guid accountUuid)
+        {
+            lock (scheduleLock)
+            {
+                if (newRange.StartTime >= newRange.EndTime)
+                {
+                    var error = new GenericError($"Invalid range: {newRange}. StartTime must be earlier than EndTime.");
+                    return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.INVALID_RANGE_TIME);
+                }
+
+                var existingBlock = schedulingBlocks.FirstOrDefault(b => b.AccountUuid == accountUuid);
+                if (existingBlock == null)
+                {
+                    var error = new GenericError($"No existing block found for user {accountUuid}.");
+                    return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.NO_DATE_TIME_RANGE_LOCK_FOUND);
+                }
+
+                if (schedulingBlocks.Any(b => b.AccountUuid != accountUuid &&
+                                              b.Range.Date == newRange.Date &&
+                                              newRange.StartTime < b.Range.EndTime &&
+                                              newRange.EndTime > b.Range.StartTime))
+                {
+                    var error = new GenericError($"Cannot extend range. Another range overlaps.");
+                    return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.SOMEONE_ELSE_IS_SCHEDULING_IN_RANGE_TIME);
+                }
+                return OperationResult<bool, GenericError>.Success(true);
+            }
+        }
+
 
         public OperationResult<bool, GenericError> UnblockTimeRange(Guid accountUuid)
         {
@@ -106,5 +137,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                 return OperationResult<Guid, GenericError>.Success(block.AccountUuid);
             }
         }
+
     }
 }

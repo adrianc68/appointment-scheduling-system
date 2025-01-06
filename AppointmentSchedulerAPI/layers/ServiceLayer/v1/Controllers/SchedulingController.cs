@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
@@ -24,23 +25,23 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
-        // public IActionResult EditAppointment()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
 
         [HttpPost("appointment/range/block")]
         [AllowAnonymous]
-        public IActionResult BlockTimeRange([FromBody] BlockTimeRangeDTO dto)
+        public async Task<IActionResult> BlockTimeRange([FromBody] BlockTimeRangeDTO dto)
         {
             DateTimeRange range = new DateTimeRange
             {
                 Date = dto.Date,
                 StartTime = dto.StartTime,
-                EndTime = dto.EndTime
             };
-            OperationResult<DateTime, GenericError> result = systemFacade.BlockTimeRange(range, dto.AccountUuid);
+
+            List<ScheduledService> services = dto.SelectedServices.Select(service => new ScheduledService
+            {
+                Uuid = service.Uuid
+            }).ToList();
+
+            OperationResult<DateTime, GenericError> result = await systemFacade.BlockTimeRange(services, range, dto.AccountUuid);
             if (!result.IsSuccessful)
             {
                 return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
@@ -50,14 +51,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpDelete("appointment/range/unblock")]
         [AllowAnonymous]
-        public IActionResult UnblockTimeRange([FromBody] BlockTimeRangeDTO dto)
+        public IActionResult UnblockTimeRange([FromBody] UnblockTimeRangeDTO dto)
         {
-            DateTimeRange range = new DateTimeRange
-            {
-                Date = dto.Date,
-                StartTime = dto.StartTime,
-                EndTime = dto.EndTime
-            };
             OperationResult<bool, GenericError> result = systemFacade.UnblockTimeRange(dto.AccountUuid);
             if (!result.IsSuccessful)
             {
@@ -414,7 +409,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 Appointment appointment = new Appointment
                 {
                     Date = dto.Date,
-                    Client = new Client { Uuid = dto.clientUuid },
+                    Client = new Client { Uuid = dto.ClientUuid },
                     ScheduledServices = [],
                     Uuid = Guid.CreateVersion7()
                 };

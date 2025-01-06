@@ -142,10 +142,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return hasConflict;
         }
 
-        public async Task<int> GetAppointmentsScheduledCountByClientUuid(int idClient)
+        public async Task<int> GetAppointmentsScheduledCountByClientId(int idClient)
         {
             int totalAppoinemnts = await schedulerRepository.GetAppointmentsScheduledCountByClientUuid(idClient);
             return totalAppoinemnts;
+        }
+
+        public async Task<List<DateTimeRange>> GetAppointmentDateTimeRangeConflictsByRange(DateTimeRange range)
+        {
+            List<DateTimeRange> ranges = (List<DateTimeRange>)await schedulerRepository.GetAppointmentDateTimeRangeConflictsByRange(range);
+            return ranges;   
         }
     }
 }
