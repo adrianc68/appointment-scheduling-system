@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -238,16 +239,17 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .Where(a => a.Date == range.Date && a.StartTime < range.EndTime && a.EndTime > range.StartTime)
                 .ToListAsync();
 
-            if(conflicts == null)
+            if (conflicts == null)
             {
                 return [];
             }
 
-            List<BusinessLogicLayer.Model.Types.DateTimeRange> conflictingRanges = conflicts.Select(a => new BusinessLogicLayer.Model.Types.DateTimeRange {
+            List<BusinessLogicLayer.Model.Types.DateTimeRange> conflictingRanges = conflicts.Select(a => new BusinessLogicLayer.Model.Types.DateTimeRange
+            {
                 StartTime = a.StartTime!.Value,
                 EndTime = a.EndTime!.Value,
                 Date = a.Date!.Value
-            }).ToList(); 
+            }).ToList();
 
             return conflictingRanges;
         }
@@ -308,34 +310,40 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         public async Task<IEnumerable<BusinessLogicLayer.Model.ScheduledService>> GetConflictingServicesByDateTimeRangeAsync(BusinessLogicLayer.Model.Types.DateTimeRange range)
         {
             using var dbContext = context.CreateDbContext();
-            var conflictingOffers = await dbContext.ScheduledServices
+
+            var rawConflicts = await dbContext.ScheduledServices
+                .Include(a => a.ServiceOffer)
+                    .ThenInclude(ase => ase!.Assistant)
+                    .ThenInclude(asac => asac!.UserAccount)
+                    .ThenInclude(uac => uac!.UserInformation)
                 .Where(aso =>
                     aso.Appointment!.Date == range.Date &&
                     !(range.EndTime <= aso.ServiceStartTime || range.StartTime >= aso.ServiceEndTime) &&
                     (aso.Appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED ||
-                    aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED))
-                .Select(aso => new BusinessLogicLayer.Model.ScheduledService
-                {
-                    Id = aso.ServiceOffer!.Id,
-                    Uuid = aso.ServiceOffer.Uuid,
-                    ServiceStartTime = aso.ServiceStartTime,
-                    ServiceEndTime = aso.ServiceEndTime,
-                    ServicePrice = aso.ServicePrice,
-                    ServiceName = aso.ServiceName,
-                    ServicesMinutes = aso.ServicesMinutes,
-                    ServiceOffer = new BusinessLogicLayer.Model.ServiceOffer
-                    {
-                        Id = aso.ServiceOffer.Id,
-                        Uuid = aso.ServiceOffer.Uuid,
-                        Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType?)aso.ServiceOffer.Status,
-                        Assistant = new BusinessLogicLayer.Model.Assistant
-                        {
-                            Uuid = aso.ServiceOffer.Assistant!.UserAccount!.Uuid,
-                            Name = aso.ServiceOffer.Assistant!.UserAccount.UserInformation!.Name
-                        }
-                    },
-                })
+                     aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED))
                 .ToListAsync();
+
+            var conflictingOffers = rawConflicts.Select(aso => new BusinessLogicLayer.Model.ScheduledService
+            {
+                Id = aso.ServiceOffer!.Id,
+                Uuid = aso.ServiceOffer.Uuid,
+                ServiceStartTime = aso.ServiceStartTime,
+                ServiceEndTime = aso.ServiceEndTime,
+                ServicePrice = aso.ServicePrice,
+                ServiceName = aso.ServiceName,
+                ServicesMinutes = aso.ServicesMinutes,
+                ServiceOffer = new BusinessLogicLayer.Model.ServiceOffer
+                {
+                    Id = aso.ServiceOffer.Id,
+                    Uuid = aso.ServiceOffer.Uuid,
+                    Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType?) aso.ServiceOffer.Status,
+                    Assistant = new BusinessLogicLayer.Model.Assistant
+                    {
+                        Uuid = aso.ServiceOffer.Assistant!.UserAccount!.Uuid,
+                        Name = aso.ServiceOffer.Assistant.UserAccount.UserInformation!.Name
+                    }
+                },
+            }).ToList();
             return conflictingOffers;
         }
 
@@ -599,6 +607,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                         .ThenInclude(ass => ass!.UserAccount)
                         .ThenInclude(assc => assc!.UserInformation)
                     .FirstOrDefaultAsync(a => a.Uuid == uuid);
+
+            if(availabilityTimeSlotDB == null)
+            {
+                return null;
+            }
 
             var availabilityTimeSlotsModel = new BusinessLogicLayer.Model.AvailabilityTimeSlot
             {

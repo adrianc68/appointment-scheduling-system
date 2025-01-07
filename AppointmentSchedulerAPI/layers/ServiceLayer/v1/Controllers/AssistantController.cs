@@ -32,7 +32,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isStatusChanged = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.DisableAssistantAsync(dto.AssistantUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.DisableAssistantAsync(dto.Uuid);
                 if (result.IsSuccessful)
                 {
                     isStatusChanged = result.Result;
@@ -56,7 +56,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isStatusChanged = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.EnableAssistantAsync(dto.AssistantUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.EnableAssistantAsync(dto.Uuid);
                 if (result.IsSuccessful)
                 {
                     isStatusChanged = result.Result;
@@ -80,7 +80,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isStatusChanged = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.DeleteAssistantAsync(dto.AssistantUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.DeleteAssistantAsync(dto.Uuid);
                 if (result.IsSuccessful)
                 {
                     isStatusChanged = result.Result;
@@ -195,7 +195,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isAssigned = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.AssignListServicesToAssistantAsync(assignServiceDTO.AssistantUuid, assignServiceDTO.ServicesUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.AssignListServicesToAssistantAsync(assignServiceDTO.AssistantUuid, assignServiceDTO.SelectedServices);
                 if (result.IsSuccessful)
                 {
                     isAssigned = result.Result;

@@ -114,7 +114,6 @@ builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtToke
 builder.Services.AddControllers();
 
 
-
 var app = builder.Build();
 
 // $$$>> This middlewares causes problems with authorization! Fix it 

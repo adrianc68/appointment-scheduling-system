@@ -4,6 +4,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -70,7 +71,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isUpdated = false;
             try
             {
-                AvailabilityTimeSlot availabilityTimeSlot = new AvailabilityTimeSlot
+                AvailabilityTimeSlot availabilityTimeSlot = new()
                 {
                     Uuid = dto.Uuid,
                     Date = dto.Date,
@@ -363,7 +364,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 Appointment appointment = new Appointment
                 {
                     Date = dto.Date,
-                    Client = new Client { Uuid = dto.clientUuid },
+                    Client = new Client { Uuid = dto.ClientUuid },
                     ScheduledServices = [],
                     Uuid = Guid.CreateVersion7()
                 };
@@ -477,7 +478,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isConfirmed = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.ConfirmAppointment(dto.AppointmentUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.ConfirmAppointment(dto.Uuid);
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;
@@ -502,7 +503,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isConfirmed = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.FinalizeAppointmentAsync(dto.AppointmentUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.FinalizeAppointmentAsync(dto.Uuid);
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;
@@ -528,7 +529,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             try
             {
                 // $$$> Get client uuid from authentication service
-                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelf(dto.AppointmentUuid, dto.clientUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelf(dto.AppointmentUuid, dto.ClientUuid);
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;

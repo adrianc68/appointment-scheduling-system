@@ -1,10 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
 {
     public class CreateAvailabilityTimeSlotDTO
     {
-        public DateOnly Date { get; set; }
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
-        public Guid AssistantUuid { get; set; }
+        [Required(ErrorMessage = "Date is required.")]
+        public required DateOnly Date { get; set; }
+        [Required(ErrorMessage = "StartTime is required.")]
+        public required TimeOnly StartTime { get; set; }
+        [Required(ErrorMessage = "EndTime is required.")]
+        public required TimeOnly EndTime { get; set; }
+        [Required(ErrorMessage = "AssistantUuid is required.")]
+        public required Guid AssistantUuid { get; set; }
     }
 }

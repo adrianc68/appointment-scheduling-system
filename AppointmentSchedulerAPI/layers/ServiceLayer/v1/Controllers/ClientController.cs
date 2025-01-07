@@ -34,7 +34,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isStatusChanged = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.DisableClientAsync(dto.clientUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.DisableClientAsync(dto.Uuid);
                 if (result.IsSuccessful)
                 {
                     isStatusChanged = result.Result;
@@ -58,7 +58,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isStatusChanged = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.EnableClientAsync(dto.clientUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.EnableClientAsync(dto.Uuid);
                 if (result.IsSuccessful)
                 {
                     isStatusChanged = result.Result;
@@ -83,7 +83,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isStatusChanged = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.DeleteClientAsync(dto.clientUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.DeleteClientAsync(dto.Uuid);
                 if (result.IsSuccessful)
                 {
                     isStatusChanged = result.Result;

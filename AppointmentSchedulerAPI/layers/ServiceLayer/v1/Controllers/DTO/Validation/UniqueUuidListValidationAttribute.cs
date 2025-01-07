@@ -1,7 +1,5 @@
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 
 public class UniqueUuidListValidationAttribute : ValidationAttribute
 {

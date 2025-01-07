@@ -1,18 +1,16 @@
 using System.ComponentModel.DataAnnotations;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 
 public class BlockTimeRangeDTO
 {
     [Required(ErrorMessage = "Date is required.")]
-    public DateOnly Date { get; set; }
+    public required DateOnly Date { get; set; }
     [Required(ErrorMessage = "StartTime is required")]
-    public TimeOnly StartTime { get; set; }
-
-    [Required(ErrorMessage = "SelectedServices cannot be null or empty.")]
-    [MinLength(1, ErrorMessage = "At least one service must be selected.")]
-    [UniqueUuidListValidation]
+    public required TimeOnly StartTime { get; set; }
+    [Required(ErrorMessage = "SelectedServices cannot be empty.")]
+    [MinLength(1, ErrorMessage = "You must select at least one service.")]
+    [UniqueUuidListValidation(ErrorMessage = "The selected services must have unique UUIDs.")]
     public required List<SelectedServiceDTO> SelectedServices { get; set; }
     [Required(ErrorMessage = "AccountUuid is required.")]
-    public Guid AccountUuid { get; set; }
+    public required Guid AccountUuid { get; set; }
 }
