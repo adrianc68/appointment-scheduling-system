@@ -39,7 +39,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
             List<ScheduledService> services = dto.SelectedServices.Select(service => new ScheduledService
             {
-                Uuid = service.Uuid
+                Uuid = service
             }).ToList();
 
             OperationResult<DateTime, GenericError> result = await systemFacade.BlockTimeRange(services, range, dto.AccountUuid);

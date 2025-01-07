@@ -9,8 +9,8 @@ public class BlockTimeRangeDTO
     public required TimeOnly StartTime { get; set; }
     [Required(ErrorMessage = "SelectedServices cannot be empty.")]
     [MinLength(1, ErrorMessage = "You must select at least one service.")]
-    [UniqueUuidListValidation(ErrorMessage = "The selected services must have unique UUIDs.")]
-    public required List<SelectedServiceDTO> SelectedServices { get; set; }
+    [UniqueGuidListValidation(ErrorMessage = "The SelectedServices must have unique UUIDs.")]
+    public required List<Guid> SelectedServices { get; set; }
     [Required(ErrorMessage = "AccountUuid is required.")]
     public required Guid AccountUuid { get; set; }
 }

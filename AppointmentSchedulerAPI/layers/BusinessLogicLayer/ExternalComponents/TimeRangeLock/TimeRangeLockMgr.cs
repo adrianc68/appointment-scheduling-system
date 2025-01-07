@@ -30,15 +30,29 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
 
                 if (range.StartTime >= range.EndTime)
                 {
-                    var error = new GenericError($"Invalid range: {range}. StartTime must be earlier than EndTime.");
-                    return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.INVALID_RANGE_TIME);
+                    GenericError genericError = new GenericError($"Invalid range. StartTime must be earlier thant EndTime");
+                    genericError.AddData("SelectedRange", range);
+                    return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.INVALID_RANGE_TIME);
                 }
 
-                if (schedulingBlocks.Any(b => b.Range.Date == range.Date &&
-                                              range.StartTime < b.Range.EndTime &&
-                                              range.EndTime > b.Range.StartTime))
+                var conflictingTimeRanges = schedulingBlocks
+                    .Where(b => b.Range.Date == range.Date &&
+                                range.StartTime < b.Range.EndTime &&
+                                range.EndTime > b.Range.StartTime)
+                    .Select(b => new
+                    {
+                        b.Range.Date,
+                        b.Range.StartTime,
+                        b.Range.EndTime
+                    })
+                    .ToList();
+
+
+                if (conflictingTimeRanges.Any())
                 {
-                    var error = new GenericError($"Cannot block range. Another range overlaps.");
+                    var error = new GenericError($"Cannot block the specified time range. Another time range is already blocked.", []);
+                    error.AddData("OverlappingTimeRanges:", conflictingTimeRanges);
+
                     return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.SOMEONE_ELSE_IS_SCHEDULING_IN_RANGE_TIME);
                 }
 
