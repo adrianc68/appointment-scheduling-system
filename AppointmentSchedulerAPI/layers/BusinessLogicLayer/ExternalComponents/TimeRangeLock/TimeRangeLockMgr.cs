@@ -60,6 +60,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                     ClientUuid = clientUuid,
                     Timer = timer,
                     Range = range,
+                    LockEndTime = lockEndTime,
                     Services = selectedServices.Select(service => new ServiceWithTime
                     {
                         StartTime = service.StartTime,
@@ -115,7 +116,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                     return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.NO_DATE_TIME_RANGE_LOCK_FOUND);
                 }
 
-                block.Timer.Dispose();
+                block.Timer!.Dispose();
                 schedulingBlocks.Remove(block);
 
                 return OperationResult<bool, GenericError>.Success(true);
@@ -136,17 +137,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
             }
         }
 
-        public OperationResult<Guid, GenericError> GetAccountUuidByDateTimeRange(DateTimeRange range)
+        public OperationResult<List<SchedulingBlock>, GenericError> GetSchedulingBlockByDate(DateOnly date)
         {
             lock (scheduleLock)
             {
-                var block = schedulingBlocks.FirstOrDefault(b => b.Range!.Equals(range));
-                if (block == null)
-                {
-                    var error = new GenericError($"No user found for the provided range: {range}");
-                    return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.NO_DATE_TIME_RANGE_LOCK_FOUND);
-                }
-                return OperationResult<Guid, GenericError>.Success(block.ClientUuid);
+                var blocks = schedulingBlocks.Where(b => b.Range!.Date == date).ToList();
+                return OperationResult<List<SchedulingBlock>, GenericError>.Success(blocks);
             }
         }
 

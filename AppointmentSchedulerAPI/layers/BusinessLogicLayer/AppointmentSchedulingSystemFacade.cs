@@ -37,6 +37,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
+        public OperationResult<List<SchedulingBlock>, GenericError> GetSchedulingBlockRanges(DateOnly date)
+        {
+            return timeRangeLockMgr.GetSchedulingBlockByDate(date);
+        }
+
         public async Task<OperationResult<DateTime, GenericError>> BlockTimeRange(List<ScheduledService> services, DateTimeRange range, Guid clientUuid)
         {
             DateTime currentDateTime = DateTime.Now;
@@ -1370,7 +1375,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     GenericError genericError = new GenericError($"The new date time range selected has conflicts with another appoinments.", []);
                     genericError.AddData("BlockedTimeRange", timeRangeBlockedByUser.Result);
                     genericError.AddData("SelectedTimeRange", appointmentRange);
-                    return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.USER_HAS_BLOCKED_DIFFERENT_TIME_RANGE);
+                    return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SLOT_UNAVAILABLE);
                 }
 
                 OperationResult<bool, GenericError> extendTimeRange = timeRangeLockMgr.ExtendTimeRange(appointmentRange, clientData.Uuid!.Value);
@@ -1430,5 +1435,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
             return OperationResult<Guid, GenericError>.Success(UuidRegistered.Value);
         }
+
     }
 }

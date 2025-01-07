@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeRangeLock.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
@@ -24,6 +25,30 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         {
             this.systemFacade = systemFacade;
             this.httpResponseService = httpResponseService;
+        }
+
+
+        [HttpGet("appointment/range")]
+        public IActionResult GetSchedulingBlocks([FromQuery] DateOnlyDTO dto)
+        {
+            DateOnly date = dto.Date;
+            OperationResult<List<SchedulingBlock>, GenericError> result = systemFacade.GetSchedulingBlockRanges(date);
+            if (!result.IsSuccessful)
+            {
+                if (result.Errors != null && result.Errors.Any())
+                {
+                    return httpResponseService.Conflict(result.Errors, ApiVersionEnum.V1, result.Code.ToString());
+                }
+                return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+
+            }
+            List<SchedulingBlockDTO> rangesBlocked = result.Result!.Select(slot => new SchedulingBlockDTO
+            {
+                Range = slot.Range,
+                Services = slot.Services,
+                LockEndtime = slot.LockEndTime
+            }).ToList();
+            return httpResponseService.OkResponse(rangesBlocked, ApiVersionEnum.V1);
         }
 
 

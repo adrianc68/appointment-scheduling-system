@@ -4,9 +4,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
 {
     public class SchedulingBlock
     {
-        public required Guid ClientUuid { get; set; }
+        public Guid? ClientUuid { get; set; }
         public DateTimeRange? Range { get; set; }
+        public DateTime LockEndTime { get; set; }
         public List<ServiceWithTime> Services { get; set; } = new();
-        public required Timer Timer { get; set; }
+        public Timer? Timer { get; set; }
     }
 }

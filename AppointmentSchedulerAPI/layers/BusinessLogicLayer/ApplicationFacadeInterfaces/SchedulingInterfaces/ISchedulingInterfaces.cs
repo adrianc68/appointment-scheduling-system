@@ -15,6 +15,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
         IDeleteAvailabilityTimeSlot,
         IBlockDateTimeRange,
         IUnblockDateTimeRange,
+        IGetSchedulingBlock,
         IGetAppointment
     {
     }
