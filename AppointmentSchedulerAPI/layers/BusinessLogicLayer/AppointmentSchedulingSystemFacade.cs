@@ -3,8 +3,8 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfa
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeRangeLock.Interfaces;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeRangeLock.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Interfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
@@ -20,9 +20,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         private readonly IAssistantMgt assistantMgr;
         private readonly IClientMgt clientMgr;
         private readonly EnvironmentVariableService envService;
-        private readonly ITimeRangeLockMgt timeRangeLockMgr;
+        private readonly ITimeSlotLockMgt timeRangeLockMgr;
 
-        public AppointmentSchedulingSystemFacade(IServiceMgt serviceMgr, IAssistantMgt assistantMgr, IClientMgt clientMgr, ISchedulerMgt schedulerMgr, ITimeRangeLockMgt timeRangeLockMgr, EnvironmentVariableService envService)
+        public AppointmentSchedulingSystemFacade(IServiceMgt serviceMgr, IAssistantMgt assistantMgr, IClientMgt clientMgr, ISchedulerMgt schedulerMgr, ITimeSlotLockMgt timeRangeLockMgr, EnvironmentVariableService envService)
         {
             this.serviceMgr = serviceMgr;
             this.schedulerMgr = schedulerMgr;
@@ -37,9 +37,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public OperationResult<List<SchedulingBlock>, GenericError> GetSchedulingBlockRanges(DateOnly date)
+        public OperationResult<List<BlockedTimeSlot>, GenericError> GetSchedulingBlockRanges(DateOnly date)
         {
-            return timeRangeLockMgr.GetSchedulingBlockByDate(date);
+            return timeRangeLockMgr.GetBlockedTimeSlotsByDate(date);
         }
 
         public async Task<OperationResult<DateTime, GenericError>> BlockTimeRange(List<ScheduledService> services, DateTimeRange range, Guid clientUuid)
@@ -106,7 +106,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             int scheduledAppoinmentsOfClientCount = await schedulerMgr.GetAppointmentsScheduledCountByClientId(clientData.Id!.Value);
             if (scheduledAppoinmentsOfClientCount >= MAX_APPOINTMENTS_PER_CLIENT)
             {
-                timeRangeLockMgr.UnblockTimeRange(clientData.Uuid!.Value);
+                timeRangeLockMgr.UnblockTimeSlot(clientData.Uuid!.Value);
                 GenericError genericError = new GenericError($"The client with UUID {clientData.Uuid} has reached the maximum allowed number of appoinments {MAX_APPOINTMENTS_PER_CLIENT}", []);
                 genericError.AddData("MaxAppointmentsPerClient", MAX_APPOINTMENTS_PER_CLIENT);
                 genericError.AddData("AppointmentsScheduledCount", scheduledAppoinmentsOfClientCount);
@@ -214,7 +214,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
 
         
-            List<ServiceWithTime> selectedServices = services.Select(service => new ServiceWithTime
+            List<ServiceTimeSlot> selectedServices = services.Select(service => new ServiceTimeSlot
             {
                 StartTime = service.ServiceStartTime!.Value,
                 EndTime = service.ServiceEndTime!.Value,
@@ -222,12 +222,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 AssistantUuid = service.ServiceOffer!.Assistant!.Uuid!.Value
             }).ToList();
 
-            return timeRangeLockMgr.BlockTimeRange(selectedServices, range, clientUuid);
+            return timeRangeLockMgr.BlockTimeSlot(selectedServices, range, clientUuid);
         }
 
         public OperationResult<bool, GenericError> UnblockTimeRange(Guid clientUuid)
         {
-            return timeRangeLockMgr.UnblockTimeRange(clientUuid);
+            return timeRangeLockMgr.UnblockTimeSlot(clientUuid);
         }
 
 
@@ -1277,7 +1277,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
             if (scheduledAppoinmentsOfClientCount >= MAX_APPOINTMENTS_PER_CLIENT)
             {
-                timeRangeLockMgr.UnblockTimeRange(clientData.Uuid!.Value);
+                timeRangeLockMgr.UnblockTimeSlot(clientData.Uuid!.Value);
                 GenericError genericError = new GenericError($"The client with UUID {clientData.Uuid} has reached the maximum allowed number of appoinments {MAX_APPOINTMENTS_PER_CLIENT}", []);
                 genericError.AddData("MaxAppointmentsPerClient", MAX_APPOINTMENTS_PER_CLIENT);
                 genericError.AddData("AppointmentsScheduledCount", scheduledAppoinmentsOfClientCount);
@@ -1357,7 +1357,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 Date = appointment.Date!.Value,
             };
 
-            OperationResult<DateTimeRange, GenericError> timeRangeBlockedByUser = timeRangeLockMgr.GetDateTimeRangeByAccountUuid(clientData.Uuid!.Value);
+            OperationResult<BlockedTimeSlot, GenericError> timeRangeBlockedByUser = timeRangeLockMgr.GetBlockedTimeSlotByClientUuid(clientData.Uuid!.Value);
             if (!timeRangeBlockedByUser.IsSuccessful)
             {
                 timeRangeBlockedByUser.Error!.AddData("TryBlockDateTimeRangeFirst", appointmentRange);
@@ -1365,7 +1365,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<Guid, GenericError>.Failure(timeRangeBlockedByUser.Error!, timeRangeBlockedByUser.Code);
             }
 
-            if (!(appointmentRange.StartTime >= timeRangeBlockedByUser.Result!.StartTime && appointmentRange.EndTime <= timeRangeBlockedByUser.Result.EndTime) && !timeRangeBlockedByUser.Result!.Equals(appointmentRange))
+            if (!(appointmentRange.StartTime >= timeRangeBlockedByUser.Result!.TotalServicesTimeRange!.StartTime && appointmentRange.EndTime <= timeRangeBlockedByUser.Result.TotalServicesTimeRange.EndTime) && !timeRangeBlockedByUser.Result!.Equals(appointmentRange))
             {
 
 
@@ -1378,7 +1378,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SLOT_UNAVAILABLE);
                 }
 
-                OperationResult<bool, GenericError> extendTimeRange = timeRangeLockMgr.ExtendTimeRange(appointmentRange, clientData.Uuid!.Value);
+                OperationResult<bool, GenericError> extendTimeRange = timeRangeLockMgr.ExtendBlockedTimeSlot(appointmentRange, clientData.Uuid!.Value);
                 if (!extendTimeRange.IsSuccessful)
                 {
                     GenericError error = new GenericError($"Cannot extend blocked time range, another blocked range overlaps. Remove some services", []);
@@ -1428,7 +1428,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
 
             Guid? UuidRegistered = await schedulerMgr.ScheduleAppointmentAsync(appointment);
-            timeRangeLockMgr.UnblockTimeRange(clientData.Uuid!.Value);
+            timeRangeLockMgr.UnblockTimeSlot(clientData.Uuid!.Value);
             if (UuidRegistered == null)
             {
                 return OperationResult<Guid, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.REGISTER_ERROR);

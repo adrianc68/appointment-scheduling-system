@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeRangeLock.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
@@ -32,7 +32,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         public IActionResult GetSchedulingBlocks([FromQuery] DateOnlyDTO dto)
         {
             DateOnly date = dto.Date;
-            OperationResult<List<SchedulingBlock>, GenericError> result = systemFacade.GetSchedulingBlockRanges(date);
+            OperationResult<List<BlockedTimeSlot>, GenericError> result = systemFacade.GetSchedulingBlockRanges(date);
             if (!result.IsSuccessful)
             {
                 if (result.Errors != null && result.Errors.Any())
@@ -42,11 +42,11 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
 
             }
-            List<SchedulingBlockDTO> rangesBlocked = result.Result!.Select(slot => new SchedulingBlockDTO
+            List<BlockedServiceTimeSlotDTO> rangesBlocked = result.Result!.Select(slot => new BlockedServiceTimeSlotDTO
             {
-                Range = slot.Range,
-                Services = slot.Services,
-                LockEndtime = slot.LockEndTime
+                TotalServicesTimeRange = slot.TotalServicesTimeRange,
+                ServicesSelected = slot.SelectedServices,
+                LockExpirationTime = slot.LockExpirationTime
             }).ToList();
             return httpResponseService.OkResponse(rangesBlocked, ApiVersionEnum.V1);
         }

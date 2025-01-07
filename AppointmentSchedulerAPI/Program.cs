@@ -6,7 +6,8 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfa
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeRangeLock.Interfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Interfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement.ExceptionHandlerService;
@@ -100,7 +101,7 @@ builder.Services.AddScoped<IAssistantRepository, AssistantRepository>();
 
 builder.Services.AddScoped<IExceptionHandlerService, ExceptionHandlerService>();
 builder.Services.AddScoped<IHttpResponseService, HttpResponseService>();
-builder.Services.AddScoped<ITimeRangeLockMgt, TimeRangeLockMgr>();
+builder.Services.AddScoped<ITimeSlotLockMgt, TimeSlotLockMgr>();
 
 builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtTokenResult>>(provider =>
 {

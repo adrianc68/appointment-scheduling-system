@@ -1,6 +1,6 @@
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeRangeLock.Model
+namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Model
 {
-    public class ServiceWithTime
+    public class ServiceTimeSlot
     {
         public Guid ServiceUuid { get; set; }
         public Guid AssistantUuid { get; set; }

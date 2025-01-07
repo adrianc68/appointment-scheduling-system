@@ -1,37 +1,35 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeRangeLock.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Interfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
 
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeRangeLock.Interfaces
+namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock
 {
-    public class TimeRangeLockMgr : ITimeRangeLockMgt
+    public class TimeSlotLockMgr : ITimeSlotLockMgt
     {
-        private static readonly List<SchedulingBlock> schedulingBlocks = new();
-
+        private static readonly List<BlockedTimeSlot> blockedTimeSlots = new();
         private readonly EnvironmentVariableService envService;
-
         private static readonly Lock scheduleLock = new();
 
-        public TimeRangeLockMgr(EnvironmentVariableService envService)
+        public TimeSlotLockMgr(EnvironmentVariableService envService)
         {
             this.envService = envService;
         }
 
-        public OperationResult<DateTime, GenericError> BlockTimeRange(List<ServiceWithTime> selectedServices, DateTimeRange range, Guid clientUuid)
+        public OperationResult<DateTime, GenericError> BlockTimeSlot(List<ServiceTimeSlot> selectedServices, DateTimeRange range, Guid clientUuid)
         {
             lock (scheduleLock)
             {
-                if (schedulingBlocks.Any(b => b.ClientUuid == clientUuid))
+                if (blockedTimeSlots.Any(b => b.ClientUuid == clientUuid))
                 {
                     var error = new GenericError($"The user {clientUuid} has already blocked a time range.", []);
                     return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.USER_ALREADY_HAS_BLOCKED_RANGE);
                 }
 
-                var conflictingServices = schedulingBlocks
-                    .Where(b => b.Range!.Date == range.Date)
-                    .SelectMany(b => b.Services)
+                var conflictingServices = blockedTimeSlots
+                    .Where(b => b.TotalServicesTimeRange!.Date == range.Date)
+                    .SelectMany(b => b.SelectedServices)
                     .Where(service => selectedServices.Any(newService =>
                         newService.StartTime < service.EndTime &&
                         newService.EndTime > service.StartTime &&
@@ -52,16 +50,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
 
                 var timer = new Timer(_ =>
                 {
-                    UnblockTimeRange(clientUuid);
+                    UnblockTimeSlot(clientUuid);
                 }, null, TimeSpan.FromSeconds(maxSecondsLock), Timeout.InfiniteTimeSpan);
 
-                schedulingBlocks.Add(new SchedulingBlock
+                blockedTimeSlots.Add(new BlockedTimeSlot
                 {
                     ClientUuid = clientUuid,
-                    Timer = timer,
-                    Range = range,
-                    LockEndTime = lockEndTime,
-                    Services = selectedServices.Select(service => new ServiceWithTime
+                    LockTimer = timer,
+                    TotalServicesTimeRange = range,
+                    LockExpirationTime = lockEndTime,
+                    SelectedServices = selectedServices.Select(service => new ServiceTimeSlot
                     {
                         StartTime = service.StartTime,
                         EndTime = service.EndTime,
@@ -75,7 +73,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
         }
 
 
-        public OperationResult<bool, GenericError> ExtendTimeRange(DateTimeRange newRange, Guid clientUuid)
+        public OperationResult<bool, GenericError> ExtendBlockedTimeSlot(DateTimeRange newRange, Guid clientUuid)
         {
             lock (scheduleLock)
             {
@@ -85,17 +83,17 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                     return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.INVALID_RANGE_TIME);
                 }
 
-                var existingBlock = schedulingBlocks.FirstOrDefault(b => b.ClientUuid == clientUuid);
+                var existingBlock = blockedTimeSlots.FirstOrDefault(b => b.ClientUuid == clientUuid);
                 if (existingBlock == null)
                 {
                     var error = new GenericError($"No existing block found for user {clientUuid}.");
                     return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.NO_DATE_TIME_RANGE_LOCK_FOUND);
                 }
 
-                if (schedulingBlocks.Any(b => b.ClientUuid != clientUuid &&
-                                              b.Range!.Date == newRange.Date &&
-                                              newRange.StartTime < b.Range.EndTime &&
-                                              newRange.EndTime > b.Range.StartTime))
+                if (blockedTimeSlots.Any(b => b.ClientUuid != clientUuid &&
+                                              b.TotalServicesTimeRange!.Date == newRange.Date &&
+                                              newRange.StartTime < b.TotalServicesTimeRange.EndTime &&
+                                              newRange.EndTime > b.TotalServicesTimeRange.StartTime))
                 {
                     var error = new GenericError($"Cannot extend range. Another range overlaps.");
                     return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.SOMEONE_ELSE_IS_SCHEDULING_IN_RANGE_TIME);
@@ -105,44 +103,44 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
         }
 
 
-        public OperationResult<bool, GenericError> UnblockTimeRange(Guid clientUuid)
+        public OperationResult<bool, GenericError> UnblockTimeSlot(Guid clientUuid)
         {
             lock (scheduleLock)
             {
-                var block = schedulingBlocks.FirstOrDefault(b => b.ClientUuid == clientUuid);
+                var block = blockedTimeSlots.FirstOrDefault(b => b.ClientUuid == clientUuid);
                 if (block == null)
                 {
                     var error = new GenericError($"No blocked range found for user {clientUuid}");
                     return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.NO_DATE_TIME_RANGE_LOCK_FOUND);
                 }
 
-                block.Timer!.Dispose();
-                schedulingBlocks.Remove(block);
+                block.LockTimer!.Dispose();
+                blockedTimeSlots.Remove(block);
 
                 return OperationResult<bool, GenericError>.Success(true);
             }
         }
 
-        public OperationResult<DateTimeRange, GenericError> GetDateTimeRangeByAccountUuid(Guid clientUuid)
+        public OperationResult<BlockedTimeSlot, GenericError> GetBlockedTimeSlotByClientUuid(Guid clientUuid)
         {
             lock (scheduleLock)
             {
-                var block = schedulingBlocks.FirstOrDefault(b => b.ClientUuid == clientUuid);
+                var block = blockedTimeSlots.FirstOrDefault(b => b.ClientUuid == clientUuid);
                 if (block == null)
                 {
                     var error = new GenericError($"No blocked range found for user with UUID {clientUuid}.");
-                    return OperationResult<DateTimeRange, GenericError>.Failure(error, MessageCodeType.NO_DATE_TIME_RANGE_LOCK_FOUND);
+                    return OperationResult<BlockedTimeSlot, GenericError>.Failure(error, MessageCodeType.NO_DATE_TIME_RANGE_LOCK_FOUND);
                 }
-                return OperationResult<DateTimeRange, GenericError>.Success(block.Range!);
+                return OperationResult<BlockedTimeSlot, GenericError>.Success(block);
             }
         }
 
-        public OperationResult<List<SchedulingBlock>, GenericError> GetSchedulingBlockByDate(DateOnly date)
+        public OperationResult<List<BlockedTimeSlot>, GenericError> GetBlockedTimeSlotsByDate(DateOnly date)
         {
             lock (scheduleLock)
             {
-                var blocks = schedulingBlocks.Where(b => b.Range!.Date == date).ToList();
-                return OperationResult<List<SchedulingBlock>, GenericError>.Success(blocks);
+                var blocks = blockedTimeSlots.Where(b => b.TotalServicesTimeRange!.Date == date).ToList();
+                return OperationResult<List<BlockedTimeSlot>, GenericError>.Success(blocks);
             }
         }
 
