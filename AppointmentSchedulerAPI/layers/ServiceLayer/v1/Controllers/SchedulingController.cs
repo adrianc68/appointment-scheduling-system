@@ -310,7 +310,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     TotalCost = app.TotalCost,
                     Status = app.Status.ToString(),
                     CreatedAt = app.CreatedAt!.Value,
-                    Client = new ClientDTO
+                    Client = new ClientDetailsDTO
                     {
                         Name = app.Client!.Name,
                         Uuid = app.Client.Uuid,

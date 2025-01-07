@@ -101,11 +101,11 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllAssistant()
         {
-            List<AssistantDTO> assistantDtos = [];
+            List<AssistantDetailsDTO> assistantDtos = [];
             try
             {
                 var assistants = await systemFacade.GetAllAssistantsAsync();
-                assistantDtos = assistants.Select(a => new AssistantDTO
+                assistantDtos = assistants.Select(a => new AssistantDetailsDTO
                 {
                     Uuid = a.Uuid,
                     Email = a.Email,

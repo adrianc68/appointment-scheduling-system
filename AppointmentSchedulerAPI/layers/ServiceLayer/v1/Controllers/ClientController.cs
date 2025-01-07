@@ -105,11 +105,11 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllClient()
         {
-            List<ClientDTO> clientDTO = [];
+            List<ClientDetailsDTO> clientDTO = [];
             try
             {
                 var clients = await systemFacade.GetAllClientsAsync();
-                clientDTO = clients.Select(a => new ClientDTO
+                clientDTO = clients.Select(a => new ClientDetailsDTO
                 {
                     Uuid = a.Uuid,
                     Email = a.Email,

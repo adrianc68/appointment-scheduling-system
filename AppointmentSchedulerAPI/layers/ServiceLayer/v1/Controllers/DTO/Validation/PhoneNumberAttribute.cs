@@ -3,13 +3,13 @@ using System.Text.RegularExpressions;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Validation
 {
-    public class NoSpecialCharactersAttribute : ValidationAttribute
+    public class PhoneNumberAttribute : ValidationAttribute
     {
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
-            if (value is string str && Regex.IsMatch(str, @"[^a-zA-Z0-9]"))
+            if (value is string phoneNumber && !Regex.IsMatch(phoneNumber, @"^\+?\d{10,15}$"))
             {
-                return new ValidationResult("It must not contain special characters.");
+                return new ValidationResult("Phone number must be valid and include 10-15 digits.");
             }
             return ValidationResult.Success;
         }

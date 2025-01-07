@@ -26,11 +26,11 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllServices()
         {
-            List<ServiceDTO> serviceDtos = [];
+            List<ServiceDetailsDTO> serviceDtos = [];
             try
             {
                 var services = await systemFacade.GetAllServicesAsync();
-                serviceDtos = services.Select(a => new ServiceDTO
+                serviceDtos = services.Select(a => new ServiceDetailsDTO
                 {
                     Uuid = a.Uuid,
                     Status = a.Status.ToString(),

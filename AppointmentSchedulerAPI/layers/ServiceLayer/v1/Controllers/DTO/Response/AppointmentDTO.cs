@@ -9,7 +9,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Respons
         public string? Status { get; set; }
         public Double? TotalCost { get; set; }
         public DateTime CreatedAt { get; set;}
-        public ClientDTO? Client {get;set;}
+        public ClientDetailsDTO? Client {get;set;}
         public List<AsisstantOfferDTO>? Assistants { get; set;}
 
     }
