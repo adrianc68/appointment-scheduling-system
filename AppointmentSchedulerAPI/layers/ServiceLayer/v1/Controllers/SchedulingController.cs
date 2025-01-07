@@ -34,18 +34,24 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             DateTimeRange range = new DateTimeRange
             {
                 Date = dto.Date,
-                StartTime = dto.StartTime,
             };
 
             List<ScheduledService> services = dto.SelectedServices.Select(service => new ScheduledService
             {
-                Uuid = service
+                Uuid = service.Uuid,
+                ServiceStartTime = service.StartTime
             }).ToList();
 
-            OperationResult<DateTime, GenericError> result = await systemFacade.BlockTimeRange(services, range, dto.AccountUuid);
+
+            OperationResult<DateTime, GenericError> result = await systemFacade.BlockTimeRange(services, range, dto.ClientUuid);
             if (!result.IsSuccessful)
             {
+                if (result.Errors != null && result.Errors.Any())
+                {
+                    return httpResponseService.Conflict(result.Errors, ApiVersionEnum.V1, result.Code.ToString());
+                }
                 return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+
             }
             return httpResponseService.OkResponse(result.Result, ApiVersionEnum.V1);
         }
@@ -54,7 +60,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowAnonymous]
         public IActionResult UnblockTimeRange([FromBody] UnblockTimeRangeDTO dto)
         {
-            OperationResult<bool, GenericError> result = systemFacade.UnblockTimeRange(dto.AccountUuid);
+            OperationResult<bool, GenericError> result = systemFacade.UnblockTimeRange(dto.ClientUuid);
             if (!result.IsSuccessful)
             {
                 return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());

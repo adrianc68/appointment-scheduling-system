@@ -6,10 +6,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
 {
     public interface ITimeRangeLockMgt
     {
-        OperationResult<DateTime, GenericError> BlockTimeRange(DateTimeRange range, Guid accountUuid);
-        OperationResult<bool, GenericError> UnblockTimeRange(Guid accountUuid);
-        OperationResult<bool, GenericError> ExtendTimeRange(DateTimeRange newRange, Guid accountUuid);
-        OperationResult<DateTimeRange, GenericError> GetDateTimeRangeByAccountUuid(Guid accountUuid);
+        OperationResult<DateTime, GenericError> BlockTimeRange(List<ServiceWithTime> selectedServices, DateTimeRange range, Guid accountUuid);
+        OperationResult<bool, GenericError> UnblockTimeRange(Guid clientUuid);
+        OperationResult<bool, GenericError> ExtendTimeRange(DateTimeRange newRange, Guid clientUuid);
+        OperationResult<DateTimeRange, GenericError> GetDateTimeRangeByAccountUuid(Guid clientUuid);
         OperationResult<Guid, GenericError> GetAccountUuidByDateTimeRange(DateTimeRange range);
     }
 }

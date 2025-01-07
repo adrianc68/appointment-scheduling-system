@@ -30,7 +30,7 @@ builder.Services.AddDbContextFactory<AppointmentDbContext>((provider, options) =
 {
     var envService = provider.GetRequiredService<EnvironmentVariableService>();
     var connectionString = envService.Get("DEFAULT_DB_CONNECTION");
-    options.UseNpgsql(connectionString, o => 
+    options.UseNpgsql(connectionString, o =>
     {
         o.MapEnum<RoleType>("RoleType");
         o.MapEnum<AssistantStatusType>("AssistantStatusType");
