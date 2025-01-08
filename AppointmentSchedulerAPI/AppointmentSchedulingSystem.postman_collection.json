@@ -11,6 +11,28 @@
 			"item": [
 				{
 					"name": "/api/v1/service/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Obtener la respuesta de la API",
+									"let response = pm.response.json();",
+									"",
+									"// Extraer los UUIDs de los servicios en la respuesta",
+									"let servicesUuid = response.data.map(service => service.uuid);",
+									"",
+									"// Guardar los UUIDs en una variable de entorno o colección",
+									"pm.environment.set(\"services\", JSON.stringify(servicesUuid));",
+									"",
+									"console.log(\"Servicios UUID almacenados:\", servicesUuid);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -53,6 +75,36 @@
 				},
 				{
 					"name": "/api/v1/service/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const getRandomMinutes = (min, max) => {",
+									"    const range = Math.floor(max / 10) - Math.floor(min / 10);",
+									"    const randomFactor = Math.floor(Math.random() * (range + 1));",
+									"    return (Math.floor(min / 10) + randomFactor) * 10;",
+									"};",
+									"",
+									"const randomMinutes = getRandomMinutes(15, 120);",
+									"",
+									"pm.environment.set(\"randomMinutes\", randomMinutes);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -68,7 +120,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"Name\": \"Servicio 2\",\n  \"Description\": \"Servicio y descripcion de prueba\",\n  \"Minutes\": \"60\",\n  \"Price\": \"450\"\n}\n",
+							"raw": "{\n  \"Description\": \"{{$randomWords}}\",\n  \"Name\": \"{{$randomJobTitle}}\",\n  \"Minutes\": \"{{randomMinutes}}\",\n  \"Price\": \"{{$randomPrice}}\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -76,7 +128,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{server}}/api/v1/service/register",
+							"raw": "{{server}}/api/v1/service/",
 							"host": [
 								"{{server}}"
 							],
@@ -84,7 +136,211 @@
 								"api",
 								"v1",
 								"service",
-								"register"
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/service/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Name\": \"Servicio 6\",\n  \"Description\": \"Nuevo precio\",\n  \"Minutes\": \"35\",\n  \"Price\": \"1200\",\n  \"Uuid\": \"01943eda-a432-78b2-bb9d-aef938bd8d70\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/service/",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"service",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/service/delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ServiceUuid\":\"01943ed7-1881-713f-88fa-b87508379b39\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/service/delete",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"service",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/service/disable",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\":\"01941ed8-79f9-7019-bfac-673f11132a4b\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/service/disable",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"service",
+								"disable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/service/enable",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\":\"01941ed8-79f9-7019-bfac-673f11132a4b\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/service/enable",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"service",
+								"enable"
 							]
 						}
 					},
@@ -133,10 +389,59 @@
 			]
 		},
 		{
-			"name": "Assistant",
+			"name": "/api/v1/assistant",
 			"item": [
 				{
 					"name": "/api/v1/assistant",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const Allowed = {",
+									"    Uppers: \"QWERTYUIOPASDFGHJKLZXCVBNM\",",
+									"    Lowers: \"qwertyuiopasdfghjklzxcvbnm\",",
+									"    Numbers: \"1234567890\",",
+									"    Symbols: \"!@#$%^&*\"",
+									"};",
+									"",
+									"const getRandomCharFromString = (str) => str.charAt(Math.floor(Math.random() * str.length));",
+									"",
+									"const generatePassword = (length = 8) => {",
+									"    let pwd = \"\";",
+									"    pwd += getRandomCharFromString(Allowed.Uppers); // At least one uppercase",
+									"    pwd += getRandomCharFromString(Allowed.Lowers); // At least one lowercase",
+									"    pwd += getRandomCharFromString(Allowed.Numbers); // At least one number",
+									"    pwd += getRandomCharFromString(Allowed.Symbols); // At least one symbol",
+									"",
+									"    for (let i = pwd.length; i < length; i++) {",
+									"        pwd += getRandomCharFromString(Object.values(Allowed).join(''));",
+									"    }",
+									"    return pwd;",
+									"}",
+									"",
+									"",
+									"const password = generatePassword(12);",
+									"pm.environment.set(\"randomPassword\", password);",
+									"",
+									"const getRandomNumber = (n) => {",
+									"    let result = '';",
+									"    for (let i = 0; i < n; i++) {",
+									"        result += Math.floor(Math.random() * 10);",
+									"    }",
+									"    return result;",
+									"};",
+									"",
+									"const areaCode = \"55\";",
+									"const phoneNumber = getRandomNumber(10);",
+									"",
+									"pm.environment.set(\"randomPhoneNumber\", areaCode + phoneNumber);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -152,7 +457,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"ejemplo@example.com\",\n  \"password\": \"securepassword\",\n  \"username\": \"ejemplo\",\n  \"name\": \"Asistente\",\n  \"phoneNumber\": \"2234562323\"\n}\n",
+							"raw": "{\n  \"phoneNumber\": \"{{randomPhoneNumber}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"name\": \"{{$randomFullName}}\",\n  \"username\": \"{{$randomUserName}}\",\n  \"password\": \"{{randomPassword}}\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -160,7 +465,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{server}}/api/v1/assistant/register",
+							"raw": "{{server}}/api/v1/assistant/",
 							"host": [
 								"{{server}}"
 							],
@@ -168,7 +473,7 @@
 								"api",
 								"v1",
 								"assistant",
-								"register"
+								""
 							]
 						}
 					},
@@ -176,6 +481,228 @@
 				},
 				{
 					"name": "/api/v1/assistant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phoneNumber\": \"2285496811\",\n  \"email\": \"6@example.com\",\n  \"name\": \"5\",\n  \"username\": \"6\",\n  \"password\": \"securepassword\",\n  \"uuid\": \"01941ed8-e9a5-7c50-87c0-8a5e6c57d0e1\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/assistant/",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"assistant",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/assistant/disable",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\":\"01941edc-0369-7965-a593-88ba78fc54dc\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/assistant/disable",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"assistant",
+								"disable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/assistant/enable",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\":\"01941ed8-e9a5-7c50-87c0-8a5e6c57d0e1\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/assistant/enable",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"assistant",
+								"enable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/assistant/delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\":\"01941ed8-e9a5-7c50-87c0-8a5e6c57d0e1\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/assistant/delete",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"assistant",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/assistant/service",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"assistantUuid\": \"01943f3c-b50b-7209-87f7-d45da6bcf61a\",\n  \"selectedServices\": \n    [\"01942ded-5e91-74ca-99fb-a78c25be81a6\", \"01942ded-6578-72cc-b1d2-e79bd3afbd6e\"]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/assistant/service",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"assistant",
+								"service"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/assistant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();",
+									"",
+									"if (response.data && response.data.length > 0) {",
+									"    let assistant = response.data.map(assistant => {",
+									"        return {",
+									"            uuid: assistant.uuid,",
+									"        };",
+									"    });",
+									"",
+									"    pm.environment.set(\"assistants\", JSON.stringify(assistant));",
+									"",
+									"    console.log(\"Asistentes almacenados:\", assistant);",
+									"} else {",
+									"    console.log(\"No se encontraron datos en la respuesta.\");",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -211,6 +738,1347 @@
 								"v1",
 								"assistant",
 								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "api/v1/client",
+			"item": [
+				{
+					"name": "/api/v1/client",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const Allowed = {",
+									"    Uppers: \"QWERTYUIOPASDFGHJKLZXCVBNM\",",
+									"    Lowers: \"qwertyuiopasdfghjklzxcvbnm\",",
+									"    Numbers: \"1234567890\",",
+									"    Symbols: \"!@#$%^&*\"",
+									"};",
+									"",
+									"const getRandomCharFromString = (str) => str.charAt(Math.floor(Math.random() * str.length));",
+									"",
+									"const generatePassword = (length = 8) => {",
+									"    let pwd = \"\";",
+									"    pwd += getRandomCharFromString(Allowed.Uppers); // At least one uppercase",
+									"    pwd += getRandomCharFromString(Allowed.Lowers); // At least one lowercase",
+									"    pwd += getRandomCharFromString(Allowed.Numbers); // At least one number",
+									"    pwd += getRandomCharFromString(Allowed.Symbols); // At least one symbol",
+									"",
+									"    for (let i = pwd.length; i < length; i++) {",
+									"        pwd += getRandomCharFromString(Object.values(Allowed).join(''));",
+									"    }",
+									"    return pwd;",
+									"}",
+									"",
+									"",
+									"const password = generatePassword(12);",
+									"pm.environment.set(\"randomPassword\", password);",
+									"",
+									"const getRandomNumber = (n) => {",
+									"    let result = '';",
+									"    for (let i = 0; i < n; i++) {",
+									"        result += Math.floor(Math.random() * 10);",
+									"    }",
+									"    return result;",
+									"};",
+									"",
+									"const areaCode = \"55\";",
+									"const phoneNumber = getRandomNumber(10);",
+									"",
+									"pm.environment.set(\"randomPhoneNumber\", areaCode + phoneNumber);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phoneNumber\": \"{{randomPhoneNumber}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"name\": \"{{$randomFullName}}\",\n  \"username\": \"{{$randomUserName}}\",\n  \"password\": \"{{randomPassword}}\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/client/",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"client",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/client",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"client3@example.com\",\n  \"password\": \"securepassword\",\n  \"username\": \"client3\",\n  \"name\": \"Client2\",\n  \"phoneNumber\": \"232322212\",\n  \"uuid\": \"\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/client/",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"client",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/client/disable",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\":\"01942b30-302b-7d0d-a08a-aae7967d551e\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/client/disable",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"client",
+								"disable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/client/enable",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\":\"01941edc-0369-7965-a593-88ba78fc54dc\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/client/enable",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"client",
+								"enable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/client/delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\":\"01942b2d-443f-795a-9883-3aea476bf2e9\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/client/delete",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"client",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();",
+									"",
+									"if (response.data && response.data.length > 0) {",
+									"    let client = response.data.map(client => {",
+									"        return {",
+									"            uuid: client.uuid,",
+									"        };",
+									"    });",
+									"",
+									"    pm.environment.set(\"clients\", JSON.stringify(client));",
+									"",
+									"    console.log(\"Clientes almacenados:\", client);",
+									"} else {",
+									"    console.log(\"No se encontraron datos en la respuesta.\");",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/client/",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"client",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "api/v1/scheduling",
+			"item": [
+				{
+					"name": "/api/v1/scheduling/services/available",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/services/available?date=2024-12-26",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"services",
+								"available"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2024-12-26"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/availabilityTimeSlot/",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/availabilityTimeSlot?startDate=2024-1-11&endDate=2025-1-11",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"availabilityTimeSlot"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-1-11"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-1-11"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/availabilityTimeSlot",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let assistants = JSON.parse(pm.environment.get(\"assistants\"));",
+									"",
+									"let currentIndex = pm.environment.get(\"currentIndex\") || 0;",
+									"",
+									"if (currentIndex < assistants.length) {",
+									"    let currentUuid = assistants[currentIndex].uuid;",
+									"    pm.environment.set(\"assistantUuid\", currentUuid);",
+									"",
+									"    pm.environment.set(\"currentIndex\", ++currentIndex);",
+									"} else {",
+									"    pm.environment.unset(\"currentIndex\");",
+									"    console.log(\"Todas las solicitudes completadas.\");",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Date\": \"2024-12-26\",\n  \"StartTime\": \"9:00:00\",\n  \"EndTime\": \"17:00:00\",\n  \"AssistantUuid\": \"01943f38-1ec9-725f-9995-201b7c8e41ba\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/availabilityTimeSlot",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"availabilityTimeSlot"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/availabilityTimeSlot",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let assistants = JSON.parse(pm.environment.get(\"assistants\"));",
+									"",
+									"let currentIndex = pm.environment.get(\"currentIndex\") || 0;",
+									"",
+									"if (currentIndex < assistants.length) {",
+									"    let currentUuid = assistants[currentIndex].uuid;",
+									"    pm.environment.set(\"assistantUuid\", currentUuid);",
+									"",
+									"    pm.environment.set(\"currentIndex\", ++currentIndex);",
+									"} else {",
+									"    pm.environment.unset(\"currentIndex\");",
+									"    console.log(\"Todas las solicitudes completadas.\");",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Date\": \"2024-12-26\",\n  \"StartTime\": \"15:00:00\",\n  \"EndTime\": \"17:00:00\",\n  \"Uuid\": \"019437fc-afad-7cc5-bfc4-28ff083561e7\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/availabilityTimeSlot",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"availabilityTimeSlot"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/availabilityTimeSlot",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let assistants = JSON.parse(pm.environment.get(\"assistants\"));",
+									"",
+									"let currentIndex = pm.environment.get(\"currentIndex\") || 0;",
+									"",
+									"if (currentIndex < assistants.length) {",
+									"    let currentUuid = assistants[currentIndex].uuid;",
+									"    pm.environment.set(\"assistantUuid\", currentUuid);",
+									"",
+									"    pm.environment.set(\"currentIndex\", ++currentIndex);",
+									"} else {",
+									"    pm.environment.unset(\"currentIndex\");",
+									"    console.log(\"Todas las solicitudes completadas.\");",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\": \"01943473-1015-7499-a7b3-b4dcd14a06ce\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/availabilityTimeSlot",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"availabilityTimeSlot"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/staffOnly/{uuid}",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/staffOnly/019442cb-a50a-71a6-bf44-5f064071a54b",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"staffOnly",
+								"019442cb-a50a-71a6-bf44-5f064071a54b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/staffOnly",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/staffOnly?StartDate=2024-1-1&EndDate=2025-1-1",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"staffOnly"
+							],
+							"query": [
+								{
+									"key": "StartDate",
+									"value": "2024-1-1"
+								},
+								{
+									"key": "EndDate",
+									"value": "2025-1-1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment?StartDate=2024-1-1&EndDate=2025-1-1",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment"
+							],
+							"query": [
+								{
+									"key": "StartDate",
+									"value": "2024-1-1"
+								},
+								{
+									"key": "EndDate",
+									"value": "2025-1-1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/conflicting",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/conflict?StartTime=09:30:00&EndTime=20:00:00&Date=2024-12-26",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"conflict"
+							],
+							"query": [
+								{
+									"key": "StartTime",
+									"value": "09:30:00"
+								},
+								{
+									"key": "EndTime",
+									"value": "20:00:00"
+								},
+								{
+									"key": "Date",
+									"value": "2024-12-26"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/asClient",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": \"2024-12-26\",\n    \"clientUuid\": \"01943f43-d6cf-7353-aa3c-15bf260748af\",\n    \"selectedServices\": [\n        {\n            \"uuid\": \"01943f68-d608-767c-a79e-41c39931e22f\", \n            \"startTime\": \"11:00:00\"\n        },\n        {\n            \"uuid\": \"01943f68-6703-7bc2-b7d6-11320251fa7a\", \n            \"startTime\": \"12:40:00\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/asClient",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"asClient"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/asStaff",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2024-12-26\",\n  \"clientUuid\": \"0194346f-e646-7615-8b17-36c9452cfb9e\",\n  \"selectedServices\": [\n    {\n        \"uuid\": \"01943d81-036b-72b5-a3f7-06ce31dc5af7\",\n        \"startTime\": \"9:00:00\"\n    },\n        {\n        \"uuid\": \"01943d81-036b-72b5-a3f7-06ce31dc5af7\",\n        \"startTime\": \"9:00:00\"\n    }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/asStaff",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"asStaff"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/range/block",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"date\": \"2024-12-26\",\n    \"clientUuid\": \"01943f43-d6cf-7353-aa3c-15bf260748af\",\n    \"selectedServices\": [\n        {\n            \"uuid\": \"01943f68-d608-767c-a79e-41c39931e22f\", // 100 min\n            \"startTime\": \"9:00:00\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/range/block",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"range",
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/range/",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/range?Date=2024-12-26",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"range"
+							],
+							"query": [
+								{
+									"key": "Date",
+									"value": "2024-12-26"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/range/unblock",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ClientUuid\": \"01943f43-43da-7713-9d7a-381c5afd6ad9\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/range/unblock",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"range",
+								"unblock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/confirm",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\": \"01943d7d-d517-7b17-bd54-d483229dcfb6\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/confirm",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"confirm"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/serviceOffer/disable",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\": \"01942e00-ee75-7993-9a3b-4455d0d8eb07\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/serviceOffer/disable",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"serviceOffer",
+								"disable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/serviceOffer/enable",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\": \"01942e00-ee75-7993-9a3b-4455d0d8eb07\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/serviceOffer/enable",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"serviceOffer",
+								"enable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/finalize",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Uuid\": \"01942e00-ee75-7993-9a3b-4455d0d8eb07\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/finalize",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"finalize"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/cancel/asClient",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"AppointmentUuid\": \"01942e00-ee75-7993-9a3b-4455d0d8eb07\",\n  \"ClientUuid\": \"01942b2f-d7ff-7c85-83a4-c3ace775ddd2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/cancel/asClient",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"cancel",
+								"asClient"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/scheduling/appointment/cancel/asStaff",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"AppointmentUuid\": \"01942df0-48cc-7d36-b286-a113fb2b462c\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/scheduling/appointment/cancel/asStaff",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"scheduling",
+								"appointment",
+								"cancel",
+								"asStaff"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TestDBController",
+			"item": [
+				{
+					"name": "/api/v1/TestDBController/",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2024-12-26\",\n  \"startTime\": \"10:00:00\",\n  \"clientUuid\": \"01940971-f6fa-71d3-b15e-256143aa0d3a\",\n  \"selectedServices\": [\n    \"019409e5-4396-758f-9686-299fa87e2441\",\n    \"019409e5-4396-70d7-99cd-60096118fced\",\n    \"019409e5-4396-7992-b9a2-9092ea3d79df\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/TestDB/test",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"TestDB",
+								"test"
 							]
 						}
 					},
