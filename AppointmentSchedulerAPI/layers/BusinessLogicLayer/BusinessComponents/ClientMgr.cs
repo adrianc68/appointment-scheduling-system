@@ -3,6 +3,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.Obser
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
@@ -10,7 +11,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
     public class ClientMgr : IClientMgt, IClientEvent
     {
         private readonly IClientRepository clientRepository;
-        private readonly List<IClientObserver> observers = new();
+        private static readonly List<IClientObserver> observers = new();
 
         public ClientMgr(IClientRepository clientRepository)
         {
@@ -55,6 +56,17 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<bool> ChangeClientStatusTypeAsync(int idClient, ClientStatusType status)
         {
             bool isStatusChanged = await clientRepository.ChangeClientStatusTypeAsync(idClient, status);
+            if (isStatusChanged && (status == ClientStatusType.DISABLED || status == ClientStatusType.DELETED))
+            {
+                ClientEvent clientEvent = new()
+                {
+                    EventType = status == ClientStatusType.DISABLED ? ClientEventType.DISABLED : ClientEventType.DELETED,
+                    ClientId = idClient,
+                };
+                this.NotifySuscribers(clientEvent);
+            }
+
+
             return isStatusChanged;
         }
 
@@ -80,7 +92,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public void NotifySuscribers(ClientEvent eventType)
         {
-            foreach(var observer in observers)
+            eventType.EventDate = DateTime.UtcNow;
+            foreach (var observer in observers)
             {
                 observer.UpdateOnClientChanged(eventType);
             }
@@ -88,7 +101,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public void Suscribe(IClientObserver clientObserver)
         {
-            if(!observers.Contains(clientObserver))
+            if (!observers.Contains(clientObserver))
             {
                 observers.Add(clientObserver);
             }
@@ -96,7 +109,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public void Unsuscribe(IClientObserver clientObserver)
         {
-            if(observers.Contains(clientObserver))
+            if (observers.Contains(clientObserver))
             {
                 observers.Remove(clientObserver);
             }

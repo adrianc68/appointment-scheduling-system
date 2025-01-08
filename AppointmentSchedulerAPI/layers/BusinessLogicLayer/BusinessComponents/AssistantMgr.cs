@@ -11,7 +11,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
     public class AssistantMgr : IAssistantMgt, IAssistantEvent
     {
         private readonly IAssistantRepository assistantRepository;
-        private readonly List<IAssistantObserver> observers = new();
+        private static readonly List<IAssistantObserver> observers = new();
 
         public AssistantMgr(IAssistantRepository assistantRepository)
         {

@@ -6,6 +6,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfa
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Interfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
@@ -84,10 +85,15 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<EnvironmentVariableService>();
 
+builder.Services.AddScoped<IClientEvent, ClientMgr>();
+builder.Services.AddScoped<IClientObserver, SchedulerMgr>();
+
+
 builder.Services.AddScoped<ISchedulerMgt, SchedulerMgr>();
 builder.Services.AddScoped<IClientMgt, ClientMgr>();
 builder.Services.AddScoped<IAssistantMgt, AssistantMgr>();
 builder.Services.AddScoped<IServiceMgt, ServiceMgr>();
+
 
 builder.Services.AddScoped<ISchedulingInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IServiceInterfaces, AppointmentSchedulingSystemFacade>();
@@ -103,6 +109,8 @@ builder.Services.AddScoped<IExceptionHandlerService, ExceptionHandlerService>();
 builder.Services.AddScoped<IHttpResponseService, HttpResponseService>();
 builder.Services.AddScoped<ITimeSlotLockMgt, TimeSlotLockMgr>();
 
+
+
 builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtTokenResult>>(provider =>
 {
     return new JwtAuthenticationService(
@@ -116,6 +124,16 @@ builder.Services.AddControllers();
 
 
 var app = builder.Build();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var clientMgr = scope.ServiceProvider.GetRequiredService<IClientEvent>() as ClientMgr;
+    var schedulerMgr = scope.ServiceProvider.GetRequiredService<IClientObserver>() as SchedulerMgr;
+
+    clientMgr?.Suscribe(schedulerMgr!);
+}
+
 
 // $$$>> This middlewares causes problems with authorization! Fix it 
 // app.UseMiddleware<HttpResponseAuthorizationMiddleware>(); 

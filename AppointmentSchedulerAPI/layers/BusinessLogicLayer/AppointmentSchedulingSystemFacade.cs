@@ -8,9 +8,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeS
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
-using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 {

@@ -33,6 +33,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<bool> AddAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot);
         Task<bool> AddAppointmentAsync(Appointment appointment);
         Task<int> GetAppointmentsScheduledCountByClientUuid(int idClient);
+        Task<bool> CancelScheduledOrConfirmedAppointmentsOfClientById(int idClient);
 
     }
 }

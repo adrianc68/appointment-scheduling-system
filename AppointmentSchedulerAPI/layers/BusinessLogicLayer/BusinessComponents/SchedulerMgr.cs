@@ -1,12 +1,14 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
-    public class SchedulerMgr : ISchedulerMgt
+    public class SchedulerMgr : ISchedulerMgt, IClientObserver
     {
         private readonly ISchedulerRepository schedulerRepository;
 
@@ -156,6 +158,19 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             List<DateTimeRange> ranges = (List<DateTimeRange>)await schedulerRepository.GetAppointmentDateTimeRangeConflictsByRange(range);
             return ranges;   
+        }
+
+        public void UpdateOnClientChanged(ClientEvent clientEvent)
+        {
+            if(clientEvent.EventType == ClientEventType.DISABLED || clientEvent.EventType == ClientEventType.DELETED)
+            {
+                _ = this.CancelScheduledOrConfirmedAppointmentsOfClientById(clientEvent.ClientId!.Value);
+            }
+        }
+
+        public async Task<bool> CancelScheduledOrConfirmedAppointmentsOfClientById(int idAssistant)
+        {
+            return await schedulerRepository.CancelScheduledOrConfirmedAppointmentsOfClientById(idAssistant);
         }
     }
 }

@@ -707,5 +707,43 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .Where(a => a.IdClient == idClient && (a.Status == Model.Types.AppointmentStatusType.CONFIRMED || a.Status == Model.Types.AppointmentStatusType.SCHEDULED)).CountAsync();
             return count;
         }
+
+        public async Task<bool> CancelScheduledOrConfirmedAppointmentsOfClientById(int idClient)
+        {
+            bool isUpdated = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                var appointments = await dbContext.Appointments
+                      .Where(app =>
+                        app.IdClient == idClient &&
+                          app.Status == Model.Types.AppointmentStatusType.CONFIRMED ||
+                           app.Status == Model.Types.AppointmentStatusType.SCHEDULED)
+                      .ToListAsync();
+
+                if(appointments == null)
+                {
+                    return true;
+                }
+
+                foreach(var appointment in appointments)
+                {
+                    appointment.Status = Model.Types.AppointmentStatusType.CANCELED;
+                }
+
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isUpdated = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+
+            return isUpdated;
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
     public class ServiceMgr : IServiceMgt, IServiceEvent
     {
         private readonly IServiceRepository serviceRepository;
-        private readonly List<IServiceObserver> observers = new();
+        private static readonly List<IServiceObserver> observers = new();
 
         public ServiceMgr(IServiceRepository serviceRepository)
         {
