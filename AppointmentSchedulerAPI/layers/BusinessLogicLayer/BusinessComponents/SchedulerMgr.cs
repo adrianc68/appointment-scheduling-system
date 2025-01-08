@@ -79,7 +79,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<Guid?> ScheduleAppointmentAsync(Appointment appointment)
         {
             appointment.Uuid = Guid.CreateVersion7();
-
+            foreach(var scheduledService in appointment.ScheduledServices!)
+            {
+                scheduledService.Uuid = Guid.CreateVersion7();
+            }
             bool isRegistered = await schedulerRepository.AddAppointmentAsync(appointment);
             if (!isRegistered)
             {

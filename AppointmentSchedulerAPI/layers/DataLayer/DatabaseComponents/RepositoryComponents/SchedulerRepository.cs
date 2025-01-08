@@ -44,7 +44,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                         ServiceEndTime = scheduledService.ServiceEndTime!.Value,
                         ServicePrice = scheduledService.ServicePrice!.Value,
                         ServicesMinutes = scheduledService.ServicesMinutes!.Value,
-                        ServiceName = scheduledService.ServiceName
+                        ServiceName = scheduledService.ServiceName,
+                        Uuid = scheduledService.Uuid!.Value
                     };
                     dbContext.ScheduledServices.Add(scheduleServices);
                 }
@@ -336,7 +337,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Id = aso.ServiceOffer.Id,
                     Uuid = aso.ServiceOffer.Uuid,
-                    Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType?) aso.ServiceOffer.Status,
+                    Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType?)aso.ServiceOffer.Status,
                     Assistant = new BusinessLogicLayer.Model.Assistant
                     {
                         Uuid = aso.ServiceOffer.Assistant!.UserAccount!.Uuid,
@@ -608,7 +609,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                         .ThenInclude(assc => assc!.UserInformation)
                     .FirstOrDefaultAsync(a => a.Uuid == uuid);
 
-            if(availabilityTimeSlotDB == null)
+            if (availabilityTimeSlotDB == null)
             {
                 return null;
             }

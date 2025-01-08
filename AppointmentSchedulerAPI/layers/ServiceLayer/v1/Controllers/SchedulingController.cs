@@ -43,7 +43,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             }
             List<BlockedServiceTimeSlotDTO> rangesBlocked = result.Result!.Select(slot => new BlockedServiceTimeSlotDTO
             {
-                TotalServicesTimeRange = slot.TotalServicesTimeRange,
+                BlockedRange = slot.TotalServicesTimeRange,
                 BlockedServices = slot.SelectedServices.Select(blockedService => new AssistantServiceBlockedTimeSlotDataDTO 
                 {
                     Assistant = new AssistantBlockedTimeSlotDTO 

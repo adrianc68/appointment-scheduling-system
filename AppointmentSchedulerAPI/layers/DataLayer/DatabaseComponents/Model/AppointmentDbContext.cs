@@ -218,8 +218,10 @@ public partial class AppointmentDbContext : DbContext
         modelBuilder.Entity<ScheduledService>(entity =>
         {
             entity.ToTable("ScheduledService");
-            entity.HasKey(e => new { e.IdAppointment, e.IdServiceOffer });
-
+            entity.HasKey(e => e.Id);
+            
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
             entity.Property(e => e.IdAppointment)
                 .HasColumnName("id_appointment");
             entity.Property(e => e.IdServiceOffer)
@@ -234,6 +236,8 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnName("service_name");
             entity.Property(e => e.ServicesMinutes)
                 .HasColumnName("service_minutes");
+            entity.Property(e => e.Uuid)
+                .HasColumnName("uuid");
 
             entity.HasOne(e => e.Appointment)
                 .WithMany(a => a.ScheduledServices)

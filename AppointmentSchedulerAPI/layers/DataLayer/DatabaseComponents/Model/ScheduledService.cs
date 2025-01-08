@@ -9,6 +9,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model
         public string? ServiceName { get; set; }
         public int? ServicesMinutes { get; set; }
         public double? ServicePrice { get; set; }
+        public Guid? Uuid { get; set; }
+        public int? Id { get; set;}
 
         public virtual Appointment? Appointment { get; set; }
         public virtual ServiceOffer? ServiceOffer { get; set; }
