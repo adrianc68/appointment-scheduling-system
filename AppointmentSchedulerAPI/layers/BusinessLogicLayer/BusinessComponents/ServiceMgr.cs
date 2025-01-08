@@ -1,13 +1,17 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
-    public class ServiceMgr : IServiceMgt
+    public class ServiceMgr : IServiceMgt, IServiceEvent
     {
         private readonly IServiceRepository serviceRepository;
+        private readonly List<IServiceObserver> observers = new();
+
         public ServiceMgr(IServiceRepository serviceRepository)
         {
             this.serviceRepository = serviceRepository;
@@ -54,6 +58,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return serviceId != null;
         }
 
+        public async Task<bool> UpdateService(Service service)
+        {
+            bool isUpdated = await serviceRepository.UpdateService(service);
+            return isUpdated;
+        }
+
         public async Task<Guid?> RegisterServiceAsync(Service service)
         {
             service.Uuid = Guid.CreateVersion7();
@@ -65,11 +75,28 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return null;
         }
 
-        public async Task<bool> UpdateService(Service service)
+        public void Suscribe(IServiceObserver serviceObserver)
         {
-            bool isUpdated = await serviceRepository.UpdateService(service);
-            return isUpdated;
+            if (!observers.Contains(serviceObserver))
+            {
+                observers.Add(serviceObserver);
+            }
         }
 
+        public void Unsuscribe(IServiceObserver serviceObserver)
+        {
+            if(observers.Contains(serviceObserver))
+            {
+                observers.Remove(serviceObserver);
+            }
+        }
+
+        public void NotifySuscribers(ServiceEvent eventType)
+        {
+            foreach(var observer in observers)
+            {
+                observer.UpdateOnServiceChanged(eventType);
+            }
+        }
     }
 }

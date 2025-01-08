@@ -1,14 +1,17 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
-    public class AssistantMgr : IAssistantMgt
+    public class AssistantMgr : IAssistantMgt, IAssistantEvent
     {
         private readonly IAssistantRepository assistantRepository;
+        private readonly List<IAssistantObserver> observers = new();
 
         public AssistantMgr(IAssistantRepository assistantRepository)
         {
@@ -96,6 +99,30 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             bool isUpdated = await assistantRepository.UpdateAssistantAsync(assistant);
             return isUpdated;
+        }
+
+        public void NotifySuscribers(AssistantEvent eventType)
+        {
+            foreach (var observer in observers)
+            {
+                observer.UpdateOnAssistantChanged(eventType);
+            }
+        }
+
+        public void Suscribe(IAssistantObserver assistantObserver)
+        {
+            if (!observers.Contains(assistantObserver))
+            {
+                observers.Add(assistantObserver);
+            }
+        }
+
+        public void Unsuscribe(IAssistantObserver assistantObserver)
+        {
+            if (observers.Contains(assistantObserver))
+            {
+                observers.Remove(assistantObserver);
+            }
         }
     }
 }
