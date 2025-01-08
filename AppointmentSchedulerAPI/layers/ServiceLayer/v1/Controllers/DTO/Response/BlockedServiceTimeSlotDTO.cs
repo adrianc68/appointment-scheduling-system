@@ -6,7 +6,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Respons
     public class BlockedServiceTimeSlotDTO
     {
         public DateTimeRange? TotalServicesTimeRange { get; set; }
-        public List<ServiceTimeSlot>? ServicesSelected { get; set;}
+        public List<AssistantServiceBlockedTimeSlotDataDTO>? BlockedServices { get; set;}
         public DateTime? LockExpirationTime { get; set;}
     }
 }

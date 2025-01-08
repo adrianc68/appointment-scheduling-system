@@ -10,6 +10,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 {
@@ -149,7 +150,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
 
             services = services.OrderBy(so => so.ServiceStartTime).ToList();
-            
+
             List<GenericError> errorMessages = [];
             for (int i = 1; i < services.Count; i++)
             {
@@ -213,7 +214,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 }
             }
 
-        
+
             List<ServiceTimeSlot> selectedServices = services.Select(service => new ServiceTimeSlot
             {
                 StartTime = service.ServiceStartTime!.Value,
