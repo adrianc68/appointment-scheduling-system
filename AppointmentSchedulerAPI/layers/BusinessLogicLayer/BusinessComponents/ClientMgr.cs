@@ -56,13 +56,25 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<bool> ChangeClientStatusTypeAsync(int idClient, ClientStatusType status)
         {
             bool isStatusChanged = await clientRepository.ChangeClientStatusTypeAsync(idClient, status);
-            if (isStatusChanged && (status == ClientStatusType.DISABLED || status == ClientStatusType.DELETED))
+            if (isStatusChanged)
             {
-                ClientEvent clientEvent = new()
+                ClientEvent clientEvent = new ClientEvent
                 {
-                    EventType = status == ClientStatusType.DISABLED ? ClientEventType.DISABLED : ClientEventType.DELETED,
                     ClientId = idClient,
+                    EventType = ClientEventType.UPDATED
                 };
+                if (status == ClientStatusType.ENABLED)
+                {
+                    clientEvent.EventType = ClientEventType.ENABLED;
+                }
+                else if (status == ClientStatusType.DISABLED)
+                {
+                    clientEvent.EventType = ClientEventType.DISABLED;
+                }
+                else if (status == ClientStatusType.DELETED)
+                {
+                    clientEvent.EventType = ClientEventType.DELETED;
+                }
                 this.NotifySuscribers(clientEvent);
             }
             return isStatusChanged;

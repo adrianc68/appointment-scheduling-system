@@ -7,9 +7,10 @@ using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInte
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
-    public class SchedulerMgr : ISchedulerMgt, IClientObserver, IServiceObserver
+    public class SchedulerMgr : ISchedulerMgt, ISchedulerEvent, IClientObserver, IServiceObserver, IAssistantObserver, ISchedulerObserver
     {
         private readonly ISchedulerRepository schedulerRepository;
+        private static readonly List<ISchedulerObserver> observers = new();
 
         public SchedulerMgr(ISchedulerRepository SchedulerRepository)
         {
@@ -169,6 +170,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return await schedulerRepository.ChangeAllServiceOfferStatusByServiceId(idService, status);
         }
 
+        public async Task<bool> ChangeAllServiceOfferStatusByAssistantId(int idAssistant, ServiceOfferStatusType status)
+        {
+            return await schedulerRepository.ChangeAllServiceOfferStatusByAssistantId(idAssistant, status);
+        }
+
         public void UpdateOnClientChanged(ClientEvent clientEvent)
         {
             if (clientEvent.EventType == ClientEventType.DISABLED || clientEvent.EventType == ClientEventType.DELETED)
@@ -178,18 +184,92 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             }
         }
 
+        public async Task<bool> CancelScheduledOrConfirmedAppointmentsOfAssistantById(int idAssistant)
+        {
+            return await schedulerRepository.CancelScheduledOrConfirmedAppointmentsOfAssistantById(idAssistant);
+        }
+
+        public void NotifySuscribers<T>(SchedulerEvent<T> eventType)
+        {
+            foreach (var observer in observers)
+            {
+                observer.UpdateOnSchedulerEvent(eventType);
+            }
+        }
+
+        public void Suscribe(ISchedulerObserver schedulerObserver)
+        {
+            if (!observers.Contains(schedulerObserver))
+            {
+                observers.Add(schedulerObserver);
+            }
+        }
+
+        public void Unsuscribe(ISchedulerObserver schedulerObserver)
+        {
+            if (observers.Contains(schedulerObserver))
+            {
+                observers.Remove(schedulerObserver);
+            }
+        }
+
         public void UpdateOnServiceChanged(ServiceEvent serviceEvent)
         {
             if (serviceEvent.EventType == ServiceEventType.DISABLED)
             {
+                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
                 _ = this.ChangeAllServiceOfferStatusByServiceId(serviceEvent.ServiceId!.Value, ServiceOfferStatusType.NOT_AVAILABLE);
             }
             else if (serviceEvent.EventType == ServiceEventType.ENABLED)
             {
+                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<   
                 _ = this.ChangeAllServiceOfferStatusByServiceId(serviceEvent.ServiceId!.Value, ServiceOfferStatusType.AVAILABLE);
+            }
+            else if (serviceEvent.EventType == ServiceEventType.DELETED)
+            {
+                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<   
+                _ = this.ChangeAllServiceOfferStatusByServiceId(serviceEvent.ServiceId!.Value, ServiceOfferStatusType.DELETED);
             }
         }
 
+        public void UpdateOnAssistantChanged(AssistantEvent assistantEvent)
+        {
+            if (assistantEvent.EventType == AssistantEventType.DISABLED)
+            {
+                // Reschedule appoinments are necessary?
+                // x = instance of Assistant
+                // Case 1:
+                // context Appoinments inv:
+                // self.scheduledServices->exists(service | service.Assistant = x)
+                // Case 2:
+                // context Appoinments inv:
+                // self.scheduledServices->size()>1 -> and self.scheduledServices->exists(service | service.Assistant = x)
+                // Case 3:
+                // context Appoinments inv:
+                // self.scheduledServices->size()>1 and self.scheduledServices->select(service | service.Assistant = x)-> size() => 1
+                // Case 4:
+                // context Appoinments inv:
+                // self.scheduledServices->forAll(service | service.assistant <> x)
+                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
+                _ = this.ChangeAllServiceOfferStatusByAssistantId(assistantEvent.AssistantId!.Value, ServiceOfferStatusType.NOT_AVAILABLE);
+            }
+            else if (assistantEvent.EventType == AssistantEventType.ENABLED)
+            {
+                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
+                _ = this.ChangeAllServiceOfferStatusByAssistantId(assistantEvent.AssistantId!.Value, ServiceOfferStatusType.AVAILABLE);
+            }
+            else if (assistantEvent.EventType == AssistantEventType.DELETED)
+            {
+                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
+                _ = this.ChangeAllServiceOfferStatusByAssistantId(assistantEvent.AssistantId!.Value, ServiceOfferStatusType.DELETED);
+                _ = this.CancelScheduledOrConfirmedAppointmentsOfAssistantById(assistantEvent.AssistantId!.Value);
+            }
+        }
+
+        public void UpdateOnSchedulerEvent<T>(SchedulerEvent<T> schedulerEvent)
+        {
+            throw new NotImplementedException();
+        }
 
     }
 }

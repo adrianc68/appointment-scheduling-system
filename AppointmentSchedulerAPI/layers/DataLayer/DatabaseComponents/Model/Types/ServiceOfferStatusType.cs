@@ -7,6 +7,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Type
         [PgName("AVAILABLE")]
         AVAILABLE,
         [PgName("NOT_AVAILABLE")]
-        NOT_AVAILABLE
+        NOT_AVAILABLE,
+        [PgName("DELETED")]
+        DELETED
     }
 }

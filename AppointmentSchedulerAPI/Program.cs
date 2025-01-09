@@ -92,6 +92,13 @@ builder.Services.AddScoped<IServiceEvent, ServiceMgr>();
 builder.Services.AddScoped<IServiceObserver, SchedulerMgr>();
 
 
+builder.Services.AddScoped<IAssistantEvent, AssistantMgr>();
+builder.Services.AddScoped<IAssistantObserver, SchedulerMgr>();
+
+builder.Services.AddScoped<ISchedulerEvent, SchedulerMgr>();
+builder.Services.AddScoped<ISchedulerObserver, SchedulerMgr>();
+
+
 builder.Services.AddScoped<ISchedulerMgt, SchedulerMgr>();
 builder.Services.AddScoped<IClientMgt, ClientMgr>();
 builder.Services.AddScoped<IAssistantMgt, AssistantMgr>();
@@ -131,14 +138,20 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var clientMgr = scope.ServiceProvider.GetRequiredService<IClientEvent>() as ClientMgr;
-    var schedulerMgr = scope.ServiceProvider.GetRequiredService<IClientObserver>() as SchedulerMgr;
+    var clientMgrEventPublisher = scope.ServiceProvider.GetRequiredService<IClientEvent>() as ClientMgr;
+    var serviceMgrEventPublisher = scope.ServiceProvider.GetRequiredService<IServiceEvent>() as ServiceMgr;
+    var assistantMgrEventPublisher = scope.ServiceProvider.GetRequiredService<IAssistantEvent>() as AssistantMgr;
+    var schedulerEventPublisher = scope.ServiceProvider.GetRequiredService<ISchedulerEvent>() as SchedulerMgr;
+    
+    
+    var schedulerMgr = scope.ServiceProvider.GetRequiredService<ISchedulerMgt>() as SchedulerMgr;
 
-    clientMgr?.Suscribe(schedulerMgr!);
+    clientMgrEventPublisher?.Suscribe(schedulerMgr!);
+    serviceMgrEventPublisher?.Suscribe(schedulerMgr!);
+    assistantMgrEventPublisher?.Suscribe(schedulerMgr!);
+    schedulerEventPublisher?.Suscribe(schedulerMgr!);
 
 
-    var serviceMgr = scope.ServiceProvider.GetRequiredService<IServiceEvent>() as ServiceMgr;
-    serviceMgr?.Suscribe(schedulerMgr!);
 }
 
 

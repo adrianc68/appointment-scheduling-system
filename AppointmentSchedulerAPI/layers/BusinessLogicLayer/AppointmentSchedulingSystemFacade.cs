@@ -632,6 +632,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 genericError.AddData("ServiceUuid", serviceOfferUuid);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_IS_ALREADY_UNAVAILABLE);
             }
+
+            if (serviceOffer.Status == ServiceOfferStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> was deleted", []);
+                genericError.AddData("ServiceUuid", serviceOfferUuid);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_WAS_DELETED);
+            }
+
+
             bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOffer.Id!.Value, ServiceOfferStatusType.NOT_AVAILABLE);
             if (!isStatusChanged)
             {
@@ -656,6 +665,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 genericError.AddData("ServiceUuid", serviceOfferUuid);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_IS_ALREADY_AVAILABLE);
             }
+
+            if (serviceOffer.Status == ServiceOfferStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> was deleted", []);
+                genericError.AddData("ServiceUuid", serviceOfferUuid);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_WAS_DELETED);
+            }
+
             bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOffer.Id!.Value, ServiceOfferStatusType.NOT_AVAILABLE);
             if (!isStatusChanged)
             {

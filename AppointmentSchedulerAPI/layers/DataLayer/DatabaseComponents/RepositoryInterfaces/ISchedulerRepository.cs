@@ -36,8 +36,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<bool> CancelScheduledOrConfirmedAppointmentsOfClientById(int idClient);
         Task<List<int>> GetServiceOfferIdsByServiceId(int idService);
         Task<bool> ChangeAllServiceOfferStatusByServiceId(int idService, ServiceOfferStatusType status);
-
-
-
+        Task<bool> ChangeAllServiceOfferStatusByAssistantId(int idAssistant, ServiceOfferStatusType status);
+        Task<bool> CancelScheduledOrConfirmedAppointmentsOfAssistantById(int idAssistant);
     }
 }

@@ -80,6 +80,28 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<bool> ChangeAssistantStatusAsync(int idAssistant, AssistantStatusType status)
         {
             bool isStatusChanged = await assistantRepository.ChangeAssistantStatus(idAssistant, status);
+
+            if (isStatusChanged)
+            {
+                AssistantEvent assistantEvent = new AssistantEvent
+                {
+                    AssistantId = idAssistant,
+                    EventType = AssistantEventType.UPDATED
+                };
+                if (status == AssistantStatusType.ENABLED)
+                {
+                    assistantEvent.EventType = AssistantEventType.ENABLED;
+                }
+                else if (status == AssistantStatusType.DISABLED)
+                {
+                    assistantEvent.EventType = AssistantEventType.DISABLED;
+                }
+                else if (status == AssistantStatusType.DELETED)
+                {
+                    assistantEvent.EventType = AssistantEventType.DELETED;
+                }
+                this.NotifySuscribers(assistantEvent);
+            }
             return isStatusChanged;
         }
 

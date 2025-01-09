@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
@@ -772,6 +773,64 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     serviceOffer.Status = (Model.Types.ServiceOfferStatusType)status;
                 }
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isUpdated = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isUpdated;
+        }
+
+        public async Task<bool> ChangeAllServiceOfferStatusByAssistantId(int idAssistant, ServiceOfferStatusType status)
+        {
+            bool isUpdated = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                var servicesOfferIds = await dbContext.ServiceOffers
+                    .Where(sero => sero.IdAssistant == idAssistant)
+                    .ToListAsync();
+
+                foreach (var serviceOffer in servicesOfferIds)
+                {
+                    serviceOffer.Status = (Model.Types.ServiceOfferStatusType)status;
+                }
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isUpdated = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isUpdated;
+        }
+
+        public async Task<bool> CancelScheduledOrConfirmedAppointmentsOfAssistantById(int idAssistant)
+        {
+            bool isUpdated = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                var appoinments = await dbContext.Appointments
+                    .Where(app => (app.Status == Model.Types.AppointmentStatusType.SCHEDULED || app.Status == Model.Types.AppointmentStatusType.CONFIRMED) &&
+                        app.ScheduledServices!.Any(ss => ss.ServiceOffer!.IdAssistant == idAssistant)
+                     ).ToListAsync();
+
+                foreach (var appointment in appoinments)
+                {
+                    appointment.Status = Model.Types.AppointmentStatusType.CANCELED;
+                }
+
                 await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
                 isUpdated = true;
