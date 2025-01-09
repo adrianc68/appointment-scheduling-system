@@ -11,7 +11,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Type
         [PgName("CANCELED")]
         CANCELED,
         [PgName("FINISHED")]
-        FINISHED
+        FINISHED,
+        [PgName("RESCHEDULED")]
+        RESCHEDULED
     }
 }
 

@@ -14,7 +14,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
         public double? TotalCost { get; set; }
         public DateTime? CreatedAt { get; set;}
         public Client? Client { get; set; } = new Client();
-        // public List<ServiceOffer> ServiceOffers { get; set;}
         public List<ScheduledService>? ScheduledServices { get; set; }
     }
 }

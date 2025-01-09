@@ -1,5 +1,5 @@
+using System.Linq.Expressions;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -117,7 +117,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var appointmentDB = await dbContext.Appointments
-                .Where(app => app.Date >= startDate && app.Date <= endDate && (app.Status == Model.Types.AppointmentStatusType.CONFIRMED || app.Status == Model.Types.AppointmentStatusType.SCHEDULED))
+                .Where(app => app.Date >= startDate && app.Date <= endDate && (app.Status == Model.Types.AppointmentStatusType.CONFIRMED || app.Status == Model.Types.AppointmentStatusType.SCHEDULED || app.Status == Model.Types.AppointmentStatusType.RESCHEDULED))
                 .Include(appAssSer => appAssSer.ScheduledServices!)
                     .ThenInclude(assisServ => assisServ.ServiceOffer)
                         .ThenInclude(assis => assis!.Assistant)
@@ -298,8 +298,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     aso.ServiceOffer!.IdAssistant == idAssistant &&
                     aso.Appointment!.Date == range.Date &&
                     !(range.EndTime <= aso.ServiceStartTime || range.StartTime >= aso.ServiceEndTime) &&
-                    (aso.Appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED ||
-                    aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED))
+                    (aso.Appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED || aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED || aso.Appointment.Status == Model.Types.AppointmentStatusType.RESCHEDULED))
                 .ToListAsync();
 
             if (conflictingOffers.Any())
@@ -321,8 +320,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .Where(aso =>
                     aso.Appointment!.Date == range.Date &&
                     !(range.EndTime <= aso.ServiceStartTime || range.StartTime >= aso.ServiceEndTime) &&
-                    (aso.Appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED ||
-                     aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED))
+                    (aso.Appointment.Status == Model.Types.AppointmentStatusType.SCHEDULED || aso.Appointment.Status == Model.Types.AppointmentStatusType.CONFIRMED || aso.Appointment.Status == Model.Types.AppointmentStatusType.RESCHEDULED))
                 .ToListAsync();
 
             var conflictingOffers = rawConflicts.Select(aso => new BusinessLogicLayer.Model.ScheduledService
@@ -705,47 +703,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var count = await dbContext.Appointments
-                .Where(a => a.IdClient == idClient && (a.Status == Model.Types.AppointmentStatusType.CONFIRMED || a.Status == Model.Types.AppointmentStatusType.SCHEDULED)).CountAsync();
+                .Where(a => a.IdClient == idClient && (a.Status == Model.Types.AppointmentStatusType.CONFIRMED || a.Status == Model.Types.AppointmentStatusType.SCHEDULED || a.Status == Model.Types.AppointmentStatusType.RESCHEDULED)).CountAsync();
             return count;
         }
 
-        public async Task<bool> CancelScheduledOrConfirmedAppointmentsOfClientById(int idClient)
-        {
-            bool isUpdated = false;
-            using var dbContext = context.CreateDbContext();
-            using var transaction = await dbContext.Database.BeginTransactionAsync();
 
-            try
-            {
-                var appointments = await dbContext.Appointments
-                      .Where(app =>
-                        app.IdClient == idClient &&
-                          app.Status == Model.Types.AppointmentStatusType.CONFIRMED ||
-                           app.Status == Model.Types.AppointmentStatusType.SCHEDULED)
-                      .ToListAsync();
-
-                if (appointments == null)
-                {
-                    return true;
-                }
-
-                foreach (var appointment in appointments)
-                {
-                    appointment.Status = Model.Types.AppointmentStatusType.CANCELED;
-                }
-
-                await dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-                isUpdated = true;
-            }
-            catch (System.Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-
-            return isUpdated;
-        }
 
         public async Task<List<int>> GetServiceOfferIdsByServiceId(int idService)
         {
@@ -757,21 +719,165 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return servicesOfferIds;
         }
 
-        public async Task<bool> ChangeAllServiceOfferStatusByServiceId(int idService, BusinessLogicLayer.Model.Types.ServiceOfferStatusType status)
+        public async Task<List<int>> GetServiceOfferIdsByAssistantId(int idAssistant)
+        {
+            using var dbContext = context.CreateDbContext();
+            var servicesOfferIds = await dbContext.ServiceOffers
+                .Where(sero => sero.IdAssistant == idAssistant)
+                .Select(ser => ser.Id)
+                .ToListAsync();
+            return servicesOfferIds;
+        }
+
+
+
+
+        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByUid(int idAssistant)
+        {
+            using var dbContext = context.CreateDbContext();
+
+            var dbAppointments = await dbContext.Appointments
+                .Include(a => a.ScheduledServices!)
+                    .ThenInclude(ss => ss.ServiceOffer)
+                    .ThenInclude(se => se!.Assistant)
+                    .ThenInclude(ac => ac!.UserAccount)
+                    .ThenInclude(ui => ui!.UserInformation)
+                .Include(cl => cl.Client)
+                    .ThenInclude(ac => ac!.UserAccount)
+            .Where(app => (app.Status == Model.Types.AppointmentStatusType.SCHEDULED || app.Status == Model.Types.AppointmentStatusType.CONFIRMED || app.Status == Model.Types.AppointmentStatusType.RESCHEDULED) &&
+                            app.ScheduledServices!.Any(ax => ax.ServiceOffer!.Assistant!.IdUserAccount == idAssistant)
+            ).ToListAsync();
+
+            var businessAppointments = dbAppointments.Select(dbApp => new BusinessLogicLayer.Model.Appointment
+            {
+                Id = dbApp.Id,
+                Date = dbApp.Date,
+                Status = (AppointmentStatusType)dbApp.Status!.Value,
+                StartTime = dbApp.StartTime,
+                TotalCost = dbApp.TotalCost,
+                Client = new BusinessLogicLayer.Model.Client
+                {
+                    Id = dbApp.Client!.IdUserAccount
+                },
+                ScheduledServices = dbApp.ScheduledServices!.Select(ss => new BusinessLogicLayer.Model.ScheduledService
+                {
+                    Id = ss.Id,
+                    Uuid = ss.Uuid,
+                    ServiceStartTime = ss.ServiceStartTime,
+                    ServiceEndTime = ss.ServiceEndTime,
+                    ServicePrice = ss.ServicePrice,
+                    ServicesMinutes = ss.ServicesMinutes,
+                    ServiceName = ss.ServiceName,
+                    ServiceOffer = new BusinessLogicLayer.Model.ServiceOffer
+                    {
+                        Id = ss.ServiceOffer!.Id,
+                        Uuid = ss.ServiceOffer.Uuid,
+                        Status = (ServiceOfferStatusType?)ss.ServiceOffer.Status,
+                        Assistant = new BusinessLogicLayer.Model.Assistant
+                        {
+                            Id = ss.ServiceOffer.Assistant!.IdUserAccount,
+                            Uuid = ss.ServiceOffer.Assistant!.UserAccount!.Uuid,
+                            Name = ss.ServiceOffer.Assistant!.UserAccount!.UserInformation!.Name,
+                        }
+                    }
+                }).ToList()
+            }).ToList();
+            return businessAppointments;
+        }
+
+
+        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfClientByUid(int idClient)
+        {
+            using var dbContext = context.CreateDbContext();
+
+            var dbAppointments = await dbContext.Appointments
+                .Include(a => a.ScheduledServices!)
+                    .ThenInclude(ss => ss.ServiceOffer)
+                    .ThenInclude(se => se!.Assistant)
+                    .ThenInclude(ac => ac!.UserAccount)
+                    .ThenInclude(ui => ui!.UserInformation)
+                .Include(cl => cl.Client)
+                    .ThenInclude(ac => ac!.UserAccount)
+            .Where(app => (app.Status == Model.Types.AppointmentStatusType.SCHEDULED || app.Status == Model.Types.AppointmentStatusType.CONFIRMED || app.Status == Model.Types.AppointmentStatusType.RESCHEDULED) &&
+                            app.IdClient == idClient
+            ).ToListAsync();
+
+            var businessAppointments = dbAppointments.Select(dbApp => new BusinessLogicLayer.Model.Appointment
+            {
+                Id = dbApp.Id,
+                Date = dbApp.Date,
+                Status = (AppointmentStatusType)dbApp.Status!.Value,
+                StartTime = dbApp.StartTime,
+                TotalCost = dbApp.TotalCost,
+                Client = new BusinessLogicLayer.Model.Client
+                {
+                    Id = dbApp.Client!.IdUserAccount
+                },
+                ScheduledServices = dbApp.ScheduledServices!.Select(ss => new BusinessLogicLayer.Model.ScheduledService
+                {
+                    Id = ss.Id,
+                    Uuid = ss.Uuid,
+                    ServiceStartTime = ss.ServiceStartTime,
+                    ServiceEndTime = ss.ServiceEndTime,
+                    ServicePrice = ss.ServicePrice,
+                    ServicesMinutes = ss.ServicesMinutes,
+                    ServiceName = ss.ServiceName,
+                    ServiceOffer = new BusinessLogicLayer.Model.ServiceOffer
+                    {
+                        Id = ss.ServiceOffer!.Id,
+                        Uuid = ss.ServiceOffer.Uuid,
+                        Status = (ServiceOfferStatusType?)ss.ServiceOffer.Status,
+                        Assistant = new BusinessLogicLayer.Model.Assistant
+                        {
+                            Id = ss.ServiceOffer.Assistant!.IdUserAccount,
+                            Uuid = ss.ServiceOffer.Assistant!.UserAccount!.Uuid,
+                            Name = ss.ServiceOffer.Assistant!.UserAccount!.UserInformation!.Name,
+                        }
+                    }
+                }).ToList()
+            }).ToList();
+            return businessAppointments;
+        }
+
+
+
+        public async Task<bool> UpdateAppointment(BusinessLogicLayer.Model.Appointment appointment)
         {
             bool isUpdated = false;
             using var dbContext = context.CreateDbContext();
             using var transaction = await dbContext.Database.BeginTransactionAsync();
-
             try
             {
-                var servicesOfferIds = await dbContext.ServiceOffers
-                    .Where(sero => sero.IdService == idService)
-                    .ToListAsync();
+                var dbAppointment = await dbContext.Appointments
+                    .Include(a => a.ScheduledServices)
+                    .FirstOrDefaultAsync(app => app.Id!.Value == appointment.Id!.Value);
 
-                foreach (var serviceOffer in servicesOfferIds)
+                if (dbAppointment != null)
                 {
-                    serviceOffer.Status = (Model.Types.ServiceOfferStatusType)status;
+                    dbAppointment.Date = appointment.Date;
+                    dbAppointment.StartTime = appointment.StartTime;
+                    dbAppointment.EndTime = appointment.EndTime;
+                    dbAppointment.TotalCost = appointment.TotalCost;
+                    dbAppointment.Status = Model.Types.AppointmentStatusType.RESCHEDULED;
+                    dbAppointment.IdClient = appointment.Client!.Id;
+
+                    dbContext.ScheduledServices.RemoveRange(dbAppointment.ScheduledServices!);
+
+                    foreach (var scheduledService in appointment.ScheduledServices!)
+                    {
+                        var scheduleServices = new ScheduledService
+                        {
+                            IdAppointment = dbAppointment.Id,
+                            IdServiceOffer = scheduledService.ServiceOffer!.Id,
+                            ServiceStartTime = scheduledService.ServiceStartTime!.Value,
+                            ServiceEndTime = scheduledService.ServiceEndTime!.Value,
+                            ServicePrice = scheduledService.ServicePrice!.Value,
+                            ServicesMinutes = scheduledService.ServicesMinutes!.Value,
+                            ServiceName = scheduledService.ServiceName,
+                            Uuid = scheduledService.Uuid!.Value
+                        };
+                        dbContext.ScheduledServices.Add(scheduleServices);
+                    }
                 }
                 await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -785,62 +891,52 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isUpdated;
         }
 
-        public async Task<bool> ChangeAllServiceOfferStatusByAssistantId(int idAssistant, ServiceOfferStatusType status)
+        public async Task<List<BusinessLogicLayer.Model.ServiceOffer>> GetServiceOffersByAssistantId(int idAssistant)
         {
-            bool isUpdated = false;
             using var dbContext = context.CreateDbContext();
-            using var transaction = await dbContext.Database.BeginTransactionAsync();
-
-            try
-            {
-                var servicesOfferIds = await dbContext.ServiceOffers
-                    .Where(sero => sero.IdAssistant == idAssistant)
+            var dbServiceOffers = await dbContext.ServiceOffers
+                    .Include(ser => ser.Service)
+                    .Where(a => a.IdAssistant == idAssistant)
                     .ToListAsync();
 
-                foreach (var serviceOffer in servicesOfferIds)
-                {
-                    serviceOffer.Status = (Model.Types.ServiceOfferStatusType)status;
-                }
-                await dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-                isUpdated = true;
-            }
-            catch (System.Exception)
+            if (dbServiceOffers == null)
             {
-                await transaction.RollbackAsync();
-                throw;
+                return [];
             }
-            return isUpdated;
+
+            var serviceOffers = dbServiceOffers.Select(so => new BusinessLogicLayer.Model.ServiceOffer
+            {
+                Id = so.Id,
+                Uuid = so.Uuid,
+                Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType)so.Status,
+                Service = new BusinessLogicLayer.Model.Service
+                {
+                    Id = so.Service!.Id,
+                    Uuid = so.Service.Uuid,
+                    Price = so.Service.Price,
+                    Name = so.Service.Name,
+                    Minutes = so.Service.Minutes,
+                    Description = so.Service.Description
+                },
+            }).ToList();
+            return serviceOffers;
         }
 
-        public async Task<bool> CancelScheduledOrConfirmedAppointmentsOfAssistantById(int idAssistant)
+        public async Task<List<int>> GetScheduledOrConfirmedAppoinmentsIdsOfClientById(int idClient)
         {
-            bool isUpdated = false;
             using var dbContext = context.CreateDbContext();
-            using var transaction = await dbContext.Database.BeginTransactionAsync();
 
-            try
+            var dbAppointments = await dbContext.Appointments
+             .Where(a => (a.Status == Model.Types.AppointmentStatusType.SCHEDULED || a.Status == Model.Types.AppointmentStatusType.CONFIRMED || a.Status == Model.Types.AppointmentStatusType.RESCHEDULED) && a.IdClient == idClient)
+             .Select(a => a.Id!.Value)
+             .ToListAsync();
+
+            if (dbAppointments == null)
             {
-                var appoinments = await dbContext.Appointments
-                    .Where(app => (app.Status == Model.Types.AppointmentStatusType.SCHEDULED || app.Status == Model.Types.AppointmentStatusType.CONFIRMED) &&
-                        app.ScheduledServices!.Any(ss => ss.ServiceOffer!.IdAssistant == idAssistant)
-                     ).ToListAsync();
-
-                foreach (var appointment in appoinments)
-                {
-                    appointment.Status = Model.Types.AppointmentStatusType.CANCELED;
-                }
-
-                await dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-                isUpdated = true;
+                return [];
             }
-            catch (System.Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-            return isUpdated;
+
+            return dbAppointments;
         }
     }
 }

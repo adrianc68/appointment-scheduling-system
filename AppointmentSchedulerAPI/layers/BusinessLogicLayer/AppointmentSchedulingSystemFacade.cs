@@ -55,6 +55,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                       .AddMonths(MAX_MONTHS_FOR_SCHEDULE)
                       .AddDays(MAX_WEEKS_FOR_SCHEDULE * 7)
                       .AddDays(MAX_DAYS_FROM_NOW);
+
+                      System.Console.WriteLine(range.StartTime);
             DateTime startDateTime = range.Date!.ToDateTime(range.StartTime);
 
             // Check for past scheduling

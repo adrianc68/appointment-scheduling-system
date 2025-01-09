@@ -28,11 +28,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         Task<bool> IsAssistantAvailableInAvailabilityTimeSlotsAsync(DateTimeRange range, int idAssistant);
         Task<bool> HasAssistantConflictingAppoinmentsAsync(DateTimeRange range, int idAssistant);
         Task<bool> HasAvailabilityTimeSlotConflictingSlotsAsync(DateTimeRange range, int idAvailabilityTimeSlot, int idAssistant);
-        Task<bool> CancelScheduledOrConfirmedAppointmentsOfClientById(int idAssistant);
-        Task<bool> ChangeAllServiceOfferStatusByServiceId(int idService, ServiceOfferStatusType status);
-        Task<bool> ChangeAllServiceOfferStatusByAssistantId(int idAssistant, ServiceOfferStatusType status);
 
-        Task<bool> CancelScheduledOrConfirmedAppointmentsOfAssistantById(int idAssistant);
+
+
 
     }
 }

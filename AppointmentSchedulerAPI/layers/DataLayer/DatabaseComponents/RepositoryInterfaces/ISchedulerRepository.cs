@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
@@ -32,11 +33,19 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<bool> IsAvailabilityTimeSlotRegisteredAsync(DateTimeRange range, int idAssistant);
         Task<bool> AddAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot);
         Task<bool> AddAppointmentAsync(Appointment appointment);
-        Task<int> GetAppointmentsScheduledCountByClientUuid(int idClient);
-        Task<bool> CancelScheduledOrConfirmedAppointmentsOfClientById(int idClient);
+
+
         Task<List<int>> GetServiceOfferIdsByServiceId(int idService);
-        Task<bool> ChangeAllServiceOfferStatusByServiceId(int idService, ServiceOfferStatusType status);
-        Task<bool> ChangeAllServiceOfferStatusByAssistantId(int idAssistant, ServiceOfferStatusType status);
-        Task<bool> CancelScheduledOrConfirmedAppointmentsOfAssistantById(int idAssistant);
+        Task<List<int>> GetServiceOfferIdsByAssistantId(int idAssistant);
+        Task<List<ServiceOffer>> GetServiceOffersByAssistantId(int idAssistant);
+
+        Task<int> GetAppointmentsScheduledCountByClientUuid(int idClient);
+
+        Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByUid(int idAssistant);
+        Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsOfClientByUid(int idClient);
+        Task<List<int>> GetScheduledOrConfirmedAppoinmentsIdsOfClientById(int idClient);
+
+
+        Task<bool> UpdateAppointment(Appointment appointment);
     }
 }

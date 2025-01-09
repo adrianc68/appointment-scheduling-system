@@ -5,7 +5,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types
         SCHEDULED,
         CONFIRMED,
         CANCELED,
-        FINISHED
+        FINISHED,
+        RESCHEDULED
     }
 }
 

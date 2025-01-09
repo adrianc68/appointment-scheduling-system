@@ -133,6 +133,7 @@ builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtToke
 builder.Services.AddControllers();
 
 
+
 var app = builder.Build();
 
 
@@ -159,6 +160,9 @@ using (var scope = app.Services.CreateScope())
 // app.UseMiddleware<HttpResponseAuthorizationMiddleware>(); 
 app.UseAuthorization();
 app.UseAuthentication();
+
+
+
 
 
 app.Use(async (context, next) =>

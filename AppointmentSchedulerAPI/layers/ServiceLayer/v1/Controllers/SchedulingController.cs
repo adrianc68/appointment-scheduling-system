@@ -70,6 +70,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             DateTimeRange range = new DateTimeRange
             {
                 Date = dto.Date,
+                StartTime = dto.SelectedServices.Min(a => a.StartTime)
             };
 
             List<ScheduledService> services = dto.SelectedServices.Select(service => new ScheduledService

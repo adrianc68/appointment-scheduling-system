@@ -1,8 +1,10 @@
+using System.Linq.Expressions;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
@@ -160,34 +162,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return ranges;
         }
 
-        public async Task<bool> CancelScheduledOrConfirmedAppointmentsOfClientById(int idAssistant)
-        {
-            return await schedulerRepository.CancelScheduledOrConfirmedAppointmentsOfClientById(idAssistant);
-        }
 
-        public async Task<bool> ChangeAllServiceOfferStatusByServiceId(int idService, ServiceOfferStatusType status)
-        {
-            return await schedulerRepository.ChangeAllServiceOfferStatusByServiceId(idService, status);
-        }
 
-        public async Task<bool> ChangeAllServiceOfferStatusByAssistantId(int idAssistant, ServiceOfferStatusType status)
-        {
-            return await schedulerRepository.ChangeAllServiceOfferStatusByAssistantId(idAssistant, status);
-        }
 
-        public void UpdateOnClientChanged(ClientEvent clientEvent)
-        {
-            if (clientEvent.EventType == ClientEventType.DISABLED || clientEvent.EventType == ClientEventType.DELETED)
-            {
-                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
-                _ = this.CancelScheduledOrConfirmedAppointmentsOfClientById(clientEvent.ClientId!.Value);
-            }
-        }
 
-        public async Task<bool> CancelScheduledOrConfirmedAppointmentsOfAssistantById(int idAssistant)
-        {
-            return await schedulerRepository.CancelScheduledOrConfirmedAppointmentsOfAssistantById(idAssistant);
-        }
+
+
+
+
+
+
 
         public void NotifySuscribers<T>(SchedulerEvent<T> eventType)
         {
@@ -213,56 +197,23 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             }
         }
 
-        public void UpdateOnServiceChanged(ServiceEvent serviceEvent)
+        public async void UpdateOnServiceChanged(ServiceEvent serviceEvent)
         {
+            List<int> serviceOffers = await schedulerRepository.GetServiceOfferIdsByServiceId(serviceEvent.ServiceId!.Value);
             if (serviceEvent.EventType == ServiceEventType.DISABLED)
             {
                 // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
-                _ = this.ChangeAllServiceOfferStatusByServiceId(serviceEvent.ServiceId!.Value, ServiceOfferStatusType.NOT_AVAILABLE);
+                await this.ChangeAllServiceOfferStatusAsync(serviceOffers, ServiceOfferStatusType.NOT_AVAILABLE);
             }
             else if (serviceEvent.EventType == ServiceEventType.ENABLED)
             {
                 // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<   
-                _ = this.ChangeAllServiceOfferStatusByServiceId(serviceEvent.ServiceId!.Value, ServiceOfferStatusType.AVAILABLE);
+                await this.ChangeAllServiceOfferStatusAsync(serviceOffers, ServiceOfferStatusType.AVAILABLE);
             }
             else if (serviceEvent.EventType == ServiceEventType.DELETED)
             {
                 // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<   
-                _ = this.ChangeAllServiceOfferStatusByServiceId(serviceEvent.ServiceId!.Value, ServiceOfferStatusType.DELETED);
-            }
-        }
-
-        public void UpdateOnAssistantChanged(AssistantEvent assistantEvent)
-        {
-            if (assistantEvent.EventType == AssistantEventType.DISABLED)
-            {
-                // Reschedule appoinments are necessary?
-                // x = instance of Assistant
-                // Case 1:
-                // context Appoinments inv:
-                // self.scheduledServices->exists(service | service.Assistant = x)
-                // Case 2:
-                // context Appoinments inv:
-                // self.scheduledServices->size()>1 -> and self.scheduledServices->exists(service | service.Assistant = x)
-                // Case 3:
-                // context Appoinments inv:
-                // self.scheduledServices->size()>1 and self.scheduledServices->select(service | service.Assistant = x)-> size() => 1
-                // Case 4:
-                // context Appoinments inv:
-                // self.scheduledServices->forAll(service | service.assistant <> x)
-                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
-                _ = this.ChangeAllServiceOfferStatusByAssistantId(assistantEvent.AssistantId!.Value, ServiceOfferStatusType.NOT_AVAILABLE);
-            }
-            else if (assistantEvent.EventType == AssistantEventType.ENABLED)
-            {
-                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
-                _ = this.ChangeAllServiceOfferStatusByAssistantId(assistantEvent.AssistantId!.Value, ServiceOfferStatusType.AVAILABLE);
-            }
-            else if (assistantEvent.EventType == AssistantEventType.DELETED)
-            {
-                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
-                _ = this.ChangeAllServiceOfferStatusByAssistantId(assistantEvent.AssistantId!.Value, ServiceOfferStatusType.DELETED);
-                _ = this.CancelScheduledOrConfirmedAppointmentsOfAssistantById(assistantEvent.AssistantId!.Value);
+                await this.ChangeAllServiceOfferStatusAsync(serviceOffers, ServiceOfferStatusType.DELETED);
             }
         }
 
@@ -270,6 +221,144 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             throw new NotImplementedException();
         }
+
+        public async void UpdateOnClientChanged(ClientEvent clientEvent)
+        {
+            if (clientEvent.EventType == ClientEventType.DISABLED || clientEvent.EventType == ClientEventType.DELETED)
+            {
+                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
+                List<int> appointmentsIds = await schedulerRepository.GetScheduledOrConfirmedAppoinmentsIdsOfClientById(clientEvent.ClientId!.Value);
+                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointmentsById(appointmentsIds);
+            }
+        }
+
+        public async void UpdateOnAssistantChanged(AssistantEvent assistantEvent)
+        {
+            List<int> serviceOffers = await schedulerRepository.GetServiceOfferIdsByAssistantId(assistantEvent.AssistantId!.Value);
+
+            if (assistantEvent.EventType == AssistantEventType.DISABLED)
+            {
+                int idAssistant = assistantEvent.AssistantId!.Value;
+                List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByUid(idAssistant);
+                List<Appointment> appointmentWithAllScheduledServicesBeingOfferredByAssistant = appointments.FindAll(a => a.ScheduledServices!.All(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant));
+
+                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointmentsById(appointmentWithAllScheduledServicesBeingOfferredByAssistant.Select(a => a.Id!.Value).ToList());
+
+                appointments.RemoveAll(a => appointmentWithAllScheduledServicesBeingOfferredByAssistant.Contains(a));
+
+                foreach (var appointment in appointments)
+                {
+                    var servicesToRemove = appointment.ScheduledServices!
+                        .Where(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant)
+                        .ToList();
+
+                    foreach (var service in servicesToRemove)
+                    {
+                        appointment.ScheduledServices!.Remove(service);
+                    }
+
+                    appointment.StartTime = appointment.ScheduledServices!.Min(ss => ss.ServiceStartTime);
+                    appointment.EndTime = appointment.ScheduledServices!.Max(ss => ss.ServiceEndTime);
+                    appointment.TotalCost = appointment.ScheduledServices!.Sum(ss => ss.ServicePrice!.Value);
+
+
+
+                }
+                (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointmentsById(appointments);
+                (bool allServiceOfferCanceled, List<int> changedStatusServiceOffers) = await this.ChangeAllServiceOfferStatusAsync(serviceOffers, ServiceOfferStatusType.NOT_AVAILABLE);
+            }
+            else if (assistantEvent.EventType == AssistantEventType.ENABLED)
+            {
+                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
+                (bool allServiceOfferCanceled, List<int> changedStatusServiceOffers) = await this.ChangeAllServiceOfferStatusAsync(serviceOffers, ServiceOfferStatusType.AVAILABLE);
+            }
+            else if (assistantEvent.EventType == AssistantEventType.DELETED)
+            {
+
+                int idAssistant = assistantEvent.AssistantId!.Value;
+                List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByUid(idAssistant);
+                List<Appointment> appointmentWithAllScheduledServicesBeingOfferredByAssistant = appointments.FindAll(a => a.ScheduledServices!.All(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant));
+
+                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointmentsById(appointmentWithAllScheduledServicesBeingOfferredByAssistant.Select(a => a.Id!.Value).ToList());
+
+                appointments.RemoveAll(a => appointmentWithAllScheduledServicesBeingOfferredByAssistant.Contains(a));
+
+                foreach (var appointment in appointments)
+                {
+                    var servicesToRemove = appointment.ScheduledServices!
+                        .Where(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant)
+                        .ToList();
+
+                    foreach (var service in servicesToRemove)
+                    {
+                        appointment.ScheduledServices!.Remove(service);
+                    }
+
+                    appointment.StartTime = appointment.ScheduledServices!.Min(ss => ss.ServiceStartTime);
+                    appointment.EndTime = appointment.ScheduledServices!.Max(ss => ss.ServiceEndTime);
+                    appointment.TotalCost = appointment.ScheduledServices!.Sum(ss => ss.ServicePrice!.Value);
+
+
+
+                }
+
+
+                (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointmentsById(appointments);
+                (bool allServiceOfferCanceled, List<int> changedStatusServiceOffers) = await this.ChangeAllServiceOfferStatusAsync(serviceOffers, ServiceOfferStatusType.DELETED);
+                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
+            }
+        }
+
+        private async Task<(bool, List<int>)> ChangeAllServiceOfferStatusAsync(List<int> serviceOffersIds, ServiceOfferStatusType status)
+        {
+            List<int> failedServiceOffers = new();
+            bool allCanceled = true;
+            foreach (var id in serviceOffersIds)
+            {
+                bool isUpdated = await schedulerRepository.ChangeServiceOfferStatusTypeAsync(id, status);
+                if (!isUpdated)
+                {
+                    failedServiceOffers.Add(id);
+                    allCanceled = false;
+                }
+            }
+            return (allCanceled, failedServiceOffers);
+        }
+
+        private async Task<(bool, List<int>)> CancelScheduledOrConfirmedAppointmentsById(List<int> appointmentsIds)
+        {
+            List<int> failedAppointments = new();
+            bool allCanceled = true;
+            foreach (var id in appointmentsIds)
+            {
+                bool isCanceled = await schedulerRepository.ChangeAppointmentStatusTypeAsync(id, AppointmentStatusType.CANCELED);
+                if (!isCanceled)
+                {
+                    failedAppointments.Add(id);
+                    allCanceled = false;
+                }
+            }
+            return (allCanceled, failedAppointments);
+        }
+
+        private async Task<(bool, List<int>)> RescheduleScheduledOrConfirmedAppointmentsById(List<Appointment> appointments)
+        {
+            List<int> failedAppointments = new();
+            bool allCanceled = true;
+            foreach (var appointment in appointments)
+            {
+                bool isUpdated = await schedulerRepository.UpdateAppointment(appointment);
+
+                if (!isUpdated)
+                {
+                    failedAppointments.Add(appointment.Id!.Value);
+                    allCanceled = false;
+                }
+            }
+            return (allCanceled, failedAppointments);
+        }
+
+
 
     }
 }
