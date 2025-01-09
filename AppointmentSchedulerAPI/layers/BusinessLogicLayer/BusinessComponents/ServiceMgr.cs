@@ -20,6 +20,26 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<bool> ChangeServiceStatusType(int idService, ServiceStatusType status)
         {
             bool isStatusChanged = await serviceRepository.ChangeServiceStatusType(idService, status);
+
+            if (status == ServiceStatusType.DISABLED)
+            {
+                ServiceEvent serviceEvent = new ServiceEvent
+                {
+                    ServiceId = idService,
+                    EventType = ServiceEventType.DISABLED,
+                };
+                this.NotifySuscribers(serviceEvent);
+            }
+            else if (status == ServiceStatusType.ENABLED)
+            {
+                ServiceEvent serviceEvent = new ServiceEvent
+                {
+                    ServiceId = idService,
+                    EventType = ServiceEventType.ENABLED,
+                };
+                this.NotifySuscribers(serviceEvent);
+            }
+
             return isStatusChanged;
         }
 
@@ -85,7 +105,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public void Unsuscribe(IServiceObserver serviceObserver)
         {
-            if(observers.Contains(serviceObserver))
+            if (observers.Contains(serviceObserver))
             {
                 observers.Remove(serviceObserver);
             }
@@ -93,7 +113,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public void NotifySuscribers(ServiceEvent eventType)
         {
-            foreach(var observer in observers)
+            foreach (var observer in observers)
             {
                 observer.UpdateOnServiceChanged(eventType);
             }

@@ -88,6 +88,9 @@ builder.Services.AddSingleton<EnvironmentVariableService>();
 builder.Services.AddScoped<IClientEvent, ClientMgr>();
 builder.Services.AddScoped<IClientObserver, SchedulerMgr>();
 
+builder.Services.AddScoped<IServiceEvent, ServiceMgr>();
+builder.Services.AddScoped<IServiceObserver, SchedulerMgr>();
+
 
 builder.Services.AddScoped<ISchedulerMgt, SchedulerMgr>();
 builder.Services.AddScoped<IClientMgt, ClientMgr>();
@@ -132,6 +135,10 @@ using (var scope = app.Services.CreateScope())
     var schedulerMgr = scope.ServiceProvider.GetRequiredService<IClientObserver>() as SchedulerMgr;
 
     clientMgr?.Suscribe(schedulerMgr!);
+
+
+    var serviceMgr = scope.ServiceProvider.GetRequiredService<IServiceEvent>() as ServiceMgr;
+    serviceMgr?.Suscribe(schedulerMgr!);
 }
 
 

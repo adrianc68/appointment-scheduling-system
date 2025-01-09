@@ -4,11 +4,10 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
-using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
-    public class SchedulerMgr : ISchedulerMgt, IClientObserver
+    public class SchedulerMgr : ISchedulerMgt, IClientObserver, IServiceObserver
     {
         private readonly ISchedulerRepository schedulerRepository;
 
@@ -81,7 +80,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<Guid?> ScheduleAppointmentAsync(Appointment appointment)
         {
             appointment.Uuid = Guid.CreateVersion7();
-            foreach(var scheduledService in appointment.ScheduledServices!)
+            foreach (var scheduledService in appointment.ScheduledServices!)
             {
                 scheduledService.Uuid = Guid.CreateVersion7();
             }
@@ -157,20 +156,40 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<List<DateTimeRange>> GetAppointmentDateTimeRangeConflictsByRange(DateTimeRange range)
         {
             List<DateTimeRange> ranges = (List<DateTimeRange>)await schedulerRepository.GetAppointmentDateTimeRangeConflictsByRange(range);
-            return ranges;   
-        }
-
-        public void UpdateOnClientChanged(ClientEvent clientEvent)
-        {
-            if(clientEvent.EventType == ClientEventType.DISABLED || clientEvent.EventType == ClientEventType.DELETED)
-            {
-                _ = this.CancelScheduledOrConfirmedAppointmentsOfClientById(clientEvent.ClientId!.Value);
-            }
+            return ranges;
         }
 
         public async Task<bool> CancelScheduledOrConfirmedAppointmentsOfClientById(int idAssistant)
         {
             return await schedulerRepository.CancelScheduledOrConfirmedAppointmentsOfClientById(idAssistant);
         }
+
+        public async Task<bool> ChangeAllServiceOfferStatusByServiceId(int idService, ServiceOfferStatusType status)
+        {
+            return await schedulerRepository.ChangeAllServiceOfferStatusByServiceId(idService, status);
+        }
+
+        public void UpdateOnClientChanged(ClientEvent clientEvent)
+        {
+            if (clientEvent.EventType == ClientEventType.DISABLED || clientEvent.EventType == ClientEventType.DELETED)
+            {
+                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
+                _ = this.CancelScheduledOrConfirmedAppointmentsOfClientById(clientEvent.ClientId!.Value);
+            }
+        }
+
+        public void UpdateOnServiceChanged(ServiceEvent serviceEvent)
+        {
+            if (serviceEvent.EventType == ServiceEventType.DISABLED)
+            {
+                _ = this.ChangeAllServiceOfferStatusByServiceId(serviceEvent.ServiceId!.Value, ServiceOfferStatusType.NOT_AVAILABLE);
+            }
+            else if (serviceEvent.EventType == ServiceEventType.ENABLED)
+            {
+                _ = this.ChangeAllServiceOfferStatusByServiceId(serviceEvent.ServiceId!.Value, ServiceOfferStatusType.AVAILABLE);
+            }
+        }
+
+
     }
 }

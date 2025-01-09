@@ -65,8 +65,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 };
                 this.NotifySuscribers(clientEvent);
             }
-
-
             return isStatusChanged;
         }
 

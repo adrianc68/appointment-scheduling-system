@@ -723,12 +723,12 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                            app.Status == Model.Types.AppointmentStatusType.SCHEDULED)
                       .ToListAsync();
 
-                if(appointments == null)
+                if (appointments == null)
                 {
                     return true;
                 }
 
-                foreach(var appointment in appointments)
+                foreach (var appointment in appointments)
                 {
                     appointment.Status = Model.Types.AppointmentStatusType.CANCELED;
                 }
@@ -743,6 +743,44 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 throw;
             }
 
+            return isUpdated;
+        }
+
+        public async Task<List<int>> GetServiceOfferIdsByServiceId(int idService)
+        {
+            using var dbContext = context.CreateDbContext();
+            var servicesOfferIds = await dbContext.ServiceOffers
+                .Where(sero => sero.IdService == idService)
+                .Select(ser => ser.Id)
+                .ToListAsync();
+            return servicesOfferIds;
+        }
+
+        public async Task<bool> ChangeAllServiceOfferStatusByServiceId(int idService, BusinessLogicLayer.Model.Types.ServiceOfferStatusType status)
+        {
+            bool isUpdated = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                var servicesOfferIds = await dbContext.ServiceOffers
+                    .Where(sero => sero.IdService == idService)
+                    .ToListAsync();
+
+                foreach (var serviceOffer in servicesOfferIds)
+                {
+                    serviceOffer.Status = (Model.Types.ServiceOfferStatusType)status;
+                }
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isUpdated = true;
+            }
+            catch (System.Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
             return isUpdated;
         }
     }
