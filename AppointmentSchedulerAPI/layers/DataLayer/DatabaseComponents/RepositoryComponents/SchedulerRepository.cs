@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -72,15 +73,26 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             {
                 var timeSlot = new AvailabilityTimeSlot
                 {
-                    Uuid = availabilityTimeSlot.Uuid,
+                    Uuid = availabilityTimeSlot.Uuid!.Value,
                     Date = availabilityTimeSlot.Date,
                     StartTime = availabilityTimeSlot.StartTime,
                     EndTime = availabilityTimeSlot.EndTime,
                     IdAssistant = availabilityTimeSlot.Assistant!.Id,
                     Status = Model.Types.AvailabilityTimeSlotStatusType.AVAILABLE
                 };
-
                 dbContext.AvailabilityTimeSlots.Add(timeSlot);
+                await dbContext.SaveChangesAsync();
+
+                if (availabilityTimeSlot.UnavailableTimeSlots != null)
+                {
+                    List<UnavailableTimeSlot> unavailableTimeSlotsDb = availabilityTimeSlot.UnavailableTimeSlots.Select(una => new UnavailableTimeSlot
+                    {
+                        StartTime = una.StartTime,
+                        EndTime = una.EndTime,
+                        IdAvailabilityTimeSlot = timeSlot.Id
+                    }).ToList();
+                    dbContext.UnavailableTimeSlots.AddRange(unavailableTimeSlotsDb);
+                }
                 await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
                 isRegistered = true;
@@ -665,7 +677,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
             {
-                var existingSlot = await dbContext.AvailabilityTimeSlots.FirstOrDefaultAsync(slot => slot.Id == availabilityTimeSlot.Id);
+                var existingSlot = await dbContext.AvailabilityTimeSlots
+                    .Include(slot => slot.UnavailableTimeSlots)
+                    .FirstOrDefaultAsync(slot => slot.Id == availabilityTimeSlot.Id);
+
                 if (existingSlot == null)
                 {
                     return false;
@@ -674,6 +689,18 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 existingSlot.Date = availabilityTimeSlot.Date;
                 existingSlot.StartTime = availabilityTimeSlot.StartTime;
                 existingSlot.EndTime = availabilityTimeSlot.EndTime;
+
+                dbContext.UnavailableTimeSlots.RemoveRange(existingSlot.UnavailableTimeSlots!);
+                if (availabilityTimeSlot.UnavailableTimeSlots?.Count > 0)
+                {
+                    List<UnavailableTimeSlot> unavailableTimeSlotsDb = availabilityTimeSlot.UnavailableTimeSlots.Select(una => new UnavailableTimeSlot
+                    {
+                        StartTime = una.StartTime,
+                        EndTime = una.EndTime,
+                        IdAvailabilityTimeSlot = existingSlot.Id,
+                    }).ToList();
+                    dbContext.UnavailableTimeSlots.AddRange(unavailableTimeSlotsDb);
+                }
 
                 await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();

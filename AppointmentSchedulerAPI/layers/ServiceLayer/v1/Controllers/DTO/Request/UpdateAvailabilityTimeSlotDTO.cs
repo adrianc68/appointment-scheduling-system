@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Validation;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
 {
@@ -12,5 +13,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
         public required TimeOnly EndTime { get; set; }
         [Required(ErrorMessage = "StartTime is required.")]
         public required TimeOnly StartTime { get; set; }
+        [ValidTimeSlot]
+        public List<UnavailableTimeSlotDTO>? UnavailableTimeSlots { get; set; }
     }
 }

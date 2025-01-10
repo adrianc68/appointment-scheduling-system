@@ -24,6 +24,7 @@ public partial class AppointmentDbContext : DbContext
     public required virtual DbSet<Service> Services { get; set; }
     public required virtual DbSet<ServiceOffer> ServiceOffers { get; set; }
     public required virtual DbSet<AvailabilityTimeSlot> AvailabilityTimeSlots { get; set; }
+    public required virtual DbSet<UnavailableTimeSlot> UnavailableTimeSlots { get; set; }
     public required virtual DbSet<ScheduledService> ScheduledServices { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -219,7 +220,7 @@ public partial class AppointmentDbContext : DbContext
         {
             entity.ToTable("ScheduledService");
             entity.HasKey(e => e.Id);
-            
+
             entity.Property(e => e.Id)
                 .HasColumnName("id");
             entity.Property(e => e.IdAppointment)
@@ -251,7 +252,7 @@ public partial class AppointmentDbContext : DbContext
         modelBuilder.Entity<AvailabilityTimeSlot>(entity =>
         {
             entity.ToTable("AvailabilityTimeSlot");
-            entity.HasKey(e => new { e.IdAssistant, e.Id });
+            entity.HasKey(e => new { e.Id });
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("nextval(('\"availabilitytimeslot_id_seq\"'::text)::regclass)")
@@ -279,14 +280,35 @@ public partial class AppointmentDbContext : DbContext
             entity.HasOne(d => d.Assistant)
                 .WithMany(p => p.AvailabilityTimeSlots)
                 .HasForeignKey(d => d.IdAssistant);
+
+            entity.HasMany(d => d.UnavailableTimeSlots)
+                .WithOne(p => p.AvailabilityTimeSlot)
+                .HasForeignKey(e => e.IdAvailabilityTimeSlot);
         });
+
+        modelBuilder.Entity<UnavailableTimeSlot>(entity =>
+        {
+            entity.ToTable("UnavailableTimeSlot");
+            entity.HasKey(e => new { e.StartTime, e.EndTime, e.IdAvailabilityTimeSlot });
+
+            entity.Property(e => e.IdAvailabilityTimeSlot)
+                .HasColumnName("id_availability_time_slot");
+            entity.Property(e => e.StartTime)
+                .HasColumnName("start_time");
+            entity.Property(e => e.EndTime)
+            .HasColumnName("end_time");
+        });
+
+        
+
+
 
 
         modelBuilder.HasSequence("appointment_id_seq");
-        modelBuilder.HasSequence("assistant_id_seq");
         modelBuilder.HasSequence("availabilitytimeslot_id_seq");
-        modelBuilder.HasSequence("client_id_seq");
+        modelBuilder.HasSequence("scheduledservice_id_seq");
         modelBuilder.HasSequence("service_id_seq");
+        modelBuilder.HasSequence("serficeoffer_id_seq");
         modelBuilder.HasSequence("useraccount_id_seq");
 
         OnModelCreatingPartial(modelBuilder);

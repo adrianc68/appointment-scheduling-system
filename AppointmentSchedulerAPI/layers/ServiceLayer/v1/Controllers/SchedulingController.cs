@@ -5,6 +5,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -119,7 +120,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Uuid = dto.Uuid,
                     Date = dto.Date,
                     EndTime = dto.EndTime,
-                    StartTime = dto.StartTime
+                    StartTime = dto.StartTime,
+                    UnavailableTimeSlots = dto.UnavailableTimeSlots?.Select(una => new UnavailableTimeSlot
+                    {
+                        StartTime = una.StartTime,
+                        EndTime = una.EndTime,
+                    }).ToList()
                 };
 
                 OperationResult<bool, GenericError> result = await systemFacade.EditAvailabilityTimeSlot(availabilityTimeSlot);
@@ -178,7 +184,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Assistant = new Assistant
                     {
                         Uuid = availabilityDTO.AssistantUuid
-                    }
+                    },
+                    UnavailableTimeSlots = availabilityDTO.UnavailableTimeSlots?.Select(e => new UnavailableTimeSlot
+                    {
+                        StartTime = e.StartTime,
+                        EndTime = e.EndTime
+                    }).ToList()
                 };
                 OperationResult<Guid, GenericError> result = await systemFacade.RegisterAvailabilityTimeSlotAsync(availabilityTimeSlot);
                 if (result.IsSuccessful)

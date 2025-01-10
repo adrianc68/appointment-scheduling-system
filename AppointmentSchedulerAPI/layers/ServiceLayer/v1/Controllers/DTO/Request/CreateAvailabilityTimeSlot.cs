@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Validation;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
 {
@@ -12,5 +13,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
         public required TimeOnly EndTime { get; set; }
         [Required(ErrorMessage = "AssistantUuid is required.")]
         public required Guid AssistantUuid { get; set; }
+
+        [ValidTimeSlot]
+        public List<UnavailableTimeSlotDTO>? UnavailableTimeSlots { get; set;}
     }
 }

@@ -258,6 +258,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(new GenericError("Range provided is not valid"), MessageCodeType.INVALID_RANGE_TIME);
             }
 
+
             // 1. Get account data
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(slotData.Assistant!.Uuid!.Value);
             if (assistantData == null)

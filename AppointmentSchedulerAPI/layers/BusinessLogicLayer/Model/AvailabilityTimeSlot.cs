@@ -10,6 +10,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
         public TimeOnly? EndTime { get; set; }
         public TimeOnly? StartTime { get; set; }
         public AvailabilityTimeSlotStatusType Status { get; set;}
+        public List<UnavailableTimeSlot>? UnavailableTimeSlots { get; set; }
 
         public List<Service>? Services { get; set; }
         public Assistant? Assistant { get; set; }

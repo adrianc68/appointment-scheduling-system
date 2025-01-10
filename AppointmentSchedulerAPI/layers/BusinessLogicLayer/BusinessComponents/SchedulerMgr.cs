@@ -261,7 +261,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     appointment.EndTime = appointment.ScheduledServices!.Max(ss => ss.ServiceEndTime);
                     appointment.TotalCost = appointment.ScheduledServices!.Sum(ss => ss.ServicePrice!.Value);
 
-
+                    // It can cause some gaps to appear!
 
                 }
                 (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointmentsById(appointments);
@@ -298,7 +298,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     appointment.EndTime = appointment.ScheduledServices!.Max(ss => ss.ServiceEndTime);
                     appointment.TotalCost = appointment.ScheduledServices!.Sum(ss => ss.ServicePrice!.Value);
 
-
+                     // It can cause some gaps to appear!
 
                 }
 
