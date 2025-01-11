@@ -144,7 +144,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
             if (isUpdated)
             {
-                SchedulerEvent<AvailabilityTimeSlotEventData> newEvent = new SchedulerEvent<AvailabilityTimeSlotEventData>
+                SchedulerEvent<AvailabilityTimeSlotEventData> availabilityTimeSlotEvent = new SchedulerEvent<AvailabilityTimeSlotEventData>
                 {
                     Source = EventSource.AVAILABILITY_TIME_SLOT,
                     EventType = SchedulerEventType.AVAILABILITY_TIME_SLOT_UPDATED,
@@ -153,7 +153,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                         Uuid = availabilityTimeSlot.Uuid,
                     }
                 };
-                this.NotifySuscribers(newEvent);
+                this.NotifySuscribers(availabilityTimeSlotEvent);
             }
 
             return isUpdated;
@@ -257,6 +257,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                         };
                         appointments.AddRange(await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByUidAndRange(slotData.Assistant!.Id!.Value, range));
                     }
+
                     appointments = appointments.DistinctBy(a => a.Id).ToList();
 
                     List<Appointment> appointmentsToCancel = [];
@@ -266,8 +267,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     {
                         var overlappingServices = appointment.ScheduledServices!
                             .Where(ss => slotData.UnavailableTimeSlots.Any(uts =>
-                                (ss.ServiceStartTime < uts.EndTime && ss.ServiceEndTime > uts.StartTime) || // Partially overlap
-                                (ss.ServiceStartTime >= uts.StartTime && ss.ServiceEndTime <= uts.EndTime))) // Fully overlap
+                                ((ss.ServiceStartTime < uts.EndTime && ss.ServiceEndTime > uts.StartTime) || // Partially overlap
+                                (ss.ServiceStartTime >= uts.StartTime && ss.ServiceEndTime <= uts.EndTime)) && // Fully overlap 
+                                ss.ServiceOffer!.Assistant!.Id!.Value == slotData.Assistant!.Id!.Value))
                             .ToList();
 
                         if (overlappingServices.Count == appointment.ScheduledServices!.Count)
@@ -288,6 +290,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                             appointmentsToReschedule.Add(appointment);
                         }
                     }
+
+                    // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
                     (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointments(appointmentsToCancel.Select(a => a.Id!.Value).ToList());
                     (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointments(appointmentsToReschedule);
                 }
@@ -313,31 +317,35 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             {
                 int idAssistant = assistantEvent.AssistantId!.Value;
                 List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByUid(idAssistant);
-                List<Appointment> appointmentWithAllScheduledServicesBeingOfferredByAssistant = appointments.FindAll(a => a.ScheduledServices!.All(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant));
 
-                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointments(appointmentWithAllScheduledServicesBeingOfferredByAssistant.Select(a => a.Id!.Value).ToList());
-
-                appointments.RemoveAll(a => appointmentWithAllScheduledServicesBeingOfferredByAssistant.Contains(a));
-
+                List<int> appointmentsToCancel = [];
+                List<Appointment> appointmentsToReschedule = [];
                 foreach (var appointment in appointments)
                 {
-                    var servicesToRemove = appointment.ScheduledServices!
-                        .Where(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant)
-                        .ToList();
+                    var scheduledServices = appointment.ScheduledServices!;
+                    var servicesToRemove = scheduledServices.Where(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant).ToList();
 
-                    foreach (var service in servicesToRemove)
+                    if (servicesToRemove.Count == scheduledServices.Count)
                     {
-                        appointment.ScheduledServices!.Remove(service);
+                        appointmentsToCancel.Add(appointment.Id!.Value);
                     }
+                    else
+                    {
+                        foreach (var service in servicesToRemove)
+                        {
+                            scheduledServices.Remove(service);
+                        }
+                        appointment.StartTime = scheduledServices.Min(ss => ss.ServiceStartTime);
+                        appointment.EndTime = scheduledServices.Max(ss => ss.ServiceEndTime);
+                        appointment.TotalCost = scheduledServices.Sum(ss => ss.ServicePrice!.Value);
 
-                    appointment.StartTime = appointment.ScheduledServices!.Min(ss => ss.ServiceStartTime);
-                    appointment.EndTime = appointment.ScheduledServices!.Max(ss => ss.ServiceEndTime);
-                    appointment.TotalCost = appointment.ScheduledServices!.Sum(ss => ss.ServicePrice!.Value);
-
-                    // It can cause some gaps to appear!
-
+                        appointmentsToReschedule.Add(appointment);
+                    }
                 }
+
+                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
                 (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointments(appointments);
+                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointments(appointmentsToCancel);
                 (bool allServiceOfferCanceled, List<int> changedStatusServiceOffers) = await this.ChangeAllServiceOfferStatusAsync(serviceOffers, ServiceOfferStatusType.NOT_AVAILABLE);
             }
             else if (assistantEvent.EventType == AssistantEventType.ENABLED)
@@ -350,31 +358,32 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
                 int idAssistant = assistantEvent.AssistantId!.Value;
                 List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByUid(idAssistant);
-                List<Appointment> appointmentWithAllScheduledServicesBeingOfferredByAssistant = appointments.FindAll(a => a.ScheduledServices!.All(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant));
 
-                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointments(appointmentWithAllScheduledServicesBeingOfferredByAssistant.Select(a => a.Id!.Value).ToList());
 
-                appointments.RemoveAll(a => appointmentWithAllScheduledServicesBeingOfferredByAssistant.Contains(a));
-
+                List<int> appointmentsToCancel = [];
+                List<Appointment> appointmentsToReschedule = [];
                 foreach (var appointment in appointments)
                 {
-                    var servicesToRemove = appointment.ScheduledServices!
-                        .Where(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant)
-                        .ToList();
+                    var scheduledServices = appointment.ScheduledServices!;
+                    var servicesToRemove = scheduledServices.Where(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant).ToList();
 
-                    foreach (var service in servicesToRemove)
+                    if (servicesToRemove.Count == scheduledServices.Count)
                     {
-                        appointment.ScheduledServices!.Remove(service);
+                        appointmentsToCancel.Add(appointment.Id!.Value);
                     }
+                    else
+                    {
+                        foreach (var service in servicesToRemove)
+                        {
+                            scheduledServices.Remove(service);
+                        }
+                        appointment.StartTime = scheduledServices.Min(ss => ss.ServiceStartTime);
+                        appointment.EndTime = scheduledServices.Max(ss => ss.ServiceEndTime);
+                        appointment.TotalCost = scheduledServices.Sum(ss => ss.ServicePrice!.Value);
 
-                    appointment.StartTime = appointment.ScheduledServices!.Min(ss => ss.ServiceStartTime);
-                    appointment.EndTime = appointment.ScheduledServices!.Max(ss => ss.ServiceEndTime);
-                    appointment.TotalCost = appointment.ScheduledServices!.Sum(ss => ss.ServicePrice!.Value);
-
-                    // It can cause some gaps to appear!
-
+                        appointmentsToReschedule.Add(appointment);
+                    }
                 }
-
 
                 (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointments(appointments);
                 (bool allServiceOfferCanceled, List<int> changedStatusServiceOffers) = await this.ChangeAllServiceOfferStatusAsync(serviceOffers, ServiceOfferStatusType.DELETED);
