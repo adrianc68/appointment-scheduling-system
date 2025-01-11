@@ -65,7 +65,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"You cannot schedule an appoinment in the past. You can only schedule from the current time", []);
                 genericError.AddData("SelectedDateTime", startDateTime.ToUniversalTime());
                 genericError.AddData("SuggestedDateTime", currentDateTime.AddMinutes(1).ToUniversalTime());
-                return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.CANNOT_SCHEDULE_APPOINTMENT_IN_THE_PAST);
+                return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SCHEDULING_IN_THE_PAST_NOT_ALLOWED);
             }
 
             if (startDateTime > maxDate)
@@ -73,7 +73,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"You cannot schedule an appoinment beyond {maxDate}.", []);
                 genericError.AddData("SelectedDateTime", startDateTime.ToUniversalTime());
                 genericError.AddData("SuggestedDateTime", currentDateTime.AddMinutes(5).ToUniversalTime());
-                return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.CANNOT_SCHEDULE_APPOINTMENT_BEYOND_X);
+                return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SCHEDULING_BEYOND_X_NOT_ALLOWED);
             }
 
             // Check max services per client
@@ -81,7 +81,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Too many services selected for the appointment. You can only select up to {MAX_SERVICES_PER_CLIENT} service(s) per appointment", []);
                 genericError.AddData("MaxServicesPerAppointment", MAX_SERVICES_PER_CLIENT);
-                return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.TOO_MANY_SERVICES_SELECTED);
+                return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SERVICES_LIMIT_REACHED);
             }
 
 
@@ -100,7 +100,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"Client with UUID <{clientData.Uuid}> is not available. Client was disabled or deleted!", []);
                 genericError.AddData("clientUuid", clientData.Uuid!.Value);
                 genericError.AddData("Status", clientData.Status!.Value.ToString());
-                return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.CLIENT_UNAVAILABLE);
+                return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_AVAILABLE);
             }
 
             // Check max allowed appoinments per client
@@ -111,7 +111,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"The client with UUID {clientData.Uuid} has reached the maximum allowed number of appoinments {MAX_APPOINTMENTS_PER_CLIENT}", []);
                 genericError.AddData("MaxAppointmentsPerClient", MAX_APPOINTMENTS_PER_CLIENT);
                 genericError.AddData("AppointmentsScheduledCount", scheduledAppoinmentsOfClientCount);
-                return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.MAX_SCHEDULED_APPOINTMENTS_REACHED);
+                return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SCHEDULED_LIMIT_REACHED);
             }
 
             // Get Services data
@@ -210,7 +210,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     error.AddData("SelectedServiceEndTime", serviceRange.EndTime);
                     error.AddData("AssistantUuid", scheduledService.ServiceOffer.Assistant!.Uuid!.Value);
                     error.AddData("AssistantName", scheduledService.ServiceOffer.Assistant!.Name!);
-                    return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.SELECTED_SERVICE_HAS_CONFLICTING_APPOINTMENT_TIME_SLOT);
+                    return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.APPOINTMENT_SELECTED_SERVICE_CONFLICT_WITH_TIME_SLOT);
                 }
             }
 
@@ -1321,7 +1321,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Too many services selected for the appointment. You can only select up to {MAX_SERVICES_PER_CLIENT} service(s) per appointment", []);
                 genericError.AddData("MaxServicesPerAppointment", MAX_SERVICES_PER_CLIENT);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.TOO_MANY_SERVICES_SELECTED);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SERVICES_LIMIT_REACHED);
             }
 
             if (!IsPastSchedulingAllowed && startDateTime < currentDateTime)
@@ -1329,7 +1329,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"You cannot schedule an appoinment in the past. You can only schedule from the current time", []);
                 genericError.AddData("SelectedDateTime", startDateTime.ToUniversalTime());
                 genericError.AddData("SuggestedDateTime", currentDateTime.AddMinutes(1).ToUniversalTime());
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CANNOT_SCHEDULE_APPOINTMENT_IN_THE_PAST);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SCHEDULING_IN_THE_PAST_NOT_ALLOWED);
             }
 
             if (startDateTime > maxDate)
@@ -1337,7 +1337,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"You cannot schedule an appoinment beyond {maxDate}.", []);
                 genericError.AddData("SelectedDateTime", startDateTime.ToUniversalTime());
                 genericError.AddData("SuggestedDateTime", currentDateTime.AddMinutes(5).ToUniversalTime());
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CANNOT_SCHEDULE_APPOINTMENT_BEYOND_X);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SCHEDULING_BEYOND_X_NOT_ALLOWED);
             }
 
 
@@ -1355,7 +1355,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"Client with UUID <{clientData.Uuid}> is not available. Client was disabled or deleted!", []);
                 genericError.AddData("clientUuid", clientData.Uuid!.Value);
                 genericError.AddData("Status", clientData.Status!.Value.ToString());
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CLIENT_UNAVAILABLE);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_AVAILABLE);
             }
             appointment.Client = clientData;
 
@@ -1368,7 +1368,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 GenericError genericError = new GenericError($"The client with UUID {clientData.Uuid} has reached the maximum allowed number of appoinments {MAX_APPOINTMENTS_PER_CLIENT}", []);
                 genericError.AddData("MaxAppointmentsPerClient", MAX_APPOINTMENTS_PER_CLIENT);
                 genericError.AddData("AppointmentsScheduledCount", scheduledAppoinmentsOfClientCount);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.MAX_SCHEDULED_APPOINTMENTS_REACHED);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SCHEDULED_LIMIT_REACHED);
             }
 
             // Get Services data
@@ -1471,7 +1471,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     GenericError error = new GenericError($"Cannot extend blocked time range, another blocked range overlaps. Remove some services", []);
                     error.AddData("BlockedTimeRange", timeRangeBlockedByUser.Result);
                     error.AddData("SelectedTimeRange", appointmentRange);
-                    return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.CANNOT_EXTEND_BLOCKED_TIME_RANGE);
+                    return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.APPOINTMENT_TIME_RANGE_LOCK_CANNOT_BE_EXTENDED);
                 }
             }
 
@@ -1510,7 +1510,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     error.AddData("SelectedServiceEndTime", serviceRange.EndTime);
                     error.AddData("AssistantUuid", scheduledService.ServiceOffer.Assistant!.Uuid!.Value);
                     error.AddData("AssistantName", scheduledService.ServiceOffer.Assistant!.Name!);
-                    return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.SELECTED_SERVICE_HAS_CONFLICTING_APPOINTMENT_TIME_SLOT);
+                    return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.APPOINTMENT_SELECTED_SERVICE_CONFLICT_WITH_TIME_SLOT);
                 }
             }
 

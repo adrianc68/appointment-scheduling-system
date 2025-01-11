@@ -24,7 +24,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                 if (blockedTimeSlots.Any(b => b.ClientUuid == clientUuid))
                 {
                     var error = new GenericError($"The user {clientUuid} has already blocked a time range.", []);
-                    return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.USER_ALREADY_HAS_BLOCKED_RANGE);
+                    return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.APPOINTMENT_TIME_RANGE_LOCK_HAS_BEEN_LOCKED_BY_USER);
                 }
 
                 var conflictingServices = blockedTimeSlots
@@ -42,7 +42,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                 {
                     var error = new GenericError($"Cannot block the specified time range. Another time range is already blocked.", []);
                     error.AddData("OverlappingTimeRanges:", conflictingServices);
-                    return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.SOMEONE_ELSE_IS_SCHEDULING_IN_RANGE_TIME);
+                    return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.APPOINTMENT_TIME_RANGE_LOCK_OCCUPPIED_BY_ANOTHER_USER);
                 }
 
                 int maxSecondsLock = int.Parse(envService.Get("MAX_SECONDS_SCHEDULING_LOCK"));
@@ -87,7 +87,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                 if (existingBlock == null)
                 {
                     var error = new GenericError($"No existing block found for user {clientUuid}.");
-                    return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.NO_DATE_TIME_RANGE_LOCK_FOUND);
+                    return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.APPOINTMENT_TIME_RANGE_LOCK_NOT_FOUND);
                 }
 
                 if (blockedTimeSlots.Any(b => b.ClientUuid != clientUuid &&
@@ -96,7 +96,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                                               newRange.EndTime > b.TotalServicesTimeRange.StartTime))
                 {
                     var error = new GenericError($"Cannot extend range. Another range overlaps.");
-                    return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.SOMEONE_ELSE_IS_SCHEDULING_IN_RANGE_TIME);
+                    return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.APPOINTMENT_TIME_RANGE_LOCK_OCCUPPIED_BY_ANOTHER_USER);
                 }
                 return OperationResult<bool, GenericError>.Success(true);
             }
@@ -111,7 +111,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                 if (block == null)
                 {
                     var error = new GenericError($"No blocked range found for user {clientUuid}");
-                    return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.NO_DATE_TIME_RANGE_LOCK_FOUND);
+                    return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.APPOINTMENT_TIME_RANGE_LOCK_NOT_FOUND);
                 }
 
                 block.LockTimer!.Dispose();
@@ -129,7 +129,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.T
                 if (block == null)
                 {
                     var error = new GenericError($"No blocked range found for user with UUID {clientUuid}.");
-                    return OperationResult<BlockedTimeSlot, GenericError>.Failure(error, MessageCodeType.NO_DATE_TIME_RANGE_LOCK_FOUND);
+                    return OperationResult<BlockedTimeSlot, GenericError>.Failure(error, MessageCodeType.APPOINTMENT_TIME_RANGE_LOCK_NOT_FOUND);
                 }
                 return OperationResult<BlockedTimeSlot, GenericError>.Success(block);
             }
