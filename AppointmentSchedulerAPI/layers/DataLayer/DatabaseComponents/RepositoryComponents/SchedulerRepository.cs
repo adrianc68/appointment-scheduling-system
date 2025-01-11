@@ -615,6 +615,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var availabilityTimeSlotDB = await dbContext.AvailabilityTimeSlots
+                    .Include(una => una.UnavailableTimeSlots)
                     .Include(a => a.Assistant)
                         .ThenInclude(ass => ass!.UserAccount)
                         .ThenInclude(assc => assc!.UserInformation)
@@ -638,7 +639,12 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Name = availabilityTimeSlotDB.Assistant!.UserAccount!.UserInformation!.Name,
                     Uuid = availabilityTimeSlotDB.Assistant.UserAccount.Uuid,
                     Id = availabilityTimeSlotDB.Assistant.IdUserAccount
-                }
+                },
+                UnavailableTimeSlots = availabilityTimeSlotDB.UnavailableTimeSlots?.Select(a => new BusinessLogicLayer.Model.UnavailableTimeSlot
+                {
+                    StartTime = a.StartTime!.Value,
+                    EndTime = a.EndTime!.Value
+                }).ToList()
             };
 
             return availabilityTimeSlotsModel;
@@ -964,6 +970,62 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }
 
             return dbAppointments;
+        }
+
+        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByUidAndRange(int idAssistant, DateTimeRange range)
+        {
+            using var dbContext = context.CreateDbContext();
+
+            var dbAppointments = await dbContext.Appointments
+                .Include(a => a.ScheduledServices!)
+                    .ThenInclude(ss => ss.ServiceOffer)
+                    .ThenInclude(se => se!.Assistant)
+                    .ThenInclude(ac => ac!.UserAccount)
+                    .ThenInclude(ui => ui!.UserInformation)
+                .Include(cl => cl.Client)
+                    .ThenInclude(ac => ac!.UserAccount)
+            .Where(app => (app.Status == Model.Types.AppointmentStatusType.SCHEDULED || app.Status == Model.Types.AppointmentStatusType.CONFIRMED || app.Status == Model.Types.AppointmentStatusType.RESCHEDULED) &&
+                            app.Date == range.Date &&
+                            app.ScheduledServices!.Any(ax => ax.ServiceOffer!.Assistant!.IdUserAccount == idAssistant && 
+                                                                               (ax.ServiceStartTime < range.EndTime && ax.ServiceEndTime > range.StartTime)
+                            )
+            ).ToListAsync();
+
+            var businessAppointments = dbAppointments.Select(dbApp => new BusinessLogicLayer.Model.Appointment
+            {
+                Id = dbApp.Id,
+                Date = dbApp.Date,
+                Status = (AppointmentStatusType)dbApp.Status!.Value,
+                StartTime = dbApp.StartTime,
+                TotalCost = dbApp.TotalCost,
+                Client = new BusinessLogicLayer.Model.Client
+                {
+                    Id = dbApp.Client!.IdUserAccount
+                },
+                ScheduledServices = dbApp.ScheduledServices!.Select(ss => new BusinessLogicLayer.Model.ScheduledService
+                {
+                    Id = ss.Id,
+                    Uuid = ss.Uuid,
+                    ServiceStartTime = ss.ServiceStartTime,
+                    ServiceEndTime = ss.ServiceEndTime,
+                    ServicePrice = ss.ServicePrice,
+                    ServicesMinutes = ss.ServicesMinutes,
+                    ServiceName = ss.ServiceName,
+                    ServiceOffer = new BusinessLogicLayer.Model.ServiceOffer
+                    {
+                        Id = ss.ServiceOffer!.Id,
+                        Uuid = ss.ServiceOffer.Uuid,
+                        Status = (ServiceOfferStatusType?)ss.ServiceOffer.Status,
+                        Assistant = new BusinessLogicLayer.Model.Assistant
+                        {
+                            Id = ss.ServiceOffer.Assistant!.IdUserAccount,
+                            Uuid = ss.ServiceOffer.Assistant!.UserAccount!.Uuid,
+                            Name = ss.ServiceOffer.Assistant!.UserAccount!.UserInformation!.Name,
+                        }
+                    }
+                }).ToList()
+            }).ToList();
+            return businessAppointments;
         }
     }
 }

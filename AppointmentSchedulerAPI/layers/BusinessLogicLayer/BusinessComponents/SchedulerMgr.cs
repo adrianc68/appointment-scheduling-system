@@ -141,6 +141,21 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<bool> UpdateAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot)
         {
             bool isUpdated = await schedulerRepository.UpdateAvailabilityTimeSlot(availabilityTimeSlot);
+
+            if (isUpdated)
+            {
+                SchedulerEvent<AvailabilityTimeSlotEventData> newEvent = new SchedulerEvent<AvailabilityTimeSlotEventData>
+                {
+                    Source = EventSource.AVAILABILITY_TIME_SLOT,
+                    EventType = SchedulerEventType.AVAILABILITY_TIME_SLOT_UPDATED,
+                    EventData = new AvailabilityTimeSlotEventData
+                    {
+                        Uuid = availabilityTimeSlot.Uuid,
+                    }
+                };
+                this.NotifySuscribers(newEvent);
+            }
+
             return isUpdated;
         }
 
@@ -217,9 +232,67 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             }
         }
 
-        public void UpdateOnSchedulerEvent<T>(SchedulerEvent<T> schedulerEvent)
+        public async void UpdateOnSchedulerEvent<T>(SchedulerEvent<T> schedulerEvent)
         {
-            throw new NotImplementedException();
+            if (schedulerEvent.EventType == SchedulerEventType.AVAILABILITY_TIME_SLOT_UPDATED)
+            {
+                AvailabilityTimeSlotEventData? slotEventData = schedulerEvent.EventData as AvailabilityTimeSlotEventData;
+                AvailabilityTimeSlot? slotData = await schedulerRepository.GetAvailabilityTimeSlotByUuidAsync(slotEventData!.Uuid!.Value);
+                if (slotData != null)
+                {
+                    if (slotData.UnavailableTimeSlots == null || slotData.UnavailableTimeSlots!.Count == 0)
+                    {
+                        return;
+                    }
+
+                    List<Appointment> appointments = [];
+
+                    foreach (var unavailableSlot in slotData.UnavailableTimeSlots!)
+                    {
+                        DateTimeRange range = new DateTimeRange
+                        {
+                            StartTime = unavailableSlot.StartTime,
+                            EndTime = unavailableSlot.EndTime,
+                            Date = slotData.Date!.Value
+                        };
+                        appointments.AddRange(await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByUidAndRange(slotData.Assistant!.Id!.Value, range));
+                    }
+                    appointments = appointments.DistinctBy(a => a.Id).ToList();
+
+                    List<Appointment> appointmentsToCancel = [];
+                    List<Appointment> appointmentsToReschedule = [];
+
+                    foreach (var appointment in appointments)
+                    {
+                        var overlappingServices = appointment.ScheduledServices!
+                            .Where(ss => slotData.UnavailableTimeSlots.Any(uts =>
+                                (ss.ServiceStartTime < uts.EndTime && ss.ServiceEndTime > uts.StartTime) || // Partially overlap
+                                (ss.ServiceStartTime >= uts.StartTime && ss.ServiceEndTime <= uts.EndTime))) // Fully overlap
+                            .ToList();
+
+                        if (overlappingServices.Count == appointment.ScheduledServices!.Count)
+                        {
+                            appointmentsToCancel.Add(appointment);
+                        }
+                        else if (overlappingServices.Count > 0)
+                        {
+                            foreach (var service in overlappingServices)
+                            {
+                                appointment.ScheduledServices!.Remove(service);
+                            }
+
+                            appointment.StartTime = appointment.ScheduledServices!.Min(ss => ss.ServiceStartTime);
+                            appointment.EndTime = appointment.ScheduledServices!.Max(ss => ss.ServiceEndTime);
+                            appointment.TotalCost = appointment.ScheduledServices!.Sum(ss => ss.ServicePrice!.Value);
+
+                            appointmentsToReschedule.Add(appointment);
+                        }
+                    }
+                    (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointments(appointmentsToCancel.Select(a => a.Id!.Value).ToList());
+                    (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointments(appointmentsToReschedule);
+                }
+
+            }
         }
 
         public async void UpdateOnClientChanged(ClientEvent clientEvent)
@@ -228,7 +301,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             {
                 // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
                 List<int> appointmentsIds = await schedulerRepository.GetScheduledOrConfirmedAppoinmentsIdsOfClientById(clientEvent.ClientId!.Value);
-                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointmentsById(appointmentsIds);
+                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointments(appointmentsIds);
             }
         }
 
@@ -242,7 +315,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByUid(idAssistant);
                 List<Appointment> appointmentWithAllScheduledServicesBeingOfferredByAssistant = appointments.FindAll(a => a.ScheduledServices!.All(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant));
 
-                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointmentsById(appointmentWithAllScheduledServicesBeingOfferredByAssistant.Select(a => a.Id!.Value).ToList());
+                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointments(appointmentWithAllScheduledServicesBeingOfferredByAssistant.Select(a => a.Id!.Value).ToList());
 
                 appointments.RemoveAll(a => appointmentWithAllScheduledServicesBeingOfferredByAssistant.Contains(a));
 
@@ -264,7 +337,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     // It can cause some gaps to appear!
 
                 }
-                (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointmentsById(appointments);
+                (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointments(appointments);
                 (bool allServiceOfferCanceled, List<int> changedStatusServiceOffers) = await this.ChangeAllServiceOfferStatusAsync(serviceOffers, ServiceOfferStatusType.NOT_AVAILABLE);
             }
             else if (assistantEvent.EventType == AssistantEventType.ENABLED)
@@ -279,7 +352,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByUid(idAssistant);
                 List<Appointment> appointmentWithAllScheduledServicesBeingOfferredByAssistant = appointments.FindAll(a => a.ScheduledServices!.All(ss => ss.ServiceOffer!.Assistant!.Id == idAssistant));
 
-                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointmentsById(appointmentWithAllScheduledServicesBeingOfferredByAssistant.Select(a => a.Id!.Value).ToList());
+                (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointments(appointmentWithAllScheduledServicesBeingOfferredByAssistant.Select(a => a.Id!.Value).ToList());
 
                 appointments.RemoveAll(a => appointmentWithAllScheduledServicesBeingOfferredByAssistant.Contains(a));
 
@@ -298,12 +371,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     appointment.EndTime = appointment.ScheduledServices!.Max(ss => ss.ServiceEndTime);
                     appointment.TotalCost = appointment.ScheduledServices!.Sum(ss => ss.ServicePrice!.Value);
 
-                     // It can cause some gaps to appear!
+                    // It can cause some gaps to appear!
 
                 }
 
 
-                (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointmentsById(appointments);
+                (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointments(appointments);
                 (bool allServiceOfferCanceled, List<int> changedStatusServiceOffers) = await this.ChangeAllServiceOfferStatusAsync(serviceOffers, ServiceOfferStatusType.DELETED);
                 // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
             }
@@ -325,7 +398,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (allCanceled, failedServiceOffers);
         }
 
-        private async Task<(bool, List<int>)> CancelScheduledOrConfirmedAppointmentsById(List<int> appointmentsIds)
+        private async Task<(bool, List<int>)> CancelScheduledOrConfirmedAppointments(List<int> appointmentsIds)
         {
             List<int> failedAppointments = new();
             bool allCanceled = true;
@@ -341,7 +414,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (allCanceled, failedAppointments);
         }
 
-        private async Task<(bool, List<int>)> RescheduleScheduledOrConfirmedAppointmentsById(List<Appointment> appointments)
+        private async Task<(bool, List<int>)> RescheduleScheduledOrConfirmedAppointments(List<Appointment> appointments)
         {
             List<int> failedAppointments = new();
             bool allCanceled = true;
