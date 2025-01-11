@@ -78,7 +78,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     StartTime = availabilityTimeSlot.StartTime,
                     EndTime = availabilityTimeSlot.EndTime,
                     IdAssistant = availabilityTimeSlot.Assistant!.Id,
-                    Status = Model.Types.AvailabilityTimeSlotStatusType.AVAILABLE
+                    Status = Model.Types.AvailabilityTimeSlotStatusType.ENABLED
                 };
                 dbContext.AvailabilityTimeSlots.Add(timeSlot);
                 await dbContext.SaveChangesAsync();
@@ -179,7 +179,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var availableServices = await dbContext.AvailabilityTimeSlots
-                .Where(slot => slot.Date >= startDate && slot.Date <= endDate && slot.Status == Model.Types.AvailabilityTimeSlotStatusType.AVAILABLE)
+                .Where(slot => slot.Date >= startDate && slot.Date <= endDate && slot.Status == Model.Types.AvailabilityTimeSlotStatusType.ENABLED)
                     .Include(a => a.Assistant)
                         .ThenInclude(ass => ass!.UserAccount)
                         .ThenInclude(assc => assc!.UserInformation)
@@ -611,6 +611,45 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return true;
         }
 
+        public async Task<BusinessLogicLayer.Model.AvailabilityTimeSlot?> GetAvailabilityTimeSlotByIdAsync(int idAvailabilityTimeSlot)
+        {
+            using var dbContext = context.CreateDbContext();
+            var availabilityTimeSlotDB = await dbContext.AvailabilityTimeSlots
+                    .Include(una => una.UnavailableTimeSlots)
+                    .Include(a => a.Assistant)
+                        .ThenInclude(ass => ass!.UserAccount)
+                        .ThenInclude(assc => assc!.UserInformation)
+                    .FirstOrDefaultAsync(a => a.Id == idAvailabilityTimeSlot);
+
+            if (availabilityTimeSlotDB == null)
+            {
+                return null;
+            }
+
+            var availabilityTimeSlotsModel = new BusinessLogicLayer.Model.AvailabilityTimeSlot
+            {
+                Id = availabilityTimeSlotDB!.Id,
+                Uuid = availabilityTimeSlotDB.Uuid,
+                Date = availabilityTimeSlotDB.Date,
+                StartTime = availabilityTimeSlotDB.StartTime,
+                EndTime = availabilityTimeSlotDB.EndTime,
+                Status = (BusinessLogicLayer.Model.Types.AvailabilityTimeSlotStatusType)availabilityTimeSlotDB.Status,
+                Assistant = new BusinessLogicLayer.Model.Assistant
+                {
+                    Name = availabilityTimeSlotDB.Assistant!.UserAccount!.UserInformation!.Name,
+                    Uuid = availabilityTimeSlotDB.Assistant.UserAccount.Uuid,
+                    Id = availabilityTimeSlotDB.Assistant.IdUserAccount
+                },
+                UnavailableTimeSlots = availabilityTimeSlotDB.UnavailableTimeSlots?.Select(a => new BusinessLogicLayer.Model.UnavailableTimeSlot
+                {
+                    StartTime = a.StartTime!.Value,
+                    EndTime = a.EndTime!.Value
+                }).ToList()
+            };
+
+            return availabilityTimeSlotsModel;
+        }
+
         public async Task<BusinessLogicLayer.Model.AvailabilityTimeSlot?> GetAvailabilityTimeSlotByUuidAsync(Guid uuid)
         {
             using var dbContext = context.CreateDbContext();
@@ -986,7 +1025,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     .ThenInclude(ac => ac!.UserAccount)
             .Where(app => (app.Status == Model.Types.AppointmentStatusType.SCHEDULED || app.Status == Model.Types.AppointmentStatusType.CONFIRMED || app.Status == Model.Types.AppointmentStatusType.RESCHEDULED) &&
                             app.Date == range.Date &&
-                            app.ScheduledServices!.Any(ax => ax.ServiceOffer!.Assistant!.IdUserAccount == idAssistant && 
+                            app.ScheduledServices!.Any(ax => ax.ServiceOffer!.Assistant!.IdUserAccount == idAssistant &&
                                                                                (ax.ServiceStartTime < range.EndTime && ax.ServiceEndTime > range.StartTime)
                             )
             ).ToListAsync();

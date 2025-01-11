@@ -45,9 +45,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             List<BlockedServiceTimeSlotDTO> rangesBlocked = result.Result!.Select(slot => new BlockedServiceTimeSlotDTO
             {
                 BlockedRange = slot.TotalServicesTimeRange,
-                BlockedServices = slot.SelectedServices.Select(blockedService => new AssistantServiceBlockedTimeSlotDataDTO 
+                BlockedServices = slot.SelectedServices.Select(blockedService => new AssistantServiceBlockedTimeSlotDataDTO
                 {
-                    Assistant = new AssistantBlockedTimeSlotDTO 
+                    Assistant = new AssistantBlockedTimeSlotDTO
                     {
                         Uuid = blockedService.AssistantUuid,
                     },
@@ -153,6 +153,55 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             try
             {
                 OperationResult<bool, GenericError> result = await systemFacade.DeleteAvailabilityTimeSlotAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
+
+
+        [HttpPatch("availabilityTimeSlot/disable")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DisableAvailabilityTimeSlot([FromBody] DisableAvailabilityTimeSlotDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DisableAvailabilityTimeSlotAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
+
+        [HttpPatch("availabilityTimeSlot/enable")]
+        [AllowAnonymous]
+        public async Task<IActionResult> EnableAvailabilityTimeSlot([FromBody] DisableAvailabilityTimeSlotDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.EnableAvailabilityTimeSlotAsync(dto.Uuid);
                 if (result.IsSuccessful)
                 {
                     isStatusChanged = result.Result;
@@ -584,12 +633,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         Name = a.ServiceOffer!.Assistant!.Name,
                         Uuid = a.ServiceOffer!.Assistant!.Uuid!.Value
                     },
-                    TimeRange = new ConflictingAppointmentTimeRangeDTO 
+                    TimeRange = new ConflictingAppointmentTimeRangeDTO
                     {
                         StartTime = a.ServiceStartTime!.Value,
                         EndTime = a.ServiceEndTime!.Value
                     }
- 
+
                 }).ToList();
             }
             catch (System.Exception ex)

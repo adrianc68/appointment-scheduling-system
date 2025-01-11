@@ -21,6 +21,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<bool> HasAvailabilityTimeSlotConflictingSlotsAsync(DateTimeRange date, int idAvailabilityTimeSlot, int idAssistant);
         Task<int?> GetAvailabilityTimeSlotIdByUuidAsync(Guid uuid);
         Task<AvailabilityTimeSlot?> GetAvailabilityTimeSlotByUuidAsync(Guid uuid);
+        Task<AvailabilityTimeSlot?> GetAvailabilityTimeSlotByIdAsync(int idAvailabilityTimeSlot);
         Task<IEnumerable<ScheduledService>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
         Task<IEnumerable<DateTimeRange>> GetAppointmentDateTimeRangeConflictsByRange(DateTimeRange range);
         Task<ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid);

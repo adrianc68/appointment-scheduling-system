@@ -69,7 +69,7 @@ CREATE TYPE "RoleType" AS ENUM ('ADMINISTRATOR', 'CLIENT', 'ASSISTANT');
 
 CREATE TYPE "ServiceOfferStatusType" AS ENUM ('AVAILABLE', 'NOT_AVAILABLE', 'DELETED');
 
-CREATE TYPE "AvailabilityTimeSlotStatusType" AS ENUM ('AVAILABLE', 'UNAVAILABLE', 'DELETED');
+CREATE TYPE "AvailabilityTimeSlotStatusType" AS ENUM ('AVAILABLE', '', 'DELETED');
 
 /* Create Tables */
 

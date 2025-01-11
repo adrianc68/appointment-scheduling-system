@@ -135,6 +135,32 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async Task<bool> ChangeAvailabilityStatusTypeAsync(int idAvailabilityTimeSlot, AvailabilityTimeSlotStatusType status)
         {
             bool isStatusChanged = await schedulerRepository.ChangeAvailabilityStatusTypeAsync(idAvailabilityTimeSlot, status);
+            if (isStatusChanged)
+            {
+                SchedulerEventType eventType = status switch
+                {
+                    AvailabilityTimeSlotStatusType.DISABLED => SchedulerEventType.AVAILABILITY_TIME_SLOT_DISABLED,
+                    AvailabilityTimeSlotStatusType.DELETED => SchedulerEventType.AVAILABILITY_TIME_SLOT_DELETED,
+                    AvailabilityTimeSlotStatusType.ENABLED => SchedulerEventType.AVAILABILITY_TIME_SLOT_ENABLED,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                SchedulerEvent<AvailabilityTimeSlotEventData> availabilityTimeSlotEvent = new SchedulerEvent<AvailabilityTimeSlotEventData>
+                {
+                    Source = EventSource.AVAILABILITY_TIME_SLOT,
+                    EventType = eventType,
+                    EventData = new AvailabilityTimeSlotEventData
+                    {
+                        Id = idAvailabilityTimeSlot
+                    }
+                };
+
+                if (status == AvailabilityTimeSlotStatusType.DISABLED || status == AvailabilityTimeSlotStatusType.DELETED)
+                {
+                    this.NotifySuscribers(availabilityTimeSlotEvent);
+                }
+            }
+
             return isStatusChanged;
         }
 
@@ -260,7 +286,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
                     appointments = appointments.DistinctBy(a => a.Id).ToList();
 
-                    List<Appointment> appointmentsToCancel = [];
+                    List<int> appointmentsToCancel = [];
                     List<Appointment> appointmentsToReschedule = [];
 
                     foreach (var appointment in appointments)
@@ -274,7 +300,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
                         if (overlappingServices.Count == appointment.ScheduledServices!.Count)
                         {
-                            appointmentsToCancel.Add(appointment);
+                            appointmentsToCancel.Add(appointment.Id!.Value);
                         }
                         else if (overlappingServices.Count > 0)
                         {
@@ -292,10 +318,55 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     }
 
                     // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
-                    (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointments(appointmentsToCancel.Select(a => a.Id!.Value).ToList());
+                    (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointments(appointmentsToCancel);
                     (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointments(appointmentsToReschedule);
                 }
+            }
+            else if (schedulerEvent.EventType == SchedulerEventType.AVAILABILITY_TIME_SLOT_DISABLED || schedulerEvent.EventType == SchedulerEventType.AVAILABILITY_TIME_SLOT_DELETED)
+            {
+                AvailabilityTimeSlotEventData? slotEventData = schedulerEvent.EventData as AvailabilityTimeSlotEventData;
+                AvailabilityTimeSlot? slotData = await schedulerRepository.GetAvailabilityTimeSlotByIdAsync(slotEventData!.Id!.Value);
+                if (slotData != null)
+                {
+                    DateTimeRange range = new DateTimeRange
+                    {
+                        StartTime = slotData.StartTime!.Value,
+                        EndTime = slotData.EndTime!.Value,
+                        Date = slotData.Date!.Value
+                    };
+                    List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByUidAndRange(slotData.Assistant!.Id!.Value, range);
+                    appointments = appointments.DistinctBy(a => a.Id).ToList();
 
+                    List<int> appointmentsToCancel = [];
+                    List<Appointment> appointmentsToReschedule = [];
+
+                    foreach (var appointment in appointments)
+                    {
+                        var scheduledServices = appointment.ScheduledServices!;
+                        var servicesToRemove = scheduledServices.Where(ss => ss.ServiceOffer!.Assistant!.Id == slotData.Assistant.Id.Value).ToList();
+
+                        if (servicesToRemove.Count == scheduledServices.Count)
+                        {
+                            appointmentsToCancel.Add(appointment.Id!.Value);
+                        }
+                        else
+                        {
+                            foreach (var service in servicesToRemove)
+                            {
+                                scheduledServices.Remove(service);
+                            }
+                            appointment.StartTime = scheduledServices.Min(ss => ss.ServiceStartTime);
+                            appointment.EndTime = scheduledServices.Max(ss => ss.ServiceEndTime);
+                            appointment.TotalCost = scheduledServices.Sum(ss => ss.ServicePrice!.Value);
+
+                            appointmentsToReschedule.Add(appointment);
+                        }
+                    }
+
+                    // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
+                    (bool allCanceled, List<int> cancelAppoinments) = await this.CancelScheduledOrConfirmedAppointments(appointmentsToCancel);
+                    (bool allRescheduled, List<int> rescheduledAppointments) = await this.RescheduleScheduledOrConfirmedAppointments(appointmentsToReschedule);
+                }
             }
         }
 
