@@ -1,9 +1,9 @@
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types
 {
-    public enum RoleType
+    public enum AccountStatusType
     {
-        ADMINISTRATOR,
-        CLIENT,
-        ASSISTANT
+        ENABLED,
+        DISABLED,
+        DELETED,
     }
 }

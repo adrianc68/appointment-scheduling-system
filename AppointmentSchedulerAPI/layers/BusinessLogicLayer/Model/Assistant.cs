@@ -11,7 +11,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
         public string? Password { get; set; }
         public string? Username { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public AssistantStatusType? Status { get; set; }
+        public AccountStatusType? Status { get; set; }
         public Guid? Uuid { get; set; }
 
         public List<Service>? Services { get; set; }

@@ -1,17 +1,33 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Interfaces;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using Microsoft.AspNetCore.SignalR;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.SignalRNotifier
 {
     public class NotificationHub : Hub, INotifier
     {
-        private readonly IHubContext<NotificationHub> _hubContext;
-        private static readonly Dictionary<string, string> _userConnections = new();
+        private readonly IHubContext<NotificationHub> hubContext;
+        private static readonly Dictionary<string, string> userConnections = new();
 
 
         public NotificationHub(IHubContext<NotificationHub> hubContext)
         {
-            _hubContext = hubContext;
+            this.hubContext = hubContext;
+        }
+
+        public void AddUser(string username)
+        {
+            var connectionId = Context.ConnectionId;
+            if (!userConnections.ContainsKey(username))
+            {
+                userConnections.Add(username, connectionId);
+            }
+            else
+            {
+                userConnections[username] = connectionId; 
+            }
+            PropToString.PrintListData(userConnections);
+            System.Console.WriteLine($"User {username} connected with connectionId {connectionId}");
         }
 
         public override Task OnConnectedAsync()
@@ -19,7 +35,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
             var username = Context.User?.Identity?.Name;
             if (!string.IsNullOrEmpty(username))
             {
-                _userConnections[username] = Context.ConnectionId;
+                userConnections[username] = Context.ConnectionId;
             }
             return base.OnConnectedAsync();
         }
@@ -29,7 +45,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
             var username = Context.User?.Identity?.Name;
             if (!string.IsNullOrEmpty(username))
             {
-                _userConnections.Remove(username);
+                userConnections.Remove(username);
             }
             return base.OnDisconnectedAsync(exception);
         }
@@ -46,24 +62,26 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
 
         public async Task SendToAllAsync(string message)
         {
-            await _hubContext.Clients.All.SendAsync("ReceiveNotification", message);
+            await hubContext.Clients.All.SendAsync("ReceiveNotification", message);
         }
 
         public async Task SendToGroupAsync(string groupName, string message)
         {
-            await _hubContext.Clients.Group(groupName).SendAsync("ReceiveNotification", message);
+            await hubContext.Clients.Group(groupName).SendAsync("ReceiveNotification", message);
         }
 
         public async Task SendToUserAsync(string recipient, string message)
         {
-            if (_userConnections.TryGetValue(recipient, out var connectionId))
+            if (userConnections.TryGetValue(recipient, out var connectionId))
             {
-                await Clients.Client(connectionId).SendAsync("ReceiveNotification", message);
+                await hubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", message);
             }
             else
             {
+                System.Console.WriteLine("User is not connected");
                 // User is not connected!!! $$$>> Resolve this
             }
+            await Task.CompletedTask;
         }
     }
 }

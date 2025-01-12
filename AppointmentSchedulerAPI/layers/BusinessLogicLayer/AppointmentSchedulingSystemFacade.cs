@@ -1,34 +1,44 @@
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AccountInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AssistantInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ClientInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.AccountMgr.Interfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.AccountMgr.Types;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Interfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authentication;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 {
-    public class AppointmentSchedulingSystemFacade : ISchedulingInterfaces, IServiceInterfaces, IClientInterfaces, IAssistantInterfaces
+    public class AppointmentSchedulingSystemFacade : ISchedulingInterfaces, IServiceInterfaces, IClientInterfaces, IAssistantInterfaces, IAccountInterfaces
     {
         private readonly IServiceMgt serviceMgr;
         private readonly ISchedulerMgt schedulerMgr;
         private readonly IAssistantMgt assistantMgr;
         private readonly IClientMgt clientMgr;
+        private readonly IAccountMgt accountMgr;
         private readonly EnvironmentVariableService envService;
         private readonly ITimeSlotLockMgt timeRangeLockMgr;
+        private readonly IAuthenticationService<JwtUserCredentials, JwtTokenResult, JwtTokenData> authJwtService;
 
-        public AppointmentSchedulingSystemFacade(IServiceMgt serviceMgr, IAssistantMgt assistantMgr, IClientMgt clientMgr, ISchedulerMgt schedulerMgr, ITimeSlotLockMgt timeRangeLockMgr, EnvironmentVariableService envService)
+        public AppointmentSchedulingSystemFacade(IServiceMgt serviceMgr, IAssistantMgt assistantMgr, IClientMgt clientMgr, ISchedulerMgt schedulerMgr, IAccountMgt accountMgr, ITimeSlotLockMgt timeRangeLockMgr, EnvironmentVariableService envService, IAuthenticationService<JwtUserCredentials, JwtTokenResult, JwtTokenData> authJwtService)
         {
             this.serviceMgr = serviceMgr;
             this.schedulerMgr = schedulerMgr;
             this.assistantMgr = assistantMgr;
+            this.accountMgr = accountMgr;
             this.clientMgr = clientMgr;
             this.timeRangeLockMgr = timeRangeLockMgr;
             this.envService = envService;
+            this.authJwtService = authJwtService;
         }
 
         public Task<OperationResult<bool, GenericError>> EditAppointment(Appointment appointment)
@@ -95,7 +105,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
             }
 
-            if (clientData.Status != ClientStatusType.ENABLED)
+            if (clientData.Status != AccountStatusType.ENABLED)
             {
                 GenericError genericError = new GenericError($"Client with UUID <{clientData.Uuid}> is not available. Client was disabled or deleted!", []);
                 genericError.AddData("clientUuid", clientData.Uuid!.Value);
@@ -126,7 +136,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
                 }
 
-                if (serviceOfferData.Assistant!.Status != AssistantStatusType.ENABLED || serviceOfferData.Service!.Status != ServiceStatusType.ENABLED)
+                if (serviceOfferData.Assistant!.Status != AccountStatusType.ENABLED || serviceOfferData.Service!.Status != ServiceStatusType.ENABLED)
                 {
                     GenericError genericError = new GenericError($"Service or assistant is deleted or disabled. ServiceOffer with UUID <{serviceOffer.Uuid.Value}> is unavailable", []);
                     genericError.AddData("SelectedServiceUuid", serviceOfferData.Uuid!.Value);
@@ -268,7 +278,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
-            if (assistantData.Status != AssistantStatusType.ENABLED)
+            if (assistantData.Status != AccountStatusType.ENABLED)
             {
                 GenericError genericError = new GenericError($"Cannot assign slot. Assistant with UUID <{assistantData!.Uuid!.Value}>. Assistant is unavailable!", []);
                 genericError.AddData("AssistantUuid", assistantData!.Uuid.Value);
@@ -366,7 +376,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
-            if (assistantData.Status == AssistantStatusType.DELETED)
+            if (assistantData.Status == AccountStatusType.DELETED)
             {
                 GenericError genericError = new GenericError($"Cannot modify Assistant with UUID <{assistantData.Uuid}>. Assistant was deleted!", []);
                 genericError.AddData("AssistantUuid", assistantData.Uuid!.Value);
@@ -376,23 +386,23 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
             if (assistant.Username != assistantData.Username)
             {
-                bool newUsernameIsRegistered = await assistantMgr.IsUsernameRegisteredAsync(assistant.Username!);
+                bool newUsernameIsRegistered = await accountMgr.IsUsernameRegisteredAsync(assistant.Username!);
                 if (newUsernameIsRegistered)
                 {
                     GenericError genericError = new GenericError($"Username <{assistant.Username}> is already registered", []);
                     genericError.AddData("username", assistant.Username!);
-                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_USERNAME_ALREADY_REGISTERED);
                 }
             }
 
             if (assistant.Email != assistantData.Email)
             {
-                bool newEmailRegistered = await assistantMgr.IsEmailRegisteredAsync(assistant.Email!);
+                bool newEmailRegistered = await accountMgr.IsEmailRegisteredAsync(assistant.Email!);
                 if (newEmailRegistered)
                 {
                     GenericError genericError = new GenericError($"Email <{assistant.Email}> is already registered", []);
                     genericError.AddData("email", assistant.Email!);
-                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_EMAIL_ALREADY_REGISTERED);
                 }
             }
 
@@ -414,7 +424,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
             }
 
-            if (clientData.Status == ClientStatusType.DELETED)
+            if (clientData.Status == AccountStatusType.DELETED)
             {
                 GenericError genericError = new GenericError($"Cannot modify Client with UUID <{clientData.Uuid}>. Client was deleted!", []);
                 genericError.AddData("clientUuid", clientData.Uuid!.Value);
@@ -424,23 +434,23 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
             if (client.Username != clientData.Username)
             {
-                bool newUsernameIsRegistered = await clientMgr.IsUsernameRegisteredAsync(client.Username!);
+                bool newUsernameIsRegistered = await accountMgr.IsUsernameRegisteredAsync(client.Username!);
                 if (newUsernameIsRegistered)
                 {
                     GenericError genericError = new GenericError($"Username <{client.Username}> is already registered", []);
                     genericError.AddData("username", client.Username!);
-                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_USERNAME_ALREADY_REGISTERED);
                 }
             }
 
             if (client.Email != clientData.Email)
             {
-                bool newEmailRegistered = await clientMgr.IsEmailRegisteredAsync(client.Email!);
+                bool newEmailRegistered = await accountMgr.IsEmailRegisteredAsync(client.Email!);
                 if (newEmailRegistered)
                 {
                     GenericError genericError = new GenericError($"Email <{client.Email}> is already registered", []);
                     genericError.AddData("email", client.Email!);
-                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_EMAIL_ALREADY_REGISTERED);
                 }
             }
 
@@ -488,28 +498,28 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
         public async Task<OperationResult<Guid, GenericError>> RegisterAssistant(Assistant assistant)
         {
-            bool IsUsernameRegistered = await assistantMgr.IsUsernameRegisteredAsync(assistant.Username!);
+            bool IsUsernameRegistered = await accountMgr.IsUsernameRegisteredAsync(assistant.Username!);
             if (IsUsernameRegistered)
             {
                 GenericError genericError = new GenericError($"Username <{assistant.Username}> is already registered", []);
                 genericError.AddData("username", assistant.Username!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_USERNAME_ALREADY_REGISTERED);
             }
 
-            bool IsEmailRegistered = await assistantMgr.IsEmailRegisteredAsync(assistant.Email!);
+            bool IsEmailRegistered = await accountMgr.IsEmailRegisteredAsync(assistant.Email!);
             if (IsEmailRegistered)
             {
                 GenericError genericError = new GenericError($"Email <{assistant.Email}> is already registered", []);
                 genericError.AddData("email", assistant.Email!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_EMAIL_ALREADY_REGISTERED);
             }
 
-            bool IsPhoneNumberRegistered = await assistantMgr.IsPhoneNumberRegisteredAsync(assistant.PhoneNumber!);
+            bool IsPhoneNumberRegistered = await accountMgr.IsPhoneNumberRegisteredAsync(assistant.PhoneNumber!);
             if (IsPhoneNumberRegistered)
             {
                 GenericError genericError = new GenericError($"PhoneNumber <{assistant.PhoneNumber}> is already registered", []);
                 genericError.AddData("phoneNumber", assistant.PhoneNumber!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_PHONE_NUMBER_ALREADY_REGISTERED);
             }
             Guid? uuidNewAssistant = await assistantMgr.RegisterAssistantAsync(assistant);
             if (uuidNewAssistant == null)
@@ -521,28 +531,28 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
         public async Task<OperationResult<Guid, GenericError>> RegisterClientAsync(Client client)
         {
-            bool IsUsernameRegistered = await clientMgr.IsUsernameRegisteredAsync(client.Username!);
+            bool IsUsernameRegistered = await accountMgr.IsUsernameRegisteredAsync(client.Username!);
             if (IsUsernameRegistered)
             {
                 GenericError genericError = new GenericError($"Username <{client.Username}> is already registered", []);
                 genericError.AddData("username", client.Username!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.USERNAME_ALREADY_REGISTERED);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_USERNAME_ALREADY_REGISTERED);
             }
 
-            bool IsEmailRegistered = await clientMgr.IsEmailRegisteredAsync(client.Email!);
+            bool IsEmailRegistered = await accountMgr.IsEmailRegisteredAsync(client.Email!);
             if (IsEmailRegistered)
             {
                 GenericError genericError = new GenericError($"Email <{client.Email}> is already registered", []);
                 genericError.AddData("email", client.Email!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.EMAIL_ALREADY_REGISTERED);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_EMAIL_ALREADY_REGISTERED);
             }
 
-            bool IsPhoneNumberRegistered = await clientMgr.IsPhoneNumberRegisteredAsync(client.PhoneNumber!);
+            bool IsPhoneNumberRegistered = await accountMgr.IsPhoneNumberRegisteredAsync(client.PhoneNumber!);
             if (IsPhoneNumberRegistered)
             {
                 GenericError genericError = new GenericError($"PhoneNumber <{client.PhoneNumber}> is already registered", []);
                 genericError.AddData("phoneNumber", client.PhoneNumber!);
-                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED);
+                return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_PHONE_NUMBER_ALREADY_REGISTERED);
             }
             Guid? uuidNewClient = await clientMgr.RegisterClientAsync(client);
             if (uuidNewClient == null)
@@ -569,7 +579,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
-            if (assistantData.Status != AssistantStatusType.ENABLED)
+            if (assistantData.Status != AccountStatusType.ENABLED)
             {
                 GenericError genericError = new GenericError($"Cannot assign slot. Assistant with UUID <{assistantData!.Uuid!.Value}>. Assistant is unavailable!", []);
                 genericError.AddData("AssistantUuid", assistantData!.Uuid.Value);
@@ -695,7 +705,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
-            if (assistantData.Status == AssistantStatusType.DELETED)
+            if (assistantData.Status == AccountStatusType.DELETED)
             {
                 GenericError genericError = new GenericError($"Cannot change status of Assistant <{assistantUuid}>. Assistant was deleted!", []);
                 genericError.AddData("AssistantUuid", assistantUuid);
@@ -703,7 +713,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
             }
 
-            if (assistantData.Status == AssistantStatusType.DISABLED)
+            if (assistantData.Status == AccountStatusType.DISABLED)
             {
                 GenericError genericError = new GenericError($"Assistant with UUID: <{assistantUuid}> is already disabled", []);
                 genericError.AddData("AssistantUuid", assistantUuid);
@@ -711,7 +721,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_DISABLED);
             }
 
-            bool isStatusChanged = await assistantMgr.ChangeAssistantStatusAsync(assistantData.Id!.Value, AssistantStatusType.DISABLED);
+            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(assistantData.Id!.Value, AccountStatusType.DISABLED, AccountType.ASSISTANT);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -729,7 +739,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
             }
 
-            if (clientData.Status == ClientStatusType.DELETED)
+            if (clientData.Status == AccountStatusType.DELETED)
             {
                 GenericError genericError = new GenericError($"Cannot change status of Client <{clientUuid}>. Client was deleted!", []);
                 genericError.AddData("clientUuid", clientUuid);
@@ -737,7 +747,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_WAS_DELETED);
             }
 
-            if (clientData.Status == ClientStatusType.DISABLED)
+            if (clientData.Status == AccountStatusType.DISABLED)
             {
                 GenericError genericError = new GenericError($"Client with UUID: <{clientUuid}> is already disabled", []);
                 genericError.AddData("clientUuid", clientUuid);
@@ -745,7 +755,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_IS_ALREADY_DISABLED);
             }
 
-            bool isStatusChanged = await clientMgr.ChangeClientStatusTypeAsync(clientData.Id!.Value, ClientStatusType.DISABLED);
+            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(clientData.Id!.Value, AccountStatusType.DISABLED, AccountType.CLIENT);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -763,7 +773,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
-            if (assistantData.Status == AssistantStatusType.DELETED)
+            if (assistantData.Status == AccountStatusType.DELETED)
             {
                 GenericError genericError = new GenericError($"Cannot change status of Assistant <{assistantUuid}>. Assistant was deleted!", []);
                 genericError.AddData("AssistantUuid", assistantUuid);
@@ -771,7 +781,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
             }
 
-            if (assistantData.Status == AssistantStatusType.ENABLED)
+            if (assistantData.Status == AccountStatusType.ENABLED)
             {
                 GenericError genericError = new GenericError($"Assistant with UUID: <{assistantUuid}> is already enabled", []);
                 genericError.AddData("AssistantUuid", assistantUuid);
@@ -779,7 +789,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_ENABLED);
             }
 
-            bool isStatusChanged = await assistantMgr.ChangeAssistantStatusAsync(assistantData.Id!.Value, AssistantStatusType.ENABLED);
+            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(assistantData.Id!.Value, AccountStatusType.ENABLED, AccountType.ASSISTANT);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -797,7 +807,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
             }
 
-            if (clientData.Status == ClientStatusType.DELETED)
+            if (clientData.Status == AccountStatusType.DELETED)
             {
                 GenericError genericError = new GenericError($"Cannot change status of Client <{clientUuid}>. Client was deleted!", []);
                 genericError.AddData("clientUuid", clientUuid);
@@ -805,7 +815,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_WAS_DELETED);
             }
 
-            if (clientData.Status == ClientStatusType.ENABLED)
+            if (clientData.Status == AccountStatusType.ENABLED)
             {
                 GenericError genericError = new GenericError($"Client with UUID: <{clientUuid}> is already enabled", []);
                 genericError.AddData("clientUuid", clientUuid);
@@ -813,7 +823,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_IS_ALREADY_ENABLED);
             }
 
-            bool isStatusChanged = await clientMgr.ChangeClientStatusTypeAsync(clientData.Id!.Value, ClientStatusType.ENABLED);
+            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(clientData.Id!.Value, AccountStatusType.ENABLED, AccountType.CLIENT);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -831,7 +841,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
-            if (assistantData.Status == AssistantStatusType.DELETED)
+            if (assistantData.Status == AccountStatusType.DELETED)
             {
                 GenericError genericError = new GenericError($"Assistant with UUID: <{assistantUuid}> is already disabled", []);
                 genericError.AddData("AssistantUuid", assistantUuid);
@@ -839,7 +849,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_DELETED);
             }
 
-            bool isStatusChanged = await assistantMgr.ChangeAssistantStatusAsync(assistantData.Id!.Value, AssistantStatusType.DELETED);
+            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(assistantData.Id!.Value, AccountStatusType.DELETED, AccountType.ASSISTANT);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -857,7 +867,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
             }
 
-            if (clientData.Status == ClientStatusType.DELETED)
+            if (clientData.Status == AccountStatusType.DELETED)
             {
                 GenericError genericError = new GenericError($"Client with UUID: <{clientUuid}> is already deleted", []);
                 genericError.AddData("clientUuid", clientUuid);
@@ -865,7 +875,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_IS_ALREADY_DELETED);
             }
 
-            bool isStatusChanged = await clientMgr.ChangeClientStatusTypeAsync(clientData.Id!.Value, ClientStatusType.DELETED);
+            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(clientData.Id!.Value, AccountStatusType.DELETED, AccountType.CLIENT);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -1073,7 +1083,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
-            if (assistantData.Status == AssistantStatusType.DELETED)
+            if (assistantData.Status == AccountStatusType.DELETED)
             {
                 GenericError genericError = new GenericError($"Cannot modify Assistant with UUID <{assistantData.Uuid}>. Assistant was deleted!", []);
                 genericError.AddData("AssistantUuid", assistantData.Uuid!.Value);
@@ -1350,7 +1360,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
             }
 
-            if (clientData.Status != ClientStatusType.ENABLED)
+            if (clientData.Status != AccountStatusType.ENABLED)
             {
                 GenericError genericError = new GenericError($"Client with UUID <{clientData.Uuid}> is not available. Client was disabled or deleted!", []);
                 genericError.AddData("clientUuid", clientData.Uuid!.Value);
@@ -1384,7 +1394,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
                 }
 
-                if (serviceOfferData.Assistant!.Status != AssistantStatusType.ENABLED || serviceOfferData.Service!.Status != ServiceStatusType.ENABLED)
+                if (serviceOfferData.Assistant!.Status != AccountStatusType.ENABLED || serviceOfferData.Service!.Status != ServiceStatusType.ENABLED)
                 {
                     GenericError genericError = new GenericError($"Service or assistant is deleted or disabled. ServiceOffer with UUID <{serviceOffer.Uuid.Value}> is unavailable", []);
                     genericError.AddData("SelectedServiceUuid", serviceOfferData.Uuid!.Value);
@@ -1523,5 +1533,60 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(UuidRegistered.Value);
         }
 
+        public async Task<OperationResult<JwtTokenResult, GenericError>> LoginWithEmailOrUsernameOrPhoneNumberJwtToken(string account, string password)
+        {
+            AccountData? accountData = await accountMgr.GetAccountDataByEmailOrUsernameOrPhoneNumber(account, password);
+            if (accountData == null)
+            {
+                return OperationResult<JwtTokenResult, GenericError>.Failure(new GenericError("Account not found"), MessageCodeType.ACCOUNT_NOT_FOUND);
+            }
+
+            JwtUserCredentials credentials = new JwtUserCredentials
+            {
+                Username = accountData.Username!,
+                Role = accountData.Role.ToString(),
+                Email = accountData.Email!,
+                Uuid = accountData.Uuid!.Value.ToString()
+            };
+
+            JwtTokenResult? token = authJwtService.Authenticate(credentials);
+
+            if (token == null)
+            {
+                return OperationResult<JwtTokenResult, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.AUTHENTICATION_FAILED_TO_GENERATE_JWT_TOKEN);
+            }
+
+            return OperationResult<JwtTokenResult, GenericError>.Success(token);
+        }
+
+        public Task<OperationResult<JwtTokenResult, GenericError>> RefreshToken(string token)
+        {
+
+            JwtTokenResult tokenResult = new JwtTokenResult
+            {
+                Token = token
+            };
+
+            JwtTokenData? tokenData = authJwtService.ValidateCredentials(tokenResult);
+            if (tokenData == null)
+            {
+                return Task.FromResult(OperationResult<JwtTokenResult, GenericError>.Failure(new GenericError("Token is not valid"), MessageCodeType.AUTHENTICATION_INVALID_CREDENTIALS));
+            }
+
+            JwtUserCredentials credentials = new JwtUserCredentials
+            {
+                Email = tokenData!.Email,
+                Username = tokenData!.Username,
+                Role = tokenData.Role,
+                Uuid = tokenData.Uuid
+            };
+
+            JwtTokenResult? newToken = authJwtService.RefreshCredentials(credentials);
+            if (newToken == null)
+            {
+                return Task.FromResult(OperationResult<JwtTokenResult, GenericError>.Failure(new GenericError("Cannot refresh token!"), MessageCodeType.AUTHENTICATION_CANNOT_REFRESH_TOKEN));
+            }
+            return Task.FromResult(OperationResult<JwtTokenResult, GenericError>.Success(newToken));
+        }
     }
 }

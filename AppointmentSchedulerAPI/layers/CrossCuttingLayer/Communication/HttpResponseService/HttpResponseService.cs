@@ -34,6 +34,12 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpRes
             return new ObjectResult(payload) { StatusCode = StatusCodes.Status401Unauthorized };
         }
 
+        public IActionResult Unauthorized<T>(T data, ApiVersionEnum version, string message)
+        {
+            var payload = new ApiResponse<T>(StatusCodes.Status401Unauthorized, message, version.ToString(), data);
+            return new ObjectResult(payload) { StatusCode = StatusCodes.Status409Conflict };
+        }
+
         public IActionResult Forbidden(ApiVersionEnum version, string message)
         {
             var payload = new ApiResponse<object>(StatusCodes.Status403Forbidden, message, version.ToString());

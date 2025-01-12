@@ -36,7 +36,8 @@ public partial class AppointmentDbContext : DbContext
             .HasPostgresEnum<RoleType>("RoleType")
             .HasPostgresEnum<ServiceStatusType>("ServiceStatusType")
             .HasPostgresEnum<ServiceOfferStatusType>("ServiceOfferStatusType")
-            .HasPostgresEnum<AvailabilityTimeSlotStatusType>("AvailabilityTimeSlotStatusType");
+            .HasPostgresEnum<AvailabilityTimeSlotStatusType>("AvailabilityTimeSlotStatusType")
+            .HasPostgresEnum<AccountStatusType>("AccountStatusType");
 
         modelBuilder.Entity<UserAccount>(entity =>
         {
@@ -52,6 +53,9 @@ public partial class AppointmentDbContext : DbContext
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .HasColumnName("email");
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasColumnType("AccountStatusType");
             entity.Property(e => e.Uuid)
                 .HasColumnName("uuid");
             entity.Property(e => e.Password)
@@ -97,9 +101,9 @@ public partial class AppointmentDbContext : DbContext
 
             entity.Property(e => e.IdUserAccount)
                 .HasColumnName("id_user_account");
-            entity.Property(e => e.Status)
-                .HasColumnName("status")
-                .HasColumnType("AssistantStatusType");
+            // entity.Property(e => e.Status)
+            //     .HasColumnName("status")
+            //     .HasColumnType("AssistantStatusType");
 
             entity.HasOne(d => d.UserAccount)
             .WithOne(ua => ua.Assistant)
@@ -115,9 +119,9 @@ public partial class AppointmentDbContext : DbContext
 
             entity.Property(e => e.IdUserAccount)
                 .HasColumnName("id_user_account");
-            entity.Property(e => e.Status)
-                .HasColumnName("status")
-                .HasColumnType("ClientStatusType");
+            // entity.Property(e => e.Status)
+            //     .HasColumnName("status")
+            //     .HasColumnType("ClientStatusType");
 
             entity.HasOne(d => d.UserAccount)
             .WithOne(ua => ua.Client)

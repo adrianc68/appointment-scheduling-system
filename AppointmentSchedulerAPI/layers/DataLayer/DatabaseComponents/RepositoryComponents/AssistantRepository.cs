@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
@@ -26,7 +27,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Password = assistant.Password,
                     Username = assistant.Username,
                     Role = RoleType.ASSISTANT,
-                    Uuid = assistant.Uuid
+                    Uuid = assistant.Uuid,
+                    Status = AccountStatusType.ENABLED
                 };
                 dbContext.UserAccounts.Add(userAccount);
                 await dbContext.SaveChangesAsync();
@@ -45,7 +47,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 var newAssistant = new Assistant
                 {
                     IdUserAccount = userAccount.Id,
-                    Status = AssistantStatusType.ENABLED
                 };
 
                 dbContext.Assistants.Add(newAssistant);
@@ -89,39 +90,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isRegistered;
         }
 
-        public async Task<bool> IsUsernameRegisteredAsync(string username)
-        {
-            using var dbContext = context.CreateDbContext();
-            var usernameDB = await dbContext.UserAccounts
-                .Where(a => a.Username!.ToLower() == username && a.Assistant!.Status != AssistantStatusType.DELETED)
-                .Select(a => a.Username)
-                .FirstOrDefaultAsync();
-
-            return usernameDB != null;
-        }
-
-        public async Task<bool> IsEmailRegisteredAsync(string email)
-        {
-            using var dbContext = context.CreateDbContext();
-            var emailDB = await dbContext.UserAccounts
-                .Where(a => a.Email!.ToLower() == email && a.Assistant!.Status != AssistantStatusType.DELETED)
-                .Select(a => a.Email)
-                .FirstOrDefaultAsync();
-
-            return emailDB != null;
-        }
-
-        public async Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber)
-        {
-            using var dbContext = context.CreateDbContext();
-            var phoneNumberDB = await dbContext.UserInformations
-                .Where(a => a.PhoneNumber == phoneNumber && a.UserAccount!.Assistant!.Status != AssistantStatusType.DELETED)
-                .Select(a => a.PhoneNumber)
-                .FirstOrDefaultAsync();
-
-            return phoneNumberDB != null;
-        }
-
         public async Task<int?> GetAssistantIdByUuidAsync(Guid uuid)
         {
             using var dbContext = context.CreateDbContext();
@@ -151,7 +119,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Email = assistantDB.UserAccount.Email,
                     Username = assistantDB.UserAccount.Username,
                     CreatedAt = assistantDB.UserAccount.CreatedAt,
-                    Status = (BusinessLogicLayer.Model.Types.AssistantStatusType?)assistantDB.Status,
+                    Status = (BusinessLogicLayer.Model.Types.AccountStatusType?)assistantDB.UserAccount.Status,
                     Uuid = assistantDB.UserAccount.Uuid
                 };
             }
@@ -165,7 +133,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             var assistantsDB = await dbContext.Assistants
               .Include(a => a.UserAccount)
                   .ThenInclude(ua => ua!.UserInformation)
-                  .Where(c => c.UserAccount!.Role == RoleType.ASSISTANT && c.Status != AssistantStatusType.DELETED)
+                  .Where(c => c.UserAccount!.Role == RoleType.ASSISTANT && c.UserAccount.Status != AccountStatusType.DELETED)
               .ToListAsync();
 
             businessAssistants = assistantsDB
@@ -178,7 +146,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Name = a.UserAccount.UserInformation!.Name!,
                     PhoneNumber = a.UserAccount.UserInformation.PhoneNumber!,
                     Username = a.UserAccount.Username!,
-                    Status = (BusinessLogicLayer.Model.Types.AssistantStatusType)a.Status,
+                    Status = (BusinessLogicLayer.Model.Types.AccountStatusType?)a.UserAccount.Status,
                     CreatedAt = a.UserAccount.CreatedAt
                 })
                 .ToList();
@@ -264,7 +232,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Name = dbServiceOffer.Assistant.UserAccount.UserInformation!.Name!,
                     PhoneNumber = dbServiceOffer.Assistant.UserAccount.UserInformation.PhoneNumber!,
                     Username = dbServiceOffer.Assistant.UserAccount.Username!,
-                    Status = (BusinessLogicLayer.Model.Types.AssistantStatusType)dbServiceOffer.Assistant.Status,
+                    Status = (BusinessLogicLayer.Model.Types.AccountStatusType?)dbServiceOffer.Assistant.UserAccount.Status,
                     CreatedAt = dbServiceOffer.Assistant.UserAccount.CreatedAt
                 }
             };
@@ -274,38 +242,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var serviceOfferDB = await dbContext.ServiceOffers
-                .Where(a => a.IdService == idService && a.IdAssistant == idAssistant && a.Assistant!.Status != AssistantStatusType.DELETED && a.Service!.Status != ServiceStatusType.DELETED)
+                .Where(a => a.IdService == idService && a.IdAssistant == idAssistant && a.Assistant!.UserAccount!.Status != AccountStatusType.DELETED && a.Service!.Status != ServiceStatusType.DELETED)
                 .FirstOrDefaultAsync();
 
             return serviceOfferDB != null;
-        }
-
-        public async Task<bool> ChangeAssistantStatus(int idAssistant, BusinessLogicLayer.Model.Types.AssistantStatusType status)
-        {
-            bool isStatusChanged = false;
-            using var dbContext = context.CreateDbContext();
-            using var transaction = await dbContext.Database.BeginTransactionAsync();
-            try
-            {
-                var assistantDb = await dbContext.Assistants
-                     .FirstOrDefaultAsync(ac => ac.UserAccount!.Id == idAssistant);
-
-                if (assistantDb == null)
-                {
-                    return false;
-                }
-
-                assistantDb.Status = (AssistantStatusType)status;
-                await dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-                isStatusChanged = true;
-            }
-            catch (System.Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-            return isStatusChanged;
         }
 
         public async Task<bool> UpdateAssistantAsync(BusinessLogicLayer.Model.Assistant assistant)

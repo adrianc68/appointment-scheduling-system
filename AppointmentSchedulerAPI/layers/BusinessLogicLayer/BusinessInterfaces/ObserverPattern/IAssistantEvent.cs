@@ -4,7 +4,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.O
 {
     public interface IAssistantEvent
     {
-        void NotifySuscribers(AssistantEvent eventType);
+        void NotifySubscribers(AssistantEvent eventType);
         void Suscribe(IAssistantObserver assistantObserver);
         void Unsuscribe(IAssistantObserver assistantObserver);
     }

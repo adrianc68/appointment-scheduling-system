@@ -1,6 +1,5 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Interfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
@@ -54,56 +53,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return assistantId != null;
         }
 
-        public async Task<bool> IsEmailRegisteredAsync(string email)
-        {
-            bool isEmailRegistered = await assistantRepository.IsEmailRegisteredAsync(email);
-            return isEmailRegistered;
-        }
-
-        public async Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber)
-        {
-            bool isPhoneNumberRegistered = await assistantRepository.IsPhoneNumberRegisteredAsync(phoneNumber);
-            return isPhoneNumberRegistered;
-        }
-
-        public async Task<bool> IsUsernameRegisteredAsync(string username)
-        {
-            bool isUsernameRegistered = await assistantRepository.IsUsernameRegisteredAsync(username);
-            return isUsernameRegistered;
-        }
-
         public async Task<bool> AssignListServicesToAssistantAsync(int idAssistant, List<int> idServices)
         {
             bool areAllServicesRegistered = await assistantRepository.AddServicesToAssistantAsync(idAssistant, idServices);
             return areAllServicesRegistered;
-        }
-
-        public async Task<bool> ChangeAssistantStatusAsync(int idAssistant, AssistantStatusType status)
-        {
-            bool isStatusChanged = await assistantRepository.ChangeAssistantStatus(idAssistant, status);
-
-            if (isStatusChanged)
-            {
-                AssistantEvent assistantEvent = new AssistantEvent
-                {
-                    AssistantId = idAssistant,
-                    EventType = AssistantEventType.UPDATED
-                };
-                if (status == AssistantStatusType.ENABLED)
-                {
-                    assistantEvent.EventType = AssistantEventType.ENABLED;
-                }
-                else if (status == AssistantStatusType.DISABLED)
-                {
-                    assistantEvent.EventType = AssistantEventType.DISABLED;
-                }
-                else if (status == AssistantStatusType.DELETED)
-                {
-                    assistantEvent.EventType = AssistantEventType.DELETED;
-                }
-                this.NotifySuscribers(assistantEvent);
-            }
-            return isStatusChanged;
         }
 
         public async Task<Guid?> RegisterAssistantAsync(Assistant assistant)
@@ -124,7 +77,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return isUpdated;
         }
 
-        public void NotifySuscribers(AssistantEvent eventType)
+        public void NotifySubscribers(AssistantEvent eventType)
         {
             foreach (var observer in observers)
             {

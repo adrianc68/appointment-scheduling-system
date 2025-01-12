@@ -1,3 +1,4 @@
+
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authentication
 {
-    public class JwtAuthenticationService : IAuthenticationService<JwtUserCredentials, JwtTokenResult>
+    public class JwtAuthenticationService : IAuthenticationService<JwtUserCredentials, JwtTokenResult, JwtTokenData>
     {
         private readonly string issuer;
         private readonly string audience;
@@ -22,21 +23,17 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authenticati
 
         public JwtTokenResult? Authenticate(JwtUserCredentials credentials)
         {
-            if (!ValidateCredentials(credentials))
-                return null;
-
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(secretKey);
-
-            // $$$>> It needs to be changed
-            // var userRole = GetRoleForUser(credentials.Username); 
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(
                  [
-                     new Claim(ClaimTypes.Name, credentials.Username),
-                    new Claim(ClaimTypes.Role, UserRoleConstants.CLIENT) // $$$>> We need a specific user role from database
+                     new Claim("username", credentials.Username),
+                     new Claim("uuid", credentials.Uuid),
+                     new Claim("email", credentials.Email),
+                    new Claim("role", credentials.Role)
                  ]),
                 Expires = DateTime.UtcNow.AddHours(24),
                 Issuer = issuer,
@@ -58,22 +55,54 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authenticati
             return Authenticate(credentials);
         }
 
-        public bool ValidateCredentials(JwtUserCredentials credentials)
+        public JwtTokenData? ValidateCredentials(JwtTokenResult token)
         {
-            if (credentials is not JwtUserCredentials jwtUserCredentials)
-                return false;
-            // $$$>> It needs get password from database!!!!!
-            return !string.IsNullOrEmpty(jwtUserCredentials.Username) && jwtUserCredentials.Password == "securepassword";
-        }
-
-        private string GetUserDataFromDatabase()
-        {
-            return "$$$>> getUserRole, getEmail";
-        }
-
-        private string GetUserRoleFromDatabase()
-        {
-            return "$$$>> change me please";
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(secretKey);
+            JwtTokenData newToken;
+            try
+            {
+                tokenHandler.ValidateToken(token.Token, new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                }, out SecurityToken validatedToken);
+                JwtSecurityToken see = (JwtSecurityToken)validatedToken;
+                var claims = see.Claims;
+                newToken = new JwtTokenData
+                {
+                    Email = claims.First(claim => claim.Type == "email").Value,
+                    Username = claims.First(claim => claim.Type == "username").Value,
+                    Role = claims.First(claim => claim.Type == "role").Value,
+                    Uuid = claims.First(claim => claim.Type == "uuid").Value
+                };
+            }
+            catch (Exception ex) when (ex is SecurityTokenException ||
+                           ex is ArgumentNullException ||
+                           ex is ArgumentException ||
+                           ex is SecurityTokenMalformedException ||
+                           ex is SecurityTokenDecryptionFailedException ||
+                           ex is SecurityTokenEncryptionKeyNotFoundException ||
+                           ex is SecurityTokenExpiredException ||
+                           ex is SecurityTokenInvalidAudienceException ||
+                           ex is SecurityTokenInvalidLifetimeException ||
+                           ex is SecurityTokenInvalidSignatureException ||
+                           ex is SecurityTokenNoExpirationException ||
+                           ex is SecurityTokenNotYetValidException ||
+                           ex is SecurityTokenReplayAddFailedException ||
+                           ex is SecurityTokenReplayDetectedException)
+            {
+                return null;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return newToken;
         }
     }
 }

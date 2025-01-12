@@ -4,7 +4,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.O
 {
     public interface IClientEvent
     {
-        void NotifySuscribers(ClientEvent eventType);
+        void NotifySubscribers(ClientEvent eventType);
         void Suscribe(IClientObserver clientObserver);
         void Unsuscribe(IClientObserver clientObserver);
     }

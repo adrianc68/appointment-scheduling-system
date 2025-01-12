@@ -26,7 +26,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Password = client.Password,
                     Username = client.Username,
                     Role = RoleType.CLIENT,
-                    Uuid = Guid.CreateVersion7()
+                    Uuid = Guid.CreateVersion7(),
+                    Status = AccountStatusType.ENABLED
                 };
                 dbContext.UserAccounts.Add(userAccount);
                 await dbContext.SaveChangesAsync();
@@ -45,7 +46,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 var newClient = new Client
                 {
                     IdUserAccount = userAccount.Id,
-                    Status = ClientStatusType.ENABLED
                 };
 
                 dbContext.Clients.Add(newClient);
@@ -59,39 +59,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 throw;
             }
             return isRegistered;
-        }
-
-        public async Task<bool> IsUsernameRegisteredAsync(string username)
-        {
-            using var dbContext = context.CreateDbContext();
-            var usernameDB = await dbContext.UserAccounts
-                .Where(a => a.Username!.ToLower() == username && a.Client!.Status != ClientStatusType.DELETED)
-                .Select(a => a.Username)
-                .FirstOrDefaultAsync();
-
-            return usernameDB != null;
-        }
-
-        public async Task<bool> IsEmailRegisteredAsync(string email)
-        {
-            using var dbContext = context.CreateDbContext();
-            var emailDB = await dbContext.UserAccounts
-                .Where(a => a.Email!.ToLower() == email && a.Client!.Status != ClientStatusType.DELETED)
-                .Select(a => a.Email)
-                .FirstOrDefaultAsync();
-
-            return emailDB != null;
-        }
-
-        public async Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber)
-        {
-            using var dbContext = context.CreateDbContext();
-            var phoneNumberDB = await dbContext.UserInformations
-                .Where(a => a.PhoneNumber == phoneNumber && a.UserAccount!.Client!.Status != ClientStatusType.DELETED)
-                .Select(a => a.PhoneNumber)
-                .FirstOrDefaultAsync();
-
-            return phoneNumberDB != null;
         }
 
         public async Task<int?> GetClientIdByUuidAsync(Guid uuid)
@@ -111,7 +78,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             var clientsDB = await dbContext.Clients
                 .Include(a => a.UserAccount)
                   .ThenInclude(ua => ua!.UserInformation)
-                  .Where(c => c.UserAccount!.Role == RoleType.CLIENT && c.Status != ClientStatusType.DELETED)
+                  .Where(c => c.UserAccount!.Role == RoleType.CLIENT && c.UserAccount!.Status != AccountStatusType.DELETED)
               .ToListAsync();
 
             businessClient = clientsDB
@@ -124,7 +91,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Name = a.UserAccount.UserInformation!.Name!,
                     PhoneNumber = a.UserAccount.UserInformation.PhoneNumber!,
                     Username = a.UserAccount.Username!,
-                    Status = (BusinessLogicLayer.Model.Types.ClientStatusType)a.Status!.Value,
+                    Status = (BusinessLogicLayer.Model.Types.AccountStatusType)a.UserAccount.Status!.Value,
                     CreatedAt = a.UserAccount.CreatedAt
                 })
                 .ToList();
@@ -150,44 +117,16 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Email = clientDB.UserAccount.Email,
                     Username = clientDB.UserAccount.Username,
                     CreatedAt = clientDB.UserAccount.CreatedAt,
-                    Status = (BusinessLogicLayer.Model.Types.ClientStatusType?)clientDB.Status,
+                    Status = (BusinessLogicLayer.Model.Types.AccountStatusType?)clientDB.UserAccount!.Status,
                     Uuid = clientDB.UserAccount.Uuid
                 };
             }
             return client;
         }
 
-        public async Task<bool> ChangeClientStatusTypeAsync(int idClient, BusinessLogicLayer.Model.Types.ClientStatusType status)
-        {
-            bool isStatusChanged = false;
-            using var dbContext = context.CreateDbContext();
-            using var transaction = await dbContext.Database.BeginTransactionAsync();
-            try
-            {
-                var clientDb = await dbContext.Clients
-                     .FirstOrDefaultAsync(ac => ac.UserAccount!.Id == idClient);
-
-                if (clientDb == null)
-                {
-                    return false;
-                }
-
-                clientDb.Status = (ClientStatusType)status;
-                await dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-                isStatusChanged = true;
-            }
-            catch (System.Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-            return isStatusChanged;
-        }
-
         public async Task<bool> UpdateClientAsync(BusinessLogicLayer.Model.Client client)
         {
-             bool isUpdated = false;
+            bool isUpdated = false;
             using var dbContext = context.CreateDbContext();
             using var transaction = await dbContext.Database.BeginTransactionAsync();
 

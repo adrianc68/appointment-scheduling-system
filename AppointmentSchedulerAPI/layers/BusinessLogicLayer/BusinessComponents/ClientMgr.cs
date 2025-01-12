@@ -3,7 +3,6 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.Obser
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
@@ -35,51 +34,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return clientId != null;
         }
 
-        public async Task<bool> IsEmailRegisteredAsync(string email)
-        {
-            bool isEmailRegistered = await clientRepository.IsEmailRegisteredAsync(email);
-            return isEmailRegistered;
-        }
-
-        public async Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber)
-        {
-            bool isPhoneNumberRegistered = await clientRepository.IsPhoneNumberRegisteredAsync(phoneNumber);
-            return isPhoneNumberRegistered;
-        }
-
-        public async Task<bool> IsUsernameRegisteredAsync(string username)
-        {
-            bool isUsernameRegistered = await clientRepository.IsUsernameRegisteredAsync(username);
-            return isUsernameRegistered;
-        }
-
-        public async Task<bool> ChangeClientStatusTypeAsync(int idClient, ClientStatusType status)
-        {
-            bool isStatusChanged = await clientRepository.ChangeClientStatusTypeAsync(idClient, status);
-            if (isStatusChanged)
-            {
-                ClientEvent clientEvent = new ClientEvent
-                {
-                    ClientId = idClient,
-                    EventType = ClientEventType.UPDATED
-                };
-                if (status == ClientStatusType.ENABLED)
-                {
-                    clientEvent.EventType = ClientEventType.ENABLED;
-                }
-                else if (status == ClientStatusType.DISABLED)
-                {
-                    clientEvent.EventType = ClientEventType.DISABLED;
-                }
-                else if (status == ClientStatusType.DELETED)
-                {
-                    clientEvent.EventType = ClientEventType.DELETED;
-                }
-                this.NotifySuscribers(clientEvent);
-            }
-            return isStatusChanged;
-        }
-
         public async Task<Guid?> RegisterClientAsync(Client client)
         {
             client.Uuid = Guid.CreateVersion7();
@@ -100,7 +54,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return isUpdated;
         }
 
-        public void NotifySuscribers(ClientEvent eventType)
+        public void NotifySubscribers(ClientEvent eventType)
         {
             eventType.EventDate = DateTime.UtcNow;
             foreach (var observer in observers)

@@ -13,11 +13,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
     public class SchedulerMgr : ISchedulerMgt, ISchedulerEvent, IClientObserver, IServiceObserver, IAssistantObserver, ISchedulerObserver
     {
         private readonly ISchedulerRepository schedulerRepository;
+        private readonly INotificationMgt notificationMgr;
         private static readonly List<ISchedulerObserver> observers = new();
 
-        public SchedulerMgr(ISchedulerRepository SchedulerRepository)
+        public SchedulerMgr(ISchedulerRepository SchedulerRepository, INotificationMgt notificationMgr)
         {
             this.schedulerRepository = SchedulerRepository;
+            this.notificationMgr = notificationMgr;
         }
 
         public async Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsAsync(DateOnly startDate, DateOnly endDate)
@@ -181,6 +183,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     }
                 };
                 this.NotifySuscribers(availabilityTimeSlotEvent);
+                _ = this.notificationMgr.NotifyAllAsync($"{availabilityTimeSlot.StartTime}: {availabilityTimeSlot.EndTime}");
             }
 
             return isUpdated;
@@ -463,6 +466,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             }
         }
 
+        public void UpdateOnAccountChanged(AssistantEvent eventType)
+        {
+            this.UpdateOnAssistantChanged(eventType);
+        }
+
+        public void UpdateOnAccountChanged(ClientEvent eventType)
+        {
+            this.UpdateOnClientChanged(eventType);
+        }
+
         private async Task<(bool, List<int>)> ChangeAllServiceOfferStatusAsync(List<int> serviceOffersIds, ServiceOfferStatusType status)
         {
             List<int> failedServiceOffers = new();
@@ -511,7 +524,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             }
             return (allCanceled, failedAppointments);
         }
-
 
 
     }

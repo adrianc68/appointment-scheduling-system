@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
+using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -166,7 +166,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Email = aso.ServiceOffer.Assistant.UserAccount.Email,
                             Username = aso.ServiceOffer.Assistant.UserAccount.Username,
                             CreatedAt = aso.ServiceOffer.Assistant.UserAccount.CreatedAt,
-                            Status = (BusinessLogicLayer.Model.Types.AssistantStatusType?)aso.ServiceOffer.Assistant.Status,
+                            Status = (BusinessLogicLayer.Model.Types.AccountStatusType?)aso.ServiceOffer.Assistant.UserAccount.Status,
                             PhoneNumber = aso.ServiceOffer.Assistant.UserAccount.UserInformation.PhoneNumber
                         }
                     }
@@ -520,7 +520,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Name = app.Client.UserAccount.UserInformation!.Name,
                     Email = app.Client.UserAccount.Email,
                     PhoneNumber = app.Client.UserAccount.UserInformation.PhoneNumber,
-                    Status = (BusinessLogicLayer.Model.Types.ClientStatusType)app.Client.Status!.Value,
+                    Status = (BusinessLogicLayer.Model.Types.AccountStatusType)app.Client.UserAccount.Status!.Value,
                     Username = app.Client.UserAccount.Username,
                     CreatedAt = app.Client.UserAccount.CreatedAt
                 },
@@ -824,7 +824,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             {
                 Id = dbApp.Id,
                 Date = dbApp.Date,
-                Status = (AppointmentStatusType)dbApp.Status!.Value,
+                Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)dbApp.Status!.Value,
                 StartTime = dbApp.StartTime,
                 TotalCost = dbApp.TotalCost,
                 Client = new BusinessLogicLayer.Model.Client
@@ -844,7 +844,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     {
                         Id = ss.ServiceOffer!.Id,
                         Uuid = ss.ServiceOffer.Uuid,
-                        Status = (ServiceOfferStatusType?)ss.ServiceOffer.Status,
+                        Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType?)ss.ServiceOffer.Status,
                         Assistant = new BusinessLogicLayer.Model.Assistant
                         {
                             Id = ss.ServiceOffer.Assistant!.IdUserAccount,
@@ -878,7 +878,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             {
                 Id = dbApp.Id,
                 Date = dbApp.Date,
-                Status = (AppointmentStatusType)dbApp.Status!.Value,
+                Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)dbApp.Status!.Value,
                 StartTime = dbApp.StartTime,
                 TotalCost = dbApp.TotalCost,
                 Client = new BusinessLogicLayer.Model.Client
@@ -898,7 +898,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     {
                         Id = ss.ServiceOffer!.Id,
                         Uuid = ss.ServiceOffer.Uuid,
-                        Status = (ServiceOfferStatusType?)ss.ServiceOffer.Status,
+                        Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType?)ss.ServiceOffer.Status,
                         Assistant = new BusinessLogicLayer.Model.Assistant
                         {
                             Id = ss.ServiceOffer.Assistant!.IdUserAccount,
@@ -1011,7 +1011,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return dbAppointments;
         }
 
-        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByUidAndRange(int idAssistant, DateTimeRange range)
+        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByUidAndRange(int idAssistant, BusinessLogicLayer.Model.Types.DateTimeRange range)
         {
             using var dbContext = context.CreateDbContext();
 
@@ -1034,7 +1034,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             {
                 Id = dbApp.Id,
                 Date = dbApp.Date,
-                Status = (AppointmentStatusType)dbApp.Status!.Value,
+                Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)dbApp.Status!.Value,
                 StartTime = dbApp.StartTime,
                 TotalCost = dbApp.TotalCost,
                 Client = new BusinessLogicLayer.Model.Client
@@ -1054,7 +1054,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     {
                         Id = ss.ServiceOffer!.Id,
                         Uuid = ss.ServiceOffer.Uuid,
-                        Status = (ServiceOfferStatusType?)ss.ServiceOffer.Status,
+                        Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType?)ss.ServiceOffer.Status,
                         Assistant = new BusinessLogicLayer.Model.Assistant
                         {
                             Id = ss.ServiceOffer.Assistant!.IdUserAccount,

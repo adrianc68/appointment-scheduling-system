@@ -1,5 +1,6 @@
 using System.Text;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AccountInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AssistantInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ClientInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
@@ -7,11 +8,14 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfa
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.AccountMgr.Component;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.AccountMgr.Interfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Component;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Interfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.SignalRNotifier;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Component;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Interfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement.ExceptionHandlerService;
@@ -44,6 +48,7 @@ builder.Services.AddDbContextFactory<AppointmentDbContext>((provider, options) =
         o.MapEnum<ServiceStatusType>("ServiceStatusType");
         o.MapEnum<ServiceOfferStatusType>("ServiceOfferStatusType");
         o.MapEnum<AvailabilityTimeSlotStatusType>("AvailabilityTimeSlotStatusType");
+        o.MapEnum<AccountStatusType>("AccountStatusType");
     });
 });
 
@@ -88,11 +93,15 @@ builder.Services.AddAuthentication(options =>
 
 
 builder.Services.AddOpenApi();
-builder.Services.AddSignalR(opt => {
+builder.Services.AddSignalR(opt =>
+{
     opt.EnableDetailedErrors = true;
 });
 
 builder.Services.AddSingleton<EnvironmentVariableService>();
+
+builder.Services.AddScoped<IAccountEvent<AssistantEvent>, AccountMgr>(); // Para eventos de Assistant
+builder.Services.AddScoped<IAccountEvent<ClientEvent>, AccountMgr>();    // Para eventos de Client
 
 builder.Services.AddScoped<IClientEvent, ClientMgr>();
 builder.Services.AddScoped<IClientObserver, SchedulerMgr>();
@@ -113,25 +122,26 @@ builder.Services.AddScoped<ISchedulerMgt, SchedulerMgr>();
 builder.Services.AddScoped<IClientMgt, ClientMgr>();
 builder.Services.AddScoped<IAssistantMgt, AssistantMgr>();
 builder.Services.AddScoped<IServiceMgt, ServiceMgr>();
-
+builder.Services.AddScoped<IAccountMgt, AccountMgr>();
 
 builder.Services.AddScoped<ISchedulingInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IServiceInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IAssistantInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IClientInterfaces, AppointmentSchedulingSystemFacade>();
+builder.Services.AddScoped<IAccountInterfaces, AppointmentSchedulingSystemFacade>();
 
 builder.Services.AddScoped<ISchedulerRepository, SchedulerRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IAssistantRepository, AssistantRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 builder.Services.AddScoped<IExceptionHandlerService, ExceptionHandlerService>();
 builder.Services.AddScoped<IHttpResponseService, HttpResponseService>();
 builder.Services.AddScoped<ITimeSlotLockMgt, TimeSlotLockMgr>();
 
 
-
-builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtTokenResult>>(provider =>
+builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtTokenResult, JwtTokenData>>(provider =>
 {
     return new JwtAuthenticationService(
         envManager.Get("JWT_ISSUER"),
@@ -156,12 +166,17 @@ using (var scope = app.Services.CreateScope())
     var schedulerEventPublisher = scope.ServiceProvider.GetRequiredService<ISchedulerEvent>() as SchedulerMgr;
 
 
+    var accountAssistantEventPublisher = scope.ServiceProvider.GetRequiredService<IAccountEvent<AssistantEvent>>();
+    var accountClientEventPublisher = scope.ServiceProvider.GetRequiredService<IAccountEvent<ClientEvent>>();
+
     var schedulerMgr = scope.ServiceProvider.GetRequiredService<ISchedulerMgt>() as SchedulerMgr;
 
     clientMgrEventPublisher?.Suscribe(schedulerMgr!);
     serviceMgrEventPublisher?.Suscribe(schedulerMgr!);
     assistantMgrEventPublisher?.Suscribe(schedulerMgr!);
     schedulerEventPublisher?.Suscribe(schedulerMgr!);
+    accountAssistantEventPublisher?.Subscribe(schedulerMgr!);
+    accountClientEventPublisher?.Subscribe(schedulerMgr!);
 }
 
 
@@ -179,7 +194,7 @@ app.Use(async (context, next) =>
     await next.Invoke();
 });
 
-var port = envManager.Get("SERVER_PORT", "8000");
+var port = envManager.Get("SERVER_PORT");
 
 if (app.Environment.IsDevelopment())
 {
@@ -194,7 +209,8 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseCors(policy => policy
-    .WithOrigins("http://localhost:8080") 
+    // $$$>> Resolve this! Use .env file or something else
+    .WithOrigins("http://localhost:8080")
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials());

@@ -1,7 +1,9 @@
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AccountInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authentication;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
@@ -10,31 +12,66 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
     [Route("api/v1/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthenticationService<JwtUserCredentials, JwtTokenResult> authenticationService;
+        private readonly IAccountInterfaces systemFacade;
         private readonly IHttpResponseService httpResponseService;
 
-        public AuthController(IAuthenticationService<JwtUserCredentials, JwtTokenResult> authenticationService, IHttpResponseService httpResponseService)
+        public AuthController(IAccountInterfaces systemFacade, IHttpResponseService httpResponseService)
         {
-            this.authenticationService = authenticationService;
+            this.systemFacade = systemFacade;
             this.httpResponseService = httpResponseService;
 
         }
 
-        [HttpPost("login")]
-        public IActionResult Login([FromBody] JwtUserCredentials credentials)
+        [HttpPost("login/")]
+        public async Task<IActionResult> LoginJwt([FromBody] LoginAccountAndPasswordDTO dto)
         {
-            if (credentials == null)
+            JwtTokenResult token;
+            try
             {
-                return httpResponseService.BadRequest(ApiVersionEnum.V1, MessageCodeType.INVALID_CREDENTIALS.ToString());
+                OperationResult<JwtTokenResult, GenericError> result = await systemFacade.LoginWithEmailOrUsernameOrPhoneNumberJwtToken(dto.Account, dto.Password);
+                if (result.IsSuccessful)
+                {
+                    token = result.Result!;
+                }
+                else
+                {
+                    return httpResponseService.Unauthorized(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
             }
-
-            JwtTokenResult? result = authenticationService.Authenticate(credentials);
-
-            if (result == null)
+            catch (System.Exception ex)
             {
-                return httpResponseService.Unauthorized(ApiVersionEnum.V1, MessageCodeType.UNAUTHORIZED.ToString());
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
             }
-            return httpResponseService.OkResponse(result, ApiVersionEnum.V1);
+            return httpResponseService.OkResponse(token, ApiVersionEnum.V1);
+        }
+
+        [HttpPost("refresh/")]
+        public async Task<IActionResult> RefreshJwt()
+        {
+            var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return Unauthorized("Token is missing.");
+            }
+            JwtTokenResult tokenResult;
+            try
+            {
+                OperationResult<JwtTokenResult, GenericError> result = await systemFacade.RefreshToken(token);
+                if (result.IsSuccessful)
+                {
+                    tokenResult = result.Result!;
+                }
+                else
+                {
+                    return httpResponseService.Unauthorized(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(tokenResult, ApiVersionEnum.V1);
         }
 
 

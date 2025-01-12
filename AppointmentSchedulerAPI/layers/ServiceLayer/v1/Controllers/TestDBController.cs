@@ -18,7 +18,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [HttpPost("send")]
         public async Task<IActionResult> SendNotification([FromBody] NotificationRequest request)
         {
-
             await notificationMgr.NotifyAllAsync(request.Message!);
             return Ok("Notification sent successfully.");
         }
