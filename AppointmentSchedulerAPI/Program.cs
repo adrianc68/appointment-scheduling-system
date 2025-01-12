@@ -7,7 +7,10 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfa
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Component;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Interfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.SignalRNotifier;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Component;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Interfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
@@ -82,7 +85,13 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
+
 builder.Services.AddOpenApi();
+builder.Services.AddSignalR(opt => {
+    opt.EnableDetailedErrors = true;
+});
+
 builder.Services.AddSingleton<EnvironmentVariableService>();
 
 builder.Services.AddScoped<IClientEvent, ClientMgr>();
@@ -91,13 +100,14 @@ builder.Services.AddScoped<IClientObserver, SchedulerMgr>();
 builder.Services.AddScoped<IServiceEvent, ServiceMgr>();
 builder.Services.AddScoped<IServiceObserver, SchedulerMgr>();
 
-
 builder.Services.AddScoped<IAssistantEvent, AssistantMgr>();
 builder.Services.AddScoped<IAssistantObserver, SchedulerMgr>();
 
 builder.Services.AddScoped<ISchedulerEvent, SchedulerMgr>();
 builder.Services.AddScoped<ISchedulerObserver, SchedulerMgr>();
 
+builder.Services.AddScoped<INotificationMgt, NotificationMgr>();
+builder.Services.AddScoped<INotifier, NotificationHub>();
 
 builder.Services.AddScoped<ISchedulerMgt, SchedulerMgr>();
 builder.Services.AddScoped<IClientMgt, ClientMgr>();
@@ -137,22 +147,21 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 
+
 using (var scope = app.Services.CreateScope())
 {
     var clientMgrEventPublisher = scope.ServiceProvider.GetRequiredService<IClientEvent>() as ClientMgr;
     var serviceMgrEventPublisher = scope.ServiceProvider.GetRequiredService<IServiceEvent>() as ServiceMgr;
     var assistantMgrEventPublisher = scope.ServiceProvider.GetRequiredService<IAssistantEvent>() as AssistantMgr;
     var schedulerEventPublisher = scope.ServiceProvider.GetRequiredService<ISchedulerEvent>() as SchedulerMgr;
-    
-    
+
+
     var schedulerMgr = scope.ServiceProvider.GetRequiredService<ISchedulerMgt>() as SchedulerMgr;
 
     clientMgrEventPublisher?.Suscribe(schedulerMgr!);
     serviceMgrEventPublisher?.Suscribe(schedulerMgr!);
     assistantMgrEventPublisher?.Suscribe(schedulerMgr!);
     schedulerEventPublisher?.Suscribe(schedulerMgr!);
-
-
 }
 
 
@@ -160,8 +169,6 @@ using (var scope = app.Services.CreateScope())
 // app.UseMiddleware<HttpResponseAuthorizationMiddleware>(); 
 app.UseAuthorization();
 app.UseAuthentication();
-
-
 
 
 
@@ -186,5 +193,15 @@ if (app.Environment.IsDevelopment())
 }
 
 
+app.UseCors(policy => policy
+    .WithOrigins("http://localhost:8080") 
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials());
+
+
+
+app.MapHub<NotificationHub>("/notificationHub");
 app.MapControllers();
+
 app.Run($"http://0.0.0.0:{port}");

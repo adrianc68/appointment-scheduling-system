@@ -76,11 +76,5 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         APPOINTMENT_SERVICES_LIMIT_REACHED,
         APPOINTMENT_SCHEDULED_LIMIT_REACHED,
         APPOINTMENT_SELECTED_SERVICE_CONFLICT_WITH_TIME_SLOT,
-
-
-
-
-
-
     }
 }

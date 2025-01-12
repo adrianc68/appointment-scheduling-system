@@ -4,7 +4,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
 
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock
+namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Component
 {
     public class TimeSlotLockMgr : ITimeSlotLockMgt
     {
