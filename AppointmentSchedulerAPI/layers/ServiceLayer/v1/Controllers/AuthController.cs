@@ -1,9 +1,9 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AccountInterfaces;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authentication;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
@@ -23,6 +23,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPost("login/")]
+        [AllowAnonymous]
         public async Task<IActionResult> LoginJwt([FromBody] LoginAccountAndPasswordDTO dto)
         {
             JwtTokenResult token;
@@ -45,14 +46,16 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(token, ApiVersionEnum.V1);
         }
 
+
         [HttpPost("refresh/")]
+        [AllowAnonymous]
         public async Task<IActionResult> RefreshJwt()
         {
             var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
             if (string.IsNullOrEmpty(token))
             {
-                return Unauthorized("Token is missing.");
+                return httpResponseService.BadRequest(ApiVersionEnum.V1, "Token is missing.");
             }
             JwtTokenResult tokenResult;
             try

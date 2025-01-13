@@ -6,8 +6,5 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
     {
         [Required(ErrorMessage = "Uuid is required.")]
         public required Guid AppointmentUuid { get; set; }
-        // Get from the Authentication Service
-        // $$$> THIS MUST BE REMOVED FROM HERE
-        public required Guid ClientUuid { get; set; }
     }
 }

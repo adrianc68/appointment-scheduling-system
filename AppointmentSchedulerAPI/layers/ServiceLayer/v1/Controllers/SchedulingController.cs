@@ -1,10 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AccountInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -18,16 +21,20 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
     public class SchedulingController : ControllerBase
     {
         private readonly ISchedulingInterfaces systemFacade;
+        private readonly IAccountInterfaces acountSystemFacade;
         private readonly IHttpResponseService httpResponseService;
 
-        public SchedulingController(ISchedulingInterfaces systemFacade, IHttpResponseService httpResponseService)
+        public SchedulingController(ISchedulingInterfaces systemFacade, IAccountInterfaces accountSystemFacade, IHttpResponseService httpResponseService)
         {
             this.systemFacade = systemFacade;
+            this.acountSystemFacade = accountSystemFacade;
             this.httpResponseService = httpResponseService;
         }
 
 
         [HttpGet("appointment/range")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public IActionResult GetSchedulingBlocks([FromQuery] DateOnlyDTO dto)
         {
             DateOnly date = dto.Date;
@@ -64,7 +71,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
         [HttpPost("appointment/range/block")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public async Task<IActionResult> BlockTimeRange([FromBody] BlockTimeRangeDTO dto)
         {
             DateTimeRange range = new DateTimeRange
@@ -94,7 +102,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpDelete("appointment/range/unblock")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public IActionResult UnblockTimeRange([FromBody] UnblockTimeRangeDTO dto)
         {
             OperationResult<bool, GenericError> result = systemFacade.UnblockTimeRange(dto.ClientUuid);
@@ -108,7 +117,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
         [HttpPut("availabilityTimeSlot")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> EditAvailabilityTimeSlot([FromBody] UpdateAvailabilityTimeSlotDTO dto)
         {
             bool isUpdated = false;
@@ -145,7 +155,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpDelete("availabilityTimeSlot")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> DeleteAvailabilityTimeSlot([FromBody] DeleteAvailabilityTimeSlotDTO dto)
         {
             bool isStatusChanged = false;
@@ -170,7 +181,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
         [HttpPatch("availabilityTimeSlot/disable")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> DisableAvailabilityTimeSlot([FromBody] DisableAvailabilityTimeSlotDTO dto)
         {
             bool isStatusChanged = false;
@@ -194,7 +206,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPatch("availabilityTimeSlot/enable")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> EnableAvailabilityTimeSlot([FromBody] DisableAvailabilityTimeSlotDTO dto)
         {
             bool isStatusChanged = false;
@@ -218,7 +231,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPost("availabilityTimeSlot")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> RegisterAvailabilityTimeSlot([FromBody] CreateAvailabilityTimeSlotDTO availabilityDTO)
         {
             Guid? guid;
@@ -258,7 +272,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
         [HttpGet("services/available")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public async Task<IActionResult> GetAllAvailableServicesByDate([FromQuery] AvailableServicesByDateDTO getByDateDTO)
         {
             List<ServiceAvailableDTO> assistantServiceDTO = [];
@@ -293,7 +308,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
         [HttpGet("availabilityTimeSlot")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public async Task<IActionResult> GetAllAvailabilityTimeSlot([FromQuery] DateOnlyRangeDTO rangeDTO)
         {
             List<AvailabilityTimeSlotRegisteredDTO> availabilityTimeslotsDTO = [];
@@ -326,7 +342,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
         [HttpPatch("appointment/serviceOffer/disable")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> DisableServiceOffer([FromBody] DisableServiceOfferDTO dto)
         {
             bool isDisabled = false;
@@ -350,8 +367,10 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isDisabled, ApiVersionEnum.V1);
         }
 
+
         [HttpPatch("appointment/serviceOffer/enable")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> EnableServiceOffer([FromBody] EnableServiceOfferDTO dto)
         {
             bool isEnabled = false;
@@ -377,7 +396,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
         [HttpGet("appointment/")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public async Task<IActionResult> GetAppointmentsFromScheduler([FromQuery] GetAllAppointmentsDTO dto)
         {
             List<AppointmentDetailsDTO> appointments = [];
@@ -417,8 +437,10 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(appointments, ApiVersionEnum.V1);
         }
 
+
         [HttpGet("appointment/staffOnly")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT)]
         public async Task<IActionResult> GetAllAppoinments([FromQuery] GetAllAppointmentsDTO dto)
         {
             List<AppointmentDetailsDTO> appointments = [];
@@ -454,7 +476,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpGet("appointment/staffOnly/{uuid}")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT)]
         public async Task<IActionResult> GetAppointmentsDetails(Guid uuid)
         {
             Appointment app;
@@ -521,20 +544,22 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
         [HttpPost("appointment/asClient")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.CLIENT)]
         public async Task<IActionResult> ScheduleAppointmentAsClientAsync([FromBody] CreateAppointmentAsClientDTO dto)
         {
             Guid? guid;
             try
             {
+                var claims = ClaimsPOCO.GetUserClaims(User);
                 Appointment appointment = new Appointment
                 {
                     Date = dto.Date,
-                    Client = new Client { Uuid = dto.ClientUuid },
+                    Client = new Client { Uuid = Guid.Parse(claims.Uuid) },
                     ScheduledServices = [],
-                    Uuid = Guid.CreateVersion7()
+                    Uuid = Guid.CreateVersion7(),
+                    StartTime = dto.SelectedServices.Min(service => service.StartTime)
                 };
-                appointment.StartTime = dto.SelectedServices.Min(service => service.StartTime);
                 foreach (var serviceOfferUuid in dto.SelectedServices)
                 {
                     var selectedService = new ScheduledService
@@ -567,7 +592,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPost("appointment/asStaff")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT)]
         public async Task<IActionResult> ScheduleAppointmentAsStaff([FromBody] CreateAppointmentAsStaffDTO dto)
         {
             Guid? guid;
@@ -613,7 +639,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpGet("appointment/conflict")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public async Task<IActionResult> GetConflictingServiceAppointmentFromRange([FromQuery] DateTimeRangeDTO rangeDTO)
         {
             List<ConflictingServiceOfferDTO> conflictingServiceOfferDTOs = [];
@@ -648,7 +675,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPatch("appointment/confirm")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT)]
         public async Task<IActionResult> ConfirmAppointment([FromBody] ConfirmAppointmentDTO dto)
         {
             bool isConfirmed = false;
@@ -673,7 +701,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPatch("appointment/finalize")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT)]
         public async Task<IActionResult> FinalizeAppointment([FromBody] FinalizeAppointmentDTO dto)
         {
             bool isConfirmed = false;
@@ -698,14 +727,15 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPatch("appointment/cancel/asClient")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public async Task<IActionResult> CancelAppointment([FromBody] CancelAppointmentAsClientDTO dto)
         {
             bool isConfirmed = false;
             try
             {
-                // $$$> Get client uuid from authentication service
-                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelf(dto.AppointmentUuid, dto.ClientUuid);
+                var claims = ClaimsPOCO.GetUserClaims(User);
+                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelf(dto.AppointmentUuid, Guid.Parse(claims.Uuid));
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;
@@ -724,13 +754,13 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPatch("appointment/cancel/asStaff")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT)]
         public async Task<IActionResult> CancelAppointmentAsStaff([FromBody] CancelAppointmentAsStaffDTO dto)
         {
             bool isConfirmed = false;
             try
             {
-                // $$$> Get client uuid from authentication service
                 OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentStaffAssisted(dto.AppointmentUuid);
                 if (result.IsSuccessful)
                 {

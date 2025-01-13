@@ -1,6 +1,8 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AssistantInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
@@ -26,7 +28,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPatch("disable")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> DisableAssistant([FromBody] DisableAssistantDTO dto)
         {
             bool isStatusChanged = false;
@@ -50,7 +53,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPatch("enable")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> EnableAssistant([FromBody] EnableAssistantDTO dto)
         {
             bool isStatusChanged = false;
@@ -74,7 +78,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpDelete("delete")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> DeleteAssistant([FromBody] DeleteAssistantDTO dto)
         {
             bool isStatusChanged = false;
@@ -98,7 +103,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> GetAllAssistant()
         {
             List<AssistantDetailsDTO> assistantDtos = [];
@@ -124,7 +130,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> RegisterAssistant([FromBody] CreateAssistantDTO dto)
         {
             Guid? guid;
@@ -156,7 +163,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPut]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> UpdateAssistant([FromBody] UpdateAssistantDTO dto)
         {
             bool isUpdated = false;
@@ -189,7 +197,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPost("service")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> AssignServiceToAssistant([FromBody] AssignServiceToAssistantDTO assignServiceDTO)
         {
             bool isAssigned = false;

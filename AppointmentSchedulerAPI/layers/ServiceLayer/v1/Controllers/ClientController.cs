@@ -1,6 +1,8 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ClientInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -22,13 +24,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
-        // public IActionResult EditClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
         [HttpPatch("disable")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> DisableClient([FromBody] DisableClientDTO dto)
         {
             bool isStatusChanged = false;
@@ -52,7 +50,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPatch("enable")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> EnableClient([FromBody] EnableClientDTO dto)
         {
             bool isStatusChanged = false;
@@ -77,7 +76,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
         [HttpDelete("delete")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> DeleteClient([FromBody] DeleteClientDTO dto)
         {
             bool isStatusChanged = false;
@@ -102,7 +102,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> GetAllClient()
         {
             List<ClientDetailsDTO> clientDTO = [];
@@ -162,7 +163,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
         [HttpPut]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> UpdateClient([FromBody] UpdateClientDTO dto)
         {
             bool isUpdated = false;

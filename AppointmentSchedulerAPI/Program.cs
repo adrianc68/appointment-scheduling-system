@@ -72,24 +72,6 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var envManager = new EnvironmentVariableService();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = envManager.Get("JWT_ISSUER"),
-        ValidAudience = envManager.Get("JWT_AUDIENCE"),
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(envManager.Get("JWT_SECRET_KEY")))
-    };
-});
-
 
 
 builder.Services.AddOpenApi();
@@ -150,6 +132,33 @@ builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtToke
     );
 });
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = envManager.Get("JWT_ISSUER"),
+            ValidateAudience = true,
+            ValidAudience = envManager.Get("JWT_AUDIENCE"),
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(envManager.Get("JWT_SECRET_KEY")))
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                var userClaims = context.Principal!.Claims;
+                return Task.CompletedTask;
+            }
+        };
+    });
+
 builder.Services.AddControllers();
 
 
@@ -180,10 +189,9 @@ using (var scope = app.Services.CreateScope())
 }
 
 
-// $$$>> This middlewares causes problems with authorization! Fix it 
-// app.UseMiddleware<HttpResponseAuthorizationMiddleware>(); 
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseMiddleware<HttpResponseAuthorizationMiddleware>();
+app.UseAuthorization();
 
 
 

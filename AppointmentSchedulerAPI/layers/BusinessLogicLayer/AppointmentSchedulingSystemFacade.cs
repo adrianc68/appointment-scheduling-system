@@ -1544,7 +1544,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             JwtUserCredentials credentials = new JwtUserCredentials
             {
                 Username = accountData.Username!,
-                Role = accountData.Role.ToString(),
+                Role = accountData.Role!.Value.ToString(),
                 Email = accountData.Email!,
                 Uuid = accountData.Uuid!.Value.ToString()
             };
@@ -1587,6 +1587,28 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return Task.FromResult(OperationResult<JwtTokenResult, GenericError>.Failure(new GenericError("Cannot refresh token!"), MessageCodeType.AUTHENTICATION_CANNOT_REFRESH_TOKEN));
             }
             return Task.FromResult(OperationResult<JwtTokenResult, GenericError>.Success(newToken));
+        }
+
+        public Task<OperationResult<AccountData, GenericError>> ValidateCredentials(string token)
+        {
+            JwtTokenResult tokenResult = new JwtTokenResult
+            {
+                Token = token
+            };
+            JwtTokenData? tokenData = authJwtService.ValidateCredentials(tokenResult);
+            if (tokenData == null)
+            {
+                return Task.FromResult(OperationResult<AccountData, GenericError>.Failure(new GenericError("Token is not valid"), MessageCodeType.AUTHENTICATION_INVALID_CREDENTIALS));
+            }
+            
+            AccountData accountData = new AccountData
+            {
+                Username = tokenData.Username,
+                Email = tokenData.Email,
+                Uuid = Guid.Parse(tokenData.Uuid),
+                Role = Enum.TryParse<RoleType>(tokenData.Role, true, out var roleValue) ? roleValue : null,
+            };
+           return Task.FromResult(OperationResult<AccountData, GenericError>.Success(accountData)); 
         }
     }
 }
