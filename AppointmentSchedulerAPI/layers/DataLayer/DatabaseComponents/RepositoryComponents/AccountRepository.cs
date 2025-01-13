@@ -1,5 +1,3 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +46,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return phoneNumberDB != null;
         }
 
-        public async Task<AccountData?> GetAccountDataByEmailOrUsernameOrPhoneNumber(string account, string password)
+        public async Task<BusinessLogicLayer.Model.AccountData?> GetAccountDataByEmailOrUsernameOrPhoneNumber(string account, string password)
         {
             using var dbContext = context.CreateDbContext();
             var userDB = await dbContext.UserAccounts
@@ -61,7 +59,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 return null;
             }
 
-            return new AccountData
+            return new BusinessLogicLayer.Model.AccountData
             {
                 Id = userDB.Id,
                 Email = userDB.Email,
@@ -69,7 +67,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 PhoneNumber = userDB.UserInformation!.PhoneNumber,
                 Username = userDB.Username,
                 CreatedAt = userDB.CreatedAt,
-                Role = (BusinessLogicLayer.Model.Types.RoleType) userDB.Role!.Value
+                Role = (BusinessLogicLayer.Model.Types.RoleType)userDB.Role!.Value
             };
         }
 
@@ -99,6 +97,21 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 throw;
             }
             return isStatusChanged;
+        }
+
+        public async Task<BusinessLogicLayer.Model.Types.RoleType?> GetRoleTypeByUuid(Guid accountUuid)
+        {
+            using var dbContext = context.CreateDbContext();
+            var userDB = await dbContext.UserAccounts
+               .Where(a => a.Uuid == accountUuid)
+               .FirstOrDefaultAsync();
+
+            if (userDB == null)
+            {
+                return null;
+            }
+
+            return (BusinessLogicLayer.Model.Types.RoleType?)userDB.Role;
         }
     }
 }

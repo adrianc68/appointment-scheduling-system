@@ -10,6 +10,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.A
         Task<bool> IsEmailRegisteredAsync(string email);
         Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber);
         Task<AccountData?> GetAccountDataByEmailOrUsernameOrPhoneNumber(string account, string password);
+        Task<RoleType?> GetRoleTypeByUuid(Guid accountUuid);
         Task<bool> ChangeAccountStatusAsync(int idAccount, AccountStatusType status, AccountType accountType);
     }
 }

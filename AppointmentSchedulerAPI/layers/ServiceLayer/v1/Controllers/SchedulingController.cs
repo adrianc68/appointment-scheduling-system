@@ -6,7 +6,6 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
@@ -75,6 +74,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public async Task<IActionResult> BlockTimeRange([FromBody] BlockTimeRangeDTO dto)
         {
+            var claims = ClaimsPOCO.GetUserClaims(User);
+            if (claims.Role == RoleType.CLIENT && claims.Uuid != dto.ClientUuid)
+            {
+                return httpResponseService.Conflict(new GenericError("Clients can only block their own uuids"), ApiVersionEnum.V1, MessageCodeType.AUTHENTICATION_UUID_VIOLATION.ToString());
+            }
+
             DateTimeRange range = new DateTimeRange
             {
                 Date = dto.Date,
@@ -104,9 +109,10 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [HttpDelete("appointment/range/unblock")]
         [Authorize]
         [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
-        public IActionResult UnblockTimeRange([FromBody] UnblockTimeRangeDTO dto)
+        public IActionResult UnblockTimeRange()
         {
-            OperationResult<bool, GenericError> result = systemFacade.UnblockTimeRange(dto.ClientUuid);
+            var claims = ClaimsPOCO.GetUserClaims(User);
+            OperationResult<bool, GenericError> result = systemFacade.UnblockTimeRange(claims.Uuid);
             if (!result.IsSuccessful)
             {
                 return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
@@ -555,7 +561,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 Appointment appointment = new Appointment
                 {
                     Date = dto.Date,
-                    Client = new Client { Uuid = Guid.Parse(claims.Uuid) },
+                    Client = new Client { Uuid = claims.Uuid },
                     ScheduledServices = [],
                     Uuid = Guid.CreateVersion7(),
                     StartTime = dto.SelectedServices.Min(service => service.StartTime)
@@ -676,7 +682,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpPatch("appointment/confirm")]
         [Authorize]
-        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT)]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> ConfirmAppointment([FromBody] ConfirmAppointmentDTO dto)
         {
             bool isConfirmed = false;
@@ -702,7 +708,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpPatch("appointment/finalize")]
         [Authorize]
-        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT)]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> FinalizeAppointment([FromBody] FinalizeAppointmentDTO dto)
         {
             bool isConfirmed = false;
@@ -728,14 +734,14 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpPatch("appointment/cancel/asClient")]
         [Authorize]
-        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
+        [AllowedRoles(RoleType.CLIENT)]
         public async Task<IActionResult> CancelAppointment([FromBody] CancelAppointmentAsClientDTO dto)
         {
             bool isConfirmed = false;
             try
             {
                 var claims = ClaimsPOCO.GetUserClaims(User);
-                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelf(dto.AppointmentUuid, Guid.Parse(claims.Uuid));
+                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelf(dto.AppointmentUuid, claims.Uuid);
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;

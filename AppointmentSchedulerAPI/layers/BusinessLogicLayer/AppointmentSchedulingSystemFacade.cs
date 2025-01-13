@@ -1173,7 +1173,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         }
 
         public async Task<OperationResult<bool, GenericError>> ConfirmAppointment(Guid appointmentUuid)
-        {
+        {   
             Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(appointmentUuid);
             if (appointment == null)
             {
@@ -1198,7 +1198,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
             }
 
-
             if (appointment.Status == AppointmentStatusType.CONFIRMED)
             {
                 GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} is already confirmed", []);
@@ -1206,6 +1205,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 genericError.AddData("Status", appointment.Status.ToString());
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_CONFIRMED);
             }
+
             bool isStatusOfAppointmentChanged = await schedulerMgr.ChangeAppointmentStatusTypeAsync(appointment.Id!.Value, AppointmentStatusType.CONFIRMED);
             if (!isStatusOfAppointmentChanged)
             {
