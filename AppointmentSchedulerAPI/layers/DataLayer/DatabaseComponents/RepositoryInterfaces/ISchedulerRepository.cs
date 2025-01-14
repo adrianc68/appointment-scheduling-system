@@ -39,12 +39,15 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<List<int>> GetServiceOfferIdsByServiceId(int idService);
         Task<List<int>> GetServiceOfferIdsByAssistantId(int idAssistant);
         Task<List<ServiceOffer>> GetServiceOffersByAssistantId(int idAssistant);
+        Task<List<ServiceOffer>> GetServiceOffersByServiceId(int idService);
+
+ 
 
         Task<int> GetAppointmentsScheduledCountByClientUuid(int idClient);
 
         Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByUid(int idAssistant);
-        Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByUidAndRange(int idAssistant, DateTimeRange range);
-        Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsOfClientByUid(int idClient);
+        Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAndRange(int idAssistant, DateTimeRange range);
+        Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsOfClientById(int idClient);
         Task<List<int>> GetScheduledOrConfirmedAppoinmentsIdsOfClientById(int idClient);
 
 

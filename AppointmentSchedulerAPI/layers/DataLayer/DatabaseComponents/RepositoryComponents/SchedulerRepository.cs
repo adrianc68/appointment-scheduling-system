@@ -132,9 +132,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .Where(app => app.Date >= startDate && app.Date <= endDate && (app.Status == Model.Types.AppointmentStatusType.CONFIRMED || app.Status == Model.Types.AppointmentStatusType.SCHEDULED || app.Status == Model.Types.AppointmentStatusType.RESCHEDULED))
                 .Include(appAssSer => appAssSer.ScheduledServices!)
                     .ThenInclude(assisServ => assisServ.ServiceOffer)
-                        .ThenInclude(assis => assis!.Assistant)
-                            .ThenInclude(asacc => asacc!.UserAccount)
-                            .ThenInclude(asinf => asinf!.UserInformation)
+                    .ThenInclude(assis => assis!.Assistant)
+                    .ThenInclude(asacc => asacc!.UserAccount)
+                    .ThenInclude(asinf => asinf!.UserInformation)
+                .Include(cli => cli.Client)
+                    .ThenInclude(asacc => asacc!.UserAccount)
                 .ToListAsync();
 
             var appointmentsModel = appointmentDB.Select(app => new BusinessLogicLayer.Model.Appointment
@@ -146,7 +148,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 Uuid = app.Uuid,
                 Id = app.Id,
                 CreatedAt = app.CreatedAt,
-                Client = null,
+                Client = new BusinessLogicLayer.Model.Client
+                {
+                    Uuid = app.Client!.UserAccount!.Uuid,
+                    Id = app.Client.IdUserAccount
+                },
                 ScheduledServices = app.ScheduledServices!.Select(aso => new BusinessLogicLayer.Model.ScheduledService
                 {
                     ServiceStartTime = aso.ServiceStartTime,
@@ -823,13 +829,15 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             var businessAppointments = dbAppointments.Select(dbApp => new BusinessLogicLayer.Model.Appointment
             {
                 Id = dbApp.Id,
+                Uuid = dbApp.Uuid,
                 Date = dbApp.Date,
                 Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)dbApp.Status!.Value,
                 StartTime = dbApp.StartTime,
                 TotalCost = dbApp.TotalCost,
                 Client = new BusinessLogicLayer.Model.Client
                 {
-                    Id = dbApp.Client!.IdUserAccount
+                    Id = dbApp.Client!.IdUserAccount,
+                    Uuid = dbApp.Client.UserAccount!.Uuid
                 },
                 ScheduledServices = dbApp.ScheduledServices!.Select(ss => new BusinessLogicLayer.Model.ScheduledService
                 {
@@ -858,7 +866,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         }
 
 
-        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfClientByUid(int idClient)
+        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfClientById(int idClient)
         {
             using var dbContext = context.CreateDbContext();
 
@@ -878,12 +886,14 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             {
                 Id = dbApp.Id,
                 Date = dbApp.Date,
+                Uuid = dbApp.Uuid,
                 Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)dbApp.Status!.Value,
                 StartTime = dbApp.StartTime,
                 TotalCost = dbApp.TotalCost,
                 Client = new BusinessLogicLayer.Model.Client
                 {
-                    Id = dbApp.Client!.IdUserAccount
+                    Id = dbApp.Client!.IdUserAccount,
+                    Uuid = dbApp.Client.UserAccount!.Uuid
                 },
                 ScheduledServices = dbApp.ScheduledServices!.Select(ss => new BusinessLogicLayer.Model.ScheduledService
                 {
@@ -994,6 +1004,37 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return serviceOffers;
         }
 
+        public async Task<List<BusinessLogicLayer.Model.ServiceOffer>> GetServiceOffersByServiceId(int idService)
+        {
+            using var dbContext = context.CreateDbContext();
+            var dbServiceOffers = await dbContext.ServiceOffers
+                    .Include(ser => ser.Service)
+                    .Where(a => a.IdService == idService)
+                    .ToListAsync();
+
+            if (dbServiceOffers == null)
+            {
+                return [];
+            }
+
+            var serviceOffers = dbServiceOffers.Select(so => new BusinessLogicLayer.Model.ServiceOffer
+            {
+                Id = so.Id,
+                Uuid = so.Uuid,
+                Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType)so.Status,
+                Service = new BusinessLogicLayer.Model.Service
+                {
+                    Id = so.Service!.Id,
+                    Uuid = so.Service.Uuid,
+                    Price = so.Service.Price,
+                    Name = so.Service.Name,
+                    Minutes = so.Service.Minutes,
+                    Description = so.Service.Description
+                },
+            }).ToList();
+            return serviceOffers;
+        }
+
         public async Task<List<int>> GetScheduledOrConfirmedAppoinmentsIdsOfClientById(int idClient)
         {
             using var dbContext = context.CreateDbContext();
@@ -1011,7 +1052,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return dbAppointments;
         }
 
-        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByUidAndRange(int idAssistant, BusinessLogicLayer.Model.Types.DateTimeRange range)
+        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAndRange(int idAssistant, BusinessLogicLayer.Model.Types.DateTimeRange range)
         {
             using var dbContext = context.CreateDbContext();
 
@@ -1034,12 +1075,14 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             {
                 Id = dbApp.Id,
                 Date = dbApp.Date,
+                Uuid = dbApp.Uuid,
                 Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)dbApp.Status!.Value,
                 StartTime = dbApp.StartTime,
                 TotalCost = dbApp.TotalCost,
                 Client = new BusinessLogicLayer.Model.Client
                 {
-                    Id = dbApp.Client!.IdUserAccount
+                    Id = dbApp.Client!.IdUserAccount,
+                    Uuid = dbApp.Client!.UserAccount!.Uuid
                 },
                 ScheduledServices = dbApp.ScheduledServices!.Select(ss => new BusinessLogicLayer.Model.ScheduledService
                 {

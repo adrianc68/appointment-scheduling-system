@@ -82,8 +82,8 @@ builder.Services.AddSignalR(opt =>
 
 builder.Services.AddSingleton<EnvironmentVariableService>();
 
-builder.Services.AddScoped<IAccountEvent<AssistantEvent>, AccountMgr>(); // Para eventos de Assistant
-builder.Services.AddScoped<IAccountEvent<ClientEvent>, AccountMgr>();    // Para eventos de Client
+builder.Services.AddScoped<IAccountEvent<AssistantEvent>, AccountMgr>();
+builder.Services.AddScoped<IAccountEvent<ClientEvent>, AccountMgr>();
 
 builder.Services.AddScoped<IClientEvent, ClientMgr>();
 builder.Services.AddScoped<IClientObserver, SchedulerMgr>();
@@ -155,8 +155,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             {
                 var userClaims = context.Principal!.Claims;
                 return Task.CompletedTask;
+            },
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/notificationHub"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
             }
         };
+
     });
 
 builder.Services.AddControllers();
@@ -164,6 +180,12 @@ builder.Services.AddControllers();
 
 
 var app = builder.Build();
+
+app.UseCors(policy => policy
+    .WithOrigins("http://localhost:8080")
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials());
 
 
 
@@ -215,13 +237,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-
-app.UseCors(policy => policy
-    // $$$>> Resolve this! Use .env file or something else
-    .WithOrigins("http://localhost:8080")
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-    .AllowCredentials());
 
 
 

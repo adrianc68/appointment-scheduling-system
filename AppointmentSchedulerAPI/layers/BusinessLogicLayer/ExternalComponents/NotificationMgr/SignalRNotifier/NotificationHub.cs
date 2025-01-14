@@ -1,5 +1,4 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Interfaces;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using Microsoft.AspNetCore.SignalR;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.SignalRNotifier
@@ -15,38 +14,35 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
             this.hubContext = hubContext;
         }
 
-        public void AddUser(string username)
+        public void AddUser()
         {
+
             var connectionId = Context.ConnectionId;
-            if (!userConnections.ContainsKey(username))
+            var claims = ClaimsPOCO.GetUserClaims(Context.User!);
+
+            if (!userConnections.ContainsKey(claims.Uuid.ToString()))
             {
-                userConnections.Add(username, connectionId);
+                userConnections.Add(claims.Uuid.ToString(), connectionId);
             }
             else
             {
-                userConnections[username] = connectionId; 
+                userConnections[claims.Uuid.ToString()] = connectionId;
             }
-            PropToString.PrintListData(userConnections);
-            System.Console.WriteLine($"User {username} connected with connectionId {connectionId}");
+            System.Console.WriteLine($"User {claims.Uuid.ToString()} connected with connectionId {connectionId}");
         }
 
         public override Task OnConnectedAsync()
         {
             var username = Context.User?.Identity?.Name;
-            if (!string.IsNullOrEmpty(username))
-            {
-                userConnections[username] = Context.ConnectionId;
-            }
+            var claims = ClaimsPOCO.GetUserClaims(Context.User!);
+            userConnections[claims.Uuid.ToString()] = Context.ConnectionId;
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception? exception)
         {
-            var username = Context.User?.Identity?.Name;
-            if (!string.IsNullOrEmpty(username))
-            {
-                userConnections.Remove(username);
-            }
+            var claims = ClaimsPOCO.GetUserClaims(Context.User!);
+            userConnections.Remove(claims.Uuid.ToString());
             return base.OnDisconnectedAsync(exception);
         }
 
