@@ -1,4 +1,3 @@
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;

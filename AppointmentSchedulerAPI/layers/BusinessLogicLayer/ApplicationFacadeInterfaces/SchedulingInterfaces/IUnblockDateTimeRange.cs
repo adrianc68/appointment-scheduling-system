@@ -1,4 +1,3 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 
 

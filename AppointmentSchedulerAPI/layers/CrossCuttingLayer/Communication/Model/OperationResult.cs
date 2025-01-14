@@ -1,5 +1,3 @@
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
-
 namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
 {
     public class OperationResult<T, TError>

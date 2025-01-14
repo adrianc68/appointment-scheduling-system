@@ -11,7 +11,6 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeS
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authentication;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;

@@ -1,5 +1,3 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
-
 namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model
 {
     public class JwtTokenData

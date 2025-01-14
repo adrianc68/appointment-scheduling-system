@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
 public class UnblockTimeRangeDTO
 {

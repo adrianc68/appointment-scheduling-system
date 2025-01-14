@@ -1,7 +1,4 @@
-using System.Linq.Expressions;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
-using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -833,6 +830,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 Date = dbApp.Date,
                 Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)dbApp.Status!.Value,
                 StartTime = dbApp.StartTime,
+                EndTime = dbApp.EndTime,
                 TotalCost = dbApp.TotalCost,
                 Client = new BusinessLogicLayer.Model.Client
                 {
@@ -889,6 +887,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 Uuid = dbApp.Uuid,
                 Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)dbApp.Status!.Value,
                 StartTime = dbApp.StartTime,
+                EndTime = dbApp.EndTime,
                 TotalCost = dbApp.TotalCost,
                 Client = new BusinessLogicLayer.Model.Client
                 {
@@ -1078,6 +1077,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 Uuid = dbApp.Uuid,
                 Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)dbApp.Status!.Value,
                 StartTime = dbApp.StartTime,
+                EndTime = dbApp.EndTime,
                 TotalCost = dbApp.TotalCost,
                 Client = new BusinessLogicLayer.Model.Client
                 {

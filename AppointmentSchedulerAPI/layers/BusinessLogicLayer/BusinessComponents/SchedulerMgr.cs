@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using System.Text.Json;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
@@ -7,7 +6,6 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents

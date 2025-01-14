@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using AppointmentSchedulerAPI.layers.ServiceLayer.v1.ValidationAttributes;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
 {

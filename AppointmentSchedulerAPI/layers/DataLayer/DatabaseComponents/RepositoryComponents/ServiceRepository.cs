@@ -1,4 +1,3 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
