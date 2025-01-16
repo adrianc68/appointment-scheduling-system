@@ -28,6 +28,7 @@ public partial class AppointmentDbContext : DbContext
     public required virtual DbSet<ScheduledService> ScheduledServices { get; set; }
     public required virtual DbSet<AppointmentNotification> AppointmentNotifications { get; set; }
     public required virtual DbSet<NotificationBase> NotificationBases { get; set; }
+    public required virtual DbSet<NotificationRecipient> NotificationRecipients { get; set; }
 
 
 
@@ -110,9 +111,7 @@ public partial class AppointmentDbContext : DbContext
                  .HasColumnName("uuid");
              entity.Property(e => e.CreatedAt)
                  .HasColumnName("created_at");
-             entity.Property(e => e.Status)
-                 .HasColumnType("NotificationStatusType")
-                 .HasColumnName("status");
+
              entity.Property(e => e.Message)
                  .HasColumnName("message");
              entity.Property(e => e.Code)
@@ -121,14 +120,31 @@ public partial class AppointmentDbContext : DbContext
              entity.Property(e => e.Type)
                  .HasColumnType("NotificationType")
                  .HasColumnName("type");
-             entity.Property(e => e.IdUserAccount)
-                 .HasColumnName("id_user_account");
-
-             entity.HasOne(a => a.UserAccount)
-                .WithMany(e => e.Notifications)
-                .HasForeignKey(x => x.IdUserAccount)
-                .OnDelete(DeleteBehavior.Cascade);
          });
+
+        modelBuilder.Entity<NotificationRecipient>(entity =>
+        {
+            entity.ToTable("NotificationRecipient");
+            entity.HasKey(e => new { e.IdUserAccount, e.IdNotificationBase });
+
+            entity.Property(e => e.IdNotificationBase)
+                .HasColumnName("id_notification");
+            entity.Property(e => e.IdUserAccount)
+                .HasColumnName("id_user_account");
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasColumnType("NotificationStatusType");
+            entity.Property(e => e.ChangedAt)
+                .HasColumnName("changed_at");
+
+            entity.HasOne(e => e.UserAccount)
+                .WithMany(a => a.NotificationRecipients)
+                .HasForeignKey(e => e.IdUserAccount);
+
+            entity.HasOne(e => e.NotificationBase)
+                .WithMany(e => e.NotificationRecipients)
+                .HasForeignKey(e => e.IdNotificationBase);
+        });
 
 
         modelBuilder.Entity<AppointmentNotification>(entity =>

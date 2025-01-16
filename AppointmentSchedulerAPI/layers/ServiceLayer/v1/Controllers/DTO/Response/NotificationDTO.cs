@@ -2,7 +2,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.Notif
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response
 {
-    public class NotificationDto
+    public class NotificationDTO
     {
         public required DateTime CreatedAt { get; set; }
         public required Guid Uuid { get; set; }

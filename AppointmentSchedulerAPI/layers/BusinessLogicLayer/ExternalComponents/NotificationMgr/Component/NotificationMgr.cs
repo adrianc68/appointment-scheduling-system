@@ -20,33 +20,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
             this.webNotifier = webNotifier;
         }
 
-        // public async Task NotifyToUserAsync(string recipient, string message)
-        // {
-        //     var tasks = notifiers.Select(notifier => notifier.SendToUserAsync(recipient, message));
-        //     await Task.WhenAll(tasks);
-        // }
-
-        // public async Task NotifyAllAsync(string message)
-        // {
-        //     var tasks = notifiers.Select(notifier => notifier.SendToAllAsync(message));
-        //     await Task.WhenAll(tasks);
-        // }
-
-        // public async Task NotifyToGroupAsync(string groupName, string message)
-        // {
-        //     var tasks = notifiers.Select(notifier => notifier.SendToGroupAsync(groupName, message));
-        //     await Task.WhenAll(tasks);
-        // }
-
-        private string SerializeObjectToJson<T>(T data)
+        private async void SendNotificationToUsers(List<NotificationRecipient> users, NotificationDTO dto)
         {
-            var options = new JsonSerializerOptions
+            foreach (var recipient in users)
             {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                WriteIndented = true,
-                Converters = { new JsonStringEnumConverter() } 
-            };
-            return JsonSerializer.Serialize(data, options);
+                await this.webNotifier.SendToUserAsync(recipient!.Uuid.ToString()!, SerializeObjectToJson<NotificationDTO>(dto));
+            }
         }
 
         public async Task<Guid?> CreateNotification(NotificationBase notification)
@@ -54,9 +33,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
             notification.Status = NotificationStatusType.UNREAD;
             notification.Uuid = Guid.CreateVersion7();
             bool isRegistered = await notificationRepository.CreateNotification(notification);
-
-            PropToString.PrintData(notification);
-            System.Console.WriteLine(isRegistered);
 
             if (!isRegistered)
             {
@@ -66,16 +42,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
 
             if (notification.Type == NotificationType.APPOINTMENT_NOTIFICATION)
             {
-                NotificationDto notificationDTO = new NotificationDto
+                NotificationDTO notificationDTO = new NotificationDTO
                 {
                     CreatedAt = notification.CreatedAt!.Value,
                     Uuid = notification.Uuid.Value,
                     Status = notification.Status.Value,
-                    Message = notification.Message,
-                    Code = notification.Code,
-                    Type = notification.Type
+                    Message = notification.Message!,
+                    Code = notification.Code!.Value,
+                    Type = notification.Type!.Value
                 };
-                await this.webNotifier.SendToUserAsync(notification.Recipient!.Uuid.ToString()!, SerializeObjectToJson<NotificationDto>(notificationDTO));
+                SendNotificationToUsers(notification.Recipients!, notificationDTO);
             }
             else if (notification.Type == NotificationType.SYSTEM_NOTIFICATION)
             {
@@ -108,6 +84,17 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
         {
             bool isStatusChanged = await notificationRepository.ChangeNotificationStatusByNotificationUuid(uuid, status);
             return isStatusChanged;
+        }
+
+        private string SerializeObjectToJson<T>(T data)
+        {
+            var options = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+            return JsonSerializer.Serialize(data, options);
         }
     }
 }

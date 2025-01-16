@@ -36,22 +36,20 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             var appointmentData = await schedulerMgr.GetAppointmentByUuidAsync(request.AppointmentUuid!.Value);
             var accountData = await accountMgr.GetAccountIdByUuid(claims.Uuid);
 
-            System.Console.WriteLine("********");
-            System.Console.WriteLine(appointmentData);
-            System.Console.WriteLine("********");
-            System.Console.WriteLine(accountData);
-            System.Console.WriteLine("********");
 
             AppointmentNotification appointmentNotification = new AppointmentNotification
             {
                 Type = NotificationType.APPOINTMENT_NOTIFICATION,
                 Message = $"La cita se ha cancelado.",
                 Code = NotificationCodeType.APPOINTMENT_CANCELED,
-                Recipient = new BusinessLogicLayer.Model.AccountData
+                Recipients = new List<NotificationRecipient>
                 {
-                    Uuid = appointmentData!.Client!.Uuid,
-                    Id = appointmentData.Client.Id
+                    new NotificationRecipient
+                {
+                    Uuid = appointmentData!.Client!.Uuid!.Value,
+                    Id = appointmentData.Client.Id!.Value
                     },
+                },
                 Appointment = new BusinessLogicLayer.Model.Appointment
                 {
                     Id = appointmentData!.Id,
@@ -59,9 +57,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 }
             };
 
-            PropToString.PrintData(appointmentNotification);
-            PropToString.PrintData(appointmentNotification.Recipient);
-            PropToString.PrintData(appointmentNotification.Appointment);
 
             await this.notificationMgr.CreateNotification(appointmentNotification);
       

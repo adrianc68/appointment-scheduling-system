@@ -15,5 +15,5 @@ public partial class UserAccount
     public virtual UserInformation? UserInformation { get; set; }
     public virtual Assistant? Assistant { get; set; }
     public virtual Client? Client { get; set; }
-     public virtual IEnumerable<NotificationBase>? Notifications { get; set;}
+     public virtual IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 }
