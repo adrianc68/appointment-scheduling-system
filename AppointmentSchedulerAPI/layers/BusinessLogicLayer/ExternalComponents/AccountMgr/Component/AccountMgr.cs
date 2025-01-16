@@ -86,6 +86,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.A
             return result;
         }
 
+        public async Task<int?> GetAccountIdByUuid(Guid uuid)
+        {
+            int? id = await accountRepository.GetAccountIdByUuid(uuid);
+            return id;
+        }
+
         public async Task<RoleType?> GetRoleTypeByUuid(Guid accountUuid)
         {
             RoleType? role = await accountRepository.GetRoleTypeByUuid(accountUuid);
@@ -139,7 +145,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.A
                 clientObservers.Remove(observer);
             }
         }
-
 
     }
 }

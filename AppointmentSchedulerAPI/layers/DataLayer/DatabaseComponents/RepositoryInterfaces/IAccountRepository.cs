@@ -11,5 +11,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<bool> ChangeAccountStatusType(int idAccount, AccountStatusType status);
         Task<RoleType?> GetRoleTypeByUuid(Guid accountUuid);
         Task<AccountData?> GetAccountDataByEmailOrUsernameOrPhoneNumber(string account, string password);
+        Task<int?> GetAccountIdByUuid(Guid uuid);
     }
 }

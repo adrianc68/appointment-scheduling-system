@@ -11,6 +11,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         Task<List<ServiceOffer>> GetAvailableServicesAsync(DateOnly date);
         Task<List<ScheduledService>> GetConflictingServicesByDateTimeRangeAsync(DateTimeRange range);
         Task<Appointment?> GetAppointmentByUuidAsync(Guid uuid);
+        Task<int?> GetAppointmentIdByUuidAsync(Guid uuid);
         Task<Appointment?> GetAppointmentDetailsByUuidAsync(Guid uuid);
         Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsAsync(DateOnly startDate, DateOnly endDate);
         Task<List<Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate);

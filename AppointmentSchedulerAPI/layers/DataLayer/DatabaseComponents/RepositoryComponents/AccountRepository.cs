@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -71,6 +72,21 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             };
         }
 
+        public async Task<int?> GetAccountIdByUuid(Guid uuid)
+        {
+            using var dbContext = context.CreateDbContext();
+            var userDB = await dbContext.UserAccounts
+               .Where(a => a.Uuid == uuid)
+               .FirstOrDefaultAsync();
+
+            if (userDB == null)
+            {
+                return null;
+            }
+
+            return userDB.Id!.Value;
+        }
+
         public async Task<bool> ChangeAccountStatusType(int idAccount, BusinessLogicLayer.Model.Types.AccountStatusType status)
         {
             bool isStatusChanged = false;
@@ -113,5 +129,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
             return (BusinessLogicLayer.Model.Types.RoleType?)userDB.Role;
         }
+
+
     }
 }

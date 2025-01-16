@@ -105,6 +105,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return appointment;
         }
 
+        public async Task<int?> GetAppointmentIdByUuidAsync(Guid uuid)
+        {
+            int? id = await schedulerRepository.GetAppointmentIdByUuidAsync(uuid);
+            return id;
+        }
+
         public async Task<bool> ChangeAppointmentStatusTypeAsync(int idAppointment, AppointmentStatusType status)
         {
             bool isAppointmentStatusChanged = await schedulerRepository.ChangeAppointmentStatusTypeAsync(idAppointment, status);
@@ -183,7 +189,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     }
                 };
                 this.NotifySuscribers(availabilityTimeSlotEvent);
-                _ = this.notificationMgr.NotifyAllAsync($"{availabilityTimeSlot.StartTime}: {availabilityTimeSlot.EndTime}");
+                // _ = this.notificationMgr.NotifyAllAsync($"{availabilityTimeSlot.StartTime}: {availabilityTimeSlot.EndTime}");
             }
 
             return isUpdated;
@@ -509,30 +515,30 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 }
                 else
                 {
-                    var notification = new
-                    {
-                        type = MessageCodeType.EVENT_APPOINTMENT_HAS_BEEN_CANCELED.ToString(),
-                        appointmentUuid = appointment.Uuid!.Value,
-                        message = $"La cita ${appointment.Uuid} se ha cancelado.",
-                        clientUuid = appointment.Client!.Uuid
-                    };
+                    // var notification = new
+                    // {
+                    //     type = MessageCodeType.EVENT_APPOINTMENT_HAS_BEEN_CANCELED.ToString(),
+                    //     appointmentUuid = appointment.Uuid!.Value,
+                    //     message = $"La cita ${appointment.Uuid} se ha cancelado.",
+                    //     clientUuid = appointment.Client!.Uuid
+                    // };
 
 
-                    var uniqueAssistantUuids = new HashSet<string>();
+                    // var uniqueAssistantUuids = new HashSet<string>();
 
-                    foreach (var scheduledService in appointment.ScheduledServices!)
-                    {
-                        var assistantUuid = scheduledService!.ServiceOffer!.Assistant!.Uuid!.Value.ToString();
-                        if (uniqueAssistantUuids.Add(assistantUuid))
-                        {
-                            await this.notificationMgr.NotifyToUserAsync(
-                                assistantUuid,
-                                JsonSerializer.Serialize(notification)
-                            );
-                        }
-                    }
+                    // foreach (var scheduledService in appointment.ScheduledServices!)
+                    // {
+                    //     var assistantUuid = scheduledService!.ServiceOffer!.Assistant!.Uuid!.Value.ToString();
+                    //     if (uniqueAssistantUuids.Add(assistantUuid))
+                    //     {
+                    //         await this.notificationMgr.NotifyToUserAsync(
+                    //             assistantUuid,
+                    //             JsonSerializer.Serialize(notification)
+                    //         );
+                    //     }
+                    // }
 
-                    _ = this.notificationMgr.NotifyToUserAsync(appointment.Client!.Uuid!.Value.ToString(), JsonSerializer.Serialize(notification));
+                    // _ = this.notificationMgr.NotifyToUserAsync(appointment.Client!.Uuid!.Value.ToString(), JsonSerializer.Serialize(notification));
                 }
             }
             return (allCanceled, failedAppointments);
@@ -553,29 +559,29 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 }
                 else
                 {
-                    var notification = new
-                    {
-                        type = MessageCodeType.EVENT_APPOINTMENT_HAS_BEEN_RESCHEDULED.ToString(),
-                        appointmentUuid = appointment.Uuid!.Value,
-                        message = $"La cita ${appointment.Uuid} se ha reagendado.",
-                        clientUuid = appointment.Client!.Uuid
-                    };
+                    // var notification = new
+                    // {
+                    //     type = MessageCodeType.EVENT_APPOINTMENT_HAS_BEEN_RESCHEDULED.ToString(),
+                    //     appointmentUuid = appointment.Uuid!.Value,
+                    //     message = $"La cita ${appointment.Uuid} se ha reagendado.",
+                    //     clientUuid = appointment.Client!.Uuid
+                    // };
 
-                    var uniqueAssistantUuids = new HashSet<string>();
+                    // var uniqueAssistantUuids = new HashSet<string>();
 
-                    foreach (var scheduledService in appointment.ScheduledServices!)
-                    {
-                        var assistantUuid = scheduledService!.ServiceOffer!.Assistant!.Uuid!.Value.ToString();
-                        if (uniqueAssistantUuids.Add(assistantUuid))
-                        {
-                            await this.notificationMgr.NotifyToUserAsync(
-                                assistantUuid,
-                                JsonSerializer.Serialize(notification)
-                            );
-                        }
-                    }
+                    // foreach (var scheduledService in appointment.ScheduledServices!)
+                    // {
+                    //     var assistantUuid = scheduledService!.ServiceOffer!.Assistant!.Uuid!.Value.ToString();
+                    //     if (uniqueAssistantUuids.Add(assistantUuid))
+                    //     {
+                    //         await this.notificationMgr.NotifyToUserAsync(
+                    //             assistantUuid,
+                    //             JsonSerializer.Serialize(notification)
+                    //         );
+                    //     }
+                    // }
 
-                    await this.notificationMgr.NotifyToUserAsync(appointment.Client!.Uuid!.Value.ToString(), JsonSerializer.Serialize(notification));
+                    // await this.notificationMgr.NotifyToUserAsync(appointment.Client!.Uuid!.Value.ToString(), JsonSerializer.Serialize(notification));
                 }
             }
             return (allRescheduled, failedAppointments);

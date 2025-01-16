@@ -1143,7 +1143,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} must be confirmed before proceeding", []);
                 genericError.AddData("AppointmentUuid", appointmentUuid);
-                genericError.AddData("AppointmentStatus", appointment.Status.ToString());
+                genericError.AddData("AppointmentStatus", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NEEDS_TO_BE_CONFIRMED);
             }
 
@@ -1151,7 +1151,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} was cancelled before.", []);
                 genericError.AddData("AppointmentUuid", appointmentUuid);
-                genericError.AddData("AppointmentStatus", appointment.Status.ToString());
+                genericError.AddData("AppointmentStatus", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREDY_CANCELED);
             }
 
@@ -1159,7 +1159,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} is already finished", []);
                 genericError.AddData("AppointmentUuid", appointmentUuid);
-                genericError.AddData("AppointmentStatus", appointment.Status.ToString());
+                genericError.AddData("AppointmentStatus", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
             }
 
@@ -1185,7 +1185,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} was cancelled before.", []);
                 genericError.AddData("AppointmentUuid", appointmentUuid);
-                genericError.AddData("AppointmentStatus", appointment.Status.ToString());
+                genericError.AddData("AppointmentStatus", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREDY_CANCELED);
             }
 
@@ -1193,7 +1193,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} is finished.", []);
                 genericError.AddData("AppointmentUuid", appointmentUuid);
-                genericError.AddData("AppointmentStatus", appointment.Status.ToString());
+                genericError.AddData("AppointmentStatus", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
             }
 
@@ -1201,7 +1201,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} is already confirmed", []);
                 genericError.AddData("AppointmentUuid", appointmentUuid);
-                genericError.AddData("Status", appointment.Status.ToString());
+                genericError.AddData("Status", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_CONFIRMED);
             }
 
@@ -1242,7 +1242,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Appointment with UUID <{appointmentUuid}> is already finished", []);
                 genericError.AddData("AppointmentUuid", appointmentUuid);
-                genericError.AddData("Status", appointment.Status.ToString());
+                genericError.AddData("Status", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
             }
 
@@ -1250,7 +1250,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Appointment with UUID <{appointmentUuid}> is already canceled", []);
                 genericError.AddData("AppointmentUuid", appointmentUuid);
-                genericError.AddData("Status", appointment.Status.ToString());
+                genericError.AddData("Status", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREDY_CANCELED);
             }
 
@@ -1276,7 +1276,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Appointment with UUID <{appointmentUuid}> is already finished", []);
                 genericError.AddData("AppointmentUuid", appointmentUuid);
-                genericError.AddData("Status", appointment.Status.ToString());
+                genericError.AddData("Status", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
             }
 
@@ -1284,7 +1284,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 GenericError genericError = new GenericError($"Appointment with UUID <{appointmentUuid}> is already canceled", []);
                 genericError.AddData("AppointmentUuid", appointmentUuid);
-                genericError.AddData("Status", appointment.Status.ToString());
+                genericError.AddData("Status", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREDY_CANCELED);
             }
 

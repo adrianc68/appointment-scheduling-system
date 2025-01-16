@@ -49,6 +49,9 @@ builder.Services.AddDbContextFactory<AppointmentDbContext>((provider, options) =
         o.MapEnum<ServiceOfferStatusType>("ServiceOfferStatusType");
         o.MapEnum<AvailabilityTimeSlotStatusType>("AvailabilityTimeSlotStatusType");
         o.MapEnum<AccountStatusType>("AccountStatusType");
+        o.MapEnum<NotificationStatusType>("NotificationStatusType");
+        o.MapEnum<NotificationCodeType>("NotificationCodeType");
+        o.MapEnum<NotificationType>("NotificationType");
     });
 });
 
@@ -98,7 +101,7 @@ builder.Services.AddScoped<ISchedulerEvent, SchedulerMgr>();
 builder.Services.AddScoped<ISchedulerObserver, SchedulerMgr>();
 
 builder.Services.AddScoped<INotificationMgt, NotificationMgr>();
-builder.Services.AddScoped<INotifier, NotificationHub>();
+builder.Services.AddScoped<IWebNotifier, NotificationHub>();
 
 builder.Services.AddScoped<ISchedulerMgt, SchedulerMgr>();
 builder.Services.AddScoped<IClientMgt, ClientMgr>();
@@ -117,6 +120,8 @@ builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IAssistantRepository, AssistantRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
 
 builder.Services.AddScoped<IExceptionHandlerService, ExceptionHandlerService>();
 builder.Services.AddScoped<IHttpResponseService, HttpResponseService>();

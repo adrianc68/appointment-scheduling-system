@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.SignalRNotifier
 {
-    public class NotificationHub : Hub, INotifier
+    public class NotificationHub : Hub, IWebNotifier
     {
         private readonly IHubContext<NotificationHub> hubContext;
         private static readonly Dictionary<string, string> userConnections = new();
