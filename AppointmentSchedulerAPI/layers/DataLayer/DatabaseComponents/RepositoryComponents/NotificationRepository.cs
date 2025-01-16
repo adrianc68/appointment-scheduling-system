@@ -20,41 +20,63 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
             {
+                var notificationDB = new NotificationBase
+                {
+                    Uuid = notification.Uuid!.Value,
+                    CreatedAt = notification.CreatedAt!.Value,
+                    Message = notification.Message,
+                    Type = (Model.Types.NotificationType?)notification.Type,
+                };
+
+                await dbContext.NotificationBases.AddAsync(notificationDB);
+                await dbContext.SaveChangesAsync();
+
                 if (notification is BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.AppointmentNotification appointmentNotification)
                 {
-                    var notificationDB = new NotificationBase
-                    {
-                        Uuid = appointmentNotification.Uuid!.Value,
-                        CreatedAt = appointmentNotification.CreatedAt!.Value,
-                        Message = appointmentNotification.Message,
-                        Code = (Model.Types.NotificationCodeType?)appointmentNotification.Code,
-                        Type = (Model.Types.NotificationType?)appointmentNotification.Type,
-                    };
-
-                    await dbContext.NotificationBases.AddAsync(notificationDB);
-                    await dbContext.SaveChangesAsync();
-
                     var appointmentDB = new AppointmentNotification
                     {
                         IdAppointment = appointmentNotification.Appointment!.Id!.Value,
-                        IdNotificationBase = notificationDB.Id!.Value
+                        IdNotificationBase = notificationDB.Id!.Value,
+                        Code = (Model.Types.AppointmentNotificationCodeType)appointmentNotification.Code!.Value,
                     };
                     await dbContext.AppointmentNotifications.AddAsync(appointmentDB);
                     await dbContext.SaveChangesAsync();
 
-                    List<NotificationRecipient> recipients = notification.Recipients!.Select(recipient => new NotificationRecipient
-                    {
-                        IdNotificationBase = notificationDB.Id,
-                        IdUserAccount = recipient.Id,
-                        Status = (Model.Types.NotificationStatusType?)recipient.Status,
-                        ChangedAt = DateTime.UtcNow
-                    }).ToList();
-                    await dbContext.NotificationRecipients.AddRangeAsync(recipients);
-                    await dbContext.SaveChangesAsync();
-
-                    await transaction.CommitAsync();
-                    isRegistered = true;
                 }
+                else if (notification is BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.SystemNotification systemNotification)
+                {
+                    var systemDB = new SystemNotification
+                    {
+                        IdNotificationBase = notificationDB.Id!.Value,
+                        Severity = (Model.Types.SystemNotificationSeverityCodeType?)systemNotification.Severity!.Value,
+                        Code = (Model.Types.SystemNotificationCodeType?)systemNotification.Code!.Value,
+                    };
+                    await dbContext.SystemNotifications.AddAsync(systemDB);
+                    await dbContext.SaveChangesAsync();
+                }
+                else if (notification is BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.GeneralNotification generalNotification)
+                {
+                    var generalDB = new GeneralNotification
+                    {
+                        IdNotificationBase = notificationDB.Id!.Value,
+                        Code = (Model.Types.GeneralNotificationCodeType?)generalNotification.Code!.Value,
+                    };
+                    await dbContext.GeneralNotifications.AddAsync(generalDB);
+                    await dbContext.SaveChangesAsync();
+                }
+
+                List<NotificationRecipient> recipients = notification.Recipients!.Select(recipient => new NotificationRecipient
+                {
+                    IdNotificationBase = notificationDB.Id,
+                    IdUserAccount = recipient.Id,
+                    Status = (Model.Types.NotificationStatusType?)recipient.Status,
+                    ChangedAt = DateTime.UtcNow
+                }).ToList();
+                await dbContext.NotificationRecipients.AddRangeAsync(recipients);
+                await dbContext.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                isRegistered = true;
             }
             catch (Exception)
             {
@@ -109,11 +131,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
             if (notificationDB != null)
             {
-                notifications = notificationDB.NotificationRecipients.Select(notification =>
+                notifications = notificationDB.NotificationRecipients.Select<NotificationRecipient, BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.NotificationBase>(notification =>
                 {
-                    if (notification.NotificationBase!.Type == Model.Types.NotificationType.APPOINTMENT_NOTIFICATION)
-                    {
-                        var notificationUserRecipients = new List<BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.NotificationRecipient>
+                    var notificationUserRecipients = new List<BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.NotificationRecipient>
                         {
                             new BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.NotificationRecipient
                             {
@@ -121,8 +141,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                                 Id = notification.UserAccount!.Id!.Value
                             }
                         };
-
-
+                    if (notification.NotificationBase!.Type == Model.Types.NotificationType.APPOINTMENT_NOTIFICATION)
+                    {
                         return new BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.AppointmentNotification
                         {
                             Status = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.NotificationStatusType)notification.Status!.Value,
@@ -130,13 +150,40 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = notification.NotificationBase.Id,
                             CreatedAt = notification.NotificationBase.CreatedAt,
                             Message = notification.NotificationBase.Message!,
-                            Code = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.NotificationCodeType)notification.NotificationBase.Code!.Value,
+                            Code = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.AppointmentNotificationCodeType?)notification.NotificationBase.AppointmentNotification!.Code!.Value,
                             Recipients = notificationUserRecipients,
                             Appointment = new BusinessLogicLayer.Model.Appointment
                             {
                                 Uuid = notification.NotificationBase.AppointmentNotification!.Appointment!.Uuid,
                                 Id = notification.NotificationBase.AppointmentNotification!.Appointment.Id
                             },
+                        };
+                    }
+                    else if (notification.NotificationBase!.Type == Model.Types.NotificationType.SYSTEM_NOTIFICATION)
+                    {
+                        return new BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.SystemNotification
+                        {
+                            Status = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.NotificationStatusType)notification.Status!.Value,
+                            Uuid = notification.NotificationBase.Uuid,
+                            Id = notification.NotificationBase.Id,
+                            CreatedAt = notification.NotificationBase.CreatedAt,
+                            Message = notification.NotificationBase.Message!,
+                            Code = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.SystemNotificationCodeType?)notification.NotificationBase.SystemNotification!.Code!.Value,
+                            Recipients = notificationUserRecipients,
+                            Severity = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.SystemNotificationSeverityCodeType)notification.NotificationBase.SystemNotification!.Severity!.Value
+                        };
+                    }
+                    else if (notification.NotificationBase!.Type == Model.Types.NotificationType.GENERAL_NOTIFICATION)
+                    {
+                        return new BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.GeneralNotification
+                        {
+                            Status = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.NotificationStatusType)notification.Status!.Value,
+                            Uuid = notification.NotificationBase.Uuid,
+                            Id = notification.NotificationBase.Id,
+                            CreatedAt = notification.NotificationBase.CreatedAt,
+                            Message = notification.NotificationBase.Message!,
+                            Code = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.GeneralNotificationCodeType?)notification.NotificationBase.GeneralNotification!.Code!.Value,
+                            Recipients = notificationUserRecipients,
                         };
                     }
                     throw new NotImplementedException($"Unhandled notification type: {notification.GetType().Name}, {notification.IdNotificationBase} + : {notification.IdUserAccount}");
@@ -161,19 +208,18 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .Where(nr => nr.Status == Model.Types.NotificationStatusType.UNREAD)
                .ToListAsync();
 
-            notifications = notificationDB!.Select(notification =>
+            notifications = notificationDB!.Select<NotificationRecipient, BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.NotificationBase>(notification =>
             {
+                var notificationUserRecipients = new List<BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.NotificationRecipient>
+                        {
+                            new BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.NotificationRecipient
+                            {
+                                Uuid = notification.UserAccount!.Uuid!.Value,
+                                Id = notification.UserAccount!.Id!.Value
+                            }
+                        };
                 if (notification.NotificationBase!.Type == Model.Types.NotificationType.APPOINTMENT_NOTIFICATION)
                 {
-                    var notificationUserRecipients = new List<BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.NotificationRecipient>
-                    {
-                        new BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.NotificationRecipient
-                        {
-                            Uuid = notification.UserAccount!.Uuid!.Value,
-                            Id = notification.UserAccount!.Id!.Value
-                        }
-                    };
-
                     return new BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.AppointmentNotification
                     {
                         Status = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.NotificationStatusType)notification.Status!.Value,
@@ -181,7 +227,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                         Id = notification.NotificationBase.Id,
                         CreatedAt = notification.NotificationBase.CreatedAt,
                         Message = notification.NotificationBase.Message!,
-                        Code = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.NotificationCodeType)notification.NotificationBase.Code!.Value,
+                        Code = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.AppointmentNotificationCodeType?)notification.NotificationBase.AppointmentNotification!.Code!.Value,
                         Recipients = notificationUserRecipients,
                         Appointment = new BusinessLogicLayer.Model.Appointment
                         {
@@ -189,10 +235,41 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = notification.NotificationBase.AppointmentNotification!.Appointment.Id
                         },
                     };
-
+                }
+                else if (notification.NotificationBase!.Type == Model.Types.NotificationType.SYSTEM_NOTIFICATION)
+                {
+                    return new BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.SystemNotification
+                    {
+                        Status = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.NotificationStatusType)notification.Status!.Value,
+                        Uuid = notification.NotificationBase.Uuid,
+                        Id = notification.NotificationBase.Id,
+                        CreatedAt = notification.NotificationBase.CreatedAt,
+                        Message = notification.NotificationBase.Message!,
+                        Code = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.SystemNotificationCodeType?)notification.NotificationBase.SystemNotification!.Code!.Value,
+                        Recipients = notificationUserRecipients,
+                        Severity = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.SystemNotificationSeverityCodeType)notification.NotificationBase.SystemNotification!.Severity!.Value
+                    };
+                }
+                else if (notification.NotificationBase!.Type == Model.Types.NotificationType.GENERAL_NOTIFICATION)
+                {
+                    return new BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.GeneralNotification
+                    {
+                        Status = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.NotificationStatusType)notification.Status!.Value,
+                        Uuid = notification.NotificationBase.Uuid,
+                        Id = notification.NotificationBase.Id,
+                        CreatedAt = notification.NotificationBase.CreatedAt,
+                        Message = notification.NotificationBase.Message!,
+                        Code = (BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types.GeneralNotificationCodeType?)notification.NotificationBase.GeneralNotification!.Code!.Value,
+                        Recipients = notificationUserRecipients,
+                    };
                 }
                 throw new NotImplementedException($"Unhandled notification type: {notification.GetType().Name}, {notification.IdNotificationBase} + : {notification.IdUserAccount}");
+
             });
+
+
+
+
             return notifications;
         }
     }

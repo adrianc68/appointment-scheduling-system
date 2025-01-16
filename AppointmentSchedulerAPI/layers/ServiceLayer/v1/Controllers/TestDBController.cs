@@ -41,7 +41,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 Type = NotificationType.APPOINTMENT_NOTIFICATION,
                 Message = $"La cita se ha cancelado.",
-                Code = NotificationCodeType.APPOINTMENT_CANCELED,
+                Code = AppointmentNotificationCodeType.APPOINTMENT_CANCELED,
                 Recipients = new List<NotificationRecipient>
                 {
                     new NotificationRecipient

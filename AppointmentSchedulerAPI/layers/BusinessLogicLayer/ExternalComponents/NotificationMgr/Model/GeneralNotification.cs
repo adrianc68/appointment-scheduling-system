@@ -3,9 +3,8 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Model
 {
-    public class AppointmentNotification : NotificationBase
+    public class GeneralNotification : NotificationBase
     {
-        public AppointmentNotificationCodeType? Code { get; set; }
-        public virtual Appointment? Appointment { get; set; }
+        public GeneralNotificationCodeType? Code { get; set; }
     }
 }

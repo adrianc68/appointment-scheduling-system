@@ -50,8 +50,13 @@ builder.Services.AddDbContextFactory<AppointmentDbContext>((provider, options) =
         o.MapEnum<AvailabilityTimeSlotStatusType>("AvailabilityTimeSlotStatusType");
         o.MapEnum<AccountStatusType>("AccountStatusType");
         o.MapEnum<NotificationStatusType>("NotificationStatusType");
-        o.MapEnum<NotificationCodeType>("NotificationCodeType");
         o.MapEnum<NotificationType>("NotificationType");
+
+        o.MapEnum<AppointmentNotificationCodeType>("AppointmentNotificationCodeType");
+        o.MapEnum<GeneralNotificationCodeType>("GeneralNotificationCodeType");
+        o.MapEnum<SystemNotificationCodeType>("SystemNotificationCodeType");
+        o.MapEnum<SystemNotificationSeverityCodeType>("SystemNotificationSeverityCodeType");
+
     });
 });
 

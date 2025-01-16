@@ -27,6 +27,8 @@ public partial class AppointmentDbContext : DbContext
     public required virtual DbSet<UnavailableTimeSlot> UnavailableTimeSlots { get; set; }
     public required virtual DbSet<ScheduledService> ScheduledServices { get; set; }
     public required virtual DbSet<AppointmentNotification> AppointmentNotifications { get; set; }
+    public required virtual DbSet<SystemNotification> SystemNotifications { get; set; }
+    public required virtual DbSet<GeneralNotification> GeneralNotifications { get; set; }
     public required virtual DbSet<NotificationBase> NotificationBases { get; set; }
     public required virtual DbSet<NotificationRecipient> NotificationRecipients { get; set; }
 
@@ -44,7 +46,13 @@ public partial class AppointmentDbContext : DbContext
             .HasPostgresEnum<AvailabilityTimeSlotStatusType>("AvailabilityTimeSlotStatusType")
             .HasPostgresEnum<AccountStatusType>("AccountStatusType")
             .HasPostgresEnum<NotificationStatusType>("NotificationStatusType")
-            .HasPostgresEnum<NotificationCodeType>("NotificationCodeType");
+
+            .HasPostgresEnum<AppointmentNotificationCodeType>("AppointmentNotificationCodeType")
+            .HasPostgresEnum<GeneralNotificationCodeType>("GeneralNotificationCodeType")
+            .HasPostgresEnum<SystemNotificationCodeType>("SystemNotificationCodeType")
+            .HasPostgresEnum<SystemNotificationSeverityCodeType>("SystemNotificationSeverityCodeType");
+
+
 
         modelBuilder.Entity<UserAccount>(entity =>
         {
@@ -114,9 +122,6 @@ public partial class AppointmentDbContext : DbContext
 
              entity.Property(e => e.Message)
                  .HasColumnName("message");
-             entity.Property(e => e.Code)
-                 .HasColumnType("NotificationCodeType")
-                 .HasColumnName("code");
              entity.Property(e => e.Type)
                  .HasColumnType("NotificationType")
                  .HasColumnName("type");
@@ -156,6 +161,9 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnName("id_appointment");
             entity.Property(e => e.IdNotificationBase)
                 .HasColumnName("id_notification");
+            entity.Property(e => e.Code)
+                .HasColumnName("code")
+                .HasColumnType("AppointmentNotificationCodeType");
 
             entity.HasOne(a => a.Appointment)
                 .WithMany(a => a.AppointmentNotifications)
@@ -166,7 +174,43 @@ public partial class AppointmentDbContext : DbContext
                   .WithOne(e => e.AppointmentNotification)
                   .HasForeignKey<AppointmentNotification>(x => x.IdNotificationBase)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
 
+        modelBuilder.Entity<SystemNotification>(entity =>
+        {
+            entity.ToTable("SystemNotification");
+            entity.HasKey(e => e.IdNotificationBase);
+
+            entity.Property(e => e.IdNotificationBase)
+                .HasColumnName("id_notification");
+            entity.Property(e => e.Code)
+                .HasColumnName("code")
+                .HasColumnType("SystemNotificationCodeType");
+            entity.Property(e => e.Severity)
+                .HasColumnName("severity")
+                .HasColumnType("SystemNotificationSeverityCodeType");
+
+            entity.HasOne(a => a.NotificationBase)
+                .WithOne(e => e.SystemNotification)
+                .HasForeignKey<SystemNotification>(x => x.IdNotificationBase)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<GeneralNotification>(entity =>
+        {
+            entity.ToTable("GeneralNotification");
+            entity.HasKey(e => e.IdNotificationBase);
+
+            entity.Property(e => e.IdNotificationBase)
+                .HasColumnName("id_notification");
+            entity.Property(e => e.Code)
+                .HasColumnName("code")
+                .HasColumnType("GeneralNotificationCodeType");
+
+            entity.HasOne(a => a.NotificationBase)
+                .WithOne(e => e.GeneralNotification)
+                .HasForeignKey<GeneralNotification>(x => x.IdNotificationBase)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
 

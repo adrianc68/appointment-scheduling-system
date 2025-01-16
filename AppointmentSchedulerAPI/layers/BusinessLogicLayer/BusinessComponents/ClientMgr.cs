@@ -44,7 +44,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 return null;
             }
             return client.Uuid.Value;
-
         }
 
         public async Task<bool> UpdateClient(Client client)

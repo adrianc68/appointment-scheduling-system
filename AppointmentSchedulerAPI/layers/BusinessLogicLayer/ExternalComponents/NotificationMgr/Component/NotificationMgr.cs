@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Interfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 
@@ -20,14 +19,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
             this.webNotifier = webNotifier;
         }
 
-        private async void SendNotificationToUsers(List<NotificationRecipient> users, NotificationDTO dto)
-        {
-            foreach (var recipient in users)
-            {
-                await this.webNotifier.SendToUserAsync(recipient!.Uuid.ToString()!, SerializeObjectToJson<NotificationDTO>(dto));
-            }
-        }
-
         public async Task<Guid?> CreateNotification(NotificationBase notification)
         {
             notification.Status = NotificationStatusType.UNREAD;
@@ -40,31 +31,53 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
                 return null;
             }
 
-            if (notification.Type == NotificationType.APPOINTMENT_NOTIFICATION)
+            if (notification is AppointmentNotification appointmentNotification)
             {
-                NotificationDTO notificationDTO = new NotificationDTO
+                AppointmentNotificationDTO notificationDTO = new AppointmentNotificationDTO
                 {
                     CreatedAt = notification.CreatedAt!.Value,
                     Uuid = notification.Uuid.Value,
                     Status = notification.Status.Value,
                     Message = notification.Message!,
-                    Code = notification.Code!.Value,
-                    Type = notification.Type!.Value
+                    Type = notification.Type!.Value,
+                    Code = appointmentNotification.Code!.Value,
+                    Appointment = new AppointmentUuidDTO
+                    {
+                        Uuid = appointmentNotification.Appointment!.Uuid!.Value
+                    }
                 };
                 SendNotificationToUsers(notification.Recipients!, notificationDTO);
             }
-            else if (notification.Type == NotificationType.SYSTEM_NOTIFICATION)
+            else if (notification is SystemNotification systemNotification)
             {
+                SystemNotificationDTO notificationDTO = new SystemNotificationDTO
+                {
+                    CreatedAt = notification.CreatedAt!.Value,
+                    Uuid = notification.Uuid.Value,
+                    Status = notification.Status.Value,
+                    Message = notification.Message!,
+                    Type = notification.Type!.Value,
+                    Code = systemNotification.Code!.Value,
+                    Severity = systemNotification.Severity!.Value
+                };
+                SendNotificationToUsers(notification.Recipients!, notificationDTO);
                 throw new NotImplementedException();
             }
-            else if (notification.Type == NotificationType.GENERAL_NOTIFICATION)
+            else if (notification is GeneralNotification generalNotification)
             {
+                GeneralNotificationDTO notificationDTO = new GeneralNotificationDTO
+                {
+                    CreatedAt = notification.CreatedAt!.Value,
+                    Uuid = notification.Uuid.Value,
+                    Status = notification.Status.Value,
+                    Message = notification.Message!,
+                    Type = notification.Type!.Value,
+                    Code = generalNotification.Code!.Value,
+                };
+                SendNotificationToUsers(notification.Recipients!, notificationDTO);
                 throw new NotImplementedException();
             }
-            else if (notification.Type == NotificationType.PAYMENT_NOTIFICATION)
-            {
-                throw new NotImplementedException();
-            }
+
             return notification.Uuid.Value;
         }
 
@@ -96,5 +109,25 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
             };
             return JsonSerializer.Serialize(data, options);
         }
+
+        private async void SendNotificationToUsers(List<NotificationRecipient> users, NotificationDTO dto)
+        {
+            foreach (var recipient in users)
+            {
+                if (dto is AppointmentNotificationDTO appointmentNotificationDTO)
+                {
+                    await this.webNotifier.SendToUserAsync(recipient!.Uuid.ToString()!, SerializeObjectToJson(appointmentNotificationDTO));
+                }
+                else if (dto is SystemNotificationDTO systemNotificationDTO)
+                {
+                    await this.webNotifier.SendToAllAsync(SerializeObjectToJson(systemNotificationDTO));
+                }
+                else if (dto is GeneralNotificationDTO generalNotificationDTO)
+                {
+                    await this.webNotifier.SendToAllAsync(SerializeObjectToJson(generalNotificationDTO));
+                }
+            }
+        }
+
     }
 }
