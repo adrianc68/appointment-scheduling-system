@@ -1,4 +1,4 @@
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.AccountMgr.Types
+namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types
 {
     public enum AccountType
     {

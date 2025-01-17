@@ -1,12 +1,11 @@
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.AccountMgr.Interfaces;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.AccountMgr.Types;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.AccountMgr.Component
+namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
     public class AccountMgr : IAccountMgt, IAccountEvent<AssistantEvent>, IAccountEvent<ClientEvent>
     {
@@ -39,7 +38,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.A
                         EventType = eventTypeMapping.ContainsKey(status) ? eventTypeMapping[status] : AssistantEventType.UPDATED
                     };
 
-                    this.NotifySubscribers(assistantEvent);
+                    NotifySubscribers(assistantEvent);
                 }
                 else if (accountType == AccountType.CLIENT)
                 {
@@ -56,7 +55,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.A
                         EventType = eventTypeMapping.ContainsKey(status) ? eventTypeMapping[status] : ClientEventType.UPDATED
                     };
 
-                    this.NotifySubscribers(clientEvent);
+                    NotifySubscribers(clientEvent);
                 }
             }
             return isSuccesful;
