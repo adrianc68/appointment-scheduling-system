@@ -86,6 +86,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.A
             return result;
         }
 
+        public async Task<List<(int, Guid)>> GetAllAccountsIdsAndUuids()
+        {
+            List<(int, Guid)> IdsAndUuids = await accountRepository.GetAllAccountsIdsAndUuids();
+            return IdsAndUuids;
+        }
+
         public async Task<int?> GetAccountIdByUuid(Guid uuid)
         {
             int? id = await accountRepository.GetAccountIdByUuid(uuid);

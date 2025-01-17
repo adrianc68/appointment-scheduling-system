@@ -1,8 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.AccountMgr.Interfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Interfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 
@@ -11,24 +13,46 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
     public class NotificationMgr : INotificationMgt
     {
         private readonly INotificationRepository notificationRepository;
+        private readonly IAccountMgt accountMgr;
         private readonly IWebNotifier webNotifier;
 
-        public NotificationMgr(INotificationRepository notificationRepository, IWebNotifier webNotifier)
+        public NotificationMgr(INotificationRepository notificationRepository, IWebNotifier webNotifier, IAccountMgt accountMgr)
         {
             this.notificationRepository = notificationRepository;
             this.webNotifier = webNotifier;
+            this.accountMgr = accountMgr;
         }
 
-        public async Task<Guid?> CreateNotification(NotificationBase notification)
+        public async Task<Guid?> CreateNotification(NotificationBase notification, NotificationUsersToSendType recipientOptions = NotificationUsersToSendType.SEND_TO_SOME_USERS, List<NotificationChannelType>? channels = null)
         {
+
+
             notification.Status = NotificationStatusType.UNREAD;
             notification.Uuid = Guid.CreateVersion7();
+
+            if (recipientOptions == NotificationUsersToSendType.SEND_TO_EVERYONE)
+            {
+                List<(int, Guid)> accountsIds = await accountMgr.GetAllAccountsIdsAndUuids();
+                notification.Recipients = accountsIds.Select(x => new NotificationRecipient
+                {
+                    Id = x.Item1,
+                    Uuid = x.Item2,
+                    Status = NotificationStatusType.UNREAD,
+                    ChangedAt = DateTime.UtcNow
+                }).ToList();
+            }
+
             bool isRegistered = await notificationRepository.CreateNotification(notification);
 
             if (!isRegistered)
             {
                 notification.Uuid = null;
                 return null;
+            }
+
+            if (channels == null || channels.Count == 0)
+            {
+                channels = [NotificationChannelType.WEB_APPLICATION];
             }
 
             if (notification is AppointmentNotification appointmentNotification)
@@ -46,7 +70,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
                         Uuid = appointmentNotification.Appointment!.Uuid!.Value
                     }
                 };
-                SendNotificationToUsers(notification.Recipients!, notificationDTO);
+                SendNotificationToUsers(notification.Recipients!, notificationDTO, channels);
             }
             else if (notification is SystemNotification systemNotification)
             {
@@ -60,8 +84,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
                     Code = systemNotification.Code!.Value,
                     Severity = systemNotification.Severity!.Value
                 };
-                SendNotificationToUsers(notification.Recipients!, notificationDTO);
-                throw new NotImplementedException();
+                SendNotificationToUsers(notification.Recipients!, notificationDTO, channels);
             }
             else if (notification is GeneralNotification generalNotification)
             {
@@ -74,8 +97,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
                     Type = notification.Type!.Value,
                     Code = generalNotification.Code!.Value,
                 };
-                SendNotificationToUsers(notification.Recipients!, notificationDTO);
-                throw new NotImplementedException();
+                SendNotificationToUsers(notification.Recipients!, notificationDTO, channels);
             }
 
             return notification.Uuid.Value;
@@ -105,26 +127,34 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = true,
-                Converters = { new JsonStringEnumConverter() }
+                Converters =
+                {
+                    new JsonStringEnumConverter(),
+                 },
             };
             return JsonSerializer.Serialize(data, options);
         }
 
-        private async void SendNotificationToUsers(List<NotificationRecipient> users, NotificationDTO dto)
+        private async void SendNotificationToUsers<TNotification>(List<NotificationRecipient> users, TNotification dto, List<NotificationChannelType> channels)
         {
+            string notificationJson = SerializeObjectToJson(dto);
+
             foreach (var recipient in users)
             {
-                if (dto is AppointmentNotificationDTO appointmentNotificationDTO)
+                foreach (var channel in channels)
                 {
-                    await this.webNotifier.SendToUserAsync(recipient!.Uuid.ToString()!, SerializeObjectToJson(appointmentNotificationDTO));
-                }
-                else if (dto is SystemNotificationDTO systemNotificationDTO)
-                {
-                    await this.webNotifier.SendToAllAsync(SerializeObjectToJson(systemNotificationDTO));
-                }
-                else if (dto is GeneralNotificationDTO generalNotificationDTO)
-                {
-                    await this.webNotifier.SendToAllAsync(SerializeObjectToJson(generalNotificationDTO));
+                    switch (channel)
+                    {
+                        case NotificationChannelType.WEB_APPLICATION:
+                            await webNotifier.SendToUserAsync(recipient.Uuid.ToString(), notificationJson);
+                            break;
+                        case NotificationChannelType.EMAIL:
+                            throw new NotImplementedException();
+                            // break;
+                        case NotificationChannelType.SMS:
+                            throw new NotImplementedException();
+                            // break;
+                    }
                 }
             }
         }

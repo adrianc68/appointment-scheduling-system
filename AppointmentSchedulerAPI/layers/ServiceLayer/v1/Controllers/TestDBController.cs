@@ -37,29 +37,41 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             var accountData = await accountMgr.GetAccountIdByUuid(claims.Uuid);
 
 
-            AppointmentNotification appointmentNotification = new AppointmentNotification
+            // AppointmentNotification appointmentNotification = new AppointmentNotification
+            // {
+            //     Type = NotificationType.APPOINTMENT_NOTIFICATION,
+            //     Message = $"La cita se ha cancelado.",
+            //     Code = AppointmentNotificationCodeType.APPOINTMENT_CANCELED,
+            //     Recipients = new List<NotificationRecipient>
+            //     {
+            //         new NotificationRecipient
+            //         {
+            //         Uuid = appointmentData!.Client!.Uuid!.Value,
+            //         Id = appointmentData.Client.Id!.Value
+            //         },
+            //         new NotificationRecipient
+            //         {
+            //             Uuid = appointmentData!.
+            //         }
+            //     },
+            //     Appointment = new BusinessLogicLayer.Model.Appointment
+            //     {
+            //         Id = appointmentData!.Id,
+            //         Uuid = request.AppointmentUuid.Value
+            //     }
+            // };
+
+            GeneralNotification generalNotification = new GeneralNotification
             {
-                Type = NotificationType.APPOINTMENT_NOTIFICATION,
-                Message = $"La cita se ha cancelado.",
-                Code = AppointmentNotificationCodeType.APPOINTMENT_CANCELED,
-                Recipients = new List<NotificationRecipient>
-                {
-                    new NotificationRecipient
-                {
-                    Uuid = appointmentData!.Client!.Uuid!.Value,
-                    Id = appointmentData.Client.Id!.Value
-                    },
-                },
-                Appointment = new BusinessLogicLayer.Model.Appointment
-                {
-                    Id = appointmentData!.Id,
-                    Uuid = request.AppointmentUuid.Value
-                }
+                Type = NotificationType.GENERAL_NOTIFICATION,
+                Message = "Estamos trabajando en una nueva versión para el sistema web!!!",
+                Code = GeneralNotificationCodeType.GENERAL_SERVICE_UPDATE,
+                Recipients = [],
             };
 
 
-            await this.notificationMgr.CreateNotification(appointmentNotification);
-      
+            await this.notificationMgr.CreateNotification(generalNotification, NotificationUsersToSendType.SEND_TO_EVERYONE);
+
 
             // await notificationMgr.NotifyAllAsync("Mensaje enviado para uno");
 

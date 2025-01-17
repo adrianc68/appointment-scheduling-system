@@ -130,6 +130,17 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return (BusinessLogicLayer.Model.Types.RoleType?)userDB.Role;
         }
 
+        public async Task<List<(int, Guid)>> GetAllAccountsIdsAndUuids()
+        {
+            using var dbContext = context.CreateDbContext();
 
+            var userAccountIdsAndUuids = await dbContext.UserAccounts
+                .Select(user => new { user.Id, user.Uuid })
+                .ToListAsync();
+
+            return userAccountIdsAndUuids
+                .Select(x => (x.Id!.Value, x.Uuid!.Value))
+                .ToList();
+        }
     }
 }
