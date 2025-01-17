@@ -72,7 +72,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     IdAssistant = idAssistant,
                     IdService = serviceId,
-                    Status = ServiceOfferStatusType.AVAILABLE,
+                    Status = ServiceOfferStatusType.ENABLED,
                     Uuid = Guid.CreateVersion7()
                 }).ToList();
 

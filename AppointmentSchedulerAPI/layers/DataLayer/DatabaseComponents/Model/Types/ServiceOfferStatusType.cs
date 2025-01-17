@@ -4,10 +4,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Type
 {
     public enum ServiceOfferStatusType
     {
-        [PgName("AVAILABLE")]
-        AVAILABLE,
-        [PgName("NOT_AVAILABLE")]
-        NOT_AVAILABLE,
+        [PgName("ENABLED")]
+        ENABLED,
+        [PgName("DISABLED")]
+        DISABLED,
         [PgName("DELETED")]
         DELETED
     }

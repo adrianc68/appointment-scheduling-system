@@ -1,4 +1,6 @@
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AccountInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AssistantInterfaces;
@@ -19,6 +21,7 @@ using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryComponents;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -111,6 +114,7 @@ builder.Services.AddScoped<IAccountMgt, AccountMgr>();
 builder.Services.AddScoped<ISchedulingInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IServiceInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IAssistantInterfaces, AppointmentSchedulingSystemFacade>();
+builder.Services.AddScoped<INotificationInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IClientInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IAccountInterfaces, AppointmentSchedulingSystemFacade>();
 
@@ -179,7 +183,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
     });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+  .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 
 
 

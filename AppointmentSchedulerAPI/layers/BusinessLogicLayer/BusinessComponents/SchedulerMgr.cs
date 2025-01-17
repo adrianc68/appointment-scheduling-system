@@ -251,13 +251,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             {
                 // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
                 int idService = serviceEvent.ServiceId!.Value;
-                await this.ChangeAllServiceOfferStatusByServiceIdAsync(idService, ServiceOfferStatusType.NOT_AVAILABLE);
+                await this.ChangeAllServiceOfferStatusByServiceIdAsync(idService, ServiceOfferStatusType.DISABLED);
             }
             else if (serviceEvent.EventType == ServiceEventType.ENABLED)
             {
                 // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<< 
                 int idService = serviceEvent.ServiceId!.Value;
-                await this.ChangeAllServiceOfferStatusByServiceIdAsync(idService, ServiceOfferStatusType.AVAILABLE);
+                await this.ChangeAllServiceOfferStatusByServiceIdAsync(idService, ServiceOfferStatusType.ENABLED);
             }
             else if (serviceEvent.EventType == ServiceEventType.DELETED)
             {
@@ -300,19 +300,19 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             {
                 int idAssistant = assistantEvent.AssistantId!.Value;
                 await this.CancelOrRescheduledAppointmentsOfAssistantById(idAssistant);
-                await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.NOT_AVAILABLE);
+                await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.DISABLED);
             }
             else if (assistantEvent.EventType == AssistantEventType.ENABLED)
             {
                 // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
                 int idAssistant = assistantEvent.AssistantId!.Value;
-                await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.AVAILABLE);
+                await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.ENABLED);
             }
             else if (assistantEvent.EventType == AssistantEventType.DELETED)
             {
                 int idAssistant = assistantEvent.AssistantId!.Value;
                 await this.CancelOrRescheduledAppointmentsOfAssistantById(idAssistant);
-                await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.NOT_AVAILABLE);
+                await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.DISABLED);
             }
         }
 

@@ -13,18 +13,19 @@ using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Model;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 {
-    public class AppointmentSchedulingSystemFacade : ISchedulingInterfaces, IServiceInterfaces, IClientInterfaces, IAssistantInterfaces, IAccountInterfaces
+    public class AppointmentSchedulingSystemFacade : ISchedulingInterfaces, IServiceInterfaces, IClientInterfaces, IAssistantInterfaces, IAccountInterfaces, INotificationInterfaces
     {
         private readonly IServiceMgt serviceMgr;
         private readonly ISchedulerMgt schedulerMgr;
         private readonly IAssistantMgt assistantMgr;
         private readonly IClientMgt clientMgr;
         private readonly IAccountMgt accountMgr;
+        private readonly INotificationMgt notificationMgr;
         private readonly EnvironmentVariableService envService;
         private readonly ITimeSlotLockMgt timeRangeLockMgr;
         private readonly IAuthenticationService<JwtUserCredentials, JwtTokenResult, JwtTokenData> authJwtService;
 
-        public AppointmentSchedulingSystemFacade(IServiceMgt serviceMgr, IAssistantMgt assistantMgr, IClientMgt clientMgr, ISchedulerMgt schedulerMgr, IAccountMgt accountMgr, ITimeSlotLockMgt timeRangeLockMgr, EnvironmentVariableService envService, IAuthenticationService<JwtUserCredentials, JwtTokenResult, JwtTokenData> authJwtService)
+        public AppointmentSchedulingSystemFacade(IServiceMgt serviceMgr, IAssistantMgt assistantMgr, IClientMgt clientMgr, ISchedulerMgt schedulerMgr, IAccountMgt accountMgr, INotificationMgt notificationMgr, ITimeSlotLockMgt timeRangeLockMgr, EnvironmentVariableService envService, IAuthenticationService<JwtUserCredentials, JwtTokenResult, JwtTokenData> authJwtService)
         {
             this.serviceMgr = serviceMgr;
             this.schedulerMgr = schedulerMgr;
@@ -34,11 +35,30 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             this.timeRangeLockMgr = timeRangeLockMgr;
             this.envService = envService;
             this.authJwtService = authJwtService;
+            this.notificationMgr = notificationMgr;
         }
 
         public Task<OperationResult<bool, GenericError>> EditAppointment(Appointment appointment)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<List<NotificationBase>> GetNotificationsByAccountUuid(Guid uuid)
+        {
+            List<NotificationBase> notifications = await notificationMgr.GetNotificationsByAccountUuid(uuid);
+            return notifications;
+        }
+
+        public async Task<List<NotificationBase>> GetUnreadNotificationsByAccountUuid(Guid uuid)
+        {
+            List<NotificationBase> notifications = await notificationMgr.GetUnreadNotificationsByAccountUuid(uuid);
+            return notifications;
+        }
+
+        public async Task<bool> MarkNotificationAsReadAsync(Guid uuid, Guid accountUuid)
+        {
+            bool result = await notificationMgr.ChangeNotificationStatusByNotificationUuid(uuid, accountUuid, Model.Types.Notification.NotificationStatusType.READ);
+            return result;
         }
 
         public OperationResult<List<BlockedTimeSlot>, GenericError> GetSchedulingBlockRanges(DateOnly date)
@@ -141,7 +161,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_UNAVAILABLE);
                 }
 
-                if (serviceOfferData.Status == ServiceOfferStatusType.NOT_AVAILABLE)
+                if (serviceOfferData.Status == ServiceOfferStatusType.DISABLED)
                 {
                     GenericError genericError = new GenericError($"ServiceOffer with UUID <{serviceOffer.Uuid.Value}> is unavailable", []);
                     genericError.AddData("SelectedServiceUuid", serviceOffer.Uuid.Value);
@@ -634,7 +654,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_NOT_FOUND);
             }
 
-            if (serviceOffer.Status == ServiceOfferStatusType.NOT_AVAILABLE)
+            if (serviceOffer.Status == ServiceOfferStatusType.DISABLED)
             {
                 GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> is already disabled", []);
                 genericError.AddData("ServiceUuid", serviceOfferUuid);
@@ -649,7 +669,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
 
 
-            bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOffer.Id!.Value, ServiceOfferStatusType.NOT_AVAILABLE);
+            bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOffer.Id!.Value, ServiceOfferStatusType.DISABLED);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -667,7 +687,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_NOT_FOUND);
             }
 
-            if (serviceOffer.Status == ServiceOfferStatusType.AVAILABLE)
+            if (serviceOffer.Status == ServiceOfferStatusType.ENABLED)
             {
                 GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> is already enabled", []);
                 genericError.AddData("ServiceUuid", serviceOfferUuid);
@@ -681,7 +701,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_WAS_DELETED);
             }
 
-            bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOffer.Id!.Value, ServiceOfferStatusType.NOT_AVAILABLE);
+            bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOffer.Id!.Value, ServiceOfferStatusType.DISABLED);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -1168,7 +1188,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         }
 
         public async Task<OperationResult<bool, GenericError>> ConfirmAppointment(Guid appointmentUuid)
-        {   
+        {
             Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(appointmentUuid);
             if (appointment == null)
             {
@@ -1399,7 +1419,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_UNAVAILABLE);
                 }
 
-                if (serviceOfferData.Status == ServiceOfferStatusType.NOT_AVAILABLE)
+                if (serviceOfferData.Status == ServiceOfferStatusType.DISABLED)
                 {
                     GenericError genericError = new GenericError($"ServiceOffer with UUID <{serviceOffer.Uuid.Value}> is unavailable", []);
                     genericError.AddData("SelectedServiceUuid", serviceOffer.Uuid.Value);
@@ -1595,7 +1615,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             {
                 return Task.FromResult(OperationResult<AccountData, GenericError>.Failure(new GenericError("Token is not valid"), MessageCodeType.AUTHENTICATION_INVALID_CREDENTIALS));
             }
-            
+
             AccountData accountData = new AccountData
             {
                 Username = tokenData.Username,
@@ -1603,7 +1623,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 Uuid = Guid.Parse(tokenData.Uuid),
                 Role = Enum.TryParse<RoleType>(tokenData.Role, true, out var roleValue) ? roleValue : null,
             };
-           return Task.FromResult(OperationResult<AccountData, GenericError>.Success(accountData)); 
+            return Task.FromResult(OperationResult<AccountData, GenericError>.Success(accountData));
         }
+
     }
 }

@@ -62,7 +62,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     Uuid = notification.Uuid.Value,
                     Status = notification.Status.Value,
                     Message = notification.Message!,
-                    Type = notification.Type!.Value,
+                    Type = notification.Type,
                     Code = appointmentNotification.Code!.Value,
                     Appointment = new AppointmentUuidDTO
                     {
@@ -79,7 +79,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     Uuid = notification.Uuid.Value,
                     Status = notification.Status.Value,
                     Message = notification.Message!,
-                    Type = notification.Type!.Value,
+                    Type = notification.Type,
                     Code = systemNotification.Code!.Value,
                     Severity = systemNotification.Severity!.Value
                 };
@@ -93,8 +93,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     Uuid = notification.Uuid.Value,
                     Status = notification.Status.Value,
                     Message = notification.Message!,
-                    Type = notification.Type!.Value,
-                    Code = generalNotification.Code!.Value,
+                    Type = notification.Type,
+                    Code = generalNotification.Code!,
                 };
                 SendNotificationToUsers(notification.Recipients!, notificationDTO, channels);
             }
@@ -114,9 +114,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return notifications;
         }
 
-        public async Task<bool> ChangeNotificationStatusByNotificationUuid(Guid uuid, NotificationStatusType status)
+        public async Task<bool> ChangeNotificationStatusByNotificationUuid(Guid uuid, Guid accountUuid, NotificationStatusType status)
         {
-            bool isStatusChanged = await notificationRepository.ChangeNotificationStatusByNotificationUuid(uuid, status);
+            bool isStatusChanged = await notificationRepository.ChangeNotificationStatusByNotificationUuid(uuid, accountUuid, status);
             return isStatusChanged;
         }
 
@@ -149,7 +149,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                             break;
                         case NotificationChannelType.EMAIL:
                             throw new NotImplementedException();
-                            // break;
+                        // break;
                         case NotificationChannelType.SMS:
                             throw new NotImplementedException();
                             // break;
@@ -157,6 +157,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 }
             }
         }
+
 
     }
 }

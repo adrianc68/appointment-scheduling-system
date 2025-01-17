@@ -4,6 +4,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
 {
     public class GeneralNotification : NotificationBase
     {
-        public GeneralNotificationCodeType? Code { get; set; }
+        public GeneralNotification()
+        {
+            this.Type = NotificationType.GENERAL_NOTIFICATION;
+        }
+
+        public required GeneralNotificationCodeType Code { get; set; }
     }
 }

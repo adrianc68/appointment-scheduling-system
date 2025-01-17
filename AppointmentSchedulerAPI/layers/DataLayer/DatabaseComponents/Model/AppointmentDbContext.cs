@@ -420,11 +420,11 @@ public partial class AppointmentDbContext : DbContext
 
         modelBuilder.HasSequence("appointment_id_seq");
         modelBuilder.HasSequence("availabilitytimeslot_id_seq");
+        modelBuilder.HasSequence("notificationbase_id_seq");
         modelBuilder.HasSequence("scheduledservice_id_seq");
         modelBuilder.HasSequence("service_id_seq");
-        modelBuilder.HasSequence("serficeoffer_id_seq");
+        modelBuilder.HasSequence("serviceoffer_id_seq");
         modelBuilder.HasSequence("useraccount_id_seq");
-        modelBuilder.HasSequence("notification_id_seq");
 
         OnModelCreatingPartial(modelBuilder);
     }

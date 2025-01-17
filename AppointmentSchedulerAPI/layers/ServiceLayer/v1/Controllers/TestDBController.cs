@@ -34,25 +34,25 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             var accountData = await accountMgr.GetAccountIdByUuid(claims.Uuid);
 
 
-            AppointmentNotification notification = new AppointmentNotification
-            {
-                Type = NotificationType.APPOINTMENT_NOTIFICATION,
-                Message = $"La cita se ha cancelado.",
-                Code = AppointmentNotificationCodeType.APPOINTMENT_CANCELED,
-                Recipients = new List<NotificationRecipient>
-                {
-                    new NotificationRecipient
-                    {
-                    Uuid = appointmentData!.Client!.Uuid!.Value,
-                    Id = appointmentData.Client.Id!.Value
-                    },
-                },
-                Appointment = new BusinessLogicLayer.Model.Appointment
-                {
-                    Id = appointmentData!.Id,
-                    Uuid = request.AppointmentUuid.Value
-                }
-            };
+            // AppointmentNotification notification = new AppointmentNotification
+            // {
+            //     Type = NotificationType.APPOINTMENT_NOTIFICATION,
+            //     Message = $"La cita se ha cancelado.",
+            //     Code = AppointmentNotificationCodeType.APPOINTMENT_CANCELED,
+            //     Recipients = new List<NotificationRecipient>
+            //     {
+            //         new NotificationRecipient
+            //         {
+            //         Uuid = appointmentData!.Client!.Uuid!.Value,
+            //         Id = appointmentData.Client.Id!.Value
+            //         },
+            //     },
+            //     Appointment = new BusinessLogicLayer.Model.Appointment
+            //     {
+            //         Id = appointmentData!.Id,
+            //         Uuid = request.AppointmentUuid.Value
+            //     }
+            // };
 
             // GeneralNotification notification = new GeneralNotification
             // {
@@ -61,6 +61,14 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             //     Code = GeneralNotificationCodeType.GENERAL_SERVICE_UPDATE,
             //     Recipients = [],
             // };
+
+            SystemNotification notification = new SystemNotification
+            {
+                    Message = "EL servidor estara en mantenimiento a las 18:00 PM MXN",
+                    Code = SystemNotificationCodeType.SYSTEM_MAINTENANCE,
+                    Recipients = [],
+                    Severity = SystemNotificationSeverityCodeType.INFO
+            };
 
 
             await this.notificationMgr.CreateNotification(notification, NotificationUsersToSendType.SEND_TO_EVERYONE);

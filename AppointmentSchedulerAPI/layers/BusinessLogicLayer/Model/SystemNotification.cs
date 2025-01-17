@@ -4,7 +4,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
 {
     public class SystemNotification : NotificationBase
     {
-        public SystemNotificationCodeType? Code { get; set; }
-        public SystemNotificationSeverityCodeType? Severity { get; set;}
+        public SystemNotification()
+        {
+            this.Type = NotificationType.SYSTEM_NOTIFICATION;
+        }
+
+        public required SystemNotificationCodeType? Code { get; set; }
+        public required SystemNotificationSeverityCodeType? Severity { get; set;}
+        
+        
     }
 }

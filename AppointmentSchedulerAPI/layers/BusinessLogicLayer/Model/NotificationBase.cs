@@ -9,7 +9,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
         public Guid? Uuid { get; set; }
         public NotificationStatusType? Status { get; set; } = NotificationStatusType.UNREAD;
         public string? Message { get; set; }
-        public NotificationType? Type { get; set;}
-        public List<NotificationRecipient>? Recipients { get; set; }
+        public NotificationType Type { get; set;}
+        public required List<NotificationRecipient> Recipients { get; set; }
     }
 }

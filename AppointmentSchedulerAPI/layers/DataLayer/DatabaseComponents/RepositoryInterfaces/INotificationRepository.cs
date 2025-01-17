@@ -8,6 +8,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<bool> CreateNotification(NotificationBase notification);
         Task<IEnumerable<NotificationBase>> GetNotificationsByAccountUuid(Guid uuid);
         Task<IEnumerable<NotificationBase>> GetUnreadNotificationsByAccountUuid(Guid uuid);
-        Task<bool> ChangeNotificationStatusByNotificationUuid(Guid uuid, NotificationStatusType status);
+         Task<bool> IsNotificationRegisteredBysUuidAndAccountUuid(Guid uuid, Guid accountUuid);
+        Task<bool> ChangeNotificationStatusByNotificationUuid(Guid uuid, Guid accountUuid, NotificationStatusType status);
     }
 }

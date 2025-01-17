@@ -60,7 +60,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     var generalDB = new GeneralNotification
                     {
                         IdNotificationBase = notificationDB.Id!.Value,
-                        Code = (Model.Types.GeneralNotificationCodeType?)generalNotification.Code!.Value,
+                        Code = (Model.Types.GeneralNotificationCodeType)generalNotification.Code!,
                     };
                     await dbContext.GeneralNotifications.AddAsync(generalDB);
                     await dbContext.SaveChangesAsync();
@@ -87,7 +87,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isRegistered;
         }
 
-        public async Task<bool> ChangeNotificationStatusByNotificationUuid(Guid uuid, BusinessLogicLayer.Model.Types.Notification.NotificationStatusType status)
+        public async Task<bool> ChangeNotificationStatusByNotificationUuid(Guid uuid, Guid accountUuid, BusinessLogicLayer.Model.Types.Notification.NotificationStatusType status)
         {
             bool isStatusChanged = false;
             using var dbContext = context.CreateDbContext();
@@ -96,7 +96,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             {
                 var notificationDB = await dbContext.NotificationRecipients
                     .Include(nb => nb.NotificationBase)
-                     .FirstOrDefaultAsync(ac => ac.NotificationBase!.Uuid == uuid);
+                    .Include(ac => ac.UserAccount)
+                     .FirstOrDefaultAsync(ac => ac.NotificationBase!.Uuid == uuid && ac.UserAccount!.Uuid == accountUuid);
 
                 if (notificationDB == null)
                 {
@@ -115,6 +116,20 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }
             return isStatusChanged;
         }
+
+        public async Task<bool> IsNotificationRegisteredBysUuidAndAccountUuid(Guid uuid, Guid accountUuid)
+        {
+            using var dbContext = context.CreateDbContext();
+
+            var notificationExists = await dbContext.NotificationRecipients
+                .Include(a => a.NotificationBase)
+                .Include(a => a.UserAccount)
+                .Where(a => a.UserAccount!.Uuid == accountUuid && a.NotificationBase!.Uuid == uuid)
+                .FirstOrDefaultAsync();
+
+            return notificationExists != null;
+        }
+
 
         public async Task<IEnumerable<BusinessLogicLayer.Model.NotificationBase>> GetNotificationsByAccountUuid(Guid uuid)
         {
@@ -140,14 +155,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             {
                 notifications = notificationDB.NotificationRecipients.Select<NotificationRecipient, BusinessLogicLayer.Model.NotificationBase>(notification =>
                 {
-                    var notificationUserRecipients = new List<BusinessLogicLayer.Model.NotificationRecipient>
-                        {
-                            new BusinessLogicLayer.Model.NotificationRecipient
-                            {
-                                Uuid = notification.UserAccount!.Uuid!.Value,
-                                Id = notification.UserAccount!.Id!.Value
-                            }
-                        };
                     if (notification.NotificationBase!.Type == Model.Types.NotificationType.APPOINTMENT_NOTIFICATION)
                     {
                         return new BusinessLogicLayer.Model.AppointmentNotification
@@ -157,8 +164,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = notification.NotificationBase.Id,
                             CreatedAt = notification.NotificationBase.CreatedAt,
                             Message = notification.NotificationBase.Message!,
+                            Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
                             Code = (BusinessLogicLayer.Model.Types.Notification.AppointmentNotificationCodeType?)notification.NotificationBase.AppointmentNotification!.Code!.Value,
-                            Recipients = notificationUserRecipients,
+                            Recipients = [],
                             Appointment = new BusinessLogicLayer.Model.Appointment
                             {
                                 Uuid = notification.NotificationBase.AppointmentNotification!.Appointment!.Uuid,
@@ -175,8 +183,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = notification.NotificationBase.Id,
                             CreatedAt = notification.NotificationBase.CreatedAt,
                             Message = notification.NotificationBase.Message!,
+                            Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
                             Code = (BusinessLogicLayer.Model.Types.Notification.SystemNotificationCodeType?)notification.NotificationBase.SystemNotification!.Code!.Value,
-                            Recipients = notificationUserRecipients,
+                            Recipients = [],
                             Severity = (BusinessLogicLayer.Model.Types.Notification.SystemNotificationSeverityCodeType?)notification.NotificationBase.SystemNotification!.Severity!.Value
                         };
                     }
@@ -189,12 +198,13 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = notification.NotificationBase.Id,
                             CreatedAt = notification.NotificationBase.CreatedAt,
                             Message = notification.NotificationBase.Message!,
-                            Code = (BusinessLogicLayer.Model.Types.Notification.GeneralNotificationCodeType?)notification.NotificationBase.GeneralNotification!.Code!.Value,
-                            Recipients = notificationUserRecipients,
+                            Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
+                            Code = (BusinessLogicLayer.Model.Types.Notification.GeneralNotificationCodeType)notification.NotificationBase.GeneralNotification!.Code!.Value,
+                            Recipients = [],
                         };
                     }
                     throw new NotImplementedException($"Unhandled notification type: {notification.GetType().Name}, {notification.IdNotificationBase} + : {notification.IdUserAccount}");
-                });
+                }).ToList();
             }
             return notifications;
         }
@@ -204,76 +214,79 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             IEnumerable<BusinessLogicLayer.Model.NotificationBase> notifications = [];
             using var dbContext = context.CreateDbContext();
 
-            var notificationDB = await dbContext.UserAccounts
+            var dataClient = await dbContext.UserAccounts
                 .Where(ua => ua.Uuid == uuid)
-                .Include(ua => ua.NotificationRecipients)
-                    .ThenInclude(nr => nr.NotificationBase)
-                    .ThenInclude(nb => nb!.AppointmentNotification)
-                    .ThenInclude(app => app!.Appointment)
-                .Include(ua => ua.NotificationRecipients)
-                    .ThenInclude(nr => nr.NotificationBase)
-                    .ThenInclude(nb => nb!.SystemNotification)
-                .Include(ua => ua.NotificationRecipients)
-                    .ThenInclude(nr => nr.NotificationBase)
-                    .ThenInclude(nb => nb!.GeneralNotification)
-                .SelectMany(ua => ua.NotificationRecipients)
-                .Where(nr => nr.Status == Model.Types.NotificationStatusType.UNREAD)
-                .ToListAsync();
+                .FirstOrDefaultAsync();
 
+            var notificationDB = await dbContext.UserAccounts
+            .Where(ua => ua.Uuid == uuid)
+            .Include(ua => ua.NotificationRecipients)
+                .ThenInclude(nr => nr.NotificationBase)
+                .ThenInclude(nb => nb!.AppointmentNotification)
+                .ThenInclude(app => app!.Appointment)
+            .Include(ua => ua.NotificationRecipients)
+                .ThenInclude(nr => nr.NotificationBase)
+                .ThenInclude(nb => nb!.SystemNotification)
+            .Include(ua => ua.NotificationRecipients)
+                .ThenInclude(nr => nr.NotificationBase)
+                .ThenInclude(nb => nb!.GeneralNotification)
+            .SelectMany(ua => ua.NotificationRecipients)
+            .Where(nr => nr.Status == Model.Types.NotificationStatusType.UNREAD)
+            .ToListAsync();
 
-            notifications = notificationDB.Select<NotificationRecipient, BusinessLogicLayer.Model.NotificationBase>(notification =>
+            if (notificationDB != null)
             {
-                var notificationUserRecipients = new List<BusinessLogicLayer.Model.NotificationRecipient>
-                {
-                    new BusinessLogicLayer.Model.NotificationRecipient
-                    {
-                        Uuid = notification.UserAccount!.Uuid!.Value,
-                        Id = notification.UserAccount!.Id!.Value
-                    }
-                };
 
-                return notification.NotificationBase!.Type switch
+                notifications = notificationDB.Select<NotificationRecipient, BusinessLogicLayer.Model.NotificationBase>(notification =>
                 {
-                    Model.Types.NotificationType.APPOINTMENT_NOTIFICATION => new BusinessLogicLayer.Model.AppointmentNotification
+                    return notification.NotificationBase!.Type switch
                     {
-                        Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
-                        Uuid = notification.NotificationBase.Uuid,
-                        Id = notification.NotificationBase.Id,
-                        CreatedAt = notification.NotificationBase.CreatedAt,
-                        Message = notification.NotificationBase.Message!,
-                        Code = (BusinessLogicLayer.Model.Types.Notification.AppointmentNotificationCodeType?)notification.NotificationBase.AppointmentNotification!.Code!.Value,
-                        Recipients = notificationUserRecipients,
-                        Appointment = new BusinessLogicLayer.Model.Appointment
+                        Model.Types.NotificationType.APPOINTMENT_NOTIFICATION => new BusinessLogicLayer.Model.AppointmentNotification
                         {
-                            Uuid = notification.NotificationBase.AppointmentNotification!.Appointment!.Uuid,
-                            Id = notification.NotificationBase.AppointmentNotification!.Appointment.Id
+                            Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
+                            Uuid = notification.NotificationBase.Uuid,
+                            Id = notification.NotificationBase.Id,
+                            CreatedAt = notification.NotificationBase.CreatedAt,
+                            Message = notification.NotificationBase.Message!,
+                            Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
+                            Code = (BusinessLogicLayer.Model.Types.Notification.AppointmentNotificationCodeType?)notification.NotificationBase.AppointmentNotification!.Code!.Value,
+                            Recipients = [],
+                            Appointment = new BusinessLogicLayer.Model.Appointment
+                            {
+                                Uuid = notification.NotificationBase.AppointmentNotification!.Appointment!.Uuid,
+                                Id = notification.NotificationBase.AppointmentNotification!.Appointment.Id
+                            },
                         },
-                    },
-                    Model.Types.NotificationType.SYSTEM_NOTIFICATION => new BusinessLogicLayer.Model.SystemNotification
-                    {
-                        Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
-                        Uuid = notification.NotificationBase.Uuid,
-                        Id = notification.NotificationBase.Id,
-                        CreatedAt = notification.NotificationBase.CreatedAt,
-                        Message = notification.NotificationBase.Message!,
-                        Code = (BusinessLogicLayer.Model.Types.Notification.SystemNotificationCodeType?)notification.NotificationBase.SystemNotification!.Code!.Value,
-                        Recipients = notificationUserRecipients,
-                        Severity = (BusinessLogicLayer.Model.Types.Notification.SystemNotificationSeverityCodeType?)notification.NotificationBase.SystemNotification!.Severity!.Value
-                    },
-                    Model.Types.NotificationType.GENERAL_NOTIFICATION => new BusinessLogicLayer.Model.GeneralNotification
-                    {
-                        Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
-                        Uuid = notification.NotificationBase.Uuid,
-                        Id = notification.NotificationBase.Id,
-                        CreatedAt = notification.NotificationBase.CreatedAt,
-                        Message = notification.NotificationBase.Message!,
-                        Code = (BusinessLogicLayer.Model.Types.Notification.GeneralNotificationCodeType?)notification.NotificationBase.GeneralNotification!.Code!.Value,
-                        Recipients = notificationUserRecipients,
-                    },
-                    _ => throw new NotImplementedException($"Unhandled notification type: {notification.NotificationBase.Type}")
-                };
-            });
+                        Model.Types.NotificationType.SYSTEM_NOTIFICATION => new BusinessLogicLayer.Model.SystemNotification
+                        {
+                            Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
+                            Uuid = notification.NotificationBase.Uuid,
+                            Id = notification.NotificationBase.Id,
+                            CreatedAt = notification.NotificationBase.CreatedAt,
+                            Message = notification.NotificationBase.Message!,
+                            Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
+                            Code = (BusinessLogicLayer.Model.Types.Notification.SystemNotificationCodeType?)notification.NotificationBase.SystemNotification!.Code!.Value,
+                            Recipients = [],
+                            Severity = (BusinessLogicLayer.Model.Types.Notification.SystemNotificationSeverityCodeType?)notification.NotificationBase.SystemNotification!.Severity!.Value
+                        },
+                        Model.Types.NotificationType.GENERAL_NOTIFICATION => new BusinessLogicLayer.Model.GeneralNotification
+                        {
+                            Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
+                            Uuid = notification.NotificationBase.Uuid,
+                            Id = notification.NotificationBase.Id,
+                            CreatedAt = notification.NotificationBase.CreatedAt,
+                            Message = notification.NotificationBase.Message!,
+                            Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
+                            Code = (BusinessLogicLayer.Model.Types.Notification.GeneralNotificationCodeType)notification.NotificationBase.GeneralNotification!.Code!.Value,
+                            Recipients = [],
+                        },
+                        _ => throw new NotImplementedException($"Unhandled notification type: {notification.NotificationBase.Type}")
+                    };
+                }).ToList();
+            }
             return notifications;
         }
+
+
     }
 }
