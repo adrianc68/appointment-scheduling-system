@@ -1,6 +1,6 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.TimeSlotLock.Model
+namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
 {
     public class BlockedTimeSlot
     {
