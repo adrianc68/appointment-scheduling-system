@@ -1,4 +1,4 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Notification;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response
 {

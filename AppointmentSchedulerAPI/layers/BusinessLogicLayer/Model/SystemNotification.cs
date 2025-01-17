@@ -1,6 +1,6 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Notification;
 
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Model
+namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
 {
     public class SystemNotification : NotificationBase
     {

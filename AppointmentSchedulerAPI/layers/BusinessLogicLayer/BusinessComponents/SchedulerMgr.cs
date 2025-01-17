@@ -1,7 +1,6 @@
 using System.Text.Json;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Interfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
@@ -189,7 +188,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     }
                 };
                 this.NotifySuscribers(availabilityTimeSlotEvent);
-                // _ = this.notificationMgr.NotifyAllAsync($"{availabilityTimeSlot.StartTime}: {availabilityTimeSlot.EndTime}");
             }
 
             return isUpdated;

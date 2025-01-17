@@ -1,4 +1,4 @@
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types
+namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Notification
 {
     public enum GeneralNotificationCodeType
     {

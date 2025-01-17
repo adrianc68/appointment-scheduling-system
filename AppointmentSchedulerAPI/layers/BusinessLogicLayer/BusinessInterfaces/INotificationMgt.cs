@@ -1,7 +1,7 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Model;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Model.Types;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Notification;
 
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Interfaces
+namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
 {
     public interface INotificationMgt
     {

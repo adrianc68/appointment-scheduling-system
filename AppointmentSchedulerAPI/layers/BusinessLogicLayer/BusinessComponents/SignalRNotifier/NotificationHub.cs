@@ -1,7 +1,7 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.Interfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
 using Microsoft.AspNetCore.SignalR;
 
-namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.NotificationMgr.SignalRNotifier
+namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents.SignalRNotifier
 {
     public class NotificationHub : Hub, IWebNotifier
     {
@@ -28,7 +28,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
             {
                 userConnections[claims.Uuid.ToString()] = connectionId;
             }
-            System.Console.WriteLine($"User {claims.Uuid.ToString()} connected with connectionId {connectionId}");
+            Console.WriteLine($"User {claims.Uuid.ToString()} connected with connectionId {connectionId}");
         }
 
         public override Task OnConnectedAsync()
@@ -74,7 +74,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ExternalComponents.N
             }
             else
             {
-                System.Console.WriteLine("User is not connected");
+                Console.WriteLine("User is not connected");
                 // User is not connected!!! $$$>> Resolve this
             }
             await Task.CompletedTask;
