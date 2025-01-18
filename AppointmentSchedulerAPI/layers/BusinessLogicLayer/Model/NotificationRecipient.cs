@@ -4,9 +4,24 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
 {
     public class NotificationRecipient
     {
-        public Guid Uuid { get; set; }
-        public int Id { get; set; }
-        public NotificationStatusType Status { get; set;}
-        public DateTime? ChangedAt { get; set; } = DateTime.Now;
+        public required NotificationRecipientData RecipientData { get; set; }
+        public NotificationStatusType? Status { get; set; } = NotificationStatusType.UNREAD;
+        public DateTime ChangedAt { get; set; } = DateTime.UtcNow;
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is not NotificationRecipient other)
+            {
+                return false;
+            }
+
+            return RecipientData.Equals(other.RecipientData);
+        }
+
+        public override int GetHashCode()
+        {
+            return RecipientData.GetHashCode();
+        }
+
     }
 }

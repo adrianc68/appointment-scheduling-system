@@ -1,10 +1,7 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
@@ -37,7 +34,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 var claims = ClaimsPOCO.GetUserClaims(User);
 
-                List<NotificationBase> notifications = await systemFacade.GetUnreadNotificationsByAccountUuid(claims.Uuid);
+                List<Notification> notifications = await systemFacade.GetUnreadNotificationsByAccountUuid(claims.Uuid);
                 foreach (var notification in notifications)
                 {
 
@@ -45,12 +42,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new AppointmentNotificationDTO
                         {
-                            Status = appointmentNotification.Status!.Value,
+                            // Status = appointmentNotification.Status!.Value,
                             Uuid = appointmentNotification.Uuid!.Value,
                             CreatedAt = appointmentNotification!.CreatedAt!.Value,
                             Message = appointmentNotification.Message!,
                             Type = appointmentNotification.Type,
-                            Code = appointmentNotification!.Code!.Value,
+                            Code = appointmentNotification!.Code,
                             Appointment = new AppointmentUuidDTO
                             {
                                 Uuid = appointmentNotification.Appointment!.Uuid!.Value,
@@ -61,12 +58,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new SystemNotificationDTO
                         {
-                            Status = systemNotification.Status!.Value,
+                            // Status = systemNotification.Status!.Value,
                             Uuid = systemNotification.Uuid!.Value,
                             CreatedAt = systemNotification!.CreatedAt!.Value,
                             Message = systemNotification.Message!,
                             Type = systemNotification.Type,
-                            Code = systemNotification!.Code!.Value,
+                            Code = systemNotification!.Code,
                             Severity = systemNotification.Severity!.Value
                         });
                     }
@@ -74,7 +71,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new GeneralNotificationDTO
                         {
-                            Status = generalNotification.Status!.Value,
+                            // Status = generalNotification.Status!.Value,
                             Uuid = generalNotification.Uuid!.Value,
                             CreatedAt = generalNotification!.CreatedAt!.Value,
                             Message = generalNotification.Message!,
@@ -107,7 +104,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 var claims = ClaimsPOCO.GetUserClaims(User);
 
-                List<NotificationBase> notifications = await systemFacade.GetNotificationsByAccountUuid(claims.Uuid);
+                List<Notification> notifications = await systemFacade.GetNotificationsByAccountUuid(claims.Uuid);
                 foreach (var notification in notifications)
                 {
 
@@ -115,12 +112,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new AppointmentNotificationDTO
                         {
-                            Status = appointmentNotification.Status!.Value,
+                            // Status = appointmentNotification.Status!.Value,
                             Uuid = appointmentNotification.Uuid!.Value,
                             CreatedAt = appointmentNotification!.CreatedAt!.Value,
                             Message = appointmentNotification.Message!,
                             Type = appointmentNotification.Type,
-                            Code = appointmentNotification!.Code!.Value,
+                            Code = appointmentNotification!.Code,
                             Appointment = new AppointmentUuidDTO
                             {
                                 Uuid = appointmentNotification.Appointment!.Uuid!.Value,
@@ -131,12 +128,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new SystemNotificationDTO
                         {
-                            Status = systemNotification.Status!.Value,
+                            // Status = systemNotification.Status!.Value,
                             Uuid = systemNotification.Uuid!.Value,
                             CreatedAt = systemNotification!.CreatedAt!.Value,
                             Message = systemNotification.Message!,
                             Type = systemNotification.Type,
-                            Code = systemNotification!.Code!.Value,
+                            Code = systemNotification!.Code,
                             Severity = systemNotification.Severity!.Value
                         });
                     }
@@ -144,7 +141,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new GeneralNotificationDTO
                         {
-                            Status = generalNotification.Status!.Value,
+                            // Status = generalNotification.Status!.Value,
                             Uuid = generalNotification.Uuid!.Value,
                             CreatedAt = generalNotification!.CreatedAt!.Value,
                             Message = generalNotification.Message!,

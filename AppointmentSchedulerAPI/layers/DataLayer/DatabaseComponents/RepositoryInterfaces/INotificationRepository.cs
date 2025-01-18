@@ -5,9 +5,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 {
     public interface INotificationRepository
     {
-        Task<bool> CreateNotification(NotificationBase notification);
-        Task<IEnumerable<NotificationBase>> GetNotificationsByAccountUuid(Guid uuid);
-        Task<IEnumerable<NotificationBase>> GetUnreadNotificationsByAccountUuid(Guid uuid);
+        Task<bool> CreateNotification(Notification notification);
+        Task<IEnumerable<Notification>> GetNotificationsByAccountUuid(Guid uuid);
+        Task<IEnumerable<Notification>> GetUnreadNotificationsByAccountUuid(Guid uuid);
          Task<bool> IsNotificationRegisteredBysUuidAndAccountUuid(Guid uuid, Guid accountUuid);
         Task<bool> ChangeNotificationStatusByNotificationUuid(Guid uuid, Guid accountUuid, NotificationStatusType status);
     }

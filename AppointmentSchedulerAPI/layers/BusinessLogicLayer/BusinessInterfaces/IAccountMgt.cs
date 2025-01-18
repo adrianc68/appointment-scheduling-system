@@ -8,7 +8,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         Task<bool> IsUsernameRegisteredAsync(string username);
         Task<bool> IsEmailRegisteredAsync(string email);
         Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber);
-        Task<List<(int, Guid)>> GetAllAccountsIdsAndUuids();
+        Task<List<AccountData>> GetAllAccountsIdsAndUuids();
         Task<AccountData?> GetAccountDataByEmailOrUsernameOrPhoneNumber(string account, string password);
         Task<int?> GetAccountIdByUuid(Guid uuid);
         Task<RoleType?> GetRoleTypeByUuid(Guid accountUuid);

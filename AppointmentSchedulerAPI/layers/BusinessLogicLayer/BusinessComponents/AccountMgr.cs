@@ -85,10 +85,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return result;
         }
 
-        public async Task<List<(int, Guid)>> GetAllAccountsIdsAndUuids()
+        public async Task<List<AccountData>> GetAllAccountsIdsAndUuids()
         {
-            List<(int, Guid)> IdsAndUuids = await accountRepository.GetAllAccountsIdsAndUuids();
-            return IdsAndUuids;
+            List<AccountData> accountsData = await accountRepository.GetAllAccountData();
+            return accountsData;
         }
 
         public async Task<int?> GetAccountIdByUuid(Guid uuid)

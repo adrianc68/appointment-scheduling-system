@@ -1,4 +1,5 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -130,17 +131,30 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return (BusinessLogicLayer.Model.Types.RoleType?)userDB.Role;
         }
 
-        public async Task<List<(int, Guid)>> GetAllAccountsIdsAndUuids()
+        public async Task<List<AccountData>> GetAllAccountData()
         {
             using var dbContext = context.CreateDbContext();
 
-            var userAccountIdsAndUuids = await dbContext.UserAccounts
-                .Select(user => new { user.Id, user.Uuid })
+            var accountsData = await dbContext.UserAccounts
+                .Include(e => e.UserInformation)
                 .ToListAsync();
 
-            return userAccountIdsAndUuids
-                .Select(x => (x.Id!.Value, x.Uuid!.Value))
-                .ToList();
+            if (accountsData == null)
+            {
+                return [];
+            }
+
+            List<AccountData> accounts =  accountsData.Select(e => new AccountData {
+                Id = e.Id,
+                Uuid = e.Uuid,
+                Email = e.Email,
+                PhoneNumber = e.UserInformation!.PhoneNumber,
+                Username = e.Username,
+                Role = (BusinessLogicLayer.Model.Types.RoleType?)e.Role,
+                CreatedAt = e.CreatedAt
+            }).ToList();
+
+            return accounts;
         }
     }
 }

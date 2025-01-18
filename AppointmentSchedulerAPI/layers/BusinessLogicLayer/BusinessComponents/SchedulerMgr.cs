@@ -1,10 +1,9 @@
-using System.Text.Json;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Notification;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
@@ -513,30 +512,58 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 }
                 else
                 {
-                    // var notification = new
-                    // {
-                    //     type = MessageCodeType.EVENT_APPOINTMENT_HAS_BEEN_CANCELED.ToString(),
-                    //     appointmentUuid = appointment.Uuid!.Value,
-                    //     message = $"La cita ${appointment.Uuid} se ha cancelado.",
-                    //     clientUuid = appointment.Client!.Uuid
-                    // };
 
+                    var notification = new AppointmentNotification
+                    {
+                        Recipients = [],
+                        Message = $"La cita {appointment.Uuid} se ha cancelado",
+                        Code = Model.Types.Notification.AppointmentNotificationCodeType.APPOINTMENT_CANCELED,
+                        Appointment = new Appointment
+                        {
+                            Id = appointment.Id,
+                            Uuid = appointment.Uuid
+                        },
+                        Options = new NotificationOptions
+                        {
+                            Channels = new List<NotificationChannelType>
+                            {
+                                NotificationChannelType.WEB_APPLICATION
+                            }
+                        }
+                    };
 
-                    // var uniqueAssistantUuids = new HashSet<string>();
 
                     // foreach (var scheduledService in appointment.ScheduledServices!)
                     // {
-                    //     var assistantUuid = scheduledService!.ServiceOffer!.Assistant!.Uuid!.Value.ToString();
-                    //     if (uniqueAssistantUuids.Add(assistantUuid))
+                    //     var assistantData = scheduledService!.ServiceOffer!.Assistant;
+                    //     var recipient = new NotificationRecipient
                     //     {
-                    //         await this.notificationMgr.NotifyToUserAsync(
-                    //             assistantUuid,
-                    //             JsonSerializer.Serialize(notification)
-                    //         );
-                    //     }
+                    //         RecipientData = new NotificationRecipientData
+                    //         {
+                    //             Email = assistantData!.Email!,
+                    //             PhoneNumber = assistantData!.PhoneNumber!,
+                    //             UserAccountId = assistantData!.Id!.Value,
+                    //             UserAccountUuid = assistantData.Uuid!.Value
+                    //         },
+                    //     };
+
+                    //     notification.Recipients.Add(recipient);
                     // }
 
-                    // _ = this.notificationMgr.NotifyToUserAsync(appointment.Client!.Uuid!.Value.ToString(), JsonSerializer.Serialize(notification));
+                    // notification.Recipients.Add(new NotificationRecipient
+                    // {
+                    //     RecipientData = new NotificationRecipientData
+                    //     {
+                    //         Email = appointment.Client!.Email!,
+                    //         PhoneNumber = appointment.Client.PhoneNumber!,
+                    //         UserAccountId = appointment.Client!.Id!.Value,
+                    //         UserAccountUuid = appointment.Client.Uuid!.Value
+                    //     },
+                    // });
+
+                    await this.notificationMgr.CreateNotification(notification);
+
+
                 }
             }
             return (allCanceled, failedAppointments);

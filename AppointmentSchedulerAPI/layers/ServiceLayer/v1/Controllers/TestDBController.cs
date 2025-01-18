@@ -62,16 +62,16 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             //     Recipients = [],
             // };
 
-            SystemNotification notification = new SystemNotification
-            {
-                    Message = "EL servidor estara en mantenimiento a las 18:00 PM MXN",
-                    Code = SystemNotificationCodeType.SYSTEM_MAINTENANCE,
-                    Recipients = [],
-                    Severity = SystemNotificationSeverityCodeType.INFO
-            };
+            // SystemNotification notification = new SystemNotification
+            // {
+            //         Message = "EL servidor estara en mantenimiento a las 18:00 PM MXN",
+            //         Code = SystemNotificationCodeType.SYSTEM_MAINTENANCE,
+            //         Recipients = [],
+            //         Severity = SystemNotificationSeverityCodeType.INFO
+            // };
 
 
-            await this.notificationMgr.CreateNotification(notification, NotificationUsersToSendType.SEND_TO_EVERYONE);
+            // await this.notificationMgr.CreateNotification(notification, NotificationUsersToSendType.SEND_TO_EVERYONE);
 
 
             // await notificationMgr.NotifyAllAsync("Mensaje enviado para uno");

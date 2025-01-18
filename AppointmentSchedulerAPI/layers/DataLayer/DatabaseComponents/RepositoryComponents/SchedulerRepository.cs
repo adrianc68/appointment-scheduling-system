@@ -201,7 +201,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     {
                         Name = slot.Assistant!.UserAccount!.UserInformation!.Name,
                         Uuid = slot.Assistant.UserAccount.Uuid,
-                        Id = slot.Assistant.IdUserAccount
+                        Id = slot.Assistant.IdUserAccount,
+                        PhoneNumber = slot.Assistant!.UserAccount!.UserInformation!.Name,
+                        Email = slot.Assistant!.UserAccount!.UserInformation!.Name,
                     }
                 })
                 .ToList();
@@ -229,7 +231,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                         {
                             Id = slot.Assistant!.UserAccount!.Id,
                             Uuid = slot.Assistant!.UserAccount!.Uuid,
-                            Name = slot.Assistant!.UserAccount!.UserInformation!.Name
+                            Name = slot.Assistant!.UserAccount!.UserInformation!.Name,
+                            PhoneNumber = slot.Assistant!.UserAccount!.UserInformation!.Name,
+                            Email = slot.Assistant!.UserAccount!.UserInformation!.Name,
                         },
                         Service = new BusinessLogicLayer.Model.Service
                         {
@@ -355,7 +359,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Assistant = new BusinessLogicLayer.Model.Assistant
                     {
                         Uuid = aso.ServiceOffer.Assistant!.UserAccount!.Uuid,
-                        Name = aso.ServiceOffer.Assistant.UserAccount.UserInformation!.Name
+                        Name = aso.ServiceOffer.Assistant.UserAccount.UserInformation!.Name,
+                        Id = aso.ServiceOffer.Assistant.UserAccount.Id,
+                        PhoneNumber = aso.ServiceOffer.Assistant.UserAccount.UserInformation!.PhoneNumber,
+                        Email = aso.ServiceOffer.Assistant.UserAccount.Email,
                     }
                 },
             }).ToList();
@@ -641,7 +648,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Name = availabilityTimeSlotDB.Assistant!.UserAccount!.UserInformation!.Name,
                     Uuid = availabilityTimeSlotDB.Assistant.UserAccount.Uuid,
-                    Id = availabilityTimeSlotDB.Assistant.IdUserAccount
+                    Id = availabilityTimeSlotDB.Assistant.IdUserAccount,
+                    PhoneNumber = availabilityTimeSlotDB.Assistant.UserAccount.UserInformation.PhoneNumber,
+                    Email = availabilityTimeSlotDB.Assistant.UserAccount.Email,
                 },
                 UnavailableTimeSlots = availabilityTimeSlotDB.UnavailableTimeSlots?.Select(a => new BusinessLogicLayer.Model.UnavailableTimeSlot
                 {
@@ -680,7 +689,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Name = availabilityTimeSlotDB.Assistant!.UserAccount!.UserInformation!.Name,
                     Uuid = availabilityTimeSlotDB.Assistant.UserAccount.Uuid,
-                    Id = availabilityTimeSlotDB.Assistant.IdUserAccount
+                    Id = availabilityTimeSlotDB.Assistant.IdUserAccount,
+                    PhoneNumber = availabilityTimeSlotDB.Assistant.UserAccount.UserInformation.PhoneNumber,
+                    Email = availabilityTimeSlotDB.Assistant.UserAccount.Email,
                 },
                 UnavailableTimeSlots = availabilityTimeSlotDB.UnavailableTimeSlots?.Select(a => new BusinessLogicLayer.Model.UnavailableTimeSlot
                 {
@@ -819,6 +830,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     .ThenInclude(ui => ui!.UserInformation)
                 .Include(cl => cl.Client)
                     .ThenInclude(ac => ac!.UserAccount)
+                    .ThenInclude(ui => ui!.UserInformation)
             .Where(app => (app.Status == Model.Types.AppointmentStatusType.SCHEDULED || app.Status == Model.Types.AppointmentStatusType.CONFIRMED || app.Status == Model.Types.AppointmentStatusType.RESCHEDULED) &&
                             app.ScheduledServices!.Any(ax => ax.ServiceOffer!.Assistant!.IdUserAccount == idAssistant)
             ).ToListAsync();
@@ -835,7 +847,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 Client = new BusinessLogicLayer.Model.Client
                 {
                     Id = dbApp.Client!.IdUserAccount,
-                    Uuid = dbApp.Client.UserAccount!.Uuid
+                    Uuid = dbApp.Client.UserAccount!.Uuid,
+                    PhoneNumber = dbApp.Client.UserAccount.UserInformation!.PhoneNumber,
+                    Email = dbApp.Client.UserAccount.Email
                 },
                 ScheduledServices = dbApp.ScheduledServices!.Select(ss => new BusinessLogicLayer.Model.ScheduledService
                 {
@@ -856,6 +870,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = ss.ServiceOffer.Assistant!.IdUserAccount,
                             Uuid = ss.ServiceOffer.Assistant!.UserAccount!.Uuid,
                             Name = ss.ServiceOffer.Assistant!.UserAccount!.UserInformation!.Name,
+                            PhoneNumber = ss.ServiceOffer.Assistant!.UserAccount!.UserInformation.PhoneNumber,
+                            Email = ss.ServiceOffer.Assistant!.UserAccount!.Email,
                         }
                     }
                 }).ToList()
@@ -913,6 +929,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = ss.ServiceOffer.Assistant!.IdUserAccount,
                             Uuid = ss.ServiceOffer.Assistant!.UserAccount!.Uuid,
                             Name = ss.ServiceOffer.Assistant!.UserAccount!.UserInformation!.Name,
+                            PhoneNumber = ss.ServiceOffer.Assistant!.UserAccount!.UserInformation.PhoneNumber,
+                            Email = ss.ServiceOffer.Assistant!.UserAccount!.Email,
+
                         }
                     }
                 }).ToList()
@@ -1103,6 +1122,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = ss.ServiceOffer.Assistant!.IdUserAccount,
                             Uuid = ss.ServiceOffer.Assistant!.UserAccount!.Uuid,
                             Name = ss.ServiceOffer.Assistant!.UserAccount!.UserInformation!.Name,
+                            PhoneNumber = ss.ServiceOffer.Assistant!.UserAccount!.UserInformation.PhoneNumber,
+                            Email = ss.ServiceOffer.Assistant!.UserAccount!.Email,
                         }
                     }
                 }).ToList()

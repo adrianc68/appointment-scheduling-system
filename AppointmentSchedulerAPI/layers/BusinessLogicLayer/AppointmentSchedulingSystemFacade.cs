@@ -43,15 +43,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             throw new NotImplementedException();
         }
 
-        public async Task<List<NotificationBase>> GetNotificationsByAccountUuid(Guid uuid)
+        public async Task<List<Notification>> GetNotificationsByAccountUuid(Guid uuid)
         {
-            List<NotificationBase> notifications = await notificationMgr.GetNotificationsByAccountUuid(uuid);
+            List<Notification> notifications = await notificationMgr.GetNotificationsByAccountUuid(uuid);
             return notifications;
         }
 
-        public async Task<List<NotificationBase>> GetUnreadNotificationsByAccountUuid(Guid uuid)
+        public async Task<List<Notification>> GetUnreadNotificationsByAccountUuid(Guid uuid)
         {
-            List<NotificationBase> notifications = await notificationMgr.GetUnreadNotificationsByAccountUuid(uuid);
+            List<Notification> notifications = await notificationMgr.GetUnreadNotificationsByAccountUuid(uuid);
             return notifications;
         }
 

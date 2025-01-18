@@ -22,25 +22,36 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             this.accountMgr = accountMgr;
         }
 
-        public async Task<Guid?> CreateNotification(NotificationBase notification, NotificationUsersToSendType recipientOptions = NotificationUsersToSendType.SEND_TO_SOME_USERS, List<NotificationChannelType>? channels = null)
+        public async Task<Guid?> CreateNotification(Notification notification)
         {
-
-
-            notification.Status = NotificationStatusType.UNREAD;
-            notification.Uuid = Guid.CreateVersion7();
-
-            if (recipientOptions == NotificationUsersToSendType.SEND_TO_EVERYONE)
+            foreach (var recipient in notification.Recipients)
             {
-                List<(int, Guid)> accountsIds = await accountMgr.GetAllAccountsIdsAndUuids();
-                notification.Recipients = accountsIds.Select(x => new NotificationRecipient
-                {
-                    Id = x.Item1,
-                    Uuid = x.Item2,
-                    Status = NotificationStatusType.UNREAD,
-                    ChangedAt = DateTime.UtcNow
-                }).ToList();
+                recipient.Status = NotificationStatusType.UNREAD;
             }
 
+            if (notification.Options.Channels == null || notification.Options.Channels.Count == 0)
+            {
+                notification.Options.Channels = [NotificationChannelType.WEB_APPLICATION];
+            }
+
+            if (notification.Recipients.Count == 0)
+            {
+                List<AccountData> accountsIds = await accountMgr.GetAllAccountsIdsAndUuids();
+                notification.Recipients = accountsIds.Select(x => new NotificationRecipient
+                {
+                    RecipientData = new NotificationRecipientData
+                    {
+                        Email = x.Email!,
+                        UserAccountId = x.Id!.Value,
+                        PhoneNumber = x.PhoneNumber!,
+                        UserAccountUuid = x.Uuid!.Value
+                    },
+                    Status = NotificationStatusType.UNREAD,
+                    ChangedAt = DateTime.UtcNow
+                }).ToHashSet();
+            }
+
+            notification.Uuid = Guid.CreateVersion7();
             bool isRegistered = await notificationRepository.CreateNotification(notification);
 
             if (!isRegistered)
@@ -49,27 +60,21 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 return null;
             }
 
-            if (channels == null || channels.Count == 0)
-            {
-                channels = [NotificationChannelType.WEB_APPLICATION];
-            }
-
             if (notification is AppointmentNotification appointmentNotification)
             {
                 AppointmentNotificationDTO notificationDTO = new AppointmentNotificationDTO
                 {
                     CreatedAt = notification.CreatedAt!.Value,
                     Uuid = notification.Uuid.Value,
-                    Status = notification.Status.Value,
-                    Message = notification.Message!,
+                    Message = notification.Message,
                     Type = notification.Type,
-                    Code = appointmentNotification.Code!.Value,
+                    Code = appointmentNotification.Code,
                     Appointment = new AppointmentUuidDTO
                     {
                         Uuid = appointmentNotification.Appointment!.Uuid!.Value
                     }
                 };
-                SendNotificationToUsers(notification.Recipients!, notificationDTO, channels);
+                SendNotificationToUsers(notificationDTO, notification.Recipients, notification.Options.Channels);
             }
             else if (notification is SystemNotification systemNotification)
             {
@@ -77,13 +82,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 {
                     CreatedAt = notification.CreatedAt!.Value,
                     Uuid = notification.Uuid.Value,
-                    Status = notification.Status.Value,
-                    Message = notification.Message!,
+                    Message = notification.Message,
                     Type = notification.Type,
-                    Code = systemNotification.Code!.Value,
+                    Code = systemNotification.Code,
                     Severity = systemNotification.Severity!.Value
                 };
-                SendNotificationToUsers(notification.Recipients!, notificationDTO, channels);
+                SendNotificationToUsers(notificationDTO, notification.Recipients, notification.Options.Channels);
             }
             else if (notification is GeneralNotification generalNotification)
             {
@@ -91,26 +95,25 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 {
                     CreatedAt = notification.CreatedAt!.Value,
                     Uuid = notification.Uuid.Value,
-                    Status = notification.Status.Value,
-                    Message = notification.Message!,
+                    Message = notification.Message,
                     Type = notification.Type,
-                    Code = generalNotification.Code!,
+                    Code = generalNotification.Code,
                 };
-                SendNotificationToUsers(notification.Recipients!, notificationDTO, channels);
+                SendNotificationToUsers(notificationDTO, notification.Recipients, notification.Options.Channels);
             }
 
             return notification.Uuid.Value;
         }
 
-        public async Task<List<NotificationBase>> GetNotificationsByAccountUuid(Guid uuid)
+        public async Task<List<Notification>> GetNotificationsByAccountUuid(Guid uuid)
         {
-            List<NotificationBase> notifications = (List<NotificationBase>)await notificationRepository.GetNotificationsByAccountUuid(uuid);
+            List<Notification> notifications = (List<Notification>)await notificationRepository.GetNotificationsByAccountUuid(uuid);
             return notifications;
         }
 
-        public async Task<List<NotificationBase>> GetUnreadNotificationsByAccountUuid(Guid uuid)
+        public async Task<List<Notification>> GetUnreadNotificationsByAccountUuid(Guid uuid)
         {
-            List<NotificationBase> notifications = (List<NotificationBase>)await notificationRepository.GetUnreadNotificationsByAccountUuid(uuid);
+            List<Notification> notifications = (List<Notification>)await notificationRepository.GetUnreadNotificationsByAccountUuid(uuid);
             return notifications;
         }
 
@@ -134,7 +137,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return JsonSerializer.Serialize(data, options);
         }
 
-        private async void SendNotificationToUsers<TNotification>(List<NotificationRecipient> users, TNotification dto, List<NotificationChannelType> channels)
+        private async void SendNotificationToUsers<TNotification>(TNotification dto, HashSet<NotificationRecipient> users, List<NotificationChannelType> channels)
         {
             string notificationJson = SerializeObjectToJson(dto);
 
@@ -145,7 +148,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     switch (channel)
                     {
                         case NotificationChannelType.WEB_APPLICATION:
-                            await webNotifier.SendToUserAsync(recipient.Uuid.ToString(), notificationJson);
+                            await webNotifier.SendToUserAsync(recipient.RecipientData.UserAccountUuid.ToString(), notificationJson);
                             break;
                         case NotificationChannelType.EMAIL:
                             throw new NotImplementedException();
