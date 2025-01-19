@@ -5,7 +5,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
 {
     public interface ISchedulerMgt
     {
-        Task<bool> UpdateAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot);
+        Task<bool> UpdateAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot);
         Task<List<AvailabilityTimeSlot>> GetAllAvailabilityTimeSlotsAsync(DateOnly startDate, DateOnly endDate);
         Task<AvailabilityTimeSlot?> GetAvailabilityTimeSlotByUuidAsync(Guid uuid);
         Task<List<ServiceOffer>> GetAvailableServicesAsync(DateOnly date);
@@ -14,10 +14,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         Task<int?> GetAppointmentIdByUuidAsync(Guid uuid);
         Task<Appointment?> GetAppointmentDetailsByUuidAsync(Guid uuid);
         Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsAsync(DateOnly startDate, DateOnly endDate);
-        Task<List<Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate);
+        Task<List<Appointment>> GetAllAppoinmentsAsync(DateOnly startDate, DateOnly endDate);
         Task<ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid);
         Task<int> GetAppointmentsScheduledCountByClientId(int idClient);
-        Task<List<DateTimeRange>> GetAppointmentDateTimeRangeConflictsByRange(DateTimeRange range);
+        Task<List<DateTimeRange>> GetAppointmentDateTimeRangeConflictsByRangeAsync(DateTimeRange range);
         Task<Guid?> RegisterAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot);
         Task<Guid?> ScheduleAppointmentAsync(Appointment appointment);
         Task<bool> ChangeAppointmentStatusTypeAsync(int idAppointment, AppointmentStatusType status);

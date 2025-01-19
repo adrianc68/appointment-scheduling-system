@@ -14,7 +14,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             this.context = context;
         }
 
-        public async Task<bool> CreateNotification(BusinessLogicLayer.Model.Notification notification)
+        public async Task<bool> CreateNotificationAsync(BusinessLogicLayer.Model.Notification notification)
         {
             bool isRegistered = false;
             using var dbContext = context.CreateDbContext();
@@ -87,7 +87,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isRegistered;
         }
 
-        public async Task<bool> ChangeNotificationStatusByNotificationUuid(Guid uuid, Guid accountUuid, BusinessLogicLayer.Model.Types.Notification.NotificationStatusType status)
+        public async Task<bool> ChangeNotificationStatusByNotificationUuidAsync(Guid uuid, Guid accountUuid, BusinessLogicLayer.Model.Types.Notification.NotificationStatusType status)
         {
             bool isStatusChanged = false;
             using var dbContext = context.CreateDbContext();
@@ -117,7 +117,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isStatusChanged;
         }
 
-        public async Task<bool> IsNotificationRegisteredBysUuidAndAccountUuid(Guid uuid, Guid accountUuid)
+        public async Task<bool> IsNotificationRegisteredBysUuidAndAccountUuidAsync(Guid uuid, Guid accountUuid)
         {
             using var dbContext = context.CreateDbContext();
 
@@ -131,7 +131,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         }
 
 
-        public async Task<IEnumerable<BusinessLogicLayer.Model.Notification>> GetNotificationsByAccountUuid(Guid uuid)
+        public async Task<IEnumerable<BusinessLogicLayer.Model.Notification>> GetNotificationsByAccountUuidAsync(Guid uuid)
         {
             IEnumerable<BusinessLogicLayer.Model.Notification> notifications = [];
             using var dbContext = context.CreateDbContext();
@@ -232,7 +232,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return notifications;
         }
 
-        public async Task<IEnumerable<BusinessLogicLayer.Model.Notification>> GetUnreadNotificationsByAccountUuid(Guid uuid)
+        public async Task<IEnumerable<BusinessLogicLayer.Model.Notification>> GetUnreadNotificationsByAccountUuidAsync(Guid uuid)
         {
             IEnumerable<BusinessLogicLayer.Model.Notification> notifications = [];
             using var dbContext = context.CreateDbContext();

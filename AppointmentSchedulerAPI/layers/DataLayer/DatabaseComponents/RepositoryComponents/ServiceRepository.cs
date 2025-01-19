@@ -134,7 +134,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return serviceName != null;
         }
 
-        public async Task<bool> ChangeServiceStatusType(int idService, BusinessLogicLayer.Model.Types.ServiceStatusType status)
+        public async Task<bool> ChangeServiceStatusTypeAsync(int idService, BusinessLogicLayer.Model.Types.ServiceStatusType status)
         {
             bool isStatusChanged = false;
             using var dbContext = context.CreateDbContext();
@@ -161,7 +161,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isStatusChanged;
         }
 
-        public async Task<bool> UpdateService(BusinessLogicLayer.Model.Service service)
+        public async Task<bool> UpdateServiceAsync(BusinessLogicLayer.Model.Service service)
         {
             bool isRegistered = false;
             using var dbContext = context.CreateDbContext();

@@ -48,7 +48,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return phoneNumberDB != null;
         }
 
-        public async Task<BusinessLogicLayer.Model.AccountData?> GetAccountDataByEmailOrUsernameOrPhoneNumber(string account, string password)
+        public async Task<BusinessLogicLayer.Model.AccountData?> GetAccountDataByEmailOrUsernameOrPhoneNumberAsync(string account, string password)
         {
             using var dbContext = context.CreateDbContext();
             var userDB = await dbContext.UserAccounts
@@ -73,7 +73,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             };
         }
 
-        public async Task<int?> GetAccountIdByUuid(Guid uuid)
+        public async Task<int?> GetAccountIdByUuidAsync(Guid uuid)
         {
             using var dbContext = context.CreateDbContext();
             var userDB = await dbContext.UserAccounts
@@ -88,7 +88,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return userDB.Id!.Value;
         }
 
-        public async Task<bool> ChangeAccountStatusType(int idAccount, BusinessLogicLayer.Model.Types.AccountStatusType status)
+        public async Task<bool> ChangeAccountStatusTypeAsync(int idAccount, BusinessLogicLayer.Model.Types.AccountStatusType status)
         {
             bool isStatusChanged = false;
             using var dbContext = context.CreateDbContext();
@@ -116,7 +116,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isStatusChanged;
         }
 
-        public async Task<BusinessLogicLayer.Model.Types.RoleType?> GetRoleTypeByUuid(Guid accountUuid)
+        public async Task<BusinessLogicLayer.Model.Types.RoleType?> GetRoleTypeByUuidAsync(Guid accountUuid)
         {
             using var dbContext = context.CreateDbContext();
             var userDB = await dbContext.UserAccounts
@@ -131,7 +131,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return (BusinessLogicLayer.Model.Types.RoleType?)userDB.Role;
         }
 
-        public async Task<List<AccountData>> GetAllAccountData()
+        public async Task<List<AccountData>> GetAllAccountDataAsync()
         {
             using var dbContext = context.CreateDbContext();
 

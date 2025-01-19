@@ -6,7 +6,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IAccountJwtLogin
     {
-        Task<OperationResult<JwtTokenResult, GenericError>> LoginWithEmailOrUsernameOrPhoneNumberJwtToken(string account, string password);
+        Task<OperationResult<JwtTokenResult, GenericError>> LoginWithEmailOrUsernameOrPhoneNumberJwtTokenAsync(string account, string password);
         Task<OperationResult<JwtTokenResult, GenericError>> RefreshToken(string token);
         Task<OperationResult<AccountData, GenericError>> ValidateCredentials(string token);
     }

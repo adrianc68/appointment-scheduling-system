@@ -5,6 +5,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IEditAvailabilityTimeSlot
     {
-        Task<OperationResult<bool, GenericError>> EditAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot);
+        Task<OperationResult<bool, GenericError>> EditAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot);
     }
 }

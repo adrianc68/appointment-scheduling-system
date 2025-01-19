@@ -20,7 +20,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public async Task<bool> ChangeAccountStatusAsync(int idAccount, AccountStatusType status, AccountType accountType)
         {
-            bool isSuccesful = await accountRepository.ChangeAccountStatusType(idAccount, status);
+            bool isSuccesful = await accountRepository.ChangeAccountStatusTypeAsync(idAccount, status);
             if (isSuccesful)
             {
                 if (accountType == AccountType.ASSISTANT)
@@ -79,27 +79,27 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return isUsernameRegistered;
         }
 
-        public async Task<AccountData?> GetAccountDataByEmailOrUsernameOrPhoneNumber(string account, string password)
+        public async Task<AccountData?> GetAccountDataByEmailOrUsernameOrPhoneNumberAsync(string account, string password)
         {
-            AccountData? result = await accountRepository.GetAccountDataByEmailOrUsernameOrPhoneNumber(account, password);
+            AccountData? result = await accountRepository.GetAccountDataByEmailOrUsernameOrPhoneNumberAsync(account, password);
             return result;
         }
 
-        public async Task<List<AccountData>> GetAllAccountsIdsAndUuids()
+        public async Task<List<AccountData>> GetAllAccountsDataAsync()
         {
-            List<AccountData> accountsData = await accountRepository.GetAllAccountData();
+            List<AccountData> accountsData = await accountRepository.GetAllAccountDataAsync();
             return accountsData;
         }
 
-        public async Task<int?> GetAccountIdByUuid(Guid uuid)
+        public async Task<int?> GetAccountIdByUuidAsync(Guid uuid)
         {
-            int? id = await accountRepository.GetAccountIdByUuid(uuid);
+            int? id = await accountRepository.GetAccountIdByUuidAsync(uuid);
             return id;
         }
 
-        public async Task<RoleType?> GetRoleTypeByUuid(Guid accountUuid)
+        public async Task<RoleType?> GetRoleTypeByUuidAsync(Guid accountUuid)
         {
-            RoleType? role = await accountRepository.GetRoleTypeByUuid(accountUuid);
+            RoleType? role = await accountRepository.GetRoleTypeByUuidAsync(accountUuid);
             return role;
         }
 

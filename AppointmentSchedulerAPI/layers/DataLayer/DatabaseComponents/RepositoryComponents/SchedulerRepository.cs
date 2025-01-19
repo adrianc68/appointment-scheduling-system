@@ -253,7 +253,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return serviceOffers;
         }
 
-        public async Task<IEnumerable<BusinessLogicLayer.Model.Types.DateTimeRange>> GetAppointmentDateTimeRangeConflictsByRange(BusinessLogicLayer.Model.Types.DateTimeRange range)
+        public async Task<IEnumerable<BusinessLogicLayer.Model.Types.DateTimeRange>> GetAppointmentDateTimeRangeConflictsByRangeAsync(BusinessLogicLayer.Model.Types.DateTimeRange range)
         {
             using var dbContext = context.CreateDbContext();
             var conflicts = await dbContext.Appointments
@@ -503,7 +503,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isStatusChanged;
         }
 
-        public async Task<IEnumerable<BusinessLogicLayer.Model.Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate)
+        public async Task<IEnumerable<BusinessLogicLayer.Model.Appointment>> GetAllAppoinmentsAsync(DateOnly startDate, DateOnly endDate)
         {
             using var dbContext = context.CreateDbContext();
             var appointmentDB = await dbContext.Appointments
@@ -597,7 +597,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return serviceOffers;
         }
 
-        public async Task<bool> DeleteAvailabilityTimeSlot(int idAvailabilityTimeSlot)
+        public async Task<bool> DeleteAvailabilityTimeSlotAsync(int idAvailabilityTimeSlot)
         {
             using var dbContext = context.CreateDbContext();
             using var transaction = await dbContext.Database.BeginTransactionAsync();
@@ -729,7 +729,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isStatusChanged;
         }
 
-        public async Task<bool> UpdateAvailabilityTimeSlot(BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot)
+        public async Task<bool> UpdateAvailabilityTimeSlotAsync(BusinessLogicLayer.Model.AvailabilityTimeSlot availabilityTimeSlot)
         {
             bool isUpdated = false;
             using var dbContext = context.CreateDbContext();
@@ -785,7 +785,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return hasConflict;
         }
 
-        public async Task<int> GetAppointmentsScheduledCountByClientUuid(int idClient)
+        public async Task<int> GetAppointmentsScheduledCountByClientUuidAsync(int idClient)
         {
             using var dbContext = context.CreateDbContext();
             var count = await dbContext.Appointments
@@ -795,7 +795,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
 
 
-        public async Task<List<int>> GetServiceOfferIdsByServiceId(int idService)
+        public async Task<List<int>> GetServiceOfferIdsByServiceIdAsync(int idService)
         {
             using var dbContext = context.CreateDbContext();
             var servicesOfferIds = await dbContext.ServiceOffers
@@ -805,7 +805,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return servicesOfferIds;
         }
 
-        public async Task<List<int>> GetServiceOfferIdsByAssistantId(int idAssistant)
+        public async Task<List<int>> GetServiceOfferIdsByAssistantIdAsync(int idAssistant)
         {
             using var dbContext = context.CreateDbContext();
             var servicesOfferIds = await dbContext.ServiceOffers
@@ -818,7 +818,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
 
 
-        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByUid(int idAssistant)
+        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAsync(int idAssistant)
         {
             using var dbContext = context.CreateDbContext();
 
@@ -880,7 +880,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         }
 
 
-        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfClientById(int idClient)
+        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfClientByIdAsync(int idClient)
         {
             using var dbContext = context.CreateDbContext();
 
@@ -941,7 +941,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
 
 
-        public async Task<bool> UpdateAppointment(BusinessLogicLayer.Model.Appointment appointment)
+        public async Task<bool> UpdateAppointmentAsync(BusinessLogicLayer.Model.Appointment appointment)
         {
             bool isUpdated = false;
             using var dbContext = context.CreateDbContext();
@@ -991,7 +991,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isUpdated;
         }
 
-        public async Task<List<BusinessLogicLayer.Model.ServiceOffer>> GetServiceOffersByAssistantId(int idAssistant)
+        public async Task<List<BusinessLogicLayer.Model.ServiceOffer>> GetServiceOffersByAssistantIdAsync(int idAssistant)
         {
             using var dbContext = context.CreateDbContext();
             var dbServiceOffers = await dbContext.ServiceOffers
@@ -1022,7 +1022,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return serviceOffers;
         }
 
-        public async Task<List<BusinessLogicLayer.Model.ServiceOffer>> GetServiceOffersByServiceId(int idService)
+        public async Task<List<BusinessLogicLayer.Model.ServiceOffer>> GetServiceOffersByServiceIdAsync(int idService)
         {
             using var dbContext = context.CreateDbContext();
             var dbServiceOffers = await dbContext.ServiceOffers
@@ -1053,7 +1053,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return serviceOffers;
         }
 
-        public async Task<List<int>> GetScheduledOrConfirmedAppoinmentsIdsOfClientById(int idClient)
+        public async Task<List<int>> GetScheduledOrConfirmedAppoinmentsIdsOfClientByIdAsync(int idClient)
         {
             using var dbContext = context.CreateDbContext();
 
@@ -1070,7 +1070,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return dbAppointments;
         }
 
-        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAndRange(int idAssistant, BusinessLogicLayer.Model.Types.DateTimeRange range)
+        public async Task<List<BusinessLogicLayer.Model.Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAndRangeAsync(int idAssistant, BusinessLogicLayer.Model.Types.DateTimeRange range)
         {
             using var dbContext = context.CreateDbContext();
 

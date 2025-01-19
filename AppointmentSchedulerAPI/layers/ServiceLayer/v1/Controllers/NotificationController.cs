@@ -34,7 +34,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 var claims = ClaimsPOCO.GetUserClaims(User);
 
-                List<Notification> notifications = await systemFacade.GetUnreadNotificationsByAccountUuid(claims.Uuid);
+                List<Notification> notifications = await systemFacade.GetUnreadNotificationsByAccountUuidAsync(claims.Uuid);
                 foreach (var notification in notifications)
                 {
 
@@ -101,7 +101,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 var claims = ClaimsPOCO.GetUserClaims(User);
 
-                List<Notification> notifications = await systemFacade.GetNotificationsByAccountUuid(claims.Uuid);
+                List<Notification> notifications = await systemFacade.GetNotificationsByAccountUuidAsync(claims.Uuid);
                 foreach (var notification in notifications)
                 {
 

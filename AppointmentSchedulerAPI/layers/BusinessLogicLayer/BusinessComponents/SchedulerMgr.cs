@@ -30,9 +30,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<AvailabilityTimeSlot>)await schedulerRepository.GetAvailabilityTimeSlotsAsync(startDate, endDate);
         }
 
-        public async Task<List<Appointment>> GetAllAppoinments(DateOnly startDate, DateOnly endDate)
+        public async Task<List<Appointment>> GetAllAppoinmentsAsync(DateOnly startDate, DateOnly endDate)
         {
-            return (List<Appointment>)await schedulerRepository.GetAllAppoinments(startDate, endDate);
+            return (List<Appointment>)await schedulerRepository.GetAllAppoinmentsAsync(startDate, endDate);
         }
 
         public async Task<List<ServiceOffer>> GetAvailableServicesAsync(DateOnly date)
@@ -171,9 +171,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return isStatusChanged;
         }
 
-        public async Task<bool> UpdateAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot)
+        public async Task<bool> UpdateAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot)
         {
-            bool isUpdated = await schedulerRepository.UpdateAvailabilityTimeSlot(availabilityTimeSlot);
+            bool isUpdated = await schedulerRepository.UpdateAvailabilityTimeSlotAsync(availabilityTimeSlot);
 
             if (isUpdated)
             {
@@ -200,13 +200,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         public async Task<int> GetAppointmentsScheduledCountByClientId(int idClient)
         {
-            int totalAppoinemnts = await schedulerRepository.GetAppointmentsScheduledCountByClientUuid(idClient);
+            int totalAppoinemnts = await schedulerRepository.GetAppointmentsScheduledCountByClientUuidAsync(idClient);
             return totalAppoinemnts;
         }
 
-        public async Task<List<DateTimeRange>> GetAppointmentDateTimeRangeConflictsByRange(DateTimeRange range)
+        public async Task<List<DateTimeRange>> GetAppointmentDateTimeRangeConflictsByRangeAsync(DateTimeRange range)
         {
-            List<DateTimeRange> ranges = (List<DateTimeRange>)await schedulerRepository.GetAppointmentDateTimeRangeConflictsByRange(range);
+            List<DateTimeRange> ranges = (List<DateTimeRange>)await schedulerRepository.GetAppointmentDateTimeRangeConflictsByRangeAsync(range);
             return ranges;
         }
 
@@ -317,7 +317,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         private async Task<(bool allCanceled, List<int> failedAppointments)> CancelScheduledOrConfirmedAppointmentsOfClientById(int idClient)
         {
-            List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfClientById(idClient);
+            List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfClientByIdAsync(idClient);
             (bool allCanceled, List<int> failedAppointments) = await this.CancelAppointments(appointments);
             return (allCanceled, failedAppointments);
         }
@@ -333,7 +333,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     EndTime = slotData.EndTime!.Value,
                     Date = slotData.Date!.Value
                 };
-                List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAndRange(slotData.Assistant!.Id!.Value, range);
+                List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAndRangeAsync(slotData.Assistant!.Id!.Value, range);
                 appointments = appointments.DistinctBy(a => a.Id).ToList();
 
                 List<Appointment> appointmentsToCancel = [];
@@ -389,7 +389,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                         EndTime = unavailableSlot.EndTime,
                         Date = slotData.Date!.Value
                     };
-                    appointments.AddRange(await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAndRange(slotData.Assistant!.Id!.Value, range));
+                    appointments.AddRange(await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAndRangeAsync(slotData.Assistant!.Id!.Value, range));
                 }
 
                 appointments = appointments.DistinctBy(a => a.Id).ToList();
@@ -433,7 +433,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         private async Task<((bool allCancelled, List<int> canceledAppointments), (bool allRescheduled, List<int> rescheduledAppointments))> CancelOrRescheduledAppointmentsOfAssistantById(int idAssistant)
         {
-            List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByUid(idAssistant);
+            List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAsync(idAssistant);
 
             List<Appointment> appointmentsToCancel = [];
             List<Appointment> appointmentsToReschedule = [];
@@ -467,14 +467,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
         private async Task<(bool allChanged, List<int> failedServiceOffers)> ChangeAllServiceOfferStatusByServiceIdAsync(int idService, ServiceOfferStatusType status)
         {
-            List<ServiceOffer> serviceOffers = await schedulerRepository.GetServiceOffersByServiceId(idService);
+            List<ServiceOffer> serviceOffers = await schedulerRepository.GetServiceOffersByServiceIdAsync(idService);
             (bool allChanged, List<int> failedServiceOffers) = await ChangeServiceOffersStatus(serviceOffers, status);
             return (allChanged, failedServiceOffers);
         }
 
         private async Task<(bool allChanged, List<int> failedServiceOffers)> ChangeAllServiceOfferStatusByAssistantIdAsync(int idAssistant, ServiceOfferStatusType status)
         {
-            List<ServiceOffer> serviceOffers = await schedulerRepository.GetServiceOffersByAssistantId(idAssistant);
+            List<ServiceOffer> serviceOffers = await schedulerRepository.GetServiceOffersByAssistantIdAsync(idAssistant);
             (bool allChanged, List<int> failedServiceOffers) = await ChangeServiceOffersStatus(serviceOffers, status);
             return (allChanged, failedServiceOffers);
         }
@@ -524,7 +524,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             bool allRescheduled = true;
             foreach (var appointment in appointments)
             {
-                bool isUpdated = await schedulerRepository.UpdateAppointment(appointment);
+                bool isUpdated = await schedulerRepository.UpdateAppointmentAsync(appointment);
 
                 if (!isUpdated)
                 {
@@ -587,7 +587,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 });
             }
 
-            Guid? isCreated = await this.notificationMgr.CreateNotification(notification);
+            Guid? isCreated = await this.notificationMgr.CreateNotificationAsync(notification);
             return isCreated;
         }
 

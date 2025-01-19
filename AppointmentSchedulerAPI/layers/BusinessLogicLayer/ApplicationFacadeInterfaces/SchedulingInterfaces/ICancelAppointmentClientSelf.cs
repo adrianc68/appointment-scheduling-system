@@ -4,6 +4,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface ICancelAppointmentClientSelf
     {
-        Task<OperationResult<bool, GenericError>> CancelAppointmentClientSelf(Guid appointmentUuid, Guid clientUuid);
+        Task<OperationResult<bool, GenericError>> CancelAppointmentClientSelfAsync(Guid appointmentUuid, Guid clientUuid);
     }
 }

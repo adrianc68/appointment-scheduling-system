@@ -22,7 +22,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             this.accountMgr = accountMgr;
         }
 
-        public async Task<Guid?> CreateNotification(Notification notification)
+        public async Task<Guid?> CreateNotificationAsync(Notification notification)
         {
             foreach (var recipient in notification.Recipients)
             {
@@ -36,7 +36,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 
             if (notification.Recipients.Count == 0)
             {
-                List<AccountData> accountsIds = await accountMgr.GetAllAccountsIdsAndUuids();
+                List<AccountData> accountsIds = await accountMgr.GetAllAccountsDataAsync();
                 notification.Recipients = accountsIds.Select(x => new NotificationRecipient
                 {
                     RecipientData = new NotificationRecipientData
@@ -52,7 +52,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             }
 
             notification.Uuid = Guid.CreateVersion7();
-            bool isRegistered = await notificationRepository.CreateNotification(notification);
+            bool isRegistered = await notificationRepository.CreateNotificationAsync(notification);
 
             if (!isRegistered)
             {
@@ -104,21 +104,21 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return notification.Uuid.Value;
         }
 
-        public async Task<List<Notification>> GetNotificationsByAccountUuid(Guid uuid)
+        public async Task<List<Notification>> GetNotificationsByAccountUuidAsync(Guid uuid)
         {
-            List<Notification> notifications = (List<Notification>)await notificationRepository.GetNotificationsByAccountUuid(uuid);
+            List<Notification> notifications = (List<Notification>)await notificationRepository.GetNotificationsByAccountUuidAsync(uuid);
             return notifications;
         }
 
-        public async Task<List<Notification>> GetUnreadNotificationsByAccountUuid(Guid uuid)
+        public async Task<List<Notification>> GetUnreadNotificationsByAccountUuidAsync(Guid uuid)
         {
-            List<Notification> notifications = (List<Notification>)await notificationRepository.GetUnreadNotificationsByAccountUuid(uuid);
+            List<Notification> notifications = (List<Notification>)await notificationRepository.GetUnreadNotificationsByAccountUuidAsync(uuid);
             return notifications;
         }
 
-        public async Task<bool> ChangeNotificationStatusByNotificationUuid(Guid uuid, Guid accountUuid, NotificationStatusType status)
+        public async Task<bool> ChangeNotificationStatusByNotificationUuidAsync(Guid uuid, Guid accountUuid, NotificationStatusType status)
         {
-            bool isStatusChanged = await notificationRepository.ChangeNotificationStatusByNotificationUuid(uuid, accountUuid, status);
+            bool isStatusChanged = await notificationRepository.ChangeNotificationStatusByNotificationUuidAsync(uuid, accountUuid, status);
             return isStatusChanged;
         }
 

@@ -8,10 +8,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<bool> IsUsernameRegisteredAsync(string username);
         Task<bool> IsEmailRegisteredAsync(string email);
         Task<bool> IsPhoneNumberRegisteredAsync(string phoneNumber);
-        Task<bool> ChangeAccountStatusType(int idAccount, AccountStatusType status);
-        Task<RoleType?> GetRoleTypeByUuid(Guid accountUuid);
-        Task<AccountData?> GetAccountDataByEmailOrUsernameOrPhoneNumber(string account, string password);
-        Task<int?> GetAccountIdByUuid(Guid uuid);
-        Task<List<AccountData>> GetAllAccountData();
+        Task<bool> ChangeAccountStatusTypeAsync(int idAccount, AccountStatusType status);
+        Task<RoleType?> GetRoleTypeByUuidAsync(Guid accountUuid);
+        Task<AccountData?> GetAccountDataByEmailOrUsernameOrPhoneNumberAsync(string account, string password);
+        Task<int?> GetAccountIdByUuidAsync(Guid uuid);
+        Task<List<AccountData>> GetAllAccountDataAsync();
     }
 }

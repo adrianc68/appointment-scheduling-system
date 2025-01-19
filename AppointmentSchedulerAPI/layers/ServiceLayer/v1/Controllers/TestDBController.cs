@@ -31,7 +31,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         {
             var claims = ClaimsPOCO.GetUserClaims(User);
             var appointmentData = await schedulerMgr.GetAppointmentByUuidAsync(request.AppointmentUuid!.Value);
-            var accountData = await accountMgr.GetAccountIdByUuid(claims.Uuid);
+            var accountData = await accountMgr.GetAccountIdByUuidAsync(claims.Uuid);
 
 
             AppointmentNotification notificationApp = new AppointmentNotification
@@ -86,9 +86,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
             // await this.notificationMgr.CreateNotification(notification, NotificationUsersToSendType.SEND_TO_EVERYONE);
-            await this.notificationMgr.CreateNotification(notificationApp);
-            await this.notificationMgr.CreateNotification(notificationGen);
-            await this.notificationMgr.CreateNotification(notificationSys);
+            await this.notificationMgr.CreateNotificationAsync(notificationApp);
+            await this.notificationMgr.CreateNotificationAsync(notificationGen);
+            await this.notificationMgr.CreateNotificationAsync(notificationSys);
 
 
             // await notificationMgr.NotifyAllAsync("Mensaje enviado para uno");

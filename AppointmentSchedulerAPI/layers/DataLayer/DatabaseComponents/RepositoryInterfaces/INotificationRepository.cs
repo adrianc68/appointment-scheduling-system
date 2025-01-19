@@ -5,10 +5,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 {
     public interface INotificationRepository
     {
-        Task<bool> CreateNotification(Notification notification);
-        Task<IEnumerable<Notification>> GetNotificationsByAccountUuid(Guid uuid);
-        Task<IEnumerable<Notification>> GetUnreadNotificationsByAccountUuid(Guid uuid);
-         Task<bool> IsNotificationRegisteredBysUuidAndAccountUuid(Guid uuid, Guid accountUuid);
-        Task<bool> ChangeNotificationStatusByNotificationUuid(Guid uuid, Guid accountUuid, NotificationStatusType status);
+        Task<bool> CreateNotificationAsync(Notification notification);
+        Task<IEnumerable<Notification>> GetNotificationsByAccountUuidAsync(Guid uuid);
+        Task<IEnumerable<Notification>> GetUnreadNotificationsByAccountUuidAsync(Guid uuid);
+         Task<bool> IsNotificationRegisteredBysUuidAndAccountUuidAsync(Guid uuid, Guid accountUuid);
+        Task<bool> ChangeNotificationStatusByNotificationUuidAsync(Guid uuid, Guid accountUuid, NotificationStatusType status);
     }
 }

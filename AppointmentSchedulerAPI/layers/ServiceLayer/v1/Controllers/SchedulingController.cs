@@ -91,7 +91,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             }).ToList();
 
 
-            OperationResult<DateTime, GenericError> result = await systemFacade.BlockTimeRange(services, range, dto.ClientUuid);
+            OperationResult<DateTime, GenericError> result = await systemFacade.BlockTimeRangeAsync(services, range, dto.ClientUuid);
             if (!result.IsSuccessful)
             {
                 if (result.Errors != null && result.Errors.Any())
@@ -141,7 +141,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     }).ToList()
                 };
 
-                OperationResult<bool, GenericError> result = await systemFacade.EditAvailabilityTimeSlot(availabilityTimeSlot);
+                OperationResult<bool, GenericError> result = await systemFacade.EditAvailabilityTimeSlotAsync(availabilityTimeSlot);
                 if (result.IsSuccessful)
                 {
                     isUpdated = result.Result;
@@ -713,7 +713,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isConfirmed = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.ConfirmAppointment(dto.Uuid);
+                OperationResult<bool, GenericError> result = await systemFacade.ConfirmAppointmentAsync(dto.Uuid);
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;
@@ -766,7 +766,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             try
             {
                 var claims = ClaimsPOCO.GetUserClaims(User);
-                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelf(dto.AppointmentUuid, claims.Uuid);
+                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelfAsync(dto.AppointmentUuid, claims.Uuid);
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;
@@ -792,7 +792,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isConfirmed = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentStaffAssisted(dto.AppointmentUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentStaffAssistedAsync(dto.AppointmentUuid);
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;

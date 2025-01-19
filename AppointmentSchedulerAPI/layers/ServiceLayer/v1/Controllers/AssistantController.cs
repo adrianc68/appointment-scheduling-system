@@ -145,7 +145,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Password = dto.Password,
                     Username = dto.Username
                 };
-                OperationResult<Guid, GenericError> result = await systemFacade.RegisterAssistant(assistant);
+                OperationResult<Guid, GenericError> result = await systemFacade.RegisterAssistantAsync(assistant);
                 if (result.IsSuccessful)
                 {
                     guid = result.Result;
@@ -179,7 +179,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Password = dto.Password,
                     Username = dto.Username
                 };
-                OperationResult<bool, GenericError> result = await systemFacade.UpdateAssistant(assistant);
+                OperationResult<bool, GenericError> result = await systemFacade.UpdateAssistantAsync(assistant);
                 if (result.IsSuccessful)
                 {
                     isUpdated = result.Result;

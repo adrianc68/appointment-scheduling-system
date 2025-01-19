@@ -29,7 +29,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             JwtTokenResult token;
             try
             {
-                OperationResult<JwtTokenResult, GenericError> result = await systemFacade.LoginWithEmailOrUsernameOrPhoneNumberJwtToken(dto.Account, dto.Password);
+                OperationResult<JwtTokenResult, GenericError> result = await systemFacade.LoginWithEmailOrUsernameOrPhoneNumberJwtTokenAsync(dto.Account, dto.Password);
                 if (result.IsSuccessful)
                 {
                     token = result.Result!;

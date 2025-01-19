@@ -4,7 +4,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IGetNotification
     {
-        Task<List<Notification>> GetNotificationsByAccountUuid(Guid uuid);
-        Task<List<Notification>> GetUnreadNotificationsByAccountUuid(Guid uuid);
+        Task<List<Notification>> GetNotificationsByAccountUuidAsync(Guid uuid);
+        Task<List<Notification>> GetUnreadNotificationsByAccountUuidAsync(Guid uuid);
     }
 }

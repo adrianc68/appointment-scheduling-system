@@ -38,26 +38,26 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             this.notificationMgr = notificationMgr;
         }
 
-        public Task<OperationResult<bool, GenericError>> EditAppointment(Appointment appointment)
+        public Task<OperationResult<bool, GenericError>> EditAppointmentAsync(Appointment appointment)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<List<Notification>> GetNotificationsByAccountUuid(Guid uuid)
+        public async Task<List<Notification>> GetNotificationsByAccountUuidAsync(Guid uuid)
         {
-            List<Notification> notifications = await notificationMgr.GetNotificationsByAccountUuid(uuid);
+            List<Notification> notifications = await notificationMgr.GetNotificationsByAccountUuidAsync(uuid);
             return notifications;
         }
 
-        public async Task<List<Notification>> GetUnreadNotificationsByAccountUuid(Guid uuid)
+        public async Task<List<Notification>> GetUnreadNotificationsByAccountUuidAsync(Guid uuid)
         {
-            List<Notification> notifications = await notificationMgr.GetUnreadNotificationsByAccountUuid(uuid);
+            List<Notification> notifications = await notificationMgr.GetUnreadNotificationsByAccountUuidAsync(uuid);
             return notifications;
         }
 
         public async Task<bool> MarkNotificationAsReadAsync(Guid uuid, Guid accountUuid)
         {
-            bool result = await notificationMgr.ChangeNotificationStatusByNotificationUuid(uuid, accountUuid, Model.Types.Notification.NotificationStatusType.READ);
+            bool result = await notificationMgr.ChangeNotificationStatusByNotificationUuidAsync(uuid, accountUuid, Model.Types.Notification.NotificationStatusType.READ);
             return result;
         }
 
@@ -66,7 +66,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return timeRangeLockMgr.GetBlockedTimeSlotsByDate(date);
         }
 
-        public async Task<OperationResult<DateTime, GenericError>> BlockTimeRange(List<ScheduledService> services, DateTimeRange range, Guid clientUuid)
+        public async Task<OperationResult<DateTime, GenericError>> BlockTimeRangeAsync(List<ScheduledService> services, DateTimeRange range, Guid clientUuid)
         {
             DateTime currentDateTime = DateTime.Now;
             int MAX_DAYS_FROM_NOW = int.Parse(envService.Get("MAX_DAYS_FOR_SCHEDULE"));
@@ -256,7 +256,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return timeRangeLockMgr.UnblockTimeSlot(clientUuid);
         }
 
-        public async Task<OperationResult<bool, GenericError>> EditAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot)
+        public async Task<OperationResult<bool, GenericError>> EditAvailabilityTimeSlotAsync(AvailabilityTimeSlot availabilityTimeSlot)
         {
             AvailabilityTimeSlot? slotData = await schedulerMgr.GetAvailabilityTimeSlotByUuidAsync(availabilityTimeSlot.Uuid!.Value);
 
@@ -318,7 +318,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_HAS_CONFLICTS);
             }
 
-            bool isUpdated = await schedulerMgr.UpdateAvailabilityTimeSlot(availabilityTimeSlot);
+            bool isUpdated = await schedulerMgr.UpdateAvailabilityTimeSlotAsync(availabilityTimeSlot);
             if (!isUpdated)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred"), MessageCodeType.UPDATE_ERROR);
@@ -354,7 +354,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
         public async Task<List<Appointment>> GetAllAppoinmentsAsync(DateOnly startDate, DateOnly endDate)
         {
-            List<Appointment>? appointment = await schedulerMgr.GetAllAppoinments(startDate, endDate);
+            List<Appointment>? appointment = await schedulerMgr.GetAllAppoinmentsAsync(startDate, endDate);
             return appointment;
         }
 
@@ -380,7 +380,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return await schedulerMgr.GetConflictingServicesByDateTimeRangeAsync(range);
         }
 
-        public async Task<OperationResult<bool, GenericError>> UpdateAssistant(Assistant assistant)
+        public async Task<OperationResult<bool, GenericError>> UpdateAssistantAsync(Assistant assistant)
         {
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistant.Uuid!.Value);
             if (assistantData == null)
@@ -420,7 +420,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 }
             }
 
-            bool isUpdated = await assistantMgr.UpdateAssistant(assistant);
+            bool isUpdated = await assistantMgr.UpdateAssistantAsync(assistant);
             if (!isUpdated)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -468,7 +468,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 }
             }
 
-            bool isUpdated = await clientMgr.UpdateClient(client);
+            bool isUpdated = await clientMgr.UpdateClientAsync(client);
             if (!isUpdated)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -502,7 +502,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return OperationResult<bool, GenericError>.Failure(new GenericError($"Service name <{service.Name}> is already registered"), MessageCodeType.SERVICE_NAME_ALREADY_REGISTERED);
                 }
             }
-            bool isUpdated = await serviceMgr.UpdateService(service);
+            bool isUpdated = await serviceMgr.UpdateServiceAsync(service);
             if (!isUpdated)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has occurred"), MessageCodeType.UPDATE_ERROR);
@@ -510,7 +510,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<Guid, GenericError>> RegisterAssistant(Assistant assistant)
+        public async Task<OperationResult<Guid, GenericError>> RegisterAssistantAsync(Assistant assistant)
         {
             bool IsUsernameRegistered = await accountMgr.IsUsernameRegisteredAsync(assistant.Username!);
             if (IsUsernameRegistered)
@@ -805,7 +805,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return checkStatus;
             }
 
-            bool isStatusChanged = await serviceMgr.ChangeServiceStatusType(serviceData!.Id!.Value, ServiceStatusType.ENABLED);
+            bool isStatusChanged = await serviceMgr.ChangeServiceStatusTypeAsync(serviceData!.Id!.Value, ServiceStatusType.ENABLED);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -822,7 +822,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return checkStatus;
             }
 
-            bool isStatusChanged = await serviceMgr.ChangeServiceStatusType(serviceData!.Id!.Value, ServiceStatusType.DISABLED);
+            bool isStatusChanged = await serviceMgr.ChangeServiceStatusTypeAsync(serviceData!.Id!.Value, ServiceStatusType.DISABLED);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -839,7 +839,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return checkStatus;
             }
 
-            bool isStatusChanged = await serviceMgr.ChangeServiceStatusType(serviceData!.Id!.Value, ServiceStatusType.DELETED);
+            bool isStatusChanged = await serviceMgr.ChangeServiceStatusTypeAsync(serviceData!.Id!.Value, ServiceStatusType.DELETED);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -998,7 +998,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> ConfirmAppointment(Guid appointmentUuid)
+        public async Task<OperationResult<bool, GenericError>> ConfirmAppointmentAsync(Guid appointmentUuid)
         {
             Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(appointmentUuid);
             if (appointment == null)
@@ -1040,7 +1040,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> CancelAppointmentClientSelf(Guid appointmentUuid, Guid ClientUuid)
+        public async Task<OperationResult<bool, GenericError>> CancelAppointmentClientSelfAsync(Guid appointmentUuid, Guid ClientUuid)
         {
             Client? clientData = await clientMgr.GetClientByUuidAsync(ClientUuid);
             if (clientData == null)
@@ -1089,7 +1089,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> CancelAppointmentStaffAssisted(Guid appointmentUuid)
+        public async Task<OperationResult<bool, GenericError>> CancelAppointmentStaffAssistedAsync(Guid appointmentUuid)
         {
             Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(appointmentUuid);
             if (appointment == null)
@@ -1127,16 +1127,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         public async Task<OperationResult<Guid, GenericError>> ScheduleAppointmentAsClientAsync(Appointment appointment)
         {
             appointment.Status = AppointmentStatusType.SCHEDULED;
-            return await ScheduleAppointment(appointment);
+            return await ScheduleAppointmentAsync(appointment);
         }
 
         public async Task<OperationResult<Guid, GenericError>> ScheduleAppointmentAsStaffAsync(Appointment appointment)
         {
             appointment.Status = AppointmentStatusType.CONFIRMED;
-            return await ScheduleAppointment(appointment);
+            return await ScheduleAppointmentAsync(appointment);
         }
 
-        private async Task<OperationResult<Guid, GenericError>> ScheduleAppointment(Appointment appointment)
+        private async Task<OperationResult<Guid, GenericError>> ScheduleAppointmentAsync(Appointment appointment)
         {
             DateTime currentDateTime = DateTime.Now;
             int MAX_DAYS_FROM_NOW = int.Parse(envService.Get("MAX_DAYS_FOR_SCHEDULE"));
@@ -1359,9 +1359,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(UuidRegistered.Value);
         }
 
-        public async Task<OperationResult<JwtTokenResult, GenericError>> LoginWithEmailOrUsernameOrPhoneNumberJwtToken(string account, string password)
+        public async Task<OperationResult<JwtTokenResult, GenericError>> LoginWithEmailOrUsernameOrPhoneNumberJwtTokenAsync(string account, string password)
         {
-            AccountData? accountData = await accountMgr.GetAccountDataByEmailOrUsernameOrPhoneNumber(account, password);
+            AccountData? accountData = await accountMgr.GetAccountDataByEmailOrUsernameOrPhoneNumberAsync(account, password);
             if (accountData == null)
             {
                 return OperationResult<JwtTokenResult, GenericError>.Failure(new GenericError("Account not found"), MessageCodeType.ACCOUNT_NOT_FOUND);

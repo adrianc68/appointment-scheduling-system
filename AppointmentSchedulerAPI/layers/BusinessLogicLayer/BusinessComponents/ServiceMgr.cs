@@ -17,9 +17,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             this.serviceRepository = serviceRepository;
         }
 
-        public async Task<bool> ChangeServiceStatusType(int idService, ServiceStatusType status)
+        public async Task<bool> ChangeServiceStatusTypeAsync(int idService, ServiceStatusType status)
         {
-            bool isStatusChanged = await serviceRepository.ChangeServiceStatusType(idService, status);
+            bool isStatusChanged = await serviceRepository.ChangeServiceStatusTypeAsync(idService, status);
             if (isStatusChanged)
             {
                 ServiceEvent serviceEvent = new ServiceEvent
@@ -80,9 +80,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return serviceId != null;
         }
 
-        public async Task<bool> UpdateService(Service service)
+        public async Task<bool> UpdateServiceAsync(Service service)
         {
-            bool isUpdated = await serviceRepository.UpdateService(service);
+            bool isUpdated = await serviceRepository.UpdateServiceAsync(service);
             return isUpdated;
         }
 
