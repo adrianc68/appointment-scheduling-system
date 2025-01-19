@@ -59,6 +59,10 @@
 
 ![](images/any/Interface%20Responsibility%20Diagram%20refined.png)
 
+##### Interface Responsibility Diagram or Logical Model for Notification component
+
+![](images/any/Notification%20Interface%20Responsibility%20Diagram.png)
+
 ##### Physical Data Model
 
 ![](images/any/physical%20data%20model.png)
@@ -554,6 +558,7 @@ The objective of starting an Attribute-Driven Design process is to establish a s
 | QA-5 Performance        | Medium                     | High                         |
 | QA-7 Testability        | Medium                     | Medium                       |
 | QA-4 Usability          | Low                        | Medium                       |
+|                         |                            |                              |
 
 | Category                        | Details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
