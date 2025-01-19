@@ -645,6 +645,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         }
 
 
+
+
         public async Task<OperationResult<bool, GenericError>> DeleteServiceOfferAsync(Guid serviceOfferUuid)
         {
             ServiceOffer? serviceOfferData = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
@@ -998,22 +1000,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         public async Task<OperationResult<bool, GenericError>> DeleteAvailabilityTimeSlotAsync(Guid uuid)
         {
             AvailabilityTimeSlot? slotData = await schedulerMgr.GetAvailabilityTimeSlotByUuidAsync(uuid);
-            if (slotData == null)
+            OperationResult<bool, GenericError> checkStatus = this.CheckAvailabilityTimeSlotStatusType(slotData, AvailabilityTimeSlotStatusType.DELETED);
+            if (!checkStatus.IsSuccessful)
             {
-                GenericError genericError = new GenericError($"Availability time slot with UUID: <{uuid}> is not registered", []);
-                genericError.AddData("AvailabilityTimeSlotUuid", uuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_FOUND);
+                return checkStatus;
             }
 
-            if (slotData.Status == AvailabilityTimeSlotStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"Availability time slot with UUID: <{uuid}> was deleted", []);
-                genericError.AddData("AvailabilityTimeSlotUuid", uuid);
-                genericError.AddData("Status", slotData.Status.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_DELETED);
-            }
-
-            bool isStatusChanged = await schedulerMgr.ChangeAvailabilityStatusTypeAsync(slotData.Id!.Value, AvailabilityTimeSlotStatusType.DELETED);
+            bool isStatusChanged = await schedulerMgr.ChangeAvailabilityStatusTypeAsync(slotData!.Id!.Value, AvailabilityTimeSlotStatusType.DELETED);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -1024,30 +1017,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         public async Task<OperationResult<bool, GenericError>> DisableAvailabilityTimeSlotAsync(Guid uuid)
         {
             AvailabilityTimeSlot? slotData = await schedulerMgr.GetAvailabilityTimeSlotByUuidAsync(uuid);
-            if (slotData == null)
+            OperationResult<bool, GenericError> checkStatus = this.CheckAvailabilityTimeSlotStatusType(slotData, AvailabilityTimeSlotStatusType.DISABLED);
+            if (!checkStatus.IsSuccessful)
             {
-                GenericError genericError = new GenericError($"Availability time slot with UUID: <{uuid}> is not registered", []);
-                genericError.AddData("AvailabilityTimeSlotUuid", uuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_FOUND);
+                return checkStatus;
             }
 
-            if (slotData.Status == AvailabilityTimeSlotStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"Availability time slot with UUID: <{uuid}> was deleted", []);
-                genericError.AddData("AvailabilityTimeSlotUuid", uuid);
-                genericError.AddData("Status", slotData.Status.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_DELETED);
-            }
-
-            if (slotData.Status == AvailabilityTimeSlotStatusType.DISABLED)
-            {
-                GenericError genericError = new GenericError($"Availability time slot with UUID: <{uuid}> is already disabled", []);
-                genericError.AddData("AvailabilityTimeSlotUuid", uuid);
-                genericError.AddData("Status", slotData.Status.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_DISABLED);
-            }
-
-            bool isStatusChanged = await schedulerMgr.ChangeAvailabilityStatusTypeAsync(slotData.Id!.Value, AvailabilityTimeSlotStatusType.DISABLED);
+            bool isStatusChanged = await schedulerMgr.ChangeAvailabilityStatusTypeAsync(slotData!.Id!.Value, AvailabilityTimeSlotStatusType.DISABLED);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -1058,35 +1034,61 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         public async Task<OperationResult<bool, GenericError>> EnableAvailabilityTimeSlotAsync(Guid uuid)
         {
             AvailabilityTimeSlot? slotData = await schedulerMgr.GetAvailabilityTimeSlotByUuidAsync(uuid);
-            if (slotData == null)
+            OperationResult<bool, GenericError> checkStatus = this.CheckAvailabilityTimeSlotStatusType(slotData, AvailabilityTimeSlotStatusType.ENABLED);
+            if (!checkStatus.IsSuccessful)
             {
-                GenericError genericError = new GenericError($"Availability time slot with UUID: <{uuid}> is not registered", []);
-                genericError.AddData("AvailabilityTimeSlotUuid", uuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_FOUND);
+                return checkStatus;
             }
 
-            if (slotData.Status == AvailabilityTimeSlotStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"Availability time slot with UUID: <{uuid}> was deleted", []);
-                genericError.AddData("AvailabilityTimeSlotUuid", uuid);
-                genericError.AddData("Status", slotData.Status.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_DELETED);
-            }
-
-            if (slotData.Status == AvailabilityTimeSlotStatusType.ENABLED)
-            {
-                GenericError genericError = new GenericError($"Availability time slot with UUID: <{uuid}> is already enabled", []);
-                genericError.AddData("AvailabilityTimeSlotUuid", uuid);
-                genericError.AddData("Status", slotData.Status.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_ENABLED);
-            }
-
-            bool isStatusChanged = await schedulerMgr.ChangeAvailabilityStatusTypeAsync(slotData.Id!.Value, AvailabilityTimeSlotStatusType.ENABLED);
+            bool isStatusChanged = await schedulerMgr.ChangeAvailabilityStatusTypeAsync(slotData!.Id!.Value, AvailabilityTimeSlotStatusType.ENABLED);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
             }
             return OperationResult<bool, GenericError>.Success(true);
+        }
+
+
+        private OperationResult<bool, GenericError> CheckAvailabilityTimeSlotStatusType(AvailabilityTimeSlot? slotData, AvailabilityTimeSlotStatusType newStatus)
+        {
+            if (slotData == null)
+            {
+                GenericError genericError = new GenericError($"AvailabilityTimeSlot not found", []);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_FOUND);
+            }
+
+            if (slotData.Status == AvailabilityTimeSlotStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"AvailabilityTimeSlot with UUID: <{slotData.Uuid!.Value}> was deleted", []);
+                genericError.AddData("AvailabilityTimeSlotUuid", slotData.Uuid);
+                genericError.AddData("Status", slotData.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_DELETED);
+            }
+
+            if (newStatus == slotData.Status)
+            {
+                string message;
+                MessageCodeType messageCodeType;
+                if (newStatus == AvailabilityTimeSlotStatusType.ENABLED)
+                {
+                    message = $"AvailabilityTimeSlot with UUID: <{slotData.Uuid}> is already enabled";
+                    messageCodeType = MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_ENABLED;
+                }
+                else if (newStatus == AvailabilityTimeSlotStatusType.DISABLED)
+                {
+                    message = $"AvailabilityTimeSlot with UUID: <{slotData.Uuid}> is already disabled";
+                    messageCodeType = MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_DISABLED;
+                }
+                else
+                {
+                    throw new KeyNotFoundException($"The value '{newStatus}' was not found in the expected {nameof(AvailabilityTimeSlotStatusType)} collection.");
+                }
+                GenericError genericError = new GenericError(message);
+                genericError.AddData("AvailabilityTimeSlotUuid", slotData!.Uuid!.Value);
+                genericError.AddData("Status", slotData.Status);
+                return OperationResult<bool, GenericError>.Failure(genericError, messageCodeType);
+            }
+            return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
         }
 
 

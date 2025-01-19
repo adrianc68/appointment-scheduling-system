@@ -158,7 +158,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isUpdated, ApiVersionEnum.V1);
         }
 
-        [HttpDelete("availabilityTimeSlot")]
+        [HttpDelete("availabilityTimeSlot/delete")]
         [Authorize]
         [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> DeleteAvailabilityTimeSlot([FromBody] DeleteAvailabilityTimeSlotDTO dto)
@@ -212,7 +212,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [HttpPatch("availabilityTimeSlot/enable")]
         [Authorize]
         [AllowedRoles(RoleType.ADMINISTRATOR)]
-        public async Task<IActionResult> EnableAvailabilityTimeSlot([FromBody] DisableAvailabilityTimeSlotDTO dto)
+        public async Task<IActionResult> EnableAvailabilityTimeSlot([FromBody] EnableAvailabilityTimeSlotDTO dto)
         {
             bool isStatusChanged = false;
             try
@@ -233,6 +233,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             }
             return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
         }
+
 
         [HttpPost("availabilityTimeSlot")]
         [Authorize]
