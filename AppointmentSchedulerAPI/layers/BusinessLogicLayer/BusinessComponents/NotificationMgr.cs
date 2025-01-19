@@ -101,7 +101,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 };
                 SendNotificationToUsers(notificationDTO, notification.Recipients, notification.Options.Channels);
             }
-
             return notification.Uuid.Value;
         }
 
@@ -138,6 +137,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         }
 
         private async void SendNotificationToUsers<TNotification>(TNotification dto, HashSet<NotificationRecipient> users, List<NotificationChannelType> channels)
+            where TNotification : NotificationDTO
         {
             string notificationJson = SerializeObjectToJson(dto);
 
@@ -148,7 +148,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     switch (channel)
                     {
                         case NotificationChannelType.WEB_APPLICATION:
-                            await webNotifier.SendToUserAsync(recipient.RecipientData.UserAccountUuid.ToString(), notificationJson);
+                            await webNotifier.SendToUserAsync(recipient.RecipientData.UserAccountUuid.ToString(), dto);
                             break;
                         case NotificationChannelType.EMAIL:
                             throw new NotImplementedException();

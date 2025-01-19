@@ -533,33 +533,33 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     };
 
 
-                    // foreach (var scheduledService in appointment.ScheduledServices!)
-                    // {
-                    //     var assistantData = scheduledService!.ServiceOffer!.Assistant;
-                    //     var recipient = new NotificationRecipient
-                    //     {
-                    //         RecipientData = new NotificationRecipientData
-                    //         {
-                    //             Email = assistantData!.Email!,
-                    //             PhoneNumber = assistantData!.PhoneNumber!,
-                    //             UserAccountId = assistantData!.Id!.Value,
-                    //             UserAccountUuid = assistantData.Uuid!.Value
-                    //         },
-                    //     };
+                    foreach (var scheduledService in appointment.ScheduledServices!)
+                    {
+                        var assistantData = scheduledService!.ServiceOffer!.Assistant;
+                        var recipient = new NotificationRecipient
+                        {
+                            RecipientData = new NotificationRecipientData
+                            {
+                                Email = assistantData!.Email!,
+                                PhoneNumber = assistantData!.PhoneNumber!,
+                                UserAccountId = assistantData!.Id!.Value,
+                                UserAccountUuid = assistantData.Uuid!.Value
+                            },
+                        };
 
-                    //     notification.Recipients.Add(recipient);
-                    // }
+                        notification.Recipients.Add(recipient);
+                    }
 
-                    // notification.Recipients.Add(new NotificationRecipient
-                    // {
-                    //     RecipientData = new NotificationRecipientData
-                    //     {
-                    //         Email = appointment.Client!.Email!,
-                    //         PhoneNumber = appointment.Client.PhoneNumber!,
-                    //         UserAccountId = appointment.Client!.Id!.Value,
-                    //         UserAccountUuid = appointment.Client.Uuid!.Value
-                    //     },
-                    // });
+                    notification.Recipients.Add(new NotificationRecipient
+                    {
+                        RecipientData = new NotificationRecipientData
+                        {
+                            Email = appointment.Client!.Email!,
+                            PhoneNumber = appointment.Client.PhoneNumber!,
+                            UserAccountId = appointment.Client!.Id!.Value,
+                            UserAccountUuid = appointment.Client.Uuid!.Value
+                        },
+                    });
 
                     await this.notificationMgr.CreateNotification(notification);
 

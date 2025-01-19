@@ -1,4 +1,7 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
+using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.SignalR;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents.SignalRNotifier
@@ -56,21 +59,24 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents.S
             await Groups.RemoveFromGroupAsync(connectionId, groupName);
         }
 
-        public async Task SendToAllAsync(string message)
+        public async Task SendToAllAsync(NotificationDTO message)
         {
-            await hubContext.Clients.All.SendAsync("ReceiveNotification", message);
+            string messageData = SerializaNotification(message);
+            await hubContext.Clients.All.SendAsync("ReceiveNotification", messageData);
         }
 
-        public async Task SendToGroupAsync(string groupName, string message)
+        public async Task SendToGroupAsync(string groupName, NotificationDTO message)
         {
-            await hubContext.Clients.Group(groupName).SendAsync("ReceiveNotification", message);
+            string messageData = SerializaNotification(message);
+            await hubContext.Clients.Group(groupName).SendAsync("ReceiveNotification", messageData);
         }
 
-        public async Task SendToUserAsync(string recipient, string message)
+        public async Task SendToUserAsync(string recipient, NotificationDTO message)
         {
             if (userConnections.TryGetValue(recipient, out var connectionId))
             {
-                await hubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", message);
+                string messageData = SerializaNotification(message);
+                await hubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", messageData);
             }
             else
             {
@@ -79,5 +85,24 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents.S
             }
             await Task.CompletedTask;
         }
+
+
+        public string SerializaNotification(object notificationDTO)
+        {
+            var options = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+                WriteIndented = true,
+                Converters =
+                {
+                    new JsonStringEnumConverter(),
+                 },
+            };
+
+            string serializedNotification = JsonSerializer.Serialize(notificationDTO, options);
+            return serializedNotification;
+        }
+
+
     }
 }

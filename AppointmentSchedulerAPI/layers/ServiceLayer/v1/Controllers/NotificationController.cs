@@ -42,7 +42,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new AppointmentNotificationDTO
                         {
-                            // Status = appointmentNotification.Status!.Value,
                             Uuid = appointmentNotification.Uuid!.Value,
                             CreatedAt = appointmentNotification!.CreatedAt!.Value,
                             Message = appointmentNotification.Message!,
@@ -58,7 +57,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new SystemNotificationDTO
                         {
-                            // Status = systemNotification.Status!.Value,
                             Uuid = systemNotification.Uuid!.Value,
                             CreatedAt = systemNotification!.CreatedAt!.Value,
                             Message = systemNotification.Message!,
@@ -71,7 +69,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new GeneralNotificationDTO
                         {
-                            // Status = generalNotification.Status!.Value,
                             Uuid = generalNotification.Uuid!.Value,
                             CreatedAt = generalNotification!.CreatedAt!.Value,
                             Message = generalNotification.Message!,
@@ -112,7 +109,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new AppointmentNotificationDTO
                         {
-                            // Status = appointmentNotification.Status!.Value,
                             Uuid = appointmentNotification.Uuid!.Value,
                             CreatedAt = appointmentNotification!.CreatedAt!.Value,
                             Message = appointmentNotification.Message!,
@@ -128,7 +124,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new SystemNotificationDTO
                         {
-                            // Status = systemNotification.Status!.Value,
                             Uuid = systemNotification.Uuid!.Value,
                             CreatedAt = systemNotification!.CreatedAt!.Value,
                             Message = systemNotification.Message!,
@@ -141,7 +136,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     {
                         notificationDTOs.Add(new GeneralNotificationDTO
                         {
-                            // Status = generalNotification.Status!.Value,
                             Uuid = generalNotification.Uuid!.Value,
                             CreatedAt = generalNotification!.CreatedAt!.Value,
                             Message = generalNotification.Message!,
