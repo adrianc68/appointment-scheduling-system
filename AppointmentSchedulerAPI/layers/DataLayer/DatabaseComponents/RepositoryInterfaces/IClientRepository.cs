@@ -4,10 +4,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 {
     public interface IClientRepository
     {
+        Task<bool> AddClientAsync(Client client);
+        Task<bool> UpdateClientAsync(Client assistant);
         Task<Client?> GetClientByUuidAsync(Guid uuid);
         Task<int?> GetClientIdByUuidAsync(Guid uuid);
         Task<IEnumerable<Client>> GetAllClientsAsync();
-        Task<bool> AddClientAsync(Client client);
-        Task<bool> UpdateClientAsync(Client assistant);
     }
 }

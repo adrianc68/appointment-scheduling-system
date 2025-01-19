@@ -6,8 +6,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
     public interface INotificationMgt
     {
         Task<Guid?> CreateNotificationAsync(Notification notification);
+        Task<bool> ChangeNotificationStatusByNotificationUuidAsync(Guid uuid, Guid accountUuid, NotificationStatusType status);
         Task<List<Notification>> GetNotificationsByAccountUuidAsync(Guid uuid);
         Task<List<Notification>> GetUnreadNotificationsByAccountUuidAsync(Guid uuid);
-        Task<bool> ChangeNotificationStatusByNotificationUuidAsync(Guid uuid, Guid accountUuid, NotificationStatusType status);
     }
 }
