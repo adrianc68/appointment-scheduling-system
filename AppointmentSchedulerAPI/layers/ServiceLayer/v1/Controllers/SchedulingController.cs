@@ -398,6 +398,32 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(isEnabled, ApiVersionEnum.V1);
         }
 
+        [HttpPatch("appointment/serviceOffer/delete")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> DeleteServiceOffer([FromBody] DeleteServiceOfferDTO dto)
+        {
+            bool isEnabled = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DeleteServiceOfferAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isEnabled = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+                throw;
+            }
+            return httpResponseService.OkResponse(isEnabled, ApiVersionEnum.V1);
+        }
+
 
         [HttpGet("appointment/")]
         [Authorize]

@@ -644,32 +644,34 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(UuidNewservice.Value);
         }
 
+
+        public async Task<OperationResult<bool, GenericError>> DeleteServiceOfferAsync(Guid serviceOfferUuid)
+        {
+            ServiceOffer? serviceOfferData = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
+            OperationResult<bool, GenericError> checkStatus = this.CheckServiceOfferStatusType(serviceOfferData, ServiceOfferStatusType.DELETED);
+            if (!checkStatus.IsSuccessful)
+            {
+                return checkStatus;
+            }
+
+            bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOfferData!.Id!.Value, ServiceOfferStatusType.DELETED);
+            if (!isStatusChanged)
+            {
+                return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
+            }
+            return OperationResult<bool, GenericError>.Success(true);
+        }
+
         public async Task<OperationResult<bool, GenericError>> DisableServiceOfferAsync(Guid serviceOfferUuid)
         {
-            ServiceOffer? serviceOffer = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
-            if (serviceOffer == null)
+            ServiceOffer? serviceOfferData = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
+            OperationResult<bool, GenericError> checkStatus = this.CheckServiceOfferStatusType(serviceOfferData, ServiceOfferStatusType.DISABLED);
+            if (!checkStatus.IsSuccessful)
             {
-                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> is not found", []);
-                genericError.AddData("ServiceUuid", serviceOfferUuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_NOT_FOUND);
+                return checkStatus;
             }
 
-            if (serviceOffer.Status == ServiceOfferStatusType.DISABLED)
-            {
-                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> is already disabled", []);
-                genericError.AddData("ServiceUuid", serviceOfferUuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_IS_ALREADY_UNAVAILABLE);
-            }
-
-            if (serviceOffer.Status == ServiceOfferStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> was deleted", []);
-                genericError.AddData("ServiceUuid", serviceOfferUuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_WAS_DELETED);
-            }
-
-
-            bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOffer.Id!.Value, ServiceOfferStatusType.DISABLED);
+            bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOfferData!.Id!.Value, ServiceOfferStatusType.DISABLED);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -679,29 +681,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
         public async Task<OperationResult<bool, GenericError>> EnableServiceOfferAsync(Guid serviceOfferUuid)
         {
-            ServiceOffer? serviceOffer = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
-            if (serviceOffer == null)
+            ServiceOffer? serviceOfferData = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
+            OperationResult<bool, GenericError> checkStatus = this.CheckServiceOfferStatusType(serviceOfferData, ServiceOfferStatusType.ENABLED);
+            if (!checkStatus.IsSuccessful)
             {
-                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> is not found", []);
-                genericError.AddData("ServiceUuid", serviceOfferUuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_NOT_FOUND);
+                return checkStatus;
             }
 
-            if (serviceOffer.Status == ServiceOfferStatusType.ENABLED)
-            {
-                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> is already enabled", []);
-                genericError.AddData("ServiceUuid", serviceOfferUuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_IS_ALREADY_AVAILABLE);
-            }
-
-            if (serviceOffer.Status == ServiceOfferStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferUuid}> was deleted", []);
-                genericError.AddData("ServiceUuid", serviceOfferUuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_WAS_DELETED);
-            }
-
-            bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOffer.Id!.Value, ServiceOfferStatusType.DISABLED);
+            bool isStatusChanged = await schedulerMgr.ChangeServiceOfferStatusTypeAsync(serviceOfferData!.Id!.Value, ServiceOfferStatusType.ENABLED);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
@@ -709,6 +696,49 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
+
+        public OperationResult<bool, GenericError> CheckServiceOfferStatusType(ServiceOffer? serviceOfferData, ServiceOfferStatusType newStatus)
+        {
+            if (serviceOfferData == null)
+            {
+                GenericError genericError = new GenericError($"ServiceOffer not found", []);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_NOT_FOUND);
+            }
+
+            if (serviceOfferData.Status == ServiceOfferStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferData!.Uuid!.Value}> is already deleted", []);
+                genericError.AddData("serviceOfferUuid", serviceOfferData.Uuid.Value);
+                genericError.AddData("Status", serviceOfferData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_WAS_DELETED);
+            }
+
+            if (newStatus == serviceOfferData.Status)
+            {
+                string message;
+                MessageCodeType messageCodeType;
+                if (newStatus == ServiceOfferStatusType.ENABLED)
+                {
+                    message = $"ServiceOffer with UUID: <{serviceOfferData.Uuid!.Value}> is already enabled";
+                    messageCodeType = MessageCodeType.SERVICE_IS_ALREADY_ENABLED;
+                }
+                else if (newStatus == ServiceOfferStatusType.DISABLED)
+                {
+                    message = $"ServiceOffer with UUID: <{serviceOfferData.Uuid!.Value}> is already disabled";
+                    messageCodeType = MessageCodeType.SERVICE_OFFER_IS_ALREADY_DISABLED;
+                }
+                else
+                {
+                    throw new KeyNotFoundException($"The value '{newStatus}' was not found in the expected {nameof(ServiceOfferStatusType)} collection.");
+                }
+                GenericError genericError = new GenericError(message);
+                genericError.AddData("ServiceUuid", serviceOfferData.Uuid!.Value);
+                genericError.AddData("Status", serviceOfferData.Status);
+
+                return OperationResult<bool, GenericError>.Failure(genericError, messageCodeType);
+            }
+            return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
+        }
 
 
 
@@ -769,8 +799,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         {
             if (asisstantData == null)
             {
-                GenericError genericError = new GenericError($"Assistant with UUID: <{asisstantData!.Uuid!.Value}> is not found", []);
-                genericError.AddData("assistantUuid", asisstantData!.Uuid.Value);
+                GenericError genericError = new GenericError($"Assistant not found", []);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
             }
 
@@ -866,8 +895,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         {
             if (clientData == null)
             {
-                GenericError genericError = new GenericError($"Client with UUID: <{clientData!.Uuid!.Value}> is not found", []);
-                genericError.AddData("clientUuid", clientData!.Uuid.Value);
+                GenericError genericError = new GenericError($"Client not found", []);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
             }
 
@@ -1605,8 +1633,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         {
             if (serviceData == null)
             {
-                GenericError genericError = new GenericError($"Service with UUID: <{serviceData!.Uuid}> is not found", []);
-                genericError.AddData("ServiceUuid", serviceData!.Uuid!.Value);
+                GenericError genericError = new GenericError($"Service not found", []);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_NOT_FOUND);
             }
 
