@@ -256,7 +256,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return timeRangeLockMgr.UnblockTimeSlot(clientUuid);
         }
 
-
         public async Task<OperationResult<bool, GenericError>> EditAvailabilityTimeSlot(AvailabilityTimeSlot availabilityTimeSlot)
         {
             AvailabilityTimeSlot? slotData = await schedulerMgr.GetAvailabilityTimeSlotByUuidAsync(availabilityTimeSlot.Uuid!.Value);
@@ -644,9 +643,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(UuidNewservice.Value);
         }
 
-
-
-
         public async Task<OperationResult<bool, GenericError>> DeleteServiceOfferAsync(Guid serviceOfferUuid)
         {
             ServiceOffer? serviceOfferData = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
@@ -697,52 +693,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
             return OperationResult<bool, GenericError>.Success(true);
         }
-
-
-        public OperationResult<bool, GenericError> CheckServiceOfferStatusType(ServiceOffer? serviceOfferData, ServiceOfferStatusType newStatus)
-        {
-            if (serviceOfferData == null)
-            {
-                GenericError genericError = new GenericError($"ServiceOffer not found", []);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_NOT_FOUND);
-            }
-
-            if (serviceOfferData.Status == ServiceOfferStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferData!.Uuid!.Value}> is already deleted", []);
-                genericError.AddData("serviceOfferUuid", serviceOfferData.Uuid.Value);
-                genericError.AddData("Status", serviceOfferData.Status.Value.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_WAS_DELETED);
-            }
-
-            if (newStatus == serviceOfferData.Status)
-            {
-                string message;
-                MessageCodeType messageCodeType;
-                if (newStatus == ServiceOfferStatusType.ENABLED)
-                {
-                    message = $"ServiceOffer with UUID: <{serviceOfferData.Uuid!.Value}> is already enabled";
-                    messageCodeType = MessageCodeType.SERVICE_IS_ALREADY_ENABLED;
-                }
-                else if (newStatus == ServiceOfferStatusType.DISABLED)
-                {
-                    message = $"ServiceOffer with UUID: <{serviceOfferData.Uuid!.Value}> is already disabled";
-                    messageCodeType = MessageCodeType.SERVICE_OFFER_IS_ALREADY_DISABLED;
-                }
-                else
-                {
-                    throw new KeyNotFoundException($"The value '{newStatus}' was not found in the expected {nameof(ServiceOfferStatusType)} collection.");
-                }
-                GenericError genericError = new GenericError(message);
-                genericError.AddData("ServiceUuid", serviceOfferData.Uuid!.Value);
-                genericError.AddData("Status", serviceOfferData.Status);
-
-                return OperationResult<bool, GenericError>.Failure(genericError, messageCodeType);
-            }
-            return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
-        }
-
-
 
         public async Task<OperationResult<bool, GenericError>> DisableAssistantAsync(Guid assistantUuid)
         {
@@ -795,53 +745,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-
-
-        private OperationResult<bool, GenericError> CheckAssistantStatusType(Assistant? asisstantData, AccountStatusType newStatus)
-        {
-            if (asisstantData == null)
-            {
-                GenericError genericError = new GenericError($"Assistant not found", []);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
-            }
-
-            if (asisstantData.Status == AccountStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"Assistant with UUID: <{asisstantData!.Uuid!.Value}> is already deleted", []);
-                genericError.AddData("assistantUuid", asisstantData.Uuid.Value);
-                genericError.AddData("Status", asisstantData.Status.Value.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_DELETED);
-            }
-
-            if (newStatus == asisstantData.Status)
-            {
-                string message;
-                MessageCodeType messageCodeType;
-                if (newStatus == AccountStatusType.ENABLED)
-                {
-                    message = $"Assistant with UUID: <{asisstantData.Uuid}> is already enabled";
-                    messageCodeType = MessageCodeType.ASSISTANT_IS_ALREADY_ENABLED;
-                }
-                else if (newStatus == AccountStatusType.DISABLED)
-                {
-                    message = $"Assistant with UUID: <{asisstantData.Uuid}> is already disabled";
-                    messageCodeType = MessageCodeType.ASSISTANT_IS_ALREADY_DISABLED;
-                }
-                else
-                {
-                    throw new KeyNotFoundException($"The value '{newStatus}' was not found in the expected {nameof(AccountStatusType)} collection.");
-                }
-                GenericError genericError = new GenericError(message);
-                genericError.AddData("assistantUuid", asisstantData.Uuid!.Value);
-                genericError.AddData("Status", asisstantData.Status!.Value.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, messageCodeType);
-            }
-            return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
-        }
-
-
-
-
         public async Task<OperationResult<bool, GenericError>> DisableClientAsync(Guid clientUuid)
         {
             Client? clientData = await clientMgr.GetClientByUuidAsync(clientUuid);
@@ -892,53 +795,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
             return OperationResult<bool, GenericError>.Success(true);
         }
-
-        private OperationResult<bool, GenericError> CheckClientStatusType(Client? clientData, AccountStatusType newStatus)
-        {
-            if (clientData == null)
-            {
-                GenericError genericError = new GenericError($"Client not found", []);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
-            }
-
-            if (clientData.Status == AccountStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"Client with UUID: <{clientData!.Uuid!.Value}> is already deleted", []);
-                genericError.AddData("clientUuid", clientData.Uuid.Value);
-                genericError.AddData("Status", clientData.Status.Value.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_IS_ALREADY_DELETED);
-            }
-
-            if (newStatus == clientData.Status)
-            {
-                string message;
-                MessageCodeType messageCodeType;
-                if (newStatus == AccountStatusType.ENABLED)
-                {
-                    message = $"Client with UUID: <{clientData.Uuid}> is already enabled";
-                    messageCodeType = MessageCodeType.CLIENT_IS_ALREADY_ENABLED;
-                }
-                else if (newStatus == AccountStatusType.DISABLED)
-                {
-                    message = $"Client with UUID: <{clientData.Uuid}> is already disabled";
-                    messageCodeType = MessageCodeType.CLIENT_IS_ALREADY_DISABLED;
-                }
-                else
-                {
-                    throw new KeyNotFoundException($"The value '{newStatus}' was not found in the expected {nameof(AccountStatusType)} collection.");
-                }
-                GenericError genericError = new GenericError(message);
-                genericError.AddData("clientUuid", clientData.Uuid!.Value);
-                genericError.AddData("Status", clientData.Status!.Value.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, messageCodeType);
-            }
-            return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
-        }
-
-
-
-
-
 
         public async Task<OperationResult<bool, GenericError>> EnableServiceAsync(Guid ServiceUuid)
         {
@@ -991,12 +847,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-
-
-
-
-
-
         public async Task<OperationResult<bool, GenericError>> DeleteAvailabilityTimeSlotAsync(Guid uuid)
         {
             AvailabilityTimeSlot? slotData = await schedulerMgr.GetAvailabilityTimeSlotByUuidAsync(uuid);
@@ -1047,50 +897,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
             return OperationResult<bool, GenericError>.Success(true);
         }
-
-
-        private OperationResult<bool, GenericError> CheckAvailabilityTimeSlotStatusType(AvailabilityTimeSlot? slotData, AvailabilityTimeSlotStatusType newStatus)
-        {
-            if (slotData == null)
-            {
-                GenericError genericError = new GenericError($"AvailabilityTimeSlot not found", []);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_FOUND);
-            }
-
-            if (slotData.Status == AvailabilityTimeSlotStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"AvailabilityTimeSlot with UUID: <{slotData.Uuid!.Value}> was deleted", []);
-                genericError.AddData("AvailabilityTimeSlotUuid", slotData.Uuid);
-                genericError.AddData("Status", slotData.Status.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_DELETED);
-            }
-
-            if (newStatus == slotData.Status)
-            {
-                string message;
-                MessageCodeType messageCodeType;
-                if (newStatus == AvailabilityTimeSlotStatusType.ENABLED)
-                {
-                    message = $"AvailabilityTimeSlot with UUID: <{slotData.Uuid}> is already enabled";
-                    messageCodeType = MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_ENABLED;
-                }
-                else if (newStatus == AvailabilityTimeSlotStatusType.DISABLED)
-                {
-                    message = $"AvailabilityTimeSlot with UUID: <{slotData.Uuid}> is already disabled";
-                    messageCodeType = MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_DISABLED;
-                }
-                else
-                {
-                    throw new KeyNotFoundException($"The value '{newStatus}' was not found in the expected {nameof(AvailabilityTimeSlotStatusType)} collection.");
-                }
-                GenericError genericError = new GenericError(message);
-                genericError.AddData("AvailabilityTimeSlotUuid", slotData!.Uuid!.Value);
-                genericError.AddData("Status", slotData.Status);
-                return OperationResult<bool, GenericError>.Failure(genericError, messageCodeType);
-            }
-            return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
-        }
-
 
         public async Task<OperationResult<bool, GenericError>> AssignListServicesToAssistantAsync(Guid assistantUuid, List<Guid> servicesUuids)
         {
@@ -1673,6 +1479,174 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
         }
 
+        private OperationResult<bool, GenericError> CheckAvailabilityTimeSlotStatusType(AvailabilityTimeSlot? slotData, AvailabilityTimeSlotStatusType newStatus)
+        {
+            if (slotData == null)
+            {
+                GenericError genericError = new GenericError($"AvailabilityTimeSlot not found", []);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_FOUND);
+            }
+
+            if (slotData.Status == AvailabilityTimeSlotStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"AvailabilityTimeSlot with UUID: <{slotData.Uuid!.Value}> was deleted", []);
+                genericError.AddData("AvailabilityTimeSlotUuid", slotData.Uuid);
+                genericError.AddData("Status", slotData.Status.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_DELETED);
+            }
+
+            if (newStatus == slotData.Status)
+            {
+                string message;
+                MessageCodeType messageCodeType;
+                if (newStatus == AvailabilityTimeSlotStatusType.ENABLED)
+                {
+                    message = $"AvailabilityTimeSlot with UUID: <{slotData.Uuid}> is already enabled";
+                    messageCodeType = MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_ENABLED;
+                }
+                else if (newStatus == AvailabilityTimeSlotStatusType.DISABLED)
+                {
+                    message = $"AvailabilityTimeSlot with UUID: <{slotData.Uuid}> is already disabled";
+                    messageCodeType = MessageCodeType.AVAILABILITY_TIME_SLOT_IS_ALREADY_DISABLED;
+                }
+                else
+                {
+                    throw new KeyNotFoundException($"The value '{newStatus}' was not found in the expected {nameof(AvailabilityTimeSlotStatusType)} collection.");
+                }
+                GenericError genericError = new GenericError(message);
+                genericError.AddData("AvailabilityTimeSlotUuid", slotData!.Uuid!.Value);
+                genericError.AddData("Status", slotData.Status);
+                return OperationResult<bool, GenericError>.Failure(genericError, messageCodeType);
+            }
+            return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
+        }
+
+        private OperationResult<bool, GenericError> CheckClientStatusType(Client? clientData, AccountStatusType newStatus)
+        {
+            if (clientData == null)
+            {
+                GenericError genericError = new GenericError($"Client not found", []);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_NOT_FOUND);
+            }
+
+            if (clientData.Status == AccountStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Client with UUID: <{clientData!.Uuid!.Value}> is already deleted", []);
+                genericError.AddData("clientUuid", clientData.Uuid.Value);
+                genericError.AddData("Status", clientData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.CLIENT_IS_ALREADY_DELETED);
+            }
+
+            if (newStatus == clientData.Status)
+            {
+                string message;
+                MessageCodeType messageCodeType;
+                if (newStatus == AccountStatusType.ENABLED)
+                {
+                    message = $"Client with UUID: <{clientData.Uuid}> is already enabled";
+                    messageCodeType = MessageCodeType.CLIENT_IS_ALREADY_ENABLED;
+                }
+                else if (newStatus == AccountStatusType.DISABLED)
+                {
+                    message = $"Client with UUID: <{clientData.Uuid}> is already disabled";
+                    messageCodeType = MessageCodeType.CLIENT_IS_ALREADY_DISABLED;
+                }
+                else
+                {
+                    throw new KeyNotFoundException($"The value '{newStatus}' was not found in the expected {nameof(AccountStatusType)} collection.");
+                }
+                GenericError genericError = new GenericError(message);
+                genericError.AddData("clientUuid", clientData.Uuid!.Value);
+                genericError.AddData("Status", clientData.Status!.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, messageCodeType);
+            }
+            return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
+        }
+
+        private OperationResult<bool, GenericError> CheckAssistantStatusType(Assistant? asisstantData, AccountStatusType newStatus)
+        {
+            if (asisstantData == null)
+            {
+                GenericError genericError = new GenericError($"Assistant not found", []);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+            }
+
+            if (asisstantData.Status == AccountStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Assistant with UUID: <{asisstantData!.Uuid!.Value}> is already deleted", []);
+                genericError.AddData("assistantUuid", asisstantData.Uuid.Value);
+                genericError.AddData("Status", asisstantData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_DELETED);
+            }
+
+            if (newStatus == asisstantData.Status)
+            {
+                string message;
+                MessageCodeType messageCodeType;
+                if (newStatus == AccountStatusType.ENABLED)
+                {
+                    message = $"Assistant with UUID: <{asisstantData.Uuid}> is already enabled";
+                    messageCodeType = MessageCodeType.ASSISTANT_IS_ALREADY_ENABLED;
+                }
+                else if (newStatus == AccountStatusType.DISABLED)
+                {
+                    message = $"Assistant with UUID: <{asisstantData.Uuid}> is already disabled";
+                    messageCodeType = MessageCodeType.ASSISTANT_IS_ALREADY_DISABLED;
+                }
+                else
+                {
+                    throw new KeyNotFoundException($"The value '{newStatus}' was not found in the expected {nameof(AccountStatusType)} collection.");
+                }
+                GenericError genericError = new GenericError(message);
+                genericError.AddData("assistantUuid", asisstantData.Uuid!.Value);
+                genericError.AddData("Status", asisstantData.Status!.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, messageCodeType);
+            }
+            return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
+        }
+
+        public OperationResult<bool, GenericError> CheckServiceOfferStatusType(ServiceOffer? serviceOfferData, ServiceOfferStatusType newStatus)
+        {
+            if (serviceOfferData == null)
+            {
+                GenericError genericError = new GenericError($"ServiceOffer not found", []);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_NOT_FOUND);
+            }
+
+            if (serviceOfferData.Status == ServiceOfferStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"ServiceOffer with UUID: <{serviceOfferData!.Uuid!.Value}> is already deleted", []);
+                genericError.AddData("serviceOfferUuid", serviceOfferData.Uuid.Value);
+                genericError.AddData("Status", serviceOfferData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_WAS_DELETED);
+            }
+
+            if (newStatus == serviceOfferData.Status)
+            {
+                string message;
+                MessageCodeType messageCodeType;
+                if (newStatus == ServiceOfferStatusType.ENABLED)
+                {
+                    message = $"ServiceOffer with UUID: <{serviceOfferData.Uuid!.Value}> is already enabled";
+                    messageCodeType = MessageCodeType.SERVICE_IS_ALREADY_ENABLED;
+                }
+                else if (newStatus == ServiceOfferStatusType.DISABLED)
+                {
+                    message = $"ServiceOffer with UUID: <{serviceOfferData.Uuid!.Value}> is already disabled";
+                    messageCodeType = MessageCodeType.SERVICE_OFFER_IS_ALREADY_DISABLED;
+                }
+                else
+                {
+                    throw new KeyNotFoundException($"The value '{newStatus}' was not found in the expected {nameof(ServiceOfferStatusType)} collection.");
+                }
+                GenericError genericError = new GenericError(message);
+                genericError.AddData("ServiceUuid", serviceOfferData.Uuid!.Value);
+                genericError.AddData("Status", serviceOfferData.Status);
+
+                return OperationResult<bool, GenericError>.Failure(genericError, messageCodeType);
+            }
+            return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
+        }
 
     }
 }
