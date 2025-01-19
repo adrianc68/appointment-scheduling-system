@@ -139,8 +139,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         private async void SendNotificationToUsers<TNotification>(TNotification dto, HashSet<NotificationRecipient> users, List<NotificationChannelType> channels)
             where TNotification : NotificationDTO
         {
-            string notificationJson = SerializeObjectToJson(dto);
-
             foreach (var recipient in users)
             {
                 foreach (var channel in channels)
