@@ -1,11 +1,11 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Notification;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
@@ -71,7 +71,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     Code = appointmentNotification.Code,
                     Appointment = new AppointmentUuidDTO
                     {
-                        Uuid = appointmentNotification.Appointment!.Uuid!.Value
+                        Uuid = appointmentNotification.Appointment!.Uuid!
                     }
                 };
                 SendNotificationToUsers(notificationDTO, notification.Recipients, notification.Options.Channels);

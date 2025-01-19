@@ -10,6 +10,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
         }
 
         public required AppointmentNotificationCodeType Code { get; set; }
-        public required virtual Appointment Appointment { get; set; }
+        public required virtual AppointmentIdentifiers Appointment { get; set; }
     }
 }

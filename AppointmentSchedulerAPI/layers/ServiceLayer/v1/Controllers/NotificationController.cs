@@ -49,7 +49,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                             Code = appointmentNotification!.Code,
                             Appointment = new AppointmentUuidDTO
                             {
-                                Uuid = appointmentNotification.Appointment!.Uuid!.Value,
+                                Uuid = appointmentNotification.Appointment!.Uuid,
                             }
                         });
                     }
@@ -116,7 +116,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                             Code = appointmentNotification!.Code,
                             Appointment = new AppointmentUuidDTO
                             {
-                                Uuid = appointmentNotification.Appointment!.Uuid!.Value,
+                                Uuid = appointmentNotification.Appointment!.Uuid,
                             }
                         });
                     }

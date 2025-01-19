@@ -46,9 +46,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         NotificationChannelType.WEB_APPLICATION
                     }
                 },
-                Appointment = new BusinessLogicLayer.Model.Appointment
+                Appointment = new BusinessLogicLayer.Model.AppointmentIdentifiers
                 {
-                    Id = appointmentData!.Id,
+                    Id = appointmentData!.Id!.Value,
                     Uuid = request.AppointmentUuid.Value
                 },
                 Recipients = []

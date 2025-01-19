@@ -6,8 +6,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Type
     {
         [PgName("APPOINTMENT_SCHEDULED")]
         APPOINTMENT_SCHEDULED,
-        [PgName("APPOINTMENT_TRESCHEDULED")]
-        APPOINTMENT_TRESCHEDULED,
+        [PgName("APPOINTMENT_RESCHEDULED")]
+        APPOINTMENT_RESCHEDULED,
         [PgName("APPOINTMENT_CANCELED")]
         APPOINTMENT_CANCELED,
         [PgName("APPOINTMENT_REMINDER")]

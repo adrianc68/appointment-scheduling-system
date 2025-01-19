@@ -37,7 +37,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     var appointmentDB = new AppointmentNotification
                     {
-                        IdAppointment = appointmentNotification.Appointment!.Id!.Value,
+                        IdAppointment = appointmentNotification.Appointment!.Id!,
                         IdNotificationBase = notificationDB.Id!.Value,
                         Code = (Model.Types.AppointmentNotificationCodeType)appointmentNotification.Code,
                     };
@@ -181,10 +181,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
                             Code = (BusinessLogicLayer.Model.Types.Notification.AppointmentNotificationCodeType)notification.NotificationBase.AppointmentNotification!.Code!.Value,
                             Recipients = [recipientdata],
-                            Appointment = new BusinessLogicLayer.Model.Appointment
+                            Appointment = new BusinessLogicLayer.Model.AppointmentIdentifiers
                             {
-                                Uuid = notification.NotificationBase.AppointmentNotification!.Appointment!.Uuid,
-                                Id = notification.NotificationBase.AppointmentNotification!.Appointment.Id
+                                Uuid = notification.NotificationBase.AppointmentNotification!.Appointment!.Uuid!.Value,
+                                Id = notification.NotificationBase.AppointmentNotification!.Appointment.Id!.Value
                             },
                             Options = new NotificationOptions
                             {
@@ -288,10 +288,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Message = notification.NotificationBase.Message!,
                             Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
                             Code = (BusinessLogicLayer.Model.Types.Notification.AppointmentNotificationCodeType)notification.NotificationBase.AppointmentNotification!.Code!.Value,
-                            Appointment = new BusinessLogicLayer.Model.Appointment
+                            Appointment = new BusinessLogicLayer.Model.AppointmentIdentifiers
                             {
-                                Uuid = notification.NotificationBase.AppointmentNotification!.Appointment!.Uuid,
-                                Id = notification.NotificationBase.AppointmentNotification!.Appointment.Id
+                                Uuid = notification.NotificationBase.AppointmentNotification!.Appointment!.Uuid!.Value,
+                                Id = notification.NotificationBase.AppointmentNotification!.Appointment.Id!.Value
                             },
                             Recipients = [recipientdata],
                             Options = new NotificationOptions
