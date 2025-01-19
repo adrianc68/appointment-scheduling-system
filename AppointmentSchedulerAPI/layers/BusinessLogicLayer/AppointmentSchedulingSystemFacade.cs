@@ -710,103 +710,105 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
         }
 
 
+
+
         public async Task<OperationResult<bool, GenericError>> DisableAssistantAsync(Guid assistantUuid)
         {
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistantUuid);
-            if (assistantData == null)
+            OperationResult<bool, GenericError> checkStatus = this.CheckAssistantStatusType(assistantData, AccountStatusType.DISABLED);
+            if (!checkStatus.IsSuccessful)
             {
-                GenericError genericError = new GenericError($"Assistant with UUID: <{assistantUuid}> is not found", []);
-                genericError.AddData("AssistantUuid", assistantUuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+                return checkStatus;
             }
 
-            if (assistantData.Status == AccountStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"Cannot change status of Assistant <{assistantUuid}>. Assistant was deleted!", []);
-                genericError.AddData("AssistantUuid", assistantUuid);
-                genericError.AddData("Status", AssistantStatusType.DELETED.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
-            }
-
-            if (assistantData.Status == AccountStatusType.DISABLED)
-            {
-                GenericError genericError = new GenericError($"Assistant with UUID: <{assistantUuid}> is already disabled", []);
-                genericError.AddData("AssistantUuid", assistantUuid);
-                genericError.AddData("Status", assistantData.Status.Value.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_DISABLED);
-            }
-
-            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(assistantData.Id!.Value, AccountStatusType.DISABLED, AccountType.ASSISTANT);
+            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(assistantData!.Id!.Value, AccountStatusType.DISABLED, AccountType.ASSISTANT);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
             }
             return OperationResult<bool, GenericError>.Success(true);
         }
-
-
 
         public async Task<OperationResult<bool, GenericError>> EnableAssistantAsync(Guid assistantUuid)
         {
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistantUuid);
-            if (assistantData == null)
+            OperationResult<bool, GenericError> checkStatus = this.CheckAssistantStatusType(assistantData, AccountStatusType.ENABLED);
+            if (!checkStatus.IsSuccessful)
             {
-                GenericError genericError = new GenericError($"Assistant with UUID: <{assistantUuid}> is not found", []);
-                genericError.AddData("AssistantUuid", assistantUuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+                return checkStatus;
             }
 
-            if (assistantData.Status == AccountStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"Cannot change status of Assistant <{assistantUuid}>. Assistant was deleted!", []);
-                genericError.AddData("AssistantUuid", assistantUuid);
-                genericError.AddData("Status", AssistantStatusType.DELETED.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
-            }
-
-            if (assistantData.Status == AccountStatusType.ENABLED)
-            {
-                GenericError genericError = new GenericError($"Assistant with UUID: <{assistantUuid}> is already enabled", []);
-                genericError.AddData("AssistantUuid", assistantUuid);
-                genericError.AddData("Status", assistantData.Status.Value.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_ENABLED);
-            }
-
-            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(assistantData.Id!.Value, AccountStatusType.ENABLED, AccountType.ASSISTANT);
+            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(assistantData!.Id!.Value, AccountStatusType.ENABLED, AccountType.ASSISTANT);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
             }
             return OperationResult<bool, GenericError>.Success(true);
         }
-
-
 
         public async Task<OperationResult<bool, GenericError>> DeleteAssistantAsync(Guid assistantUuid)
         {
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistantUuid);
-            if (assistantData == null)
+            OperationResult<bool, GenericError> checkStatus = this.CheckAssistantStatusType(assistantData, AccountStatusType.DELETED);
+            if (!checkStatus.IsSuccessful)
             {
-                GenericError genericError = new GenericError($"Assistant with UUID: <{assistantUuid}> is not found", []);
-                genericError.AddData("AssistantUuid", assistantUuid);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+                return checkStatus;
             }
 
-            if (assistantData.Status == AccountStatusType.DELETED)
-            {
-                GenericError genericError = new GenericError($"Assistant with UUID: <{assistantUuid}> is already disabled", []);
-                genericError.AddData("AssistantUuid", assistantUuid);
-                genericError.AddData("Status", assistantData.Status.Value.ToString());
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_DELETED);
-            }
-
-            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(assistantData.Id!.Value, AccountStatusType.DELETED, AccountType.ASSISTANT);
+            bool isStatusChanged = await accountMgr.ChangeAccountStatusAsync(assistantData!.Id!.Value, AccountStatusType.DELETED, AccountType.ASSISTANT);
             if (!isStatusChanged)
             {
                 return OperationResult<bool, GenericError>.Failure(new GenericError("An error has ocurred!"), MessageCodeType.UPDATE_ERROR);
             }
             return OperationResult<bool, GenericError>.Success(true);
         }
+
+
+
+        private OperationResult<bool, GenericError> CheckAssistantStatusType(Assistant? asisstantData, AccountStatusType newStatus)
+        {
+            if (asisstantData == null)
+            {
+                GenericError genericError = new GenericError($"Assistant with UUID: <{asisstantData!.Uuid!.Value}> is not found", []);
+                genericError.AddData("assistantUuid", asisstantData!.Uuid.Value);
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+            }
+
+            if (asisstantData.Status == AccountStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Assistant with UUID: <{asisstantData!.Uuid!.Value}> is already deleted", []);
+                genericError.AddData("assistantUuid", asisstantData.Uuid.Value);
+                genericError.AddData("Status", asisstantData.Status.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_IS_ALREADY_DELETED);
+            }
+
+            if (newStatus == asisstantData.Status)
+            {
+                string message;
+                MessageCodeType messageCodeType;
+                if (newStatus == AccountStatusType.ENABLED)
+                {
+                    message = $"Assistant with UUID: <{asisstantData.Uuid}> is already enabled";
+                    messageCodeType = MessageCodeType.ASSISTANT_IS_ALREADY_ENABLED;
+                }
+                else if (newStatus == AccountStatusType.DISABLED)
+                {
+                    message = $"Assistant with UUID: <{asisstantData.Uuid}> is already disabled";
+                    messageCodeType = MessageCodeType.ASSISTANT_IS_ALREADY_DISABLED;
+                }
+                else
+                {
+                    throw new KeyNotFoundException($"The value '{newStatus}' was not found in the expected {nameof(AccountStatusType)} collection.");
+                }
+                GenericError genericError = new GenericError(message);
+                genericError.AddData("assistantUuid", asisstantData.Uuid!.Value);
+                genericError.AddData("Status", asisstantData.Status!.Value.ToString());
+                return OperationResult<bool, GenericError>.Failure(genericError, messageCodeType);
+            }
+            return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
+        }
+
+
 
 
         public async Task<OperationResult<bool, GenericError>> DisableClientAsync(Guid clientUuid)
