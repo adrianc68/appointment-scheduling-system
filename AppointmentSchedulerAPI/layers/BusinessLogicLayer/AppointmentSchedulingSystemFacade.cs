@@ -380,7 +380,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return await schedulerMgr.GetConflictingServicesByDateTimeRangeAsync(range);
         }
 
-        public async Task<OperationResult<bool, GenericError>> UpdateAssistantAsync(Assistant assistant)
+        public async Task<OperationResult<bool, GenericError>> EditAssistantAsync(Assistant assistant)
         {
             Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistant.Uuid!.Value);
             if (assistantData == null)
@@ -406,6 +406,18 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     GenericError genericError = new GenericError($"Username <{assistant.Username}> is already registered", []);
                     genericError.AddData("username", assistant.Username!);
                     return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_USERNAME_ALREADY_REGISTERED);
+                }
+            }
+
+
+            if (assistant.PhoneNumber != assistantData.PhoneNumber)
+            {
+                bool newPhoneNumberIsRegistered = await accountMgr.IsPhoneNumberRegisteredAsync(assistant.PhoneNumber!);
+                if (newPhoneNumberIsRegistered)
+                {
+                    GenericError genericError = new GenericError($"PhoneNumber <{assistant.PhoneNumber}> is already registered", []);
+                    genericError.AddData("phoneNumber", assistant.PhoneNumber!);
+                    return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_PHONE_NUMBER_ALREADY_REGISTERED);
                 }
             }
 
@@ -476,7 +488,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(isUpdated);
         }
 
-        public async Task<OperationResult<bool, GenericError>> UpdateServiceAsync(Service service)
+        public async Task<OperationResult<bool, GenericError>> EditServiceAsync(Service service)
         {
             Service? serviceData = await serviceMgr.GetServiceByUuidAsync(service.Uuid!.Value);
             if (service == null)
@@ -643,9 +655,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<Guid, GenericError>.Success(UuidNewservice.Value);
         }
 
-        public async Task<OperationResult<bool, GenericError>> DeleteServiceOfferAsync(Guid serviceOfferUuid)
+        public async Task<OperationResult<bool, GenericError>> DeleteServiceOfferAsync(Guid uuid)
         {
-            ServiceOffer? serviceOfferData = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
+            ServiceOffer? serviceOfferData = await schedulerMgr.GetServiceOfferByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckServiceOfferStatusType(serviceOfferData, ServiceOfferStatusType.DELETED);
             if (!checkStatus.IsSuccessful)
             {
@@ -660,9 +672,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> DisableServiceOfferAsync(Guid serviceOfferUuid)
+        public async Task<OperationResult<bool, GenericError>> DisableServiceOfferAsync(Guid uuid)
         {
-            ServiceOffer? serviceOfferData = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
+            ServiceOffer? serviceOfferData = await schedulerMgr.GetServiceOfferByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckServiceOfferStatusType(serviceOfferData, ServiceOfferStatusType.DISABLED);
             if (!checkStatus.IsSuccessful)
             {
@@ -677,9 +689,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> EnableServiceOfferAsync(Guid serviceOfferUuid)
+        public async Task<OperationResult<bool, GenericError>> EnableServiceOfferAsync(Guid uuid)
         {
-            ServiceOffer? serviceOfferData = await schedulerMgr.GetServiceOfferByUuidAsync(serviceOfferUuid);
+            ServiceOffer? serviceOfferData = await schedulerMgr.GetServiceOfferByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckServiceOfferStatusType(serviceOfferData, ServiceOfferStatusType.ENABLED);
             if (!checkStatus.IsSuccessful)
             {
@@ -694,9 +706,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> DisableAssistantAsync(Guid assistantUuid)
+        public async Task<OperationResult<bool, GenericError>> DisableAssistantAsync(Guid uuid)
         {
-            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistantUuid);
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckAssistantStatusType(assistantData, AccountStatusType.DISABLED);
             if (!checkStatus.IsSuccessful)
             {
@@ -711,9 +723,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> EnableAssistantAsync(Guid assistantUuid)
+        public async Task<OperationResult<bool, GenericError>> EnableAssistantAsync(Guid uuid)
         {
-            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistantUuid);
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckAssistantStatusType(assistantData, AccountStatusType.ENABLED);
             if (!checkStatus.IsSuccessful)
             {
@@ -728,9 +740,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> DeleteAssistantAsync(Guid assistantUuid)
+        public async Task<OperationResult<bool, GenericError>> DeleteAssistantAsync(Guid uuid)
         {
-            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(assistantUuid);
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckAssistantStatusType(assistantData, AccountStatusType.DELETED);
             if (!checkStatus.IsSuccessful)
             {
@@ -745,9 +757,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> DisableClientAsync(Guid clientUuid)
+        public async Task<OperationResult<bool, GenericError>> DisableClientAsync(Guid uuid)
         {
-            Client? clientData = await clientMgr.GetClientByUuidAsync(clientUuid);
+            Client? clientData = await clientMgr.GetClientByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckClientStatusType(clientData, AccountStatusType.DISABLED);
             if (!checkStatus.IsSuccessful)
             {
@@ -762,9 +774,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> EnableClientAsync(Guid clientUuid)
+        public async Task<OperationResult<bool, GenericError>> EnableClientAsync(Guid uuid)
         {
-            Client? clientData = await clientMgr.GetClientByUuidAsync(clientUuid);
+            Client? clientData = await clientMgr.GetClientByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckClientStatusType(clientData, AccountStatusType.ENABLED);
             if (!checkStatus.IsSuccessful)
             {
@@ -779,9 +791,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> DeleteClientAsync(Guid clientUuid)
+        public async Task<OperationResult<bool, GenericError>> DeleteClientAsync(Guid uuid)
         {
-            Client? clientData = await clientMgr.GetClientByUuidAsync(clientUuid);
+            Client? clientData = await clientMgr.GetClientByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckClientStatusType(clientData, AccountStatusType.DELETED);
             if (!checkStatus.IsSuccessful)
             {
@@ -796,9 +808,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> EnableServiceAsync(Guid ServiceUuid)
+        public async Task<OperationResult<bool, GenericError>> EnableServiceAsync(Guid uuid)
         {
-            Service? serviceData = await serviceMgr.GetServiceByUuidAsync(ServiceUuid);
+            Service? serviceData = await serviceMgr.GetServiceByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckServiceStatusType(serviceData, ServiceStatusType.ENABLED);
             if (!checkStatus.IsSuccessful)
             {
@@ -813,9 +825,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> DisableServiceAsync(Guid ServiceUuid)
+        public async Task<OperationResult<bool, GenericError>> DisableServiceAsync(Guid uuid)
         {
-            Service? serviceData = await serviceMgr.GetServiceByUuidAsync(ServiceUuid);
+            Service? serviceData = await serviceMgr.GetServiceByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckServiceStatusType(serviceData, ServiceStatusType.DISABLED);
             if (!checkStatus.IsSuccessful)
             {
@@ -830,9 +842,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> DeleteServiceAsync(Guid ServiceUuid)
+        public async Task<OperationResult<bool, GenericError>> DeleteServiceAsync(Guid uuid)
         {
-            Service? serviceData = await serviceMgr.GetServiceByUuidAsync(ServiceUuid);
+            Service? serviceData = await serviceMgr.GetServiceByUuidAsync(uuid);
             OperationResult<bool, GenericError> checkStatus = this.CheckServiceStatusType(serviceData, ServiceStatusType.DELETED);
             if (!checkStatus.IsSuccessful)
             {
@@ -956,36 +968,36 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> FinalizeAppointmentAsync(Guid appointmentUuid)
+        public async Task<OperationResult<bool, GenericError>> FinalizeAppointmentAsync(Guid uuid)
         {
-            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(appointmentUuid);
+            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(uuid);
             if (appointment == null)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} is not registered", []);
-                genericError.AddData("AppointmentUuid", appointmentUuid);
+                GenericError genericError = new GenericError($"Appointment with UUID {uuid} is not registered", []);
+                genericError.AddData("AppointmentUuid", uuid);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
             }
 
             if (appointment.Status == AppointmentStatusType.SCHEDULED)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} must be confirmed before proceeding", []);
-                genericError.AddData("AppointmentUuid", appointmentUuid);
+                GenericError genericError = new GenericError($"Appointment with UUID {uuid} must be confirmed before proceeding", []);
+                genericError.AddData("AppointmentUuid", uuid);
                 genericError.AddData("AppointmentStatus", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NEEDS_TO_BE_CONFIRMED);
             }
 
             if (appointment.Status == AppointmentStatusType.CANCELED)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} was cancelled before.", []);
-                genericError.AddData("AppointmentUuid", appointmentUuid);
+                GenericError genericError = new GenericError($"Appointment with UUID {uuid} was cancelled before.", []);
+                genericError.AddData("AppointmentUuid", uuid);
                 genericError.AddData("AppointmentStatus", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREDY_CANCELED);
             }
 
             if (appointment.Status == AppointmentStatusType.FINISHED)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} is already finished", []);
-                genericError.AddData("AppointmentUuid", appointmentUuid);
+                GenericError genericError = new GenericError($"Appointment with UUID {uuid} is already finished", []);
+                genericError.AddData("AppointmentUuid", uuid);
                 genericError.AddData("AppointmentStatus", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
             }
@@ -998,36 +1010,36 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> ConfirmAppointmentAsync(Guid appointmentUuid)
+        public async Task<OperationResult<bool, GenericError>> ConfirmAppointmentAsync(Guid uuid)
         {
-            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(appointmentUuid);
+            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(uuid);
             if (appointment == null)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} is not registered", []);
-                genericError.AddData("AppointmentUuid", appointmentUuid);
+                GenericError genericError = new GenericError($"Appointment with UUID {uuid} is not registered", []);
+                genericError.AddData("AppointmentUuid", uuid);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
             }
 
             if (appointment.Status == AppointmentStatusType.CANCELED)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} was cancelled before.", []);
-                genericError.AddData("AppointmentUuid", appointmentUuid);
+                GenericError genericError = new GenericError($"Appointment with UUID {uuid} was cancelled before.", []);
+                genericError.AddData("AppointmentUuid", uuid);
                 genericError.AddData("AppointmentStatus", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREDY_CANCELED);
             }
 
             if (appointment.Status == AppointmentStatusType.FINISHED)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} is finished.", []);
-                genericError.AddData("AppointmentUuid", appointmentUuid);
+                GenericError genericError = new GenericError($"Appointment with UUID {uuid} is finished.", []);
+                genericError.AddData("AppointmentUuid", uuid);
                 genericError.AddData("AppointmentStatus", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
             }
 
             if (appointment.Status == AppointmentStatusType.CONFIRMED)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID {appointmentUuid} is already confirmed", []);
-                genericError.AddData("AppointmentUuid", appointmentUuid);
+                GenericError genericError = new GenericError($"Appointment with UUID {uuid} is already confirmed", []);
+                genericError.AddData("AppointmentUuid", uuid);
                 genericError.AddData("Status", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_CONFIRMED);
             }
@@ -1089,28 +1101,28 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true);
         }
 
-        public async Task<OperationResult<bool, GenericError>> CancelAppointmentStaffAssistedAsync(Guid appointmentUuid)
+        public async Task<OperationResult<bool, GenericError>> CancelAppointmentStaffAssistedAsync(Guid uuid)
         {
-            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(appointmentUuid);
+            Appointment? appointment = await schedulerMgr.GetAppointmentByUuidAsync(uuid);
             if (appointment == null)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID <{appointmentUuid}> is not registered", []);
-                genericError.AddData("AppointmentUuid", appointmentUuid);
+                GenericError genericError = new GenericError($"Appointment with UUID <{uuid}> is not registered", []);
+                genericError.AddData("AppointmentUuid", uuid);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_NOT_FOUND);
             }
 
             if (appointment.Status == AppointmentStatusType.FINISHED)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID <{appointmentUuid}> is already finished", []);
-                genericError.AddData("AppointmentUuid", appointmentUuid);
+                GenericError genericError = new GenericError($"Appointment with UUID <{uuid}> is already finished", []);
+                genericError.AddData("AppointmentUuid", uuid);
                 genericError.AddData("Status", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREADY_FINISHED);
             }
 
             if (appointment.Status == AppointmentStatusType.CANCELED)
             {
-                GenericError genericError = new GenericError($"Appointment with UUID <{appointmentUuid}> is already canceled", []);
-                genericError.AddData("AppointmentUuid", appointmentUuid);
+                GenericError genericError = new GenericError($"Appointment with UUID <{uuid}> is already canceled", []);
+                genericError.AddData("AppointmentUuid", uuid);
                 genericError.AddData("Status", appointment.Status.ToString()!);
                 return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_IS_ALREDY_CANCELED);
             }
@@ -1162,7 +1174,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
             if (!IsPastSchedulingAllowed && startDateTime < currentDateTime)
             {
-                GenericError genericError = new GenericError($"You cannot schedule an appoinment in the past. You can only schedule from the current time", []);
+                GenericError genericError = new GenericError($"You cannot schedule an appoinment in the past. You can only schedule from the current time to {maxDate}", []);
                 genericError.AddData("SelectedDateTime", startDateTime.ToUniversalTime());
                 genericError.AddData("SuggestedDateTime", currentDateTime.AddMinutes(1).ToUniversalTime());
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SCHEDULING_IN_THE_PAST_NOT_ALLOWED);

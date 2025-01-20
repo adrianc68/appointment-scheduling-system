@@ -3,7 +3,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
     public interface ISchedulingInterfaces :
         IScheduleAppointmentStaffAssisted,
         IScheduleAppointmentClientSelf,
-        IAssignAvailabilityTimeSlot,
+        IAddAvailabilityTimeSlot,
         IEditAppointment,
         IEditAvailabilityTimeSlot,
         IFinalizeAppointment,

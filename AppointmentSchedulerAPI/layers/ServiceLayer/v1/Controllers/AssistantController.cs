@@ -179,7 +179,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Password = dto.Password,
                     Username = dto.Username
                 };
-                OperationResult<bool, GenericError> result = await systemFacade.UpdateAssistantAsync(assistant);
+                OperationResult<bool, GenericError> result = await systemFacade.EditAssistantAsync(assistant);
                 if (result.IsSuccessful)
                 {
                     isUpdated = result.Result;

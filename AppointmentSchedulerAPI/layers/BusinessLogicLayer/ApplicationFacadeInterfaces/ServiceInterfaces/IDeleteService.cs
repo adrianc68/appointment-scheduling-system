@@ -4,6 +4,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IDeleteService
     {
-        Task<OperationResult<bool, GenericError>> DeleteServiceAsync(Guid ServiceUuid);
+        Task<OperationResult<bool, GenericError>> DeleteServiceAsync(Guid uuid);
     }
 }

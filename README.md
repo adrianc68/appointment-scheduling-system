@@ -779,12 +779,16 @@ The instantiation design decisions considered and made are summarized in the fol
 ![](images/any/physical%20data%20model.png)
 
 
-| Business Interface | Diagram                                               |
-| ------------------ | ----------------------------------------------------- |
-| ISchedulerMgt      | ![](images/any/businessinterface%20ISchedulerMgt.png) |
-| IClientMgt         | ![](images/any/businessinterface%20IClientMgt.png)    |
-| IServiceMgt        | ![](images/any/businessinterface%20IServiceMgt.png)   |
-| IAssistantMgt      | ![](images/any/businessinterface%20IAssistantMgt.png) |
+| Business Interface | Diagram                                                  |
+| ------------------ | -------------------------------------------------------- |
+| ISchedulerMgt      | ![](images/any/businessinterface%20ISchedulerMgt.png)    |
+| IClientMgt         | ![](images/any/businessinterface%20IClientMgt.png)       |
+| IServiceMgt        | ![](images/any/businessinterface%20IServiceMgt.png)      |
+| IAssistantMgt      | ![](images/any/businessinterface%20IAssistantMgt.png)    |
+| IAccountMgt        | ![](images/any/businessinterface%20IAccountMgt.png)      |
+| INotificationMgt   | ![](images/any/businessinterface%20INotificationMgt.png) |
+| ITimeSlotLockMgt   | ![](images/any/businessinterface%20ITimeSlotLockMgt.png) |
+|                    |                                                          |
 
 | System Interfaces and Collaboration Diagrams | Diagram                                                                 |
 | -------------------------------------------- | ----------------------------------------------------------------------- |
@@ -806,10 +810,14 @@ The instantiation design decisions considered and made are summarized in the fol
 | cancelAppointmentClientSelf()                | ![](images/any/interaction%20cancelAppointmentClientSelf().png)         |
 | ICancelAppointmentStaffAssisted              | ![](images/any/systeminterface%20ICancelAppointmentStaffAssited.png)    |
 | cancelAppointmentStaffAssisted()             | ![](images/any/interaction%20cancelAppointmentStaffAssisted().png)      |
-| IAssignAvailabilityTimeSlot                  | ![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)       |
+| IAddAvailabilityTimeSlot                     | ![](images/any/systeminterface%20IAddAvailabilityTimeSlot.png)          |
 | registerAvailabilityTimeSlot()               | ![](images/any/interaction%20registerAvailabilityTimeSlot().png)        |
 | IDeleteAvailabilityTimeSlot                  | ![](images/any/systeminterface%20IDeleteAvailabilityTimeSlot.png)       |
 | deleteAvailabilityTimeSlot()                 | ![](images/any/interaction%20deleteAvailabilityTimeSlot.png)            |
+| IDisableAvailabilityTimeSlot                 | ![](images/any/systeminterface%20IDisableAvailabilityTimeSlot.png)      |
+| DisableAvailabilityTimeSlotAsync()           | ![](images/any/interaction%20disableAvailabilityTimeSlotAsync.png)      |
+| IEnableAvailabilityTimeSlot                  | ![](images/any/systeminterface%20IEnableAvailabilityTimeSlot.png)       |
+| EnableAvailabilityTimeSlotAsync()            | ![](images/any/interaction%20enableAvailabilityTimeSlotAsync().png)     |
 | IEditAvailabilityTimeSlot                    | ![](images/any/systeminterface%20IEditAvailabilityTimeSlot.png)         |
 | editAvailabilityTimeSlot()                   | ![](images/any/interaction%20editAvailabilityTimeSlot().png)            |
 | IEnableService                               | ![](images/any/systeminterface%20IEnableService.png)                    |
@@ -829,6 +837,7 @@ The instantiation design decisions considered and made are summarized in the fol
 | IDisableAssistant                            | ![](images/any/systeminterface%20IDisableAssistant.png)                 |
 | dissableAssistant()                          | ![](images/any/interaction%20disableAssistant().png)                    |
 | IDeleteAssistant                             | ![](images/any/systeminterface%20IDeleteAssistant.png)                  |
+| DeleteAssistantAsync()                       | ![](images/any/interaction%20deleteAssistant().png)                     |
 | IEnableAssistant                             | ![](images/any/systeminterface%20IEnableAssistant.png)                  |
 | enableAssistant()                            | ![](images/any/interaction%20enableAssistant().png)                     |
 | IGetAssistant                                | ![](images/any/systeminterface%20IGetAssistant.png)                     |
@@ -842,23 +851,33 @@ The instantiation design decisions considered and made are summarized in the fol
 | registerClient()                             | ![](images/any/interaction%20registerClient().png)                      |
 |                                              |                                                                         |
 | IAssignServiceToAssistant                    | ![](images/any/systeminterface%20IAssignServiceToAssistant.png)         |
-|                                              | ![](images/any/systeminterface%20IGetAssistant.png)                     |
-|                                              | ![](images/any/systeminterface%20IGetClient.png)                        |
-|                                              | ![](images/any/systeminterface%20IGetService.png)                       |
-|                                              | ![](images/any/systeminterface%20IGetAppointment.png)                   |
-|                                              | ![](images/any/systeminterface%20IGetAvailabilityTimeSlot.png)          |
-
-
-
-
-
-
-Initial elements allocation is in process...
-
-
-* Consider implementing an Idempotent Receiver and Replay Protection to ensure that duplicate messages are not processed.
-* "Apply communication between components using a notification system (app, email or messaging)."
-
+| AssignListServiceToAssistantAsync()          | ![](images/any/interaction%20assignListServicesToAssistantAsync.png)    |
+| IGetAssistant                                | ![](images/any/systeminterface%20IGetAssistant.png)                     |
+| IGetClient                                   | ![](images/any/systeminterface%20IGetClient.png)                        |
+| IGetService                                  | ![](images/any/systeminterface%20IGetService.png)                       |
+| IGetAppointment                              | ![](images/any/systeminterface%20IGetAppointment.png)                   |
+| IGetAvailabilityTimeSlot                     | ![](images/any/systeminterface%20IGetAvailabilityTimeSlot.png)          |
+| IBlockDateTimeRange                          | ![](images/any/systeminterface%20IBlockDateTimeRange.png)               |
+| IUnblockDateTimeRange                        | ![](images/any/systeminterface%20IUnblockDateTimeRange.png)             |
+| IAccountJWtLogin                             | ![](images/any/systeminterface%20IAccountJwtLogin.png)                  |
+| IGetNotification                             | ![](images/any/systeminterface%20IGetNotification.png)                  |
+| IMarkNotificationAsRead                      | ![](images/any/systeminterface%20IMarkNotificationAsRead.png)           |
 
 #### Step 7. Perform Analysis of the Current Design and Review the Iteration Goal and Achievement of Design Purpose
 
+| Not Addressed | Partially Addressed | Addressed | Design Decisiones Made During Iteration                                                                                          |
+| ------------- | ------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
+|               | CON-1               |           | The business logic will reside in the server, so it can be reused in any client using HTTP protocol.                             |
+|               |                     | CON-4     | A mutual exclusion algorithm was implemented in the TimeRangeLock component.                                                     |
+|               | CRN-2               |           | Technical debt was payed by refactoring. But additional actions must be taken.                                                   |
+|               | CRN-3               |           | A pipeline was created using Github Actions and Docker. But further actions must be taken to automatically deploy in a server.   |
+|               | QA-1<br>            |           | No relevant decisions were made.                                                                                                 |
+|               |                     | QA-2      | A authorization and authentication components were created to avoid external threats                                             |
+|               |                     | QA-3      | A component specification method was followed to achieve greater ease of maintenance and a layered architecture was implemented. |
+| QA-4          |                     |           | No relevant decisions were made.                                                                                                 |
+| QA-5          |                     |           |                                                                                                                                  |
+|               | QA-6                |           | The server side implements a set of interfaces to allow interoperability. And the SOLID principles was applied.                  |
+|               | QA-7                |           | The server side implements a component based software development to increase testability.                                       |
+|               |                     | QA-8      |                                                                                                                                  |
+|               | QA-9                |           |                                                                                                                                  |
+|               | QA-10               |           |                                                                                                                                  |

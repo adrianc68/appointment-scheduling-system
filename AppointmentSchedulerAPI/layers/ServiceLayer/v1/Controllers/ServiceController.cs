@@ -177,7 +177,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Uuid = dto.Uuid
                 };
 
-                OperationResult<bool, GenericError> result = await systemFacade.UpdateServiceAsync(service);
+                OperationResult<bool, GenericError> result = await systemFacade.EditServiceAsync(service);
                 if (result.IsSuccessful)
                 {
                     isUpdated = result.Result;
