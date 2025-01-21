@@ -7,79 +7,32 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 {
     public class ClientRepository : IClientRepository
     {
-        private readonly Model.AppointmentDbContext context;
-        public ClientRepository(Model.AppointmentDbContext context)
+        private readonly IDbContextFactory<Model.AppointmentDbContext> context;
+        private readonly IPasswordHasherService passwordHasherService;
+        public ClientRepository(IDbContextFactory<Model.AppointmentDbContext> context, IPasswordHasherService passwordHasherService)
         {
             this.context = context;
-        }
-
-        public async Task<IEnumerable<BusinessLogicLayer.Model.Client>> GetAllClientsAsync()
-        {
-            IEnumerable<BusinessLogicLayer.Model.Client> businessClient = [];
-            var clientsDB = await context.Clients
-                .Include(a => a.UserAccount)
-                  .ThenInclude(ua => ua.UserInformation)
-                  .Where(c => c.UserAccount.Role == RoleType.CLIENT)
-              .ToListAsync();
-
-            businessClient = clientsDB
-                .Where(a => a.UserAccount != null && a.UserAccount.UserInformation != null)
-                .Select(a => new BusinessLogicLayer.Model.Client
-                {
-                    Id = a.IdUserAccount,
-                    Uuid = a.UserAccount!.Uuid,
-                    Email = a.UserAccount.Email!,
-                    Name = a.UserAccount.UserInformation!.Name!,
-                    PhoneNumber = a.UserAccount.UserInformation.PhoneNumber!,
-                    Username = a.UserAccount.Username!,
-                    Status = (BusinessLogicLayer.Model.Types.ClientStatusType)a.Status,
-                    CreatedAt = a.UserAccount.CreatedAt
-                })
-                .ToList();
-            return businessClient;
-        }
-
-        public async Task<BusinessLogicLayer.Model.Client?> GetClientByUuidAsync(Guid uuid)
-        {
-            BusinessLogicLayer.Model.Client? client = null;
-            var clientDB = await context.Clients
-                 .Include(a => a.UserAccount)
-                     .ThenInclude(ua => ua.UserInformation)
-                 .FirstOrDefaultAsync(a => a.UserAccount.Uuid == uuid);
-
-            if (clientDB != null)
-            {
-                client = new BusinessLogicLayer.Model.Client
-                {
-                    Id = clientDB.UserAccount.Id,
-                    Name = clientDB.UserAccount.UserInformation.Name,
-                    PhoneNumber = clientDB.UserAccount.UserInformation.PhoneNumber,
-                    Email = clientDB.UserAccount.Email,
-                    Username = clientDB.UserAccount.Username,
-                    CreatedAt = clientDB.UserAccount.CreatedAt,
-                    Status = (BusinessLogicLayer.Model.Types.ClientStatusType?)clientDB.Status,
-                    Uuid = clientDB.UserAccount.Uuid
-                };
-            }
-            return client;
+            this.passwordHasherService = passwordHasherService;
         }
 
         public async Task<bool> AddClientAsync(BusinessLogicLayer.Model.Client client)
         {
             bool isRegistered = false;
-            using var transaction = await context.Database.BeginTransactionAsync();
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
             {
                 var userAccount = new UserAccount
                 {
                     Email = client.Email,
-                    Password = client.Password,
+                    Password = passwordHasherService.HashPassword(client.Password!),
                     Username = client.Username,
                     Role = RoleType.CLIENT,
-                    Uuid = Guid.CreateVersion7()
+                    Uuid = client.Uuid,
+                    Status = AccountStatusType.ENABLED
                 };
-                context.UserAccounts.Add(userAccount);
-                await context.SaveChangesAsync();
+                dbContext.UserAccounts.Add(userAccount);
+                await dbContext.SaveChangesAsync();
 
                 var userInformation = new UserInformation
                 {
@@ -89,17 +42,16 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     IdUser = userAccount.Id
                 };
 
-                context.UserInformations.Add(userInformation);
-                await context.SaveChangesAsync();
+                dbContext.UserInformations.Add(userInformation);
+                await dbContext.SaveChangesAsync();
 
                 var newClient = new Client
                 {
                     IdUserAccount = userAccount.Id,
-                    Status = ClientStatusType.ENABLED
                 };
 
-                context.Clients.Add(newClient);
-                await context.SaveChangesAsync();
+                dbContext.Clients.Add(newClient);
+                await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
                 isRegistered = true;
             }
@@ -113,41 +65,100 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<int?> GetClientIdByUuidAsync(Guid uuid)
         {
-            var clientID = await context.Clients
-                .Where(a => a.UserAccount.Uuid == uuid)
+            using var dbContext = context.CreateDbContext();
+            var clientID = await dbContext.Clients
+                .Where(a => a.UserAccount!.Uuid == uuid)
                 .Select(a => a.IdUserAccount)
                 .FirstOrDefaultAsync();
             return clientID;
         }
 
-        public async Task<bool> isUsernameRegistered(string username)
+        public async Task<IEnumerable<BusinessLogicLayer.Model.Client>> GetAllClientsAsync()
         {
-            var usernameDB = await context.UserAccounts
-                .Where(a => a.Username == username)
-                .Select(a => a.Username)
-                .FirstOrDefaultAsync();
+            IEnumerable<BusinessLogicLayer.Model.Client> businessClient = [];
+            using var dbContext = context.CreateDbContext();
+            var clientsDB = await dbContext.Clients
+                .Include(a => a.UserAccount)
+                  .ThenInclude(ua => ua!.UserInformation)
+                  .Where(c => c.UserAccount!.Role == RoleType.CLIENT && c.UserAccount!.Status != AccountStatusType.DELETED)
+              .ToListAsync();
 
-            return usernameDB != null;
+            businessClient = clientsDB
+                .Where(a => a.UserAccount != null && a.UserAccount.UserInformation != null)
+                .Select(a => new BusinessLogicLayer.Model.Client
+                {
+                    Id = a.IdUserAccount,
+                    Uuid = a.UserAccount!.Uuid,
+                    Email = a.UserAccount.Email!,
+                    Name = a.UserAccount.UserInformation!.Name!,
+                    PhoneNumber = a.UserAccount.UserInformation.PhoneNumber!,
+                    Username = a.UserAccount.Username!,
+                    Status = (BusinessLogicLayer.Model.Types.AccountStatusType)a.UserAccount.Status!.Value,
+                    CreatedAt = a.UserAccount.CreatedAt
+                })
+                .ToList();
+            return businessClient;
         }
 
-        public async Task<bool> isEmailRegistered(string email)
+        public async Task<BusinessLogicLayer.Model.Client?> GetClientByUuidAsync(Guid uuid)
         {
-            var emailDB = await context.UserAccounts
-                .Where(a => a.Email == email)
-                .Select(a => a.Email)
-                .FirstOrDefaultAsync();
+            BusinessLogicLayer.Model.Client? client = null;
+            using var dbContext = context.CreateDbContext();
+            var clientDB = await dbContext.Clients
+                 .Include(a => a.UserAccount)
+                     .ThenInclude(ua => ua!.UserInformation)
+                 .FirstOrDefaultAsync(a => a.UserAccount!.Uuid == uuid);
 
-            return emailDB != null;
+            if (clientDB != null)
+            {
+                client = new BusinessLogicLayer.Model.Client
+                {
+                    Id = clientDB.UserAccount!.Id,
+                    Name = clientDB.UserAccount.UserInformation!.Name,
+                    PhoneNumber = clientDB.UserAccount.UserInformation.PhoneNumber,
+                    Email = clientDB.UserAccount.Email,
+                    Username = clientDB.UserAccount.Username,
+                    CreatedAt = clientDB.UserAccount.CreatedAt,
+                    Status = (BusinessLogicLayer.Model.Types.AccountStatusType?)clientDB.UserAccount!.Status,
+                    Uuid = clientDB.UserAccount.Uuid
+                };
+            }
+            return client;
         }
 
-        public async Task<bool> IsPhoneNumberRegistered(string phoneNumber)
+        public async Task<bool> UpdateClientAsync(BusinessLogicLayer.Model.Client client)
         {
-            var phoneNumberDB = await context.UserInformations
-                .Where(a => a.PhoneNumber == phoneNumber)
-                .Select(a => a.PhoneNumber)
-                .FirstOrDefaultAsync();
+            bool isUpdated = false;
+            using var dbContext = context.CreateDbContext();
+            using var transaction = await dbContext.Database.BeginTransactionAsync();
 
-            return phoneNumberDB != null;
+            try
+            {
+                var userAccount = await dbContext.UserAccounts
+                    .Include(ua => ua.UserInformation)
+                    .FirstOrDefaultAsync(ua => ua.Uuid == client.Uuid);
+
+                if (userAccount == null)
+                {
+                    return false;
+                }
+
+                userAccount.Email = client.Email;
+                userAccount.Username = client.Username;
+                userAccount.Role = RoleType.CLIENT;
+                userAccount.UserInformation!.Name = client.Name;
+                userAccount.UserInformation.PhoneNumber = client.PhoneNumber;
+
+                await dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                isUpdated = true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            return isUpdated;
         }
     }
 }

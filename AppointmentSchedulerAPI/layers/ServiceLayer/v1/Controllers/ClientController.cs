@@ -1,5 +1,8 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ClientInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -21,48 +24,93 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> RegisterClient([FromBody] CreateClientDTO clientDTO)
+        [HttpPatch("disable")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> DisableClient([FromBody] DisableClientDTO dto)
         {
-            Guid? guid;
+            bool isStatusChanged = false;
             try
             {
-                BusinessLogicLayer.Model.Client client = new()
-                {
-                    Name = clientDTO.Name,
-                    Email = clientDTO.Email,
-                    PhoneNumber = clientDTO.PhoneNumber,
-                    Password = clientDTO.Password,
-                    Username = clientDTO.Username
-                };
-
-                CrossCuttingLayer.Communication.Model.RegistrationResponse<Guid> result = await systemFacade.RegisterClientAsync(client);
+                OperationResult<bool, GenericError> result = await systemFacade.DisableClientAsync(dto.Uuid);
                 if (result.IsSuccessful)
                 {
-                    guid = result.Data;
+                    isStatusChanged = result.Result;
                 }
                 else
                 {
-                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
                 }
             }
             catch (System.Exception ex)
             {
                 return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
             }
-            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
         }
 
+        [HttpPatch("enable")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> EnableClient([FromBody] EnableClientDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.EnableClientAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
+
+
+        [HttpDelete("delete")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> DeleteClient([FromBody] DeleteClientDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DeleteClientAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
+
+
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> GetAllClient()
         {
-            List<ClientDTO> clientDTO = [];
+            List<ClientDetailsDTO> clientDTO = [];
             try
             {
                 var clients = await systemFacade.GetAllClientsAsync();
-                clientDTO = clients.Select(a => new ClientDTO
+                clientDTO = clients.Select(a => new ClientDetailsDTO
                 {
                     Uuid = a.Uuid,
                     Email = a.Email,
@@ -80,38 +128,73 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(clientDTO, ApiVersionEnum.V1);
         }
 
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterClient([FromBody] CreateClientDTO clientDTO)
+        {
+            Guid? guid;
+            try
+            {
+                BusinessLogicLayer.Model.Client client = new()
+                {
+                    Name = clientDTO.Name,
+                    Email = clientDTO.Email,
+                    PhoneNumber = clientDTO.PhoneNumber,
+                    Password = clientDTO.Password,
+                    Username = clientDTO.Username
+                };
 
-        // public IActionResult DisableClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult EnableClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult DeleteClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult GetClientStatusType()
-        // {
-        //     throw new NotImplementedException();
-        // }
+                OperationResult<Guid, GenericError> result = await systemFacade.RegisterClientAsync(client);
+                if (result.IsSuccessful)
+                {
+                    guid = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+        }
 
 
-        // public IActionResult RegisterClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult EditClient()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
+        [HttpPut]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> UpdateClient([FromBody] UpdateClientDTO dto)
+        {
+            bool isUpdated = false;
+            try
+            {
+                BusinessLogicLayer.Model.Client client = new()
+                {
+                    Uuid = dto.Uuid,
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    PhoneNumber = dto.PhoneNumber,
+                    Password = dto.Password,
+                    Username = dto.Username
+                };
+                OperationResult<bool, GenericError> result = await systemFacade.UpdateClientAsync(client);
+                if (result.IsSuccessful)
+                {
+                    isUpdated = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isUpdated, ApiVersionEnum.V1);
+        }
 
 
     }

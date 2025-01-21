@@ -1,5 +1,8 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AssistantInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
@@ -24,30 +27,91 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.db = db;
         }
 
-        // public IActionResult DisableAssistant()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPatch("disable")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> DisableAssistant([FromBody] DisableAssistantDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DisableAssistantAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
 
-        // public IActionResult EnableAssistant()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPatch("enable")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> EnableAssistant([FromBody] EnableAssistantDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.EnableAssistantAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
 
-        // public IActionResult DeleteAssistant()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpDelete("delete")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> DeleteAssistant([FromBody] DeleteAssistantDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DeleteAssistantAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> GetAllAssistant()
         {
-            List<AssistantDTO> assistantDtos = [];
+            List<AssistantDetailsDTO> assistantDtos = [];
             try
             {
                 var assistants = await systemFacade.GetAllAssistantsAsync();
-                assistantDtos = assistants.Select(a => new AssistantDTO
+                assistantDtos = assistants.Select(a => new AssistantDetailsDTO
                 {
                     Uuid = a.Uuid,
                     Email = a.Email,
@@ -66,28 +130,29 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> RegisterAssistant([FromBody] CreateAssistantDTO assistantDTO)
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> RegisterAssistant([FromBody] CreateAssistantDTO dto)
         {
             Guid? guid;
             try
             {
                 BusinessLogicLayer.Model.Assistant assistant = new()
                 {
-                    Name = assistantDTO.Name,
-                    Email = assistantDTO.Email,
-                    PhoneNumber = assistantDTO.PhoneNumber,
-                    Password = assistantDTO.Password,
-                    Username = assistantDTO.Username
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    PhoneNumber = dto.PhoneNumber,
+                    Password = dto.Password,
+                    Username = dto.Username
                 };
-                CrossCuttingLayer.Communication.Model.RegistrationResponse<Guid> result = await systemFacade.RegisterAssistant(assistant);
-                if(result.IsSuccessful)
+                OperationResult<Guid, GenericError> result = await systemFacade.RegisterAssistantAsync(assistant);
+                if (result.IsSuccessful)
                 {
-                    guid = result.Data;
+                    guid = result.Result;
                 }
-                else 
+                else
                 {
-                    return httpResponseService.Conflict(ApiVersionEnum.V1, result.Code.ToString());
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
                 }
             }
             catch (System.Exception ex)
@@ -97,14 +162,57 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
 
+        [HttpPut]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> UpdateAssistant([FromBody] UpdateAssistantDTO dto)
+        {
+            bool isUpdated = false;
+            try
+            {
+                BusinessLogicLayer.Model.Assistant assistant = new()
+                {
+                    Uuid = dto.Uuid,
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    PhoneNumber = dto.PhoneNumber,
+                    Password = dto.Password,
+                    Username = dto.Username
+                };
+                OperationResult<bool, GenericError> result = await systemFacade.EditAssistantAsync(assistant);
+                if (result.IsSuccessful)
+                {
+                    isUpdated = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isUpdated, ApiVersionEnum.V1);
+        }
+
         [HttpPost("service")]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> AssignServiceToAssistant([FromBody] AssignServiceToAssistantDTO assignServiceDTO)
         {
             bool isAssigned = false;
             try
             {
-                isAssigned = await systemFacade.AssignServicesToAssistant(assignServiceDTO.assistantUuid, assignServiceDTO.servicesUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.AssignListServicesToAssistantAsync(assignServiceDTO.AssistantUuid, assignServiceDTO.SelectedServices);
+                if (result.IsSuccessful)
+                {
+                    isAssigned = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
             }
             catch (System.Exception ex)
             {

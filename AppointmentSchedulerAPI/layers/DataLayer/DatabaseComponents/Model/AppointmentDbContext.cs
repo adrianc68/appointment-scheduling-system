@@ -22,9 +22,17 @@ public partial class AppointmentDbContext : DbContext
     public required virtual DbSet<Client> Clients { get; set; }
     public required virtual DbSet<Appointment> Appointments { get; set; }
     public required virtual DbSet<Service> Services { get; set; }
-    public required virtual DbSet<AssistantService> AssistantServices { get; set; }
+    public required virtual DbSet<ServiceOffer> ServiceOffers { get; set; }
     public required virtual DbSet<AvailabilityTimeSlot> AvailabilityTimeSlots { get; set; }
-    public required virtual DbSet<AppointmentAssistantService> AppointmentAssistantServices { get; set; }
+    public required virtual DbSet<UnavailableTimeSlot> UnavailableTimeSlots { get; set; }
+    public required virtual DbSet<ScheduledService> ScheduledServices { get; set; }
+    public required virtual DbSet<AppointmentNotification> AppointmentNotifications { get; set; }
+    public required virtual DbSet<SystemNotification> SystemNotifications { get; set; }
+    public required virtual DbSet<GeneralNotification> GeneralNotifications { get; set; }
+    public required virtual DbSet<NotificationBase> NotificationBases { get; set; }
+    public required virtual DbSet<NotificationRecipient> NotificationRecipients { get; set; }
+
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,7 +41,18 @@ public partial class AppointmentDbContext : DbContext
             .HasPostgresEnum<ClientStatusType>("ClientStatusType")
             .HasPostgresEnum<AssistantStatusType>("AssistantType")
             .HasPostgresEnum<RoleType>("RoleType")
-            .HasPostgresEnum<ServiceStatusType>("ServiceStatusType");
+            .HasPostgresEnum<ServiceStatusType>("ServiceStatusType")
+            .HasPostgresEnum<ServiceOfferStatusType>("ServiceOfferStatusType")
+            .HasPostgresEnum<AvailabilityTimeSlotStatusType>("AvailabilityTimeSlotStatusType")
+            .HasPostgresEnum<AccountStatusType>("AccountStatusType")
+            .HasPostgresEnum<NotificationStatusType>("NotificationStatusType")
+
+            .HasPostgresEnum<AppointmentNotificationCodeType>("AppointmentNotificationCodeType")
+            .HasPostgresEnum<GeneralNotificationCodeType>("GeneralNotificationCodeType")
+            .HasPostgresEnum<SystemNotificationCodeType>("SystemNotificationCodeType")
+            .HasPostgresEnum<SystemNotificationSeverityCodeType>("SystemNotificationSeverityCodeType");
+
+
 
         modelBuilder.Entity<UserAccount>(entity =>
         {
@@ -49,6 +68,9 @@ public partial class AppointmentDbContext : DbContext
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .HasColumnName("email");
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasColumnType("AccountStatusType");
             entity.Property(e => e.Uuid)
                 .HasColumnName("uuid");
             entity.Property(e => e.Password)
@@ -86,6 +108,111 @@ public partial class AppointmentDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
         });
 
+        modelBuilder.Entity<NotificationBase>(entity =>
+         {
+             entity.ToTable("NotificationBase");
+             entity.HasKey(e => e.Id);
+
+             entity.Property(e => e.Id)
+                 .HasColumnName("id");
+             entity.Property(e => e.Uuid)
+                 .HasColumnName("uuid");
+             entity.Property(e => e.CreatedAt)
+                 .HasColumnName("created_at");
+
+             entity.Property(e => e.Message)
+                 .HasColumnName("message");
+             entity.Property(e => e.Type)
+                 .HasColumnType("NotificationType")
+                 .HasColumnName("type");
+         });
+
+        modelBuilder.Entity<NotificationRecipient>(entity =>
+        {
+            entity.ToTable("NotificationRecipient");
+            entity.HasKey(e => new { e.IdUserAccount, e.IdNotificationBase });
+
+            entity.Property(e => e.IdNotificationBase)
+                .HasColumnName("id_notification");
+            entity.Property(e => e.IdUserAccount)
+                .HasColumnName("id_user_account");
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasColumnType("NotificationStatusType");
+            entity.Property(e => e.ChangedAt)
+                .HasColumnName("changed_at");
+
+            entity.HasOne(e => e.UserAccount)
+                .WithMany(a => a.NotificationRecipients)
+                .HasForeignKey(e => e.IdUserAccount);
+
+            entity.HasOne(e => e.NotificationBase)
+                .WithMany(e => e.NotificationRecipients)
+                .HasForeignKey(e => e.IdNotificationBase);
+        });
+
+
+        modelBuilder.Entity<AppointmentNotification>(entity =>
+        {
+            entity.ToTable("AppointmentNotification");
+            entity.HasKey(e => new { e.IdAppointment, e.IdNotificationBase });
+
+            entity.Property(e => e.IdAppointment)
+                .HasColumnName("id_appointment");
+            entity.Property(e => e.IdNotificationBase)
+                .HasColumnName("id_notification");
+            entity.Property(e => e.Code)
+                .HasColumnName("code")
+                .HasColumnType("AppointmentNotificationCodeType");
+
+            entity.HasOne(a => a.Appointment)
+                .WithMany(a => a.AppointmentNotifications)
+                .HasForeignKey(a => a.IdAppointment)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(a => a.NotificationBase)
+                  .WithOne(e => e.AppointmentNotification)
+                  .HasForeignKey<AppointmentNotification>(x => x.IdNotificationBase)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SystemNotification>(entity =>
+        {
+            entity.ToTable("SystemNotification");
+            entity.HasKey(e => e.IdNotificationBase);
+
+            entity.Property(e => e.IdNotificationBase)
+                .HasColumnName("id_notification");
+            entity.Property(e => e.Code)
+                .HasColumnName("code")
+                .HasColumnType("SystemNotificationCodeType");
+            entity.Property(e => e.Severity)
+                .HasColumnName("severity")
+                .HasColumnType("SystemNotificationSeverityCodeType");
+
+            entity.HasOne(a => a.NotificationBase)
+                .WithOne(e => e.SystemNotification)
+                .HasForeignKey<SystemNotification>(x => x.IdNotificationBase)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<GeneralNotification>(entity =>
+        {
+            entity.ToTable("GeneralNotification");
+            entity.HasKey(e => e.IdNotificationBase);
+
+            entity.Property(e => e.IdNotificationBase)
+                .HasColumnName("id_notification");
+            entity.Property(e => e.Code)
+                .HasColumnName("code")
+                .HasColumnType("GeneralNotificationCodeType");
+
+            entity.HasOne(a => a.NotificationBase)
+                .WithOne(e => e.GeneralNotification)
+                .HasForeignKey<GeneralNotification>(x => x.IdNotificationBase)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
 
         modelBuilder.Entity<Assistant>(entity =>
         {
@@ -94,9 +221,6 @@ public partial class AppointmentDbContext : DbContext
 
             entity.Property(e => e.IdUserAccount)
                 .HasColumnName("id_user_account");
-            entity.Property(e => e.Status)
-                .HasColumnName("status")
-                .HasColumnType("AssistantStatusType");
 
             entity.HasOne(d => d.UserAccount)
             .WithOne(ua => ua.Assistant)
@@ -112,9 +236,6 @@ public partial class AppointmentDbContext : DbContext
 
             entity.Property(e => e.IdUserAccount)
                 .HasColumnName("id_user_account");
-            entity.Property(e => e.Status)
-                .HasColumnName("status")
-                .HasColumnType("ClientStatusType");
 
             entity.HasOne(d => d.UserAccount)
             .WithOne(ua => ua.Client)
@@ -185,12 +306,12 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnType("ServiceStatusType");
         });
 
-        modelBuilder.Entity<AssistantService>(entity =>
+        modelBuilder.Entity<ServiceOffer>(entity =>
         {
-            entity.ToTable("AssistantService");
+            entity.ToTable("ServiceOffer");
             entity.HasKey(e => e.Id);
 
-            
+
             entity.Property(e => e.IdAssistant)
                 .HasColumnName("id_assistant");
             entity.Property(e => e.IdService)
@@ -200,38 +321,56 @@ public partial class AppointmentDbContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("nextval(('\"service_id_seq\"'::text)::regclass)")
                 .HasColumnName("id");
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasColumnType("ServiceOfferStatusType");
+
             entity.HasOne(e => e.Assistant)
-                .WithMany(a => a.AssistantServices)
+                .WithMany(a => a.ServiceOffers)
                 .HasForeignKey(ase => ase.IdAssistant);
 
             entity.HasOne(e => e.Service)
-                .WithMany(se => se.AssistantServices)
+                .WithMany(se => se.ServiceOffers)
                 .HasForeignKey(sse => sse.IdService);
         });
 
-        modelBuilder.Entity<AppointmentAssistantService>(entity =>
+        modelBuilder.Entity<ScheduledService>(entity =>
         {
-            entity.ToTable("AppointmentAssistantService");
-            entity.HasKey(e => new { e.IdAppointment, e.IdAssistantService });
+            entity.ToTable("ScheduledService");
+            entity.HasKey(e => e.Id);
 
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
             entity.Property(e => e.IdAppointment)
                 .HasColumnName("id_appointment");
-            entity.Property(e => e.IdAssistantService)
-                .HasColumnName("id_assistant_service");
+            entity.Property(e => e.IdServiceOffer)
+                .HasColumnName("id_serviceOffer");
+            entity.Property(e => e.ServiceStartTime)
+                .HasColumnName("start_time");
+            entity.Property(e => e.ServiceEndTime)
+                .HasColumnName("end_time");
+            entity.Property(e => e.ServicePrice)
+                .HasColumnName("service_price");
+            entity.Property(e => e.ServiceName)
+                .HasColumnName("service_name");
+            entity.Property(e => e.ServicesMinutes)
+                .HasColumnName("service_minutes");
+            entity.Property(e => e.Uuid)
+                .HasColumnName("uuid");
 
             entity.HasOne(e => e.Appointment)
-                .WithMany(a => a.AppointmentAssistantServices)
+                .WithMany(a => a.ScheduledServices)
                 .HasForeignKey(ase => ase.IdAppointment);
 
-            entity.HasOne(e => e.AssistantService)
-                .WithMany(se => se.AppointmentAssistantServices)
-                .HasForeignKey(sse => sse.IdAssistantService);
+            entity.HasOne(e => e.ServiceOffer)
+                .WithMany(se => se.ScheduledServices)
+                .HasForeignKey(sse => sse.IdServiceOffer);
         });
 
         modelBuilder.Entity<AvailabilityTimeSlot>(entity =>
         {
             entity.ToTable("AvailabilityTimeSlot");
-            entity.HasKey(e => new { e.IdAssistant, e.Id });
+            entity.HasKey(e => new { e.Id });
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("nextval(('\"availabilitytimeslot_id_seq\"'::text)::regclass)")
@@ -251,19 +390,40 @@ public partial class AppointmentDbContext : DbContext
             entity.Property(e => e.StartTime)
                 .HasMaxLength(50)
                 .HasColumnName("start_time");
+            entity.Property(e => e.Status)
+                .HasColumnName("status");
+
             entity.Property(e => e.Uuid).HasColumnName("uuid");
 
             entity.HasOne(d => d.Assistant)
                 .WithMany(p => p.AvailabilityTimeSlots)
                 .HasForeignKey(d => d.IdAssistant);
+
+            entity.HasMany(d => d.UnavailableTimeSlots)
+                .WithOne(p => p.AvailabilityTimeSlot)
+                .HasForeignKey(e => e.IdAvailabilityTimeSlot);
+        });
+
+        modelBuilder.Entity<UnavailableTimeSlot>(entity =>
+        {
+            entity.ToTable("UnavailableTimeSlot");
+            entity.HasKey(e => new { e.StartTime, e.EndTime, e.IdAvailabilityTimeSlot });
+
+            entity.Property(e => e.IdAvailabilityTimeSlot)
+                .HasColumnName("id_availability_time_slot");
+            entity.Property(e => e.StartTime)
+                .HasColumnName("start_time");
+            entity.Property(e => e.EndTime)
+            .HasColumnName("end_time");
         });
 
 
         modelBuilder.HasSequence("appointment_id_seq");
-        modelBuilder.HasSequence("assistant_id_seq");
         modelBuilder.HasSequence("availabilitytimeslot_id_seq");
-        modelBuilder.HasSequence("client_id_seq");
+        modelBuilder.HasSequence("notificationbase_id_seq");
+        modelBuilder.HasSequence("scheduledservice_id_seq");
         modelBuilder.HasSequence("service_id_seq");
+        modelBuilder.HasSequence("serviceoffer_id_seq");
         modelBuilder.HasSequence("useraccount_id_seq");
 
         OnModelCreatingPartial(modelBuilder);

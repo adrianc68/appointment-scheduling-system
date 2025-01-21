@@ -1,30 +1,20 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
-    public class AssistantMgr : IAssistantMgt
+    public class AssistantMgr : IAssistantMgt, IAssistantEvent
     {
         private readonly IAssistantRepository assistantRepository;
+        private static readonly List<IAssistantObserver> observers = new();
 
         public AssistantMgr(IAssistantRepository assistantRepository)
         {
             this.assistantRepository = assistantRepository;
-        }
-
-        public async Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid)
-        {
-            bool areAllServicesRegistered = await assistantRepository.AddServicesToAssistantAsync(assistantUuid, servicesUuid);
-            return areAllServicesRegistered;
-        }
-
-        public bool ChangeAssistantStatus(int idAssistant, AssistantStatusType status)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<List<Assistant>> GetAllAssistantsAsync()
@@ -32,91 +22,82 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<Assistant>)await assistantRepository.GetAllAssistantsAsync();
         }
 
-        public AssistantStatusType GetAssistantStatus(int idAssistant)
+        public async Task<Assistant?> GetAssistantByUuidAsync(Guid uuid)
         {
-            throw new NotImplementedException();
+            Assistant? assistant = await assistantRepository.GetAssistantByUuidAsync(uuid);
+            return assistant;
         }
 
-        public bool GetServicesAssignedToAssistant(int idAssistant)
+        public async Task<int?> GetServiceIdByServiceOfferUuidAsync(Guid uuid)
         {
-            throw new NotImplementedException();
+            int? assistantId = await assistantRepository.GetServiceIdByAssistantServiceUuidAsync(uuid);
+            return assistantId;
         }
 
-        public bool IsAssistantRegistered(Assistant assistant)
+        public async Task<ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid)
         {
-            throw new NotImplementedException();
+            ServiceOffer? serviceOffer = await assistantRepository.GetServiceOfferByUuidAsync(uuid);
+            return serviceOffer;
         }
 
-        public async Task<RegistrationResponse<Guid>> RegisterAssistantAsync(Assistant assistant)
+        public async Task<bool> IsAssistantOfferingServiceByUuidAsync(int idService, int idAssistant)
         {
+            bool isAssistantOfferingService = await assistantRepository.IsAssistantOfferingServiceByUuidAsync(idService, idAssistant);
+            return isAssistantOfferingService;
+        }
 
-            // 1. Check if username is is registered
-            if (string.IsNullOrWhiteSpace(assistant.Username) ||
-                 string.IsNullOrWhiteSpace(assistant.Email) ||
-                 string.IsNullOrWhiteSpace(assistant.PhoneNumber))
-            {
-                return new RegistrationResponse<Guid>
-                {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.NULL_VALUE_IS_PRESENT
-                };
-            }
+        public async Task<bool> IsAssistantRegisteredByUuidAsync(Guid uuid)
+        {
+            int? assistantId = await assistantRepository.GetAssistantIdByUuidAsync(uuid);
+            return assistantId != null;
+        }
 
-            bool isUsernameRegistered = await assistantRepository.isUsernameRegistered(assistant.Username);
-            if (isUsernameRegistered)
-            {
-                return new RegistrationResponse<Guid>
-                {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.USERNAME_ALREADY_REGISTERED
-                };
-            }
+        public async Task<bool> AssignListServicesToAssistantAsync(int idAssistant, List<int> idServices)
+        {
+            bool areAllServicesRegistered = await assistantRepository.AddServicesToAssistantAsync(idAssistant, idServices);
+            return areAllServicesRegistered;
+        }
 
-            // 2. Check if email is registered
-            bool isEmailRegistered = await assistantRepository.isEmailRegistered(assistant.Email);
-            if (isEmailRegistered)
-            {
-                return new RegistrationResponse<Guid>
-                {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.EMAIL_ALREADY_REGISTERED
-                };
-            }
-
-            // 3. Check if phoneNumber is registered
-            bool isPhoneNumberRegistered = await assistantRepository.IsPhoneNumberRegistered(assistant.PhoneNumber);
-            if (isPhoneNumberRegistered)
-            {
-                return new RegistrationResponse<Guid>
-                {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED
-                };
-            }
-            // 4. Create Guid UUID
+        public async Task<Guid?> RegisterAssistantAsync(Assistant assistant)
+        {
             assistant.Uuid = Guid.CreateVersion7();
-
             bool isRegistered = await assistantRepository.AddAssistantAsync(assistant);
-            if (isRegistered)
+            if (!isRegistered)
             {
-                return new RegistrationResponse<Guid>
-                {
-                    IsSuccessful = true,
-                    Data = assistant.Uuid.Value,
-                    Code = MessageCodeType.SUCCESS_OPERATION
-
-                };
+                assistant.Uuid = null;
+                return null;
             }
-            return new RegistrationResponse<Guid>
-            {
-                IsSuccessful = true,
-                Code = MessageCodeType.REGISTER_ERROR
-            };
+            return assistant.Uuid.Value;
         }
 
-        public bool UpdateAssistant(int idAssistant, Assistant assistant)
+        public async Task<bool> UpdateAssistantAsync(Assistant assistant)
         {
-            throw new NotImplementedException();
+            bool isUpdated = await assistantRepository.UpdateAssistantAsync(assistant);
+            return isUpdated;
+        }
+
+        public void NotifySubscribers(AssistantEvent eventType)
+        {
+            foreach (var observer in observers)
+            {
+                observer.UpdateOnAssistantChanged(eventType);
+            }
+        }
+
+        public void Suscribe(IAssistantObserver assistantObserver)
+        {
+            if (!observers.Contains(assistantObserver))
+            {
+                observers.Add(assistantObserver);
+            }
+        }
+
+        public void Unsuscribe(IAssistantObserver assistantObserver)
+        {
+            if (observers.Contains(assistantObserver))
+            {
+                observers.Remove(assistantObserver);
+            }
         }
     }
 }

@@ -1,5 +1,8 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +12,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    [ApiVersion(ApiVersionEnum.V1)]
+    [ApiVersion("1")]
     public class ServiceController : ControllerBase
     {
         private readonly IServiceInterfaces systemFacade;
@@ -21,61 +24,16 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             this.httpResponseService = httpResponseService;
         }
 
-        [HttpDelete("{idService}")]
-        public IActionResult DeleteService(int idService)
-        {
-            var appointments = systemFacade.DeleteService(idService);
-            return Ok(appointments);
-        }
-
-        // public IActionResult DisableService()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult EnableService()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        // public IActionResult DeleteService()
-        // {
-        //     throw new NotImplementedException();
-        // }
-
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> RegisterService([FromBody] CreateServiceDTO serviceDTO)
-        {
-            Guid? guid;
-            try
-            {
-                BusinessLogicLayer.Model.Service service = new()
-                {
-                    Description = serviceDTO.Description,
-                    Minutes = serviceDTO.Minutes,
-                    Name = serviceDTO.Name,
-                    Price = serviceDTO.Price
-                };
-                guid = await systemFacade.RegisterService(service);
-            }
-            catch (System.Exception ex)
-            {
-                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
-            }
-            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
-        }
-
-
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> GetAllServices()
         {
-            List<ServiceDTO> serviceDtos = [];
+            List<ServiceDetailsDTO> serviceDtos = [];
             try
             {
                 var services = await systemFacade.GetAllServicesAsync();
-                serviceDtos = services.Select(a => new ServiceDTO
+                serviceDtos = services.Select(a => new ServiceDetailsDTO
                 {
                     Uuid = a.Uuid,
                     Status = a.Status.ToString(),
@@ -93,11 +51,148 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             return httpResponseService.OkResponse(serviceDtos, ApiVersionEnum.V1);
         }
 
-        // public IActionResult EditService()
-        // {
-        //     throw new NotImplementedException();
-        // }
+        [HttpPatch("enable")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> EnableService([FromBody] EnableServiceDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.EnableServiceAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
 
+        [HttpPatch("disable")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> DisableService([FromBody] DisableServiceDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DisableServiceAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
+
+        [HttpDelete("delete")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> DeleteService([FromBody] DeleteServiceDTO dto)
+        {
+            bool isStatusChanged = false;
+            try
+            {
+                OperationResult<bool, GenericError> result = await systemFacade.DeleteServiceAsync(dto.Uuid);
+                if (result.IsSuccessful)
+                {
+                    isStatusChanged = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isStatusChanged, ApiVersionEnum.V1);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> RegisterService([FromBody] CreateServiceDTO dto)
+        {
+            Guid? guid;
+            try
+            {
+                BusinessLogicLayer.Model.Service service = new()
+                {
+                    Description = dto.Description,
+                    Minutes = dto.Minutes,
+                    Name = dto.Name,
+                    Price = dto.Price
+                };
+
+                OperationResult<Guid, GenericError> result = await systemFacade.RegisterServiceAsync(service);
+                if (result.IsSuccessful)
+                {
+                    guid = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
+        }
+
+
+        [HttpPut]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> UpdateService([FromBody] UpdateServiceDTO dto)
+        {
+            bool isUpdated = false;
+            try
+            {
+                BusinessLogicLayer.Model.Service service = new()
+                {
+                    Description = dto.Description,
+                    Minutes = dto.Minutes,
+                    Name = dto.Name,
+                    Price = dto.Price,
+                    Uuid = dto.Uuid
+                };
+
+                OperationResult<bool, GenericError> result = await systemFacade.EditServiceAsync(service);
+                if (result.IsSuccessful)
+                {
+                    isUpdated = result.Result;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(isUpdated, ApiVersionEnum.V1);
+        }
 
     }
 }

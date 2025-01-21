@@ -45,6 +45,29 @@
 - `Pending`
 
 
+#### Server Side Artifacts
+
+##### Module View
+
+![](images/any/server%20side%20module%20view%20allocation.png)
+
+##### Component Architecture
+
+![](images/any/Component%20Architecture%20Refined.png)
+
+##### Interface Responsibility Diagram or Logical Data Model
+
+![](images/any/Interface%20Responsibility%20Diagram%20refined.png)
+
+##### Interface Responsibility Diagram or Logical Model for Notification component
+
+![](images/any/Notification%20Interface%20Responsibility%20Diagram.png)
+
+##### Physical Data Model
+
+![](images/any/physical%20data%20model.png)
+
+
 # Software Process
 
 ## Requirements
@@ -479,6 +502,7 @@
 | CON-2 | Code must be hosted on a proprietary Git-based platform like Github                                                                                        |
 | CON-3 | Future support for mobile clients like IOS and Android                                                                                                     |
 | CON-4 | Race condition problems must be avoided during high user traffic or parallel processing.                                                                   |
+|       |                                                                                                                                                            |
 
 ### Concerns
 
@@ -535,6 +559,7 @@ The objective of starting an Attribute-Driven Design process is to establish a s
 | QA-5 Performance        | Medium                     | High                         |
 | QA-7 Testability        | Medium                     | Medium                       |
 | QA-4 Usability          | Low                        | Medium                       |
+|                         |                            |                              |
 
 | Category                        | Details                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -698,8 +723,6 @@ Also, information about relationships between some elements in the diagram that 
 |               | QA-10                                                                     |           | Techniques were identified, but further details are needed.                                                                                                                                                                                          |
 ### Iteration 2: Identifying Structures to Support Primary Functionality
 
-
-
 #### Step 2. Establish Iteration Goal by Selecting Drivers
 
 In this iteration, the design focuses on the back-end of the application. The goal is to identify structures that support primary functionality. The first use cases considered are:
@@ -708,7 +731,6 @@ In this iteration, the design focuses on the back-end of the application. The go
 * CC-1 Register assistant
 * CD-1 Register service
 Since these use case and its modules are CRUD-based and share related behavior, I chose to apply domain decomposition to create components and accommodate the functionality within the architecture. This approach follows the reference method describe by John Chessman in "A Simple Process for Specifying Component-Based Software".
-
 #### Step 3. Choose Elements of the System to Refine
 
 In this iteration, the elements to be refined are the modules located across the different layers defined by the two reference architectures established in the previous iteration. The functionality needed to support the system’s use cases will require the collaboration of components located in these different layers, ensuring they work together to provide the necessary services.
@@ -719,40 +741,55 @@ The following table summarizes the design decisions.
 | Design Decision and Location                             | Rational and Assumptions                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Select Domain-Decomposition for Component-Based Software | Domain decomposition is selected as the primary approach for defining the system’s components because the core functionality is centered around CRUD operations that share related business behavior. By organizing components based on business domains, each module can encapsulate related logic, making the system more maintainable and scalable. This also enables better isolation of concerns, allowing each domain to evolve independently while still maintaining clear boundaries between the components. Domain decomposition provides a natural mapping to the system’s use cases. |
-| Select Repository Pattern                                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| Select Observer Pattern                                  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Select Repository Pattern                                | The repository pattern is selected to abstract the data access logic, providing a consistent and clean interface for CRUD operations while decoupling business logic from persistente concerns. This improves maintainability by centralizing queries and enhances reusability and separation of responsibilities, aligning with SOLID principles.                                                                                                                                                                                                                                              |
+| Select Observer Pattern                                  | The observer pattern is selected to enable reactive notifications between components, ensuring data consistency and integrity when entities are modified. It decouples emitters from observers, promoting modularity and scalability by allowing new observer to be added without altering existing logic.                                                                                                                                                                                                                                                                                      |
+| Select Mapping Strategy for Database Model               | A mapping strategy is selected to bridge the gap between the business logic model and the database model, to allow clear separation of concerns, where the business model focuses on domain logic while the database model optimizes persistence. This strategy is used with an ORM tool using the Repository pattern to streamline the mapping process and manage complex relationships or queries.                                                                                                                                                                                            |
+| Use Data Transfer Objects (DTOs)                         | DTOs are used to decouple the data representation from the business logic, optimizing the transfer of data between layers or external clients. It is used to allow the system to expose only the required fields while hiding internal structures, enhancing security and reducing payload size in API responses. They also enable flexibility in data formatting without affecting the core logic or persistence models.                                                                                                                                                                       |
+| Create REST API Controllers                              | REST API controllers are created to handle client request and serve as the entry point to the system. They ensure a clear separation between the presentation layer and business logic, making the API more maintainable and testable. Controllers are used for mapping HTTP requests to appropriate Application Facade methods, validating inputs, and formatting responses, enabling efficient and scalable communication between the client and the system.                                                                                                                                  |
 
 #### Step 5. Instantiate Architectural Elements, Allocate Responsibilities and Define Interfaces
 
 The instantiation design decisions considered and made are summarized in the following table:
 
-| Design Decision and Location                                   | Rational and Assumptions |
-| -------------------------------------------------------------- | ------------------------ |
-| Locate System Interfaces into Services Interfaces              |                          |
-| Locaate Business Interfaces into Business Interfaces           |                          |
-| Create an Application Facade to coordinate business components |                          |
-
-
+| Design Decision and Location                                                                      | Rational and Assumptions                                                                                                                                                                                                                                             |
+| ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Locate Controllers and DTOS into Services Layer                                                   | Controllers and DTOs are placed in the Service Layer to handle interactions between clients and the business logic. This ensures a clear separation of concerns, allowing the layer to focus on input validation, data transformation, and communication.            |
+| Locate System Interfaces into Business Logic Layer                                                | System interfaces are located in the Business Logic Layer to define the contracts that encapsulate the core functionality. This allows the business logic to evolve independently while providing a clear API for the service and data layers.                       |
+| Locate Business Interfaces and Business Components into Business Logic Layer                      | Business Interfaces and Components are placed in the Business Logic Layer to centralize domain-specific operations and encapsulate the core business rules, promoting modularity, reusability, and separation of concerns.                                           |
+| Create an Application Facade implementing System Interfaces and coordinate Business Components    | The Application Facade provides a unified interface to the Business Logic Layer by implementing system interfaces and coordinating the interaction between the Business Components, simplifying client interactions and reducing coupling with the underlying logic. |
+| Locate Repository Interfaces and Repository Components with its Database Entities into Data Layer | Repository interfaces and Components, along with database entities, are placed in the Data Layer to encapsulate persistence logic, abstract data access details, and promote maintainability and testability.                                                        |
 #### Step 6. Sketch Views and Record Design Decisions
 
 ##### Component Architecture
 
 ![](images/any/Component%20Architecture%20Refined.png)
 
-##### Interface Responsibility Diagram
+##### Interface Responsibility Diagram or Logic Data Model
 
 ![](images/any/Interface%20Responsibility%20Diagram%20refined.png)
 
+##### Module View Allocation
+
+![](images/any/module%20view%20allocate%20refined.png)
+
+##### Server Side Module View
+
 ![](images/any/server%20side%20module%20view%20allocation.png)
+##### Physical Data Model
+
 ![](images/any/physical%20data%20model.png)
 
 
-| Business Interface | Diagram                                               |
-| ------------------ | ----------------------------------------------------- |
-| ISchedulerMgt      | ![](images/any/businessinterface%20ISchedulerMgt.png) |
-| IClientMgt         | ![](images/any/businessinterface%20IClientMgt.png)    |
-| IServiceMgt        | ![](images/any/businessinterface%20IServiceMgt.png)   |
-| IAssistantMgt      | ![](images/any/businessinterface%20IAssistantMgt.png) |
+| Business Interface | Diagram                                                  |
+| ------------------ | -------------------------------------------------------- |
+| ISchedulerMgt      | ![](images/any/businessinterface%20ISchedulerMgt.png)    |
+| IClientMgt         | ![](images/any/businessinterface%20IClientMgt.png)       |
+| IServiceMgt        | ![](images/any/businessinterface%20IServiceMgt.png)      |
+| IAssistantMgt      | ![](images/any/businessinterface%20IAssistantMgt.png)    |
+| IAccountMgt        | ![](images/any/businessinterface%20IAccountMgt.png)      |
+| INotificationMgt   | ![](images/any/businessinterface%20INotificationMgt.png) |
+| ITimeSlotLockMgt   | ![](images/any/businessinterface%20ITimeSlotLockMgt.png) |
+|                    |                                                          |
 
 | System Interfaces and Collaboration Diagrams | Diagram                                                                 |
 | -------------------------------------------- | ----------------------------------------------------------------------- |
@@ -774,10 +811,14 @@ The instantiation design decisions considered and made are summarized in the fol
 | cancelAppointmentClientSelf()                | ![](images/any/interaction%20cancelAppointmentClientSelf().png)         |
 | ICancelAppointmentStaffAssisted              | ![](images/any/systeminterface%20ICancelAppointmentStaffAssited.png)    |
 | cancelAppointmentStaffAssisted()             | ![](images/any/interaction%20cancelAppointmentStaffAssisted().png)      |
-| IAssignAvailabilityTimeSlot                  | ![](images/any/systeminterface%20IAssignAvailabilityTimeSlot.png)       |
+| IAddAvailabilityTimeSlot                     | ![](images/any/systeminterface%20IAddAvailabilityTimeSlot.png)          |
 | registerAvailabilityTimeSlot()               | ![](images/any/interaction%20registerAvailabilityTimeSlot().png)        |
 | IDeleteAvailabilityTimeSlot                  | ![](images/any/systeminterface%20IDeleteAvailabilityTimeSlot.png)       |
 | deleteAvailabilityTimeSlot()                 | ![](images/any/interaction%20deleteAvailabilityTimeSlot.png)            |
+| IDisableAvailabilityTimeSlot                 | ![](images/any/systeminterface%20IDisableAvailabilityTimeSlot.png)      |
+| DisableAvailabilityTimeSlotAsync()           | ![](images/any/interaction%20disableAvailabilityTimeSlotAsync.png)      |
+| IEnableAvailabilityTimeSlot                  | ![](images/any/systeminterface%20IEnableAvailabilityTimeSlot.png)       |
+| EnableAvailabilityTimeSlotAsync()            | ![](images/any/interaction%20enableAvailabilityTimeSlotAsync().png)     |
 | IEditAvailabilityTimeSlot                    | ![](images/any/systeminterface%20IEditAvailabilityTimeSlot.png)         |
 | editAvailabilityTimeSlot()                   | ![](images/any/interaction%20editAvailabilityTimeSlot().png)            |
 | IEnableService                               | ![](images/any/systeminterface%20IEnableService.png)                    |
@@ -796,9 +837,16 @@ The instantiation design decisions considered and made are summarized in the fol
 | editAssistant()                              | ![](images/any/interaction%20editAssistant().png)                       |
 | IDisableAssistant                            | ![](images/any/systeminterface%20IDisableAssistant.png)                 |
 | dissableAssistant()                          | ![](images/any/interaction%20disableAssistant().png)                    |
+| IDeleteAssistant                             | ![](images/any/systeminterface%20IDeleteAssistant.png)                  |
+| DeleteAssistantAsync()                       | ![](images/any/interaction%20deleteAssistant().png)                     |
 | IEnableAssistant                             | ![](images/any/systeminterface%20IEnableAssistant.png)                  |
 | enableAssistant()                            | ![](images/any/interaction%20enableAssistant().png)                     |
+| IGetAssistant                                | ![](images/any/systeminterface%20IGetAssistant.png)                     |
 | IDisableClient                               | ![](images/any/systeminterface%20IDisableClient.png)                    |
+| IDeleteClient                                | ![](images/any/systeminterface%20IDeleteClient.png)                     |
+| DeleteClientAsync                            | ![](images/any/interaction%20deleteClient().png)                        |
+| IEditClient                                  | ![](images/any/systeminterface%20IEditClient.png)                       |
+| UpdateClientAsync()                          | ![](images/any/interaction%20editClient().png)                          |
 | disableClient()                              | ![](images/any/interaction%20disableClient().png)                       |
 | IEnableClient                                | ![](images/any/systeminterface%20IEnableClient.png)                     |
 | enableClient()                               | ![](images/any/interaction%20enableClient().png)                        |
@@ -806,23 +854,37 @@ The instantiation design decisions considered and made are summarized in the fol
 | registerClient()                             | ![](images/any/interaction%20registerClient().png)                      |
 |                                              |                                                                         |
 | IAssignServiceToAssistant                    | ![](images/any/systeminterface%20IAssignServiceToAssistant.png)         |
-|                                              |                                                                         |
-|                                              | ![](images/any/systeminterface%20IGetAssistant.png)                     |
-|                                              | ![](images/any/systeminterface%20IGetClient.png)                        |
-|                                              | ![](images/any/systeminterface%20IGetService.png)                       |
-|                                              | ![](images/any/systeminterface%20IGetAppointment.png)                   |
-|                                              | ![](images/any/systeminterface%20IGetAvailabilityTimeSlot.png)          |
-
-
-
-
-Initial elements allocation is in process...
-
-
-* Consider implementing an Idempotent Receiver and Replay Protection to ensure that duplicate messages are not processed.
-* The Observer Pattern is being applied. Some diagrams need to be updated.
-* "Apply communication between components using a notification system (app, email or messaging)."
+| AssignListServiceToAssistantAsync()          | ![](images/any/interaction%20assignListServicesToAssistantAsync.png)    |
+| IGetAssistant                                | ![](images/any/systeminterface%20IGetAssistant.png)                     |
+| IGetClient                                   | ![](images/any/systeminterface%20IGetClient.png)                        |
+| IGetService                                  | ![](images/any/systeminterface%20IGetService.png)                       |
+| IGetAppointment                              | ![](images/any/systeminterface%20IGetAppointment.png)                   |
+| IGetAvailabilityTimeSlot                     | ![](images/any/systeminterface%20IGetAvailabilityTimeSlot.png)          |
+| IBlockDateTimeRange                          | ![](images/any/systeminterface%20IBlockDateTimeRange.png)               |
+| BlockTimeRangeAsync()                        | ![](images/any/interaction%20BlockTimeRangeAsync().png)                 |
+| IUnblockDateTimeRange                        | ![](images/any/systeminterface%20IUnblockDateTimeRange.png)             |
+| UnblockTimeRange()                           | ![](images/any/interaction%20unblockTimeRange().png)                    |
+| IAccountJWtLogin                             | ![](images/any/systeminterface%20IAccountJwtLogin.png)                  |
+| IGetNotification                             | ![](images/any/systeminterface%20IGetNotification.png)                  |
+| IMarkNotificationAsRead                      | ![](images/any/systeminterface%20IMarkNotificationAsRead.png)           |
+| MarkNotificationAsReadAsync()                | ![](images/any/interaction%20markNotificationAsReadAsync().png)         |
 
 
 #### Step 7. Perform Analysis of the Current Design and Review the Iteration Goal and Achievement of Design Purpose
 
+| Not Addressed | Partially Addressed | Addressed | Design Decisiones Made During Iteration                                                                                                                                                                                     |
+| ------------- | ------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|               | CON-1               |           | The Business Logic Layer resides on the server, allowing it to be reused on any client via the HTTP protocol. This decision enables interoperability across different platforms and devices.                                |
+|               |                     | CON-4     | A mutual exclusion algorithm was implemented in the TimeRangeLock component to prevent race conditions during concurrent appointment scheduling.                                                                            |
+|               | CRN-2               |           | Technical deb was addressed through refactoring, though additional actions a needed to reduce long-term deb.                                                                                                                |
+|               | CRN-3               |           | A pipeline using Github Actions and Docker was created. While the deployment process is underway, further actions are required to implement automatic deployment to a production server.                                    |
+|               | QA-1<br>            |           | No relevant decisions were made.                                                                                                                                                                                            |
+|               |                     | QA-2      | Authorization and authentication components were used to protect the system from external threats. A password hashing method was used for added security.                                                                   |
+|               |                     | QA-3      | A component specification method was followed to improve maintainability, and a layered architecture was implemented to ensure better organization and scalability of the system.                                           |
+|               |                     | QA-4      | The API server returns a set of codes that can be easily translated into different languages for the clients, ensuring consistency and simplifying the internationalization.                                                |
+|               |                     | QA-5      | No necessary decisiones were made in this iteration. All related aspects will be handled by the service where the server will be hosted.                                                                                    |
+|               |                     | QA-6      | A set of interfaces was implemented on the server to ensure interoperability between different componentes and services. The SOLID principles were applied to ensure code quality and a better cohesion and lower coupling. |
+|               |                     | QA-7      | The server implements a component-based development approach to improve testability and enable unit testing of each system component.                                                                                       |
+|               |                     | QA-8      | A Jwt token service was used to allow secure login to the system via Jwt tokens, protecting endpoints.                                                                                                                      |
+|               | QA-9                |           | Github Actions were configured to deploy the system to Docker Hub, enabling container creation and automated deployment in a production environment.                                                                        |
+|               |                     | QA-10     | A lock was implemented to avoid race condition issues during appointment scheduling, ensuring that users cannot modify the same time slots simultaneously.                                                                  |

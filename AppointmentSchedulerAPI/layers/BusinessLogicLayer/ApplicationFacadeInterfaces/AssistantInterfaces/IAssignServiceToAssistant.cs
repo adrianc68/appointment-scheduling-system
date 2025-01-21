@@ -1,7 +1,9 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AssistantInterfaces
 {
     public interface IAssignServiceToAssistant
     {
-        Task<bool> AssignServicesToAssistant(Guid assistantUuid, List<Guid?> servicesUuid);
+        Task<OperationResult<bool, GenericError>> AssignListServicesToAssistantAsync(Guid assistantUuid, List<Guid> servicesUuids);
     }
 }

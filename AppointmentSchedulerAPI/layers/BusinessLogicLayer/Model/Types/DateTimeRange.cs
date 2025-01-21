@@ -2,15 +2,34 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types
 {
     public class DateTimeRange
     {
-        public DateTime Date { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public DateOnly Date { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
 
-        public DateTimeRange(DateTime date, TimeSpan startTime, TimeSpan endTime)
+        public DateTimeRange(DateOnly date, TimeOnly startTime, TimeOnly endTime)
         {
             Date = date;
             StartTime = startTime;
             EndTime = endTime;
+        }
+
+        public DateTimeRange()
+        {
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is DateTimeRange other)
+            {
+                return this.StartTime == other.StartTime && this.EndTime == other.EndTime && this.Date == other.Date;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(StartTime, EndTime, Date);
         }
     }
 }

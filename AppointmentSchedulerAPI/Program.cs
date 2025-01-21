@@ -1,11 +1,15 @@
 using System.Text;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AccountInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.AssistantInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ClientInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents.SignalRNotifier;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.OperatationManagement.ExceptionHandlerService;
@@ -25,17 +29,28 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddDbContext<AppointmentDbContext>((provider, options) =>
+builder.Services.AddDbContextFactory<AppointmentDbContext>((provider, options) =>
 {
     var envService = provider.GetRequiredService<EnvironmentVariableService>();
     var connectionString = envService.Get("DEFAULT_DB_CONNECTION");
-    options.UseNpgsql(connectionString, o => 
+    options.UseNpgsql(connectionString, o =>
     {
         o.MapEnum<RoleType>("RoleType");
         o.MapEnum<AssistantStatusType>("AssistantStatusType");
         o.MapEnum<ClientStatusType>("ClientStatusType");
         o.MapEnum<AppointmentStatusType>("AppointmentStatusType");
         o.MapEnum<ServiceStatusType>("ServiceStatusType");
+        o.MapEnum<ServiceOfferStatusType>("ServiceOfferStatusType");
+        o.MapEnum<AvailabilityTimeSlotStatusType>("AvailabilityTimeSlotStatusType");
+        o.MapEnum<AccountStatusType>("AccountStatusType");
+        o.MapEnum<NotificationStatusType>("NotificationStatusType");
+        o.MapEnum<NotificationType>("NotificationType");
+
+        o.MapEnum<AppointmentNotificationCodeType>("AppointmentNotificationCodeType");
+        o.MapEnum<GeneralNotificationCodeType>("GeneralNotificationCodeType");
+        o.MapEnum<SystemNotificationCodeType>("SystemNotificationCodeType");
+        o.MapEnum<SystemNotificationSeverityCodeType>("SystemNotificationSeverityCodeType");
+
     });
 });
 
@@ -59,46 +74,63 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var envManager = new EnvironmentVariableService();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = envManager.Get("JWT_ISSUER"),
-        ValidAudience = envManager.Get("JWT_AUDIENCE"),
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(envManager.Get("JWT_SECRET_KEY")))
-    };
-});
+
 
 builder.Services.AddOpenApi();
+builder.Services.AddSignalR(opt =>
+{
+    opt.EnableDetailedErrors = true;
+});
+
 builder.Services.AddSingleton<EnvironmentVariableService>();
+
+builder.Services.AddScoped<IAccountEvent<AssistantEvent>, AccountMgr>();
+builder.Services.AddScoped<IAccountEvent<ClientEvent>, AccountMgr>();
+
+builder.Services.AddScoped<IClientEvent, ClientMgr>();
+builder.Services.AddScoped<IClientObserver, SchedulerMgr>();
+
+builder.Services.AddScoped<IServiceEvent, ServiceMgr>();
+builder.Services.AddScoped<IServiceObserver, SchedulerMgr>();
+
+builder.Services.AddScoped<IAssistantEvent, AssistantMgr>();
+builder.Services.AddScoped<IAssistantObserver, SchedulerMgr>();
+
+builder.Services.AddScoped<ISchedulerEvent, SchedulerMgr>();
+builder.Services.AddScoped<ISchedulerObserver, SchedulerMgr>();
+
+builder.Services.AddScoped<INotificationMgt, NotificationMgr>();
+builder.Services.AddScoped<IWebNotifier, NotificationHub>();
 
 builder.Services.AddScoped<ISchedulerMgt, SchedulerMgr>();
 builder.Services.AddScoped<IClientMgt, ClientMgr>();
 builder.Services.AddScoped<IAssistantMgt, AssistantMgr>();
 builder.Services.AddScoped<IServiceMgt, ServiceMgr>();
+builder.Services.AddScoped<IAccountMgt, AccountMgr>();
 
 builder.Services.AddScoped<ISchedulingInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IServiceInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IAssistantInterfaces, AppointmentSchedulingSystemFacade>();
+builder.Services.AddScoped<INotificationInterfaces, AppointmentSchedulingSystemFacade>();
 builder.Services.AddScoped<IClientInterfaces, AppointmentSchedulingSystemFacade>();
+builder.Services.AddScoped<IAccountInterfaces, AppointmentSchedulingSystemFacade>();
 
 builder.Services.AddScoped<ISchedulerRepository, SchedulerRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IAssistantRepository, AssistantRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
 
 builder.Services.AddScoped<IExceptionHandlerService, ExceptionHandlerService>();
 builder.Services.AddScoped<IHttpResponseService, HttpResponseService>();
+builder.Services.AddScoped<ITimeSlotLockMgt, TimeSlotLockMgr>();
 
-builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtTokenResult>>(provider =>
+builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+
+
+builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtTokenResult, JwtTokenData>>(provider =>
 {
     return new JwtAuthenticationService(
         envManager.Get("JWT_ISSUER"),
@@ -107,13 +139,93 @@ builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtToke
     );
 });
 
-builder.Services.AddControllers();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = envManager.Get("JWT_ISSUER"),
+            ValidateAudience = true,
+            ValidAudience = envManager.Get("JWT_AUDIENCE"),
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(envManager.Get("JWT_SECRET_KEY")))
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                var userClaims = context.Principal!.Claims;
+                return Task.CompletedTask;
+            },
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/notificationHub"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
+
+    });
+
+builder.Services.AddControllers()
+  .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
+
+
+
 var app = builder.Build();
 
-// $$$>> This middlewares causes problems with authorization! Fix it 
-// app.UseMiddleware<HttpResponseAuthorizationMiddleware>(); 
-app.UseAuthorization();
+app.UseCors(policy => policy
+    .WithOrigins("http://localhost:8080")
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials());
+
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var clientMgrEventPublisher = scope.ServiceProvider.GetRequiredService<IClientEvent>() as ClientMgr;
+    var serviceMgrEventPublisher = scope.ServiceProvider.GetRequiredService<IServiceEvent>() as ServiceMgr;
+    var assistantMgrEventPublisher = scope.ServiceProvider.GetRequiredService<IAssistantEvent>() as AssistantMgr;
+    var schedulerEventPublisher = scope.ServiceProvider.GetRequiredService<ISchedulerEvent>() as SchedulerMgr;
+
+
+    var accountAssistantEventPublisher = scope.ServiceProvider.GetRequiredService<IAccountEvent<AssistantEvent>>();
+    var accountClientEventPublisher = scope.ServiceProvider.GetRequiredService<IAccountEvent<ClientEvent>>();
+
+    var schedulerMgr = scope.ServiceProvider.GetRequiredService<ISchedulerMgt>() as SchedulerMgr;
+
+    clientMgrEventPublisher?.Suscribe(schedulerMgr!);
+    serviceMgrEventPublisher?.Suscribe(schedulerMgr!);
+    assistantMgrEventPublisher?.Suscribe(schedulerMgr!);
+    schedulerEventPublisher?.Suscribe(schedulerMgr!);
+    accountAssistantEventPublisher?.Subscribe(schedulerMgr!);
+    accountClientEventPublisher?.Subscribe(schedulerMgr!);
+}
+
+
 app.UseAuthentication();
+app.UseMiddleware<HttpResponseAuthorizationMiddleware>();
+app.UseAuthorization();
+
 
 
 app.Use(async (context, next) =>
@@ -123,7 +235,7 @@ app.Use(async (context, next) =>
     await next.Invoke();
 });
 
-var port = envManager.Get("SERVER_PORT", "8000");
+var port = envManager.Get("SERVER_PORT");
 
 if (app.Environment.IsDevelopment())
 {
@@ -137,5 +249,9 @@ if (app.Environment.IsDevelopment())
 }
 
 
+
+
+app.MapHub<NotificationHub>("/notificationHub");
 app.MapControllers();
+
 app.Run($"http://0.0.0.0:{port}");

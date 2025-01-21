@@ -1,6 +1,4 @@
-﻿
-using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
-
+﻿using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 
 public partial class Service
@@ -14,6 +12,6 @@ public partial class Service
     public DateTime? CreatedAt { get; set; }
     public ServiceStatusType? Status { get; set; }
 
-    public virtual IEnumerable<AssistantService>? AssistantServices { get; set; } 
+    public virtual IEnumerable<ServiceOffer>? ServiceOffers { get; set; } 
 
 }

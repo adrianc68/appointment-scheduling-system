@@ -1,10 +1,8 @@
-using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.SchedulingInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
-using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
-using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
-using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Notification;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,83 +13,95 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
     [ApiVersion("1")]
     public class TestDBController : ControllerBase
     {
-        private readonly ISchedulingInterfaces systemFacade;
-        private readonly IHttpResponseService httpResponseService;
-        private readonly IAssistantRepository assistantRepository;
-        private readonly IClientRepository clientRepository;
-        private readonly IServiceRepository serviceRepository;
-        private readonly ISchedulerRepository schedulerRepository;
+        private readonly INotificationMgt notificationMgr;
+        private readonly IAccountMgt accountMgr;
+        private readonly ISchedulerMgt schedulerMgr;
 
-        public TestDBController(ISchedulingInterfaces systemFacade, IHttpResponseService httpResponseService, IAssistantRepository assistantRepository, IClientRepository clientRepository, IServiceRepository serviceRepository, ISchedulerRepository schedulerRepository)
+        public TestDBController(INotificationMgt notificationMgr, IAccountMgt accountMgr, ISchedulerMgt schedulerMgr)
         {
-            this.systemFacade = systemFacade;
-            this.httpResponseService = httpResponseService;
-            this.assistantRepository = assistantRepository;
-            this.clientRepository = clientRepository;
-            this.serviceRepository = serviceRepository;
-            this.schedulerRepository = schedulerRepository;
+            this.notificationMgr = notificationMgr;
+            this.accountMgr = accountMgr;
+            this.schedulerMgr = schedulerMgr;
         }
 
-
-        [HttpPost("test")]
-        [AllowAnonymous]
-        public async Task<IActionResult> TestDBMethod([FromBody] CreateAppointmentAsClientDTO dto)
+        [HttpPost("send")]
+        [Authorize]
+        [AllowedRoles(RoleType.ASSISTANT, RoleType.CLIENT, RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> SendNotification([FromBody] NotificationRequest request)
         {
-            object? result;
+            var claims = ClaimsPOCO.GetUserClaims(User);
+            var appointmentData = await schedulerMgr.GetAppointmentByUuidAsync(request.AppointmentUuid!.Value);
+            var accountData = await accountMgr.GetAccountIdByUuidAsync(claims.Uuid);
 
-            try
+
+            AppointmentNotification notificationApp = new AppointmentNotification
             {
+                Type = NotificationType.APPOINTMENT_NOTIFICATION,
+                Message = $"La cita se ha cancelado.",
+                Code = AppointmentNotificationCodeType.APPOINTMENT_CANCELED,
+                Options = new NotificationOptions
+                {
+                    Channels = new List<NotificationChannelType>
+                    {
+                        NotificationChannelType.WEB_APPLICATION
+                    }
+                },
+                Appointment = new BusinessLogicLayer.Model.AppointmentIdentifiers
+                {
+                    Id = appointmentData!.Id!.Value,
+                    Uuid = request.AppointmentUuid.Value
+                },
+                Recipients = []
+            };
 
-                // Appointment appointment = new Appointment
-                // {
-                //     EndTime = TimeOnly.Parse("12:00:00"),
-                //     StartTime = dto.StartTime,
-                //     Date = dto.Date,
-                //     Status = BusinessLogicLayer.Model.Types.AppointmentStatusType.SCHEDULED,
-                //     TotalCost = 500,
-                //     Client = new Client { Uuid = dto.ClientUuid },
-                //     AssistantService = [],
-                //     Uuid = Guid.CreateVersion7()
-                // };
-
-                // foreach (var serviceUuid in dto.SelectedServices)
-                // {
-                //     var assistantService = new Service
-                //     {
-                //         Uuid = serviceUuid,  
-                //     };
-                //     appointment.AssistantService.Add(assistantService);
-                // }
-
-                // var client = await schedulerRepository.AddAppointmentAsync(appointment);
-                // result = client;
-
-
-                var data = await schedulerRepository.GetAppointmentsAsync(DateOnly.Parse("2024-12-26"), DateOnly.Parse("2024-12-26"));
-
-                PropToString.PrintListData(data);
-                result = data;
-
-
-
-
-                // dto.AssistantServices.ForEach(e => )
-
-
-                // Guid guid = Guid.Parse("01940146-3d5f-756b-b03c-0776ffa7a7bf");
-                // Assistant uid
-                // Guid guid = Guid.Parse("019401d1-1634-7daf-afb7-d8d6066899b6");
-                // List<Service>? assistant = await assistantRepository.GetServicesAssignedToAssistantByUuidAsync(guid);
-                // result = assistant;
-                // PropToString.PrintListData(assistant);
-                // result = await serviceRepository.GetServiceByUuidAsync(guid);
-
-            }
-            catch (System.Exception ex)
+            GeneralNotification notificationGen = new GeneralNotification
             {
-                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
-            }
-            return httpResponseService.OkResponse(result, ApiVersionEnum.V1);
+                Type = NotificationType.GENERAL_NOTIFICATION,
+                Message = "Estamos trabajando en una nueva versión para el sistema web!!!",
+                Code = GeneralNotificationCodeType.GENERAL_SERVICE_UPDATE,
+                Options = new NotificationOptions
+                {
+                    Channels = new List<NotificationChannelType>
+                    {
+                        NotificationChannelType.WEB_APPLICATION
+                    }
+                },
+                Recipients = [],
+            };
+
+            SystemNotification notificationSys = new SystemNotification
+            {
+                Message = "EL servidor estara en mantenimiento a las 18:00 PM MXN",
+                Code = SystemNotificationCodeType.SYSTEM_MAINTENANCE,
+                Options = new NotificationOptions
+                {
+                    Channels = new List<NotificationChannelType>
+                    {
+                        NotificationChannelType.WEB_APPLICATION
+                    }
+                },
+                Recipients = [],
+                Severity = SystemNotificationSeverityCodeType.INFO
+            };
+
+
+            // await this.notificationMgr.CreateNotification(notification, NotificationUsersToSendType.SEND_TO_EVERYONE);
+            await this.notificationMgr.CreateNotificationAsync(notificationApp);
+            await this.notificationMgr.CreateNotificationAsync(notificationGen);
+            await this.notificationMgr.CreateNotificationAsync(notificationSys);
+
+
+            // await notificationMgr.NotifyAllAsync("Mensaje enviado para uno");
+
+            // await notificationMgr.NotifyToUserAsync(request.Recipient!, request.Message!);
+            return Ok("Notification sent successfully.");
+        }
+
+        public class NotificationRequest
+        {
+            public string? Recipient { get; set; }
+            public string? Message { get; set; }
+            public Guid? AppointmentUuid { get; set; }
         }
 
 

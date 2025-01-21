@@ -1,90 +1,80 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Events;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
-
 
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
 {
-    public class ClientMgr : IClientMgt
+    public class ClientMgr : IClientMgt, IClientEvent
     {
         private readonly IClientRepository clientRepository;
+        private static readonly List<IClientObserver> observers = new();
 
         public ClientMgr(IClientRepository clientRepository)
         {
             this.clientRepository = clientRepository;
         }
+
         public async Task<List<Client>> GetAllClientsAsync()
         {
             return (List<Client>)await clientRepository.GetAllClientsAsync();
         }
 
-        public async Task<RegistrationResponse<Guid>> RegisterClientAsync(Client client)
+        public async Task<Client?> GetClientByUuidAsync(Guid uuid)
         {
+            Client? client = await clientRepository.GetClientByUuidAsync(uuid);
+            return client;
+        }
 
-            // 1. Check if username is is registered
-            if (string.IsNullOrWhiteSpace(client.Username) ||
-                 string.IsNullOrWhiteSpace(client.Email) ||
-                 string.IsNullOrWhiteSpace(client.PhoneNumber))
-            {
-                return new RegistrationResponse<Guid>
-                {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.NULL_VALUE_IS_PRESENT
-                };
-            }
+        public async Task<bool> IsClientRegisteredByUuidAsync(Guid uuid)
+        {
+            int? clientId = await clientRepository.GetClientIdByUuidAsync(uuid);
+            return clientId != null;
+        }
 
-            bool isUsernameRegistered = await clientRepository.isUsernameRegistered(client.Username);
-            if (isUsernameRegistered)
-            {
-                return new RegistrationResponse<Guid>
-                {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.USERNAME_ALREADY_REGISTERED
-                };
-            }
-
-            // 2. Check if email is registered
-            bool isEmailRegistered = await clientRepository.isEmailRegistered(client.Email);
-            if (isEmailRegistered)
-            {
-                return new RegistrationResponse<Guid>
-                {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.EMAIL_ALREADY_REGISTERED
-                };
-            }
-
-            // 3. Check if phoneNumber is registered
-            bool isPhoneNumberRegistered = await clientRepository.IsPhoneNumberRegistered(client.PhoneNumber);
-            if (isPhoneNumberRegistered)
-            {
-                return new RegistrationResponse<Guid>
-                {
-                    IsSuccessful = false,
-                    Code = MessageCodeType.PHONE_NUMBER_ALREADY_REGISTERED
-                };
-            }
-            // 4. Create Guid UUID
+        public async Task<Guid?> RegisterClientAsync(Client client)
+        {
             client.Uuid = Guid.CreateVersion7();
 
             bool isRegistered = await clientRepository.AddClientAsync(client);
-            if (isRegistered)
+            if (!isRegistered)
             {
-                return new RegistrationResponse<Guid>
-                {
-                    IsSuccessful = true,
-                    Data = client.Uuid.Value,
-                    Code = MessageCodeType.SUCCESS_OPERATION
-
-                };
+                client.Uuid = null;
+                return null;
             }
-            return new RegistrationResponse<Guid>
-            {
-                IsSuccessful = true,
-                Code = MessageCodeType.REGISTER_ERROR
-            };
+            return client.Uuid.Value;
+        }
 
+        public async Task<bool> UpdateClientAsync(Client client)
+        {
+            bool isUpdated = await clientRepository.UpdateClientAsync(client);
+            return isUpdated;
+        }
+
+        public void NotifySubscribers(ClientEvent eventType)
+        {
+            eventType.EventDate = DateTime.UtcNow;
+            foreach (var observer in observers)
+            {
+                observer.UpdateOnClientChanged(eventType);
+            }
+        }
+
+        public void Suscribe(IClientObserver clientObserver)
+        {
+            if (!observers.Contains(clientObserver))
+            {
+                observers.Add(clientObserver);
+            }
+        }
+
+        public void Unsuscribe(IClientObserver clientObserver)
+        {
+            if (observers.Contains(clientObserver))
+            {
+                observers.Remove(clientObserver);
+            }
         }
     }
 }

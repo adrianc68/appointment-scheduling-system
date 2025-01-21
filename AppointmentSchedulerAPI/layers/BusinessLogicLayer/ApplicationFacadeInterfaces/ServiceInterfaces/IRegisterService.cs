@@ -1,7 +1,9 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ServiceInterfaces
 {
     public interface IRegisterService
     {
-        Task<Guid?> RegisterService(Model.Service service);
+        Task<OperationResult<Guid, GenericError>> RegisterServiceAsync(Model.Service service);
     }
 }

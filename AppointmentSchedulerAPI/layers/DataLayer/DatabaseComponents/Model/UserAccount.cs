@@ -11,8 +11,9 @@ public partial class UserAccount
     public int? Id { get; set; }
     public Guid? Uuid { get; set; }
     public RoleType? Role {get; set;}
-
-    public virtual UserInformation UserInformation { get; set; }
+    public AccountStatusType? Status { get; set; }
+    public virtual UserInformation? UserInformation { get; set; }
     public virtual Assistant? Assistant { get; set; }
     public virtual Client? Client { get; set; }
+     public virtual IEnumerable<NotificationRecipient> NotificationRecipients { get; set; } = new List<NotificationRecipient>();
 }

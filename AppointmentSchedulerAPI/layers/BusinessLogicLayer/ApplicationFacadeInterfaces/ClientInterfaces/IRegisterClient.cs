@@ -6,6 +6,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IRegisterClient
     {
-        Task<RegistrationResponse<Guid>> RegisterClientAsync(Client client);
+        Task<OperationResult<Guid,GenericError>> RegisterClientAsync(Client client);
     }
 }

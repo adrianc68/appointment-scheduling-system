@@ -1,7 +1,9 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+
 namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfaces.ClientInterfaces
 {
     public interface IDeleteClient
     {
-        bool DeleteClient(int idClient);
+         Task<OperationResult<bool, GenericError>> DeleteClientAsync(Guid clientUuid);
     }
 }
