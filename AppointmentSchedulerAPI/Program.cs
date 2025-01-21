@@ -127,6 +127,8 @@ builder.Services.AddScoped<IExceptionHandlerService, ExceptionHandlerService>();
 builder.Services.AddScoped<IHttpResponseService, HttpResponseService>();
 builder.Services.AddScoped<ITimeSlotLockMgt, TimeSlotLockMgr>();
 
+builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+
 
 builder.Services.AddSingleton<IAuthenticationService<JwtUserCredentials, JwtTokenResult, JwtTokenData>>(provider =>
 {

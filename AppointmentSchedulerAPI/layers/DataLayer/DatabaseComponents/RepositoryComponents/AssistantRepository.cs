@@ -8,9 +8,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
     public class AssistantRepository : IAssistantRepository
     {
         private readonly IDbContextFactory<Model.AppointmentDbContext> context;
-        public AssistantRepository(IDbContextFactory<AppointmentDbContext> context)
+        private readonly IPasswordHasherService passwordHasherService;
+        public AssistantRepository(IDbContextFactory<AppointmentDbContext> context, IPasswordHasherService passwordHasherService)
         {
             this.context = context;
+            this.passwordHasherService = passwordHasherService;
         }
 
         public async Task<bool> AddAssistantAsync(BusinessLogicLayer.Model.Assistant assistant)
@@ -23,7 +25,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 var userAccount = new UserAccount
                 {
                     Email = assistant.Email,
-                    Password = assistant.Password,
+                    Password = passwordHasherService.HashPassword(assistant.Password!),
                     Username = assistant.Username,
                     Role = RoleType.ASSISTANT,
                     Uuid = assistant.Uuid,

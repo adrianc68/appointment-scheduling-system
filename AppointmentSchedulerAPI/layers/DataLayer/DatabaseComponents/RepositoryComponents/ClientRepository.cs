@@ -8,9 +8,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
     public class ClientRepository : IClientRepository
     {
         private readonly IDbContextFactory<Model.AppointmentDbContext> context;
-        public ClientRepository(IDbContextFactory<Model.AppointmentDbContext> context)
+        private readonly IPasswordHasherService passwordHasherService;
+        public ClientRepository(IDbContextFactory<Model.AppointmentDbContext> context, IPasswordHasherService passwordHasherService)
         {
             this.context = context;
+            this.passwordHasherService = passwordHasherService;
         }
 
         public async Task<bool> AddClientAsync(BusinessLogicLayer.Model.Client client)
@@ -23,10 +25,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 var userAccount = new UserAccount
                 {
                     Email = client.Email,
-                    Password = client.Password,
+                    Password = passwordHasherService.HashPassword(client.Password!),
                     Username = client.Username,
                     Role = RoleType.CLIENT,
-                    Uuid = Guid.CreateVersion7(),
+                    Uuid = client.Uuid,
                     Status = AccountStatusType.ENABLED
                 };
                 dbContext.UserAccounts.Add(userAccount);

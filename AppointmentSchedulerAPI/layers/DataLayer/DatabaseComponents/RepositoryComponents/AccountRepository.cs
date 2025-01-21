@@ -9,10 +9,12 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
     public class AccountRepository : IAccountRepository
     {
         private readonly IDbContextFactory<Model.AppointmentDbContext> context;
+        private readonly IPasswordHasherService passwordHasherService;
 
-        public AccountRepository(IDbContextFactory<AppointmentDbContext> context)
+        public AccountRepository(IDbContextFactory<AppointmentDbContext> context, IPasswordHasherService passwordHasherService)
         {
             this.context = context;
+            this.passwordHasherService = passwordHasherService;
         }
 
         public async Task<bool> IsUsernameRegisteredAsync(string username)
@@ -53,13 +55,19 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var dbContext = context.CreateDbContext();
             var userDB = await dbContext.UserAccounts
                 .Include(a => a.UserInformation)
-               .Where(a => (a.Email == account || a.Username == account || a.UserInformation!.PhoneNumber == account) && a.Password == password)
+               .Where(a => a.Email == account || a.Username == account || a.UserInformation!.PhoneNumber == account)
                .FirstOrDefaultAsync();
 
             if (userDB == null)
             {
                 return null;
             }
+
+            var isCorrectPassword = passwordHasherService.VerifyPassword(password, userDB.Password!);
+            if(!isCorrectPassword)
+            {
+                return null;
+            }            
 
             return new BusinessLogicLayer.Model.AccountData
             {
