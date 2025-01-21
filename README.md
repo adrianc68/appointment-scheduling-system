@@ -580,8 +580,8 @@ The iteration goal is to establish an initial overall structure for the system c
 * CRN-2 Avoid introducing technical debt
 * CRN-1 Establishing an overall system architecture
 
+![](images/any/context%20diagram.png)
 
-![](images/any/context_diagram.png)
 #### Step 3: Choose Elements of the System to Refine
 
 The iteration goal is to achieve the architectural concern CRN-1 and refine the entire Appointment Scheduling System. In this case, refinement is performed through decomposition.
@@ -843,11 +843,11 @@ The instantiation design decisions considered and made are summarized in the fol
 | enableAssistant()                            | ![](images/any/interaction%20enableAssistant().png)                     |
 | IGetAssistant                                | ![](images/any/systeminterface%20IGetAssistant.png)                     |
 | IDisableClient                               | ![](images/any/systeminterface%20IDisableClient.png)                    |
+| DisableClientAsync()                         | ![](images/any/interaction%20disableClient().png)                       |
 | IDeleteClient                                | ![](images/any/systeminterface%20IDeleteClient.png)                     |
 | DeleteClientAsync                            | ![](images/any/interaction%20deleteClient().png)                        |
 | IEditClient                                  | ![](images/any/systeminterface%20IEditClient.png)                       |
-| UpdateClientAsync()                          | ![](images/any/interaction%20editClient().png)                          |
-| disableClient()                              | ![](images/any/interaction%20disableClient().png)                       |
+| UpdateClientAsync(                           | ![](images/any/interaction%20editClient().png)                          |
 | IEnableClient                                | ![](images/any/systeminterface%20IEnableClient.png)                     |
 | enableClient()                               | ![](images/any/interaction%20enableClient().png)                        |
 | IRegisterClient                              | ![](images/any/systeminterface%20IRegisterClient.png)                   |
@@ -888,3 +888,17 @@ The instantiation design decisions considered and made are summarized in the fol
 |               |                     | QA-8      | A Jwt token service was used to allow secure login to the system via Jwt tokens, protecting endpoints.                                                                                                                      |
 |               | QA-9                |           | Github Actions were configured to deploy the system to Docker Hub, enabling container creation and automated deployment in a production environment.                                                                        |
 |               |                     | QA-10     | A lock was implemented to avoid race condition issues during appointment scheduling, ensuring that users cannot modify the same time slots simultaneously.                                                                  |
+
+### Iteration 3: Identifying Structures to Support Primary Functionality
+
+#### Step 2. Establish Iteration Goal by Selecting Drivers
+
+In this iteration, the design focuses on the client side of the application. The goal is identify structures that support primary functionality, including necessary components to allow communication with the back-end application.
+#### Step 3. Choose Elements of the System to Refine
+#### Step 4. Choose Design Concepts That Satisfy the Selected Drivers
+#### Step 5. Instantiate Architectural Elements, Allocate Responsibilities and Define Interfaces
+#### Step 6. Sketch Views and Record Design Decisions
+
+![](images/any/client%20side%20module%20view.png)
+
+#### Step 7. Perform Analysis of the Current Design and Review the Iteration Goal and Achievement of Design Purpose
