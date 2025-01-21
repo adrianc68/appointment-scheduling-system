@@ -502,6 +502,7 @@
 | CON-2 | Code must be hosted on a proprietary Git-based platform like Github                                                                                        |
 | CON-3 | Future support for mobile clients like IOS and Android                                                                                                     |
 | CON-4 | Race condition problems must be avoided during high user traffic or parallel processing.                                                                   |
+|       |                                                                                                                                                            |
 
 ### Concerns
 
