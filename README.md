@@ -843,7 +843,9 @@ The instantiation design decisions considered and made are summarized in the fol
 | IGetAssistant                                | ![](images/any/systeminterface%20IGetAssistant.png)                     |
 | IDisableClient                               | ![](images/any/systeminterface%20IDisableClient.png)                    |
 | IDeleteClient                                | ![](images/any/systeminterface%20IDeleteClient.png)                     |
+| DeleteClientAsync                            | ![](images/any/interaction%20deleteClient().png)                        |
 | IEditClient                                  | ![](images/any/systeminterface%20IEditClient.png)                       |
+| UpdateClientAsync()                          | ![](images/any/interaction%20editClient().png)                          |
 | disableClient()                              | ![](images/any/interaction%20disableClient().png)                       |
 | IEnableClient                                | ![](images/any/systeminterface%20IEnableClient.png)                     |
 | enableClient()                               | ![](images/any/interaction%20enableClient().png)                        |
@@ -858,26 +860,30 @@ The instantiation design decisions considered and made are summarized in the fol
 | IGetAppointment                              | ![](images/any/systeminterface%20IGetAppointment.png)                   |
 | IGetAvailabilityTimeSlot                     | ![](images/any/systeminterface%20IGetAvailabilityTimeSlot.png)          |
 | IBlockDateTimeRange                          | ![](images/any/systeminterface%20IBlockDateTimeRange.png)               |
+| BlockTimeRangeAsync()                        | ![](images/any/interaction%20BlockTimeRangeAsync().png)                 |
 | IUnblockDateTimeRange                        | ![](images/any/systeminterface%20IUnblockDateTimeRange.png)             |
+| UnblockTimeRange()                           | ![](images/any/interaction%20unblockTimeRange().png)                    |
 | IAccountJWtLogin                             | ![](images/any/systeminterface%20IAccountJwtLogin.png)                  |
 | IGetNotification                             | ![](images/any/systeminterface%20IGetNotification.png)                  |
 | IMarkNotificationAsRead                      | ![](images/any/systeminterface%20IMarkNotificationAsRead.png)           |
+| MarkNotificationAsReadAsync()                | ![](images/any/interaction%20markNotificationAsReadAsync().png)         |
+
 
 #### Step 7. Perform Analysis of the Current Design and Review the Iteration Goal and Achievement of Design Purpose
 
-| Not Addressed | Partially Addressed | Addressed | Design Decisiones Made During Iteration                                                                                          |
-| ------------- | ------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
-|               | CON-1               |           | The business logic will reside in the server, so it can be reused in any client using HTTP protocol.                             |
-|               |                     | CON-4     | A mutual exclusion algorithm was implemented in the TimeRangeLock component.                                                     |
-|               | CRN-2               |           | Technical debt was payed by refactoring. But additional actions must be taken.                                                   |
-|               | CRN-3               |           | A pipeline was created using Github Actions and Docker. But further actions must be taken to automatically deploy in a server.   |
-|               | QA-1<br>            |           | No relevant decisions were made.                                                                                                 |
-|               |                     | QA-2      | A authorization and authentication components were created to avoid external threats                                             |
-|               |                     | QA-3      | A component specification method was followed to achieve greater ease of maintenance and a layered architecture was implemented. |
-| QA-4          |                     |           | No relevant decisions were made.                                                                                                 |
-| QA-5          |                     |           |                                                                                                                                  |
-|               | QA-6                |           | The server side implements a set of interfaces to allow interoperability. And the SOLID principles was applied.                  |
-|               | QA-7                |           | The server side implements a component based software development to increase testability.                                       |
-|               |                     | QA-8      |                                                                                                                                  |
-|               | QA-9                |           |                                                                                                                                  |
-|               | QA-10               |           |                                                                                                                                  |
+| Not Addressed | Partially Addressed | Addressed | Design Decisiones Made During Iteration                                                                                                                                                                                     |
+| ------------- | ------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|               | CON-1               |           | The Business Logic Layer resides on the server, allowing it to be reused on any client via the HTTP protocol. This decision enables interoperability across different platforms and devices.                                |
+|               |                     | CON-4     | A mutual exclusion algorithm was implemented in the TimeRangeLock component to prevent race conditions during concurrent appointment scheduling.                                                                            |
+|               | CRN-2               |           | Technical deb was addressed through refactoring, though additional actions a needed to reduce long-term deb.                                                                                                                |
+|               | CRN-3               |           | A pipeline using Github Actions and Docker was created. While the deployment process is underway, further actions are required to implement automatic deployment to a production server.                                    |
+|               | QA-1<br>            |           | No relevant decisions were made.                                                                                                                                                                                            |
+|               |                     | QA-2      | Authorization and authentication components were used to protect the system from external threats. A password hashing method was used for added security.                                                                   |
+|               |                     | QA-3      | A component specification method was followed to improve maintainability, and a layered architecture was implemented to ensure better organization and scalability of the system.                                           |
+|               |                     | QA-4      | The API server returns a set of codes that can be easily translated into different languages for the clients, ensuring consistency and simplifying the internationalization.                                                |
+|               |                     | QA-5      | No necessary decisiones were made in this iteration. All related aspects will be handled by the service where the server will be hosted.                                                                                    |
+|               |                     | QA-6      | A set of interfaces was implemented on the server to ensure interoperability between different componentes and services. The SOLID principles were applied to ensure code quality and a better cohesion and lower coupling. |
+|               |                     | QA-7      | The server implements a component-based development approach to improve testability and enable unit testing of each system component.                                                                                       |
+|               |                     | QA-8      | A Jwt token service was used to allow secure login to the system via Jwt tokens, protecting endpoints.                                                                                                                      |
+|               | QA-9                |           | Github Actions were configured to deploy the system to Docker Hub, enabling container creation and automated deployment in a production environment.                                                                        |
+|               |                     | QA-10     | A lock was implemented to avoid race condition issues during appointment scheduling, ensuring that users cannot modify the same time slots simultaneously.                                                                  |
