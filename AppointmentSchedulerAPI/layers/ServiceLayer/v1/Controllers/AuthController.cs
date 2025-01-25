@@ -26,13 +26,17 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> LoginJwt([FromBody] LoginAccountAndPasswordDTO dto)
         {
-            JwtTokenResult token;
+            JwtTokenDTO token;
             try
             {
                 OperationResult<JwtTokenResult, GenericError> result = await systemFacade.LoginWithEmailOrUsernameOrPhoneNumberJwtTokenAsync(dto.Account, dto.Password);
                 if (result.IsSuccessful)
                 {
-                    token = result.Result!;
+                    token = new JwtTokenDTO
+                    {
+                        Token = result.Result!.Token!,
+                        Expiration = result.Result.Expiration!.Value
+                    };
                 }
                 else
                 {
@@ -43,6 +47,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
             }
+
             return httpResponseService.OkResponse(token, ApiVersionEnum.V1);
         }
 

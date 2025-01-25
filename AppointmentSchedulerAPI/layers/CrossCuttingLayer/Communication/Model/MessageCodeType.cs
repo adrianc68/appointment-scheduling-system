@@ -14,6 +14,7 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         UPDATE_ERROR,
         INVALID_RANGE_TIME,
         UNAUTHORIZED,
+        DATA_ANNOTATIONS_ERRORS,
         // Authentication codes
         AUTHENTICATION_FAILED_TO_GENERATE_JWT_TOKEN,
         AUTHENTICATION_INVALID_CREDENTIALS,
