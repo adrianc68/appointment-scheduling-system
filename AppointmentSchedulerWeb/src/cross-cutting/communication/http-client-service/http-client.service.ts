@@ -6,30 +6,32 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
+
 export class HttpClientService implements IHttpClient {
 
   constructor(private http: HttpClient) { }
 
-  Get(uri: string): Observable<string> {
-    return this.http.get<string>(uri);
+  get<T>(uri: string): Observable<T> {
+    return this.http.get<T>(uri);
   }
 
-  Post(uri: string, value: object | FormData, isFormData: boolean = false): Observable<string> {
+  post<T>(uri: string, value: object | FormData, isFormData: boolean = false): Observable<T> {
     const headers = this.createHeaders(isFormData);
-    return this.http.post<string>(uri, value, { headers });
+    return this.http.post<T>(uri, value, { headers });
   }
 
-  Patch(uri: string, value: object | FormData, isFormData: boolean = false): Observable<string> {
+  patch<T>(uri: string, value: object | FormData, isFormData: boolean = false): Observable<T> {
     const headers = this.createHeaders(isFormData);
-    return this.http.patch<string>(uri, value, { headers });
-  }
-  Put(uri: string, value: object | FormData, isFormData: boolean = false): Observable<string> {
-    const headers = this.createHeaders(isFormData);
-    return this.http.put<string>(uri, value, { headers });
+    return this.http.patch<T>(uri, value, { headers });
   }
 
-  Delete(uri: string): Observable<string> {
-    return this.http.delete<string>(uri);
+  put<T>(uri: string, value: object | FormData, isFormData: boolean = false): Observable<T> {
+    const headers = this.createHeaders(isFormData);
+    return this.http.put<T>(uri, value, { headers });
+  }
+
+  delete<T>(uri: string): Observable<T> {
+    return this.http.delete<T>(uri);
   }
 
   private createHeaders(isFormData: boolean): HttpHeaders {
@@ -38,7 +40,6 @@ export class HttpClientService implements IHttpClient {
     }
     return new HttpHeaders({
       "Content-Type": "application/json"
-
     })
 
   }
