@@ -6,6 +6,7 @@ import { MessageCodeType } from '../../../cross-cutting/communication/model/mess
 import { LocalStorageService } from '../../../cross-cutting/security/local-storage/local-storage.service';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
+import { AuthenticationService } from '../../../cross-cutting/security/authentication/authentication.service';
 
 @Component({
   selector: 'app-login',
@@ -20,16 +21,17 @@ export class LoginComponent {
   password: string = '';
   systemMessage?: string = '';
 
-  constructor(private accountService: AccountService, private localStorageService: LocalStorageService, private i18nService: I18nService) { }
+  constructor(private authenticationService: AuthenticationService, private i18nService: I18nService) { }
 
   onSubmit() {
     this.systemMessage = '';
 
-    this.accountService.loginJwtAuth(this.account, this.password).subscribe({
+    this.authenticationService.loginJwt(this.account, this.password).subscribe({
       next: (response) => {
+        console.log("onsubmit");
+        console.log(response);
         if (response.isSuccessful) {
           if (response.code === MessageCodeType.OK) {
-            this.localStorageService.setItem("jwtToken", response.result!.token);
             let code = getStringEnumKeyByValue(MessageCodeType, response.code);
             this.systemMessage = this.i18nService.translate(code!);
           }
