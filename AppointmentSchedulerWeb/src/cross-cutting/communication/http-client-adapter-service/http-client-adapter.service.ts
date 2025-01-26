@@ -34,7 +34,7 @@ export class HttpClientAdapter {
           if (error.status === 0) { // 0 << HttpStatusCode 0
             const errorResponse: ApiResponse<TData, any> = {
               status: error.status,
-              message: parseStringToEnum(MessageCodeType, error.message) ?? MessageCodeType.UNKNOWN_ERROR,
+              message: MessageCodeType.NO_CONNECTION_WITH_SERVER,
               data: null,
               version: ApiVersionType.NO_SPECIFIED
             }
