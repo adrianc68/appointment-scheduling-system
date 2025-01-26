@@ -36,7 +36,7 @@ export class AccountService implements IAccountService {
         return this.operationResultService.createFailure(response.data, response.message);
       }),
       catchError(err => {
-        return of(this.operationResultService.createFailure(err.message ?? 'Unknown error', MessageCodeType.ERROR));
+        return of(this.operationResultService.createFailure(err.message, MessageCodeType.ERROR));
       })
     );
   }
