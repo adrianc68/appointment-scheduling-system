@@ -1,4 +1,4 @@
 export interface GenericError {
-  message: string,
+  message?: string,
   additionalData?: { [key: string]: any };
 }

@@ -2,12 +2,14 @@
   <h2>Inicia Sesión</h2>
   <form (ngSubmit)="onSubmit()">
     <label for="email">Correo Electrónico:</label>
-    <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="Ingresa tu correo" required />
+    <input id="account" type="account" [(ngModel)]="account" name="account" placeholder="Ingresa tu correo" required />
 
     <label for="password">Contraseña:</label>
     <input id="password" type="password" [(ngModel)]="password" name="password" placeholder="Ingresa tu contraseña" required />
 
     <button type="submit">Ingresar</button>
+
+    {{systemMessage}}
   </form>
 </div>
 
