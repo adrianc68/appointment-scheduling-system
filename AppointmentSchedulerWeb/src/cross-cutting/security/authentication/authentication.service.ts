@@ -51,18 +51,24 @@ export class AuthenticationService {
     return !!credentials && credentials.expiration.getTime() > Date.now();
   }
 
-  getAccountDataFromServer(): Observable<boolean> {
+  getAccountDataFromServer(): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
     return this.httpServiceAdapter.get<AccountDataDTO>(`${this.apiUrl}${ApiRoutes.getAccountData}`).pipe(
       map((response: ApiResponse<AccountDataDTO, ApiDataErrorResponse>) => {
-        console.log(response);
-        if (this.isSuccessResponse<AccountDataDTO>(response)) {
+        if (this.httpServiceAdapter.isSuccessResponse<AccountDataDTO>(response)) {
           const accountData = this.parseAccountData(response.data);
           this.currentUserData.next(accountData);
-          return true;
+          return this.operationResultService.createSuccess(true, response.message);
         }
-        return false;
+        return this.operationResultService.createFailure(false, response.message);
       }),
       catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(this.operationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
         return throwError(() => err);
       })
     );
@@ -76,7 +82,7 @@ export class AuthenticationService {
 
     return this.httpServiceAdapter.post<JwtTokenDTO>(`${this.apiUrl}${ApiRoutes.login}`, loginData).pipe(
       map((response: ApiResponse<JwtTokenDTO, ApiDataErrorResponse>) => {
-        if (this.isSuccessResponse<JwtTokenDTO>(response)) { // 200 < Http Status Code 200 OK
+        if (this.httpServiceAdapter.isSuccessResponse<JwtTokenDTO>(response)) { // 200 < Http Status Code 200 OK
           this.localStorageService.setItem(this.tokenLocalStorageKey, response.data.token);
           this.localStorageService.setItem(this.expirationTokenLocalStorageKey, response.data.expiration);
           this.currentTokenData.next(this.parseJwtToken(response.data.token, response.data.expiration.toString()));
@@ -101,10 +107,6 @@ export class AuthenticationService {
     this.localStorageService.removeItem(this.tokenLocalStorageKey);
     this.localStorageService.removeItem(this.expirationTokenLocalStorageKey);
     this.currentTokenData.next(null);
-  }
-
-  private isSuccessResponse<TData>(response: ApiResponse<TData, ApiDataErrorResponse>): response is ApiSuccessResponse<TData> {
-    return response.status >= 200 && response.status < 300;
   }
 
   private parseJwtToken(storedToken: string, storedExpiration: string): UserCredentialsJwt {

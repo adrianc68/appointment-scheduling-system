@@ -69,7 +69,7 @@ export class HttpClientAdapter {
     throw error;
   }
 
-  private isSuccessResponse<TData>(response: ApiResponse<TData, ApiDataErrorResponse>): response is ApiSuccessResponse<TData> {
+  isSuccessResponse<TData>(response: ApiResponse<TData, ApiDataErrorResponse>): response is ApiSuccessResponse<TData> {
     return response.status >= 200 && response.status < 300;
   }
 
