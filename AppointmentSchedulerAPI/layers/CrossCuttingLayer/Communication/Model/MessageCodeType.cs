@@ -15,6 +15,9 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         INVALID_RANGE_TIME,
         UNAUTHORIZED,
         DATA_ANNOTATIONS_ERRORS,
+        NO_CONNECTION_WITH_SERVER,
+        UNKNOWN_ERROR,
+        INTERNAL_SERVER_ERROR,
         // Authentication codes
         AUTHENTICATION_FAILED_TO_GENERATE_JWT_TOKEN,
         AUTHENTICATION_INVALID_CREDENTIALS,
@@ -25,6 +28,8 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         ACCOUNT_EMAIL_ALREADY_REGISTERED,
         ACCOUNT_PHONE_NUMBER_ALREADY_REGISTERED,
         ACCOUNT_NOT_FOUND,
+        ACCOUNT_NOT_AVAILABLE,
+        ACCOUNT_WAS_DELETED,
         // Client codes
         CLIENT_NOT_FOUND,
         CLIENT_NOT_AVAILABLE,

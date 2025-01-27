@@ -192,6 +192,7 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
+app.UseStaticFiles();
 app.UseCors(policy => policy
     .WithOrigins("http://localhost:4200")
     .AllowAnyHeader()
@@ -222,11 +223,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 
-app.UseAuthentication();
-app.UseMiddleware<HttpResponseAuthorizationMiddleware>();
-app.UseAuthorization();
-
-
 
 app.Use(async (context, next) =>
 {
@@ -247,6 +243,11 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = string.Empty;
     });
 }
+
+app.UseAuthentication();
+app.UseMiddleware<HttpResponseAuthorizationMiddleware>();
+app.UseAuthorization();
+
 
 
 

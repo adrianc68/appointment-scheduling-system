@@ -1,6 +1,6 @@
 namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
 {
-    public class ErrorDetails
+    public class ServerErrorDetails
     {
         public required string Error { get; set; }
         public required string Message { get; set; }

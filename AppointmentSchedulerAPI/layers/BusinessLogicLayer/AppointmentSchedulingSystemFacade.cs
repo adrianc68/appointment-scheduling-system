@@ -1660,5 +1660,24 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return OperationResult<bool, GenericError>.Success(true, MessageCodeType.OK);
         }
 
+        public async Task<OperationResult<AccountData, GenericError>> GetAccountData(Guid accountUuid)
+        {
+            AccountData? accountData = await accountMgr.GetAccountDataByUuid(accountUuid);
+            if (accountData == null)
+            {
+                GenericError genericError = new GenericError($"Account not found", []);
+                return OperationResult<AccountData, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_NOT_FOUND);
+            }
+
+
+            if (accountData.Status != AccountStatusType.ENABLED)
+            {
+                GenericError genericError = new GenericError($"Account with UUID <{accountData.Uuid}> is not available. Account was disabled or deleted!", []);
+                genericError.AddData("accountUuid", accountData.Uuid!.Value);
+                genericError.AddData("Status", accountData.Status!.Value.ToString());
+                return OperationResult<AccountData, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_NOT_AVAILABLE);
+            }
+            return OperationResult<AccountData, GenericError>.Success(accountData, MessageCodeType.OK);
+        }
     }
 }
