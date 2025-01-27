@@ -13,6 +13,7 @@
         "DATA_ANNOTATIONS_ERRORS":"Los datos enviados son inválidos",
         "NO_CONNECTION_WITH_SERVER":"No hay conexión con el servidor",
         "UNKNOWN_ERROR":"Ha ocurrido un error desconocido",
+        "INTERNAL_SERVER_ERROR": "Ha ocurrido un error de forma interna en el servidor",
         "AUTHENTICATION_FAILED_TO_GENERATE_JWT_TOKEN":"No se ha podido generar las credenciales de autenticación",
         "AUTHENTICATION_INVALID_CREDENTIALS":"Las credenciales son invalidas",
         "AUTHENTICATION_CANNOT_REFRESH_TOKEN":"No se puede crear un nuevo token de autenticación",

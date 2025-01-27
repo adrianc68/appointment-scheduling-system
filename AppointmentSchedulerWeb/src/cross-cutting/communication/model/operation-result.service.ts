@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MessageCodeType } from './message-code.types';
-import { OperationResult } from './operation-result';
+import { OperationResult } from './operation-result.response';
 
 @Injectable({
   providedIn: 'root'
@@ -22,14 +22,6 @@ export class OperationResultService {
       isSuccessful: false,
       code: code,
       error: error
-    };
-  }
-
-  createFailureList<TError>(errors: TError[], code: MessageCodeType = MessageCodeType.ERROR): OperationResult<any, TError> {
-    return {
-      isSuccessful: false,
-      code: code,
-      errors: errors
     };
   }
 }

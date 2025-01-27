@@ -1,7 +1,7 @@
 import { ApiVersionType } from "./api-version.types";
 import { MessageCodeType } from "./message-code.types";
 
-export interface ApiSuccessResponse<TData> {
+export interface ApiResponse<TData> {
   status: number;
   message: MessageCodeType;
   data: TData,
@@ -15,4 +15,3 @@ export interface ApiErrorResponse<TError> {
   version: ApiVersionType;
 }
 
-export type ApiResponse<TData, TError> = ApiSuccessResponse<TData> | ApiErrorResponse<TError>;

@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { ApiResponse } from '../model/api-response';
+import { ApiErrorResponse, ApiResponse, ApiSuccessResponse } from '../model/api-response';
 import { HttpClientService } from '../http-client-service/http-client.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MessageCodeType } from '../model/message-code.types';
 import { parseStringToEnum } from '../../helper/enum-utils/enum.utils';
 import { ApiVersionType } from '../model/api-version.types';
-import { GenericError } from '../model/generic-error';
-import { parseTemplate } from '@angular/compiler';
+import { GenericErrorResponse } from '../model/generic-error.response';
+import { ValidationErrorResponse } from '../model/validation-error.response';
+import { ServerErrorResponse } from '../model/server-error.response';
+import { ApiDataErrorResponse } from '../model/api-response.error';
+import { EmptyErrorResponse } from '../model/empty-error.response';
 
 
 @Injectable({
@@ -19,66 +22,81 @@ export class HttpClientAdapter {
 
   constructor(private httpClientService: HttpClientService) { }
 
-  post<TData>(uri: string, value: any, isFormData: boolean = false): Observable<ApiResponse<TData, any>> {
-    return this.httpClientService.post(uri, value, isFormData).pipe(
-      map((response: any) => { // 200 << HttpStatusCode 200 OK
-        return {
-          status: response.status,
-          message: parseStringToEnum(MessageCodeType, response.message.toString()) ?? MessageCodeType.UNKNOWN_ERROR,
-          data: response.data as TData,
-          version: parseStringToEnum(ApiVersionType, response.version.toString()) ?? ApiVersionType.NO_SPECIFIED,
-        };
-      }),
-      catchError((error: any) => {
-        if (error instanceof HttpErrorResponse) {
-          if (error.status === 0) { // 0 << HttpStatusCode 0
-            const errorResponse: ApiResponse<TData, any> = {
-              status: error.status,
-              message: MessageCodeType.NO_CONNECTION_WITH_SERVER,
-              data: null,
-              version: ApiVersionType.NO_SPECIFIED
-            }
-            return of(errorResponse);
-          } else if (error.status === 401) { // HttpStatusCode 401 Unauthorized
-            const genericError: GenericError = {
-              message: error.error.data.message,
-              additionalData: error.error.data.additionalData
-            };
-
-            const errorResponse: ApiResponse<TData, any> = {
-              status: error.status,
-              message: parseStringToEnum(MessageCodeType, error.error.message) ?? MessageCodeType.UNKNOWN_ERROR,
-              data: genericError,
-              version: ApiVersionType.NO_SPECIFIED
-            }
-            return of(errorResponse);
-          } else if (error.status === 400) { // HttpStatusCode 400 BadRequest
-            let codeErrors;
-            let parsedErrors: any;
-            if (error.error?.errors) {
-              parsedErrors = Object.entries(error.error.errors).map(([key, messages]) => ({
-                field: key,
-                messages: messages as string[],
-              }));
-              codeErrors = MessageCodeType.DATA_ANNOTATIONS_ERRORS;
-            } else {
-              parsedErrors = error.error?.data || {};
-            }
-            const errorResponse: ApiResponse<TData, any> = {
-              status: error.status,
-              message: error.error.message || codeErrors || MessageCodeType.UNKNOWN_ERROR,
-              data: parsedErrors,
-              version: error.error?.version || ApiVersionType.NO_SPECIFIED,
-            };
-            return of(errorResponse);
-          }
-          throw error;
-        }
-        throw error;
-      })
+  post<TData>(uri: string, value: any, isFormData: boolean = false): Observable<ApiResponse<TData, ApiDataErrorResponse>> {
+    return this.httpClientService.post<ApiResponse<TData, ApiDataErrorResponse>>(uri, value, isFormData).pipe(
+      map((response: ApiResponse<TData, ApiDataErrorResponse>) => this.handleSuccessResponse<TData>(response)),
+      catchError((error: HttpErrorResponse) => this.handleErrorResponse(error))
     );
   }
 
+  private isSuccessResponse<TData>(response: ApiResponse<TData, ApiDataErrorResponse>): response is ApiSuccessResponse<TData> {
+    return response.status >= 200 && response.status < 300;
+  }
+
+  private handleSuccessResponse<TData>(response: ApiResponse<TData, ApiDataErrorResponse>): ApiSuccessResponse<TData> {
+    if(this.isSuccessResponse(response)) {
+      return {
+        status: response.status,
+        message: parseStringToEnum(MessageCodeType, response.message.toString()) ?? MessageCodeType.UNKNOWN_ERROR,
+        data: response.data as TData,
+        version: parseStringToEnum(ApiVersionType, response.version.toString()) ?? ApiVersionType.NO_SPECIFIED,
+      }
+    }
+    throw new Error("Invalid sucesss response");
+  }
+
+
+  private handleErrorResponse(error: HttpErrorResponse): Observable<ApiErrorResponse<ApiDataErrorResponse>> {
+    if (error instanceof HttpErrorResponse) {
+      switch (error.status) {
+        case 0: // No connection with server
+          const emptyError: EmptyErrorResponse = {};
+          return of(this.createErrorResponse(error.status,MessageCodeType.NO_CONNECTION_WITH_SERVER, emptyError));
+        case 401: // Unauthorized
+          const genericError: GenericErrorResponse = {
+            message: error.error.data?.message,
+            additionalData: error.error.data?.additionalData,
+          };
+          return of(this.createErrorResponse(error.status, parseStringToEnum(MessageCodeType, error.error.message) ?? MessageCodeType.UNKNOWN_ERROR, genericError));
+        case 400: // Bad Request
+          const validationErrors: ValidationErrorResponse[] =  this.parseBadRequestErrors(error.error);
+          const errorMessage = error.error.message || MessageCodeType.DATA_ANNOTATIONS_ERRORS;
+          return of(this.createErrorResponse(error.status, errorMessage, validationErrors));
+        case 500: // Internal Server Error
+          const internalError: ServerErrorResponse = {
+            details: error.error.data!.details,
+            error: parseStringToEnum(MessageCodeType, error.error.data.error) ?? MessageCodeType.SERVER_ERROR,
+            identifier: error.error.data.identifier,
+            message: error.error.data.message
+          }
+          return of(this.createErrorResponse(error.status, parseStringToEnum(MessageCodeType, error.error.message) || MessageCodeType.INTERNAL_SERVER_ERROR, internalError));
+
+        default:
+          throw error;
+      }
+    }
+    throw error;
+  }
+
+
+   private createErrorResponse(status: number, message: MessageCodeType, data: ApiDataErrorResponse, version: ApiVersionType = ApiVersionType.NO_SPECIFIED): ApiErrorResponse<ApiDataErrorResponse> {
+    return {
+      status,
+      message,
+      data,
+      version,
+    };
+  }
+
+  private parseBadRequestErrors(error: any): any {
+    if (error?.errors) {
+      return Object.entries(error.errors).map(([key, messages]) => ({
+        field: key,
+        messages: messages as string[],
+      }));
+    }
+    return error?.data || {};
+  }
 
 }
 

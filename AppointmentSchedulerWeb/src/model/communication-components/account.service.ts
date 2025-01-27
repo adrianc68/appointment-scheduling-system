@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { catchError, map, Observable, of } from 'rxjs';
 import { IAccountService } from '../communication-interfaces/account-service.interface';
 import { HttpClientAdapter } from '../../cross-cutting/communication/http-client-adapter-service/http-client-adapter.service';
 import { ConfigService } from '../../cross-cutting/operation-management/configService/config.service';

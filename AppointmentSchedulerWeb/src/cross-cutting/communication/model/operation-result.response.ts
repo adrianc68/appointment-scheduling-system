@@ -5,5 +5,4 @@ export interface OperationResult<TData, TError> {
   code: MessageCodeType;
   result?: TData;
   error?: TError;
-  errors?: TError[];
 }
