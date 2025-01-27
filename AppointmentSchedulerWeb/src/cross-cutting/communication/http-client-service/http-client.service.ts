@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { IHttpClient } from './http-client.interface';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthenticationService } from '../../security/authentication/authentication.service';
 
 @Injectable({
   providedIn: 'root'
