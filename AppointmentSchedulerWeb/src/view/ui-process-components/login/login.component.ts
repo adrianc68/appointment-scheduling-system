@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
@@ -7,6 +7,7 @@ import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { AuthenticationService } from '../../../cross-cutting/security/authentication/authentication.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { finalize, of, switchMap, take } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,7 @@ export class LoginComponent {
   isLoading: boolean = false;
   dataLoaded: boolean = false;
 
-  constructor(private authenticationService: AuthenticationService, private i18nService: I18nService, private logginService: LoggingService) { }
+  constructor(private authenticationService: AuthenticationService, private router: Router, private ngZone: NgZone, private i18nService: I18nService, private logginService: LoggingService) { }
 
   onSubmit() {
     if (!this.isLoading) {
@@ -33,7 +34,6 @@ export class LoginComponent {
 
       this.authenticationService.loginJwt(this.account, this.password).pipe(
         switchMap((response) => {
-          console.log(response);
           if (response.isSuccessful && response.code === MessageCodeType.OK) {
             let code = getStringEnumKeyByValue(MessageCodeType, response.code);
             this.systemMessage = this.i18nService.translate(code!);
@@ -58,6 +58,9 @@ export class LoginComponent {
         next: (accountData) => {
           if (accountData) {
             this.dataLoaded = true;
+            this.ngZone.run(() => {
+              this.router.navigate(['/']);
+            });
           }
         },
         error: (err) => {

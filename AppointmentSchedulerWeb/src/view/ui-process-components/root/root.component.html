@@ -1,0 +1,6 @@
+<ng-container *ngIf="isAuthenticated; else landing">
+  <app-home></app-home>
+</ng-container>
+<ng-template #landing>
+  <app-landing-page></app-landing-page>
+</ng-template>

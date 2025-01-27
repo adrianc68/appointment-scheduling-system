@@ -46,9 +46,13 @@ export class AuthenticationService {
     return this.currentUserData.asObservable();
   }
 
-  isAuthenticated(): boolean {
-    const credentials = this.currentTokenData.value;
-    return !!credentials && credentials.expiration.getTime() > Date.now();
+  isAuthenticated(): Observable<boolean> {
+
+    return this.currentTokenData.pipe(
+      map(credentials => {
+        return !!credentials && credentials.expiration.getTime() > Date.now();
+      })
+    )
   }
 
   getAccountDataFromServer(): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
