@@ -1,15 +1,22 @@
 <div class="login-container">
   <h2>Inicia Sesión</h2>
   <form (ngSubmit)="onSubmit()">
-    <label for="email">Correo Electrónico:</label>
-    <input id="account" type="account" [(ngModel)]="account" name="account" placeholder="Ingresa tu correo" required />
+    <label for="email">
+      {{ translate(translationCodes.TC_ACCOUNT_DATA_LABEL)}}
+    </label>
+    <app-text-input id="account" type="account" [(ngModel)]="account" name="account" required
+      placeholder={{translate(translationCodes.TC_ACCOUNT_PLACEHOLDER_LABEL)}}/>
 
-    <label for="password">Contraseña:</label>
-    <input id="password" type="password" [(ngModel)]="password" name="password" placeholder="Ingresa tu contraseña" required />
+    <label for="password">
+      {{ translate(translationCodes.TC_PASSWORD_DATA_LABEL)}}
+    </label>
 
-    <button type="submit" [disabled]="isLoading">Ingresar</button>
+    <app-text-input id="password" type="password" [(ngModel)]="password" name="password" required
+      placeholder={{translate(translationCodes.TC_PASSWORD_PLACEHOLDER_LABEL)}}/>
 
-    {{systemMessage}}
+    <app-button type="submit" [disabled]="isLoading">
+      {{translate(translationCodes.TC_LOGIN_BUTTON_LABEL)}}
+    </app-button>
+    {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
   </form>
 </div>
-

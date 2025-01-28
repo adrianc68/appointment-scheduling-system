@@ -4,6 +4,7 @@ import { AuthenticationService } from '../../../cross-cutting/security/authentic
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from '../home/home.component';
 import { LandingPageComponent } from '../landing-page/landing-page.component';
+import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 
 @Component({
   selector: 'app-root-container',
@@ -13,13 +14,13 @@ import { LandingPageComponent } from '../landing-page/landing-page.component';
 export class RootComponent {
   isAuthenticated: boolean = false;
 
-  constructor(private authService: AuthenticationService, private router: Router) {
+  constructor(private authService: AuthenticationService, private loggingService: LoggingService) {
     this.authService.isAuthenticated().subscribe({
       next: (authenticated: boolean) => {
-        this.isAuthenticated = authenticated;  // Asigna el valor de autenticación
+        this.isAuthenticated = authenticated;
       },
       error: (err) => {
-        console.error('Error en la autenticación', err);
+        this.loggingService.warn(err);
       }
     });
 

@@ -8,16 +8,19 @@ import { AuthenticationService } from '../../../cross-cutting/security/authentic
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { finalize, of, switchMap, take } from 'rxjs';
 import { Router } from '@angular/router';
+import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
+import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
+import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS],
   standalone: true,
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-
+  translationCodes = TranslationCodes;
   account: string = '';
   password: string = '';
   systemMessage?: string = '';
@@ -26,21 +29,25 @@ export class LoginComponent {
 
   constructor(private authenticationService: AuthenticationService, private router: Router, private ngZone: NgZone, private i18nService: I18nService, private logginService: LoggingService) { }
 
+  translate(key: string): string {
+    return this.i18nService.translate(key);
+  }
+
   onSubmit() {
     if (!this.isLoading) {
       this.isLoading = true;
       this.dataLoaded = false;
-      this.systemMessage = '';
+      this.systemMessage = "";
 
       this.authenticationService.loginJwt(this.account, this.password).pipe(
         switchMap((response) => {
           if (response.isSuccessful && response.code === MessageCodeType.OK) {
             let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-            this.systemMessage = this.i18nService.translate(code!);
+            this.systemMessage = code;
             return this.authenticationService.getAccountDataFromServer();
           } else {
             let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-            this.systemMessage = this.i18nService.translate(code!);
+            this.systemMessage = code;
             return of(false);
           }
         }),
@@ -59,7 +66,7 @@ export class LoginComponent {
           if (accountData) {
             this.dataLoaded = true;
             this.ngZone.run(() => {
-              this.router.navigate(['/']);
+              this.router.navigate([WebRoutes.root]);
             });
           }
         },

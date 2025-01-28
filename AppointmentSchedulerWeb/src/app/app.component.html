@@ -1,3 +1,15 @@
 <router-outlet></router-outlet>
 
-<button *ngIf="isAuthenticated" (click)="logout()">Cerrar Sesión</button>
+
+
+<button *ngIf="isAuthenticated" (click)="logout()">
+  {{translate(translationCodes.TC_LOGOUT_BUTTON_LABEL)}}
+</button>
+
+
+
+
+  <button (click)="changeLanguageToEnglish()">Change to English</button>
+  <button (click)="changeLanguageToSpanish()">Change to Spanish</button>
+
+
