@@ -89,8 +89,8 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         APPOINTMENT_SERVICES_LIMIT_REACHED,
         APPOINTMENT_SCHEDULED_LIMIT_REACHED,
         APPOINTMENT_SELECTED_SERVICE_CONFLICT_WITH_TIME_SLOT,
-        // Events codes (replace $<>$ to set data)
+        // Events codes
         EVENT_APPOINTMENT_HAS_BEEN_CANCELED,
-        EVENT_APPOINTMENT_HAS_BEEN_RESCHEDULED
+        EVENT_APPOINTMENT_HAS_BEEN_RESCHEDULED,
     }
 }
