@@ -22,6 +22,7 @@
   "ACCOUNT_EMAIL_ALREADY_REGISTERED": "Email is already registered",
   "ACCOUNT_PHONE_NUMBER_ALREADY_REGISTERED": "Phone number is already registered",
   "ACCOUNT_NOT_FOUND": "The requested account was not found",
+  "ACCOUNT_LOGIN_WRONG_CREDENTIALS": "The account or password is incorrect",
   "CLIENT_NOT_FOUND": "The requested client was not found",
   "CLIENT_NOT_AVAILABLE": "The client is not available",
   "CLIENT_WAS_DELETED": "The client has been removed from the system",
@@ -99,6 +100,14 @@
   "TC_USERNAME_PLACEHOLDER_LABEL": "Enter your username",
   "TC_PHONE_NUMBER_PLACEHOLDER_LABEL": "Enter your phone number",
   "TC_NAME_PLACEHOLDER_LABEL": "Enter your full name",
+
+
+
+  "TC_LOADING_STATE_NO_ACTION_PERFORMED": "No action performed",
+  "TC_LOADING_STATE_LOADING": "Loading...",
+  "TC_LOADING_STATE_UNSUCCESSFUL_TASK": "Task not completed",
+  "TC_LOADING_STATE_SUCCESSFUL_TASK": "Task completed succesfully",
+  "TC_LOADING_STATE_WORK_DONE": "Task finished",
   "VALIDATION_ACCOUNT_FIELD_REQUIRED": "Account is required",
   "VALIDATION_PASSWORD_FIELD_REQUIRED": "Password is required",
   "VALIDATION_EMAIL_FIELD_REQUIRED": "Email is required",

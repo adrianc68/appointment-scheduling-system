@@ -10,7 +10,8 @@
       placeholder={{translate(translationCodes.TC_ACCOUNT_PLACEHOLDER_LABEL)}} />
 
 
-    <app-error-validation-message-form [messages]="errorValidationMessage['Account']" ></app-error-validation-message-form>
+    <app-error-validation-message-form
+      [messages]="errorValidationMessage['account']"></app-error-validation-message-form>
 
     <br>
 
@@ -21,13 +22,18 @@
     <app-text-input id="password" type="password" [(ngModel)]="password" name="password" required
       placeholder={{translate(translationCodes.TC_PASSWORD_PLACEHOLDER_LABEL)}} />
 
-    <app-error-validation-message-form [messages]="errorValidationMessage['Password']"></app-error-validation-message-form>
+    <app-error-validation-message-form
+      [messages]="errorValidationMessage['password']"></app-error-validation-message-form>
 
     <br>
 
-    <app-button type="submit" [disabled]="isLoading">
-      {{translate(translationCodes.TC_LOGIN_BUTTON_LABEL)}}
-    </app-button>
+    <app-button-task type="submit" [loadingState]="currentTaskState"
+      [text]="translate(translationCodes.TC_LOGIN_BUTTON_LABEL)" />
+
+
+
+    <br>
+    <br>
     {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
   </form>
 

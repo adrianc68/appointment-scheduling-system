@@ -44,9 +44,10 @@
     <app-error-validation-message-form [messages]="errorValidationMessage['password']" />
 
 
-    <app-button type="submit" [disabled]="isLoading">
-      {{translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)}}
-    </app-button>
+    <app-button-task type="submit" [loadingState]="currentTaskState"
+      [text]="translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)" />
+    <br>
+    <br>
     {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
   </form>
 </div>

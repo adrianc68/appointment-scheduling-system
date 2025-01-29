@@ -15,6 +15,7 @@ import { LanguageTypes } from '../cross-cutting/helper/i18n/model/languages.type
     RouterModule,
     CommonModule,
   ],
+  standalone: true,
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

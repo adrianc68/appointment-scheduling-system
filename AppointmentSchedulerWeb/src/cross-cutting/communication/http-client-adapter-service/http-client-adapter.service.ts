@@ -59,7 +59,7 @@ export class HttpClientAdapter {
             message: parsedMessage,
             additionalData: error.error.data?.additionalData,
           };
-          return of(this.createErrorResponse(error.status, parseStringToEnum(MessageCodeType, error.error.message) ?? MessageCodeType.UNKNOWN_ERROR, genericError));
+          return of(this.createErrorResponse(error.status, parsedMessage, genericError));
         case 400: // Bad Request
           const validationErrors: ValidationErrorResponse[] = this.parseBadRequestErrors(error.error);
           const errorMessage = error.error.message || MessageCodeType.DATA_ANNOTATIONS_ERRORS;
