@@ -29,7 +29,7 @@ export class AuthenticationService {
   private tokenLocalStorageKey: string = "token";
   private expirationTokenLocalStorageKey: string = "expiration_token";
 
-  constructor(private httpServiceAdapter: HttpClientAdapter, private operationResultService: OperationResultService, private localStorageService: LocalStorageService, private configService: ConfigService) {
+  constructor(private httpServiceAdapter: HttpClientAdapter, private localStorageService: LocalStorageService, private configService: ConfigService) {
 
     this.apiUrl = this.configService.getApiBaseUrl() + ApiVersionRoute.v1;
     const storedToken = this.localStorageService.getItem<string>(this.tokenLocalStorageKey);
@@ -61,9 +61,9 @@ export class AuthenticationService {
         if (this.httpServiceAdapter.isSuccessResponse<AccountDataDTO>(response)) {
           const accountData = this.parseAccountData(response.data);
           this.currentUserData.next(accountData);
-          return this.operationResultService.createSuccess(true, response.message);
+          return OperationResultService.createSuccess(true, response.message);
         }
-        return this.operationResultService.createFailure(false, response.message);
+        return OperationResultService.createFailure(response.data, response.message);
       }),
       catchError((err) => {
         if (err instanceof HttpErrorResponse) {
@@ -71,7 +71,7 @@ export class AuthenticationService {
           if (err.status == 500) {
             codeError = MessageCodeType.SERVER_ERROR;
           }
-          return of(this.operationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
         }
         return throwError(() => err);
       })
@@ -90,9 +90,9 @@ export class AuthenticationService {
           this.localStorageService.setItem(this.tokenLocalStorageKey, response.data.token);
           this.localStorageService.setItem(this.expirationTokenLocalStorageKey, response.data.expiration);
           this.currentTokenData.next(this.parseJwtToken(response.data.token, response.data.expiration.toString()));
-          return this.operationResultService.createSuccess<boolean>(true, response.message);
+          return OperationResultService.createSuccess<boolean>(true, response.message);
         }
-        return this.operationResultService.createFailure<ApiDataErrorResponse>(response.data, response.message);
+        return OperationResultService.createFailure<ApiDataErrorResponse>(response.data, response.message);
       }),
       catchError((err) => {
         if (err instanceof HttpErrorResponse) {
@@ -100,7 +100,7 @@ export class AuthenticationService {
           if (err.status == 500) { // 500 < Http Status Code 500 Internal Server Error
             codeError = MessageCodeType.SERVER_ERROR;
           }
-          return of(this.operationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
         }
         return throwError(() => err);
       })

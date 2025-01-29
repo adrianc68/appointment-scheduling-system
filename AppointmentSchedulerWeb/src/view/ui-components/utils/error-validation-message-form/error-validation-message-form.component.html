@@ -1,0 +1,7 @@
+<div *ngIf="messages && messages.length > 0">
+  <ul>
+    <li *ngFor="let message of messages">
+      {{ translate(message) }}
+    </li>
+  </ul>
+</div>

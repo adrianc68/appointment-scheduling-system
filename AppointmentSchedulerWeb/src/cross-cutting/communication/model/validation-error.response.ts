@@ -1,4 +1,4 @@
 export interface ValidationErrorResponse {
   field: string;
-  message: string[];
+  messages: string[];
 }

@@ -37,6 +37,10 @@ export class HttpClientAdapter {
     );
   }
 
+  isSuccessResponse<TData>(response: ApiResponse<TData, ApiDataErrorResponse>): response is ApiSuccessResponse<TData> {
+    return response.status >= 200 && response.status < 300;
+  }
+
   private handleErrorResponse(error: HttpErrorResponse): Observable<ApiErrorResponse<ApiDataErrorResponse>> {
     if (error instanceof HttpErrorResponse) {
       switch (error.status) {
@@ -69,9 +73,6 @@ export class HttpClientAdapter {
     throw error;
   }
 
-  isSuccessResponse<TData>(response: ApiResponse<TData, ApiDataErrorResponse>): response is ApiSuccessResponse<TData> {
-    return response.status >= 200 && response.status < 300;
-  }
 
   private handleSuccessResponse<TData>(response: ApiResponse<TData, ApiDataErrorResponse>): ApiSuccessResponse<TData> {
     if (this.isSuccessResponse(response)) {

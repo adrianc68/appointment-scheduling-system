@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
+import { isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 
 @Component({
   selector: 'app-login',
@@ -24,6 +25,7 @@ export class LoginComponent {
   account: string = '';
   password: string = '';
   systemMessage?: string = '';
+  errorValidationMessage: { [field: string]: string[] } = {};
   isLoading: boolean = false;
   dataLoaded: boolean = false;
 
@@ -38,6 +40,7 @@ export class LoginComponent {
       this.isLoading = true;
       this.dataLoaded = false;
       this.systemMessage = "";
+      this.errorValidationMessage = {};
 
       this.authenticationService.loginJwt(this.account, this.password).pipe(
         switchMap((response) => {
@@ -46,6 +49,27 @@ export class LoginComponent {
             this.systemMessage = code;
             return this.authenticationService.getAccountDataFromServer();
           } else {
+            if (isGenericErrorResponse(response.error)) {
+              console.log("genericError");
+            } else if (isValidationErrorResponse(response.error)) {
+
+              response.error.forEach(errorItem => {
+                this.errorValidationMessage[errorItem.field] = errorItem.messages;
+              });
+
+              //console.log(this.errorValidationMessage);
+
+              console.log("validation error");
+            } else if (isServerErrorResponse(response.error)) {
+
+              console.log("servererror error");
+            } else if (isEmptyErrorResponse(response.error)) {
+
+              console.log("empty error");
+            }
+
+
+
             let code = getStringEnumKeyByValue(MessageCodeType, response.code);
             this.systemMessage = code;
             return of(false);
@@ -75,6 +99,10 @@ export class LoginComponent {
         }
       });
     }
+  }
+
+  signUp() {
+    this.router.navigate([WebRoutes.signup])
   }
 
 

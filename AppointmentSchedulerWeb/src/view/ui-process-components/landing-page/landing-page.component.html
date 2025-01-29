@@ -1,5 +1,14 @@
-<p>landing-page works!</p>
+
+<h1>{{translate(translationCodes.TC_WELCOME)}}</h1>
 
 <app-button (click)="login()">
- {{translate(translationCodes.TC_LOGIN)}}
+ {{translate(translationCodes.TC_LOGIN_BUTTON_LABEL)}}
 </app-button>
+
+<br>
+<app-button (click)="signUp()">
+ {{translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)}}
+</app-button>
+
+
+

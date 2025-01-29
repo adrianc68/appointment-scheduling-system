@@ -1,1 +1,52 @@
-<p>register works!</p>
+<div class="login-container">
+  <h1>
+    {{translate(translationCodes.TC_SIGN_UP)}}
+  </h1>
+  <form (ngSubmit)="onSubmit()">
+
+    <label for="username">
+      {{ translate(translationCodes.TC_USERNAME_DATA_LABEL)}}
+    </label>
+    <app-text-input id="username" type="text" [(ngModel)]="username" name="username" required
+      placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['Username']" />
+
+
+    <label for="email">
+      {{ translate(translationCodes.TC_EMAIL_DATA_LABEL)}}
+    </label>
+    <app-text-input id="email" type="text" [(ngModel)]="email" name="email" required
+      placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['Email']" />
+
+
+    <label for="phoneNumber">
+      {{ translate(translationCodes.TC_PHONE_NUMBER_DATA_LABEL)}}
+    </label>
+    <app-text-input id="phoneNumber" type="text" [(ngModel)]="phoneNumber" name="phoneNumber" required
+      placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['PhoneNumber']" />
+
+
+    <label for="name">
+      {{ translate(translationCodes.TC_NAME_DATA_LABEL)}}
+    </label>
+    <app-text-input id="name" type="text" [(ngModel)]="name" name="name" required
+      placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['Name']" />
+
+
+    <label for="password">
+      {{ translate(translationCodes.TC_PASSWORD_DATA_LABEL)}}
+    </label>
+    <app-text-input id="password" type="password" [(ngModel)]="password" name="password" required
+      placeholder={{translate(translationCodes.TC_PASSWORD_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['Password']" />
+
+
+    <app-button type="submit" [disabled]="isLoading">
+      {{translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)}}
+    </app-button>
+    {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
+  </form>
+</div>

@@ -6,6 +6,7 @@ import { AppointmentManagementComponent } from '../view/ui-process-components/ap
 import { AssistantManagementComponent } from '../view/ui-process-components/assistant-management/assistant-management.component';
 import { ClientManagementComponent } from '../view/ui-process-components/client-management/client-management.component';
 import { ServiceManagementComponent } from '../view/ui-process-components/service-management/service-management.component';
+import { RegisterComponent } from '../view/ui-process-components/register/register.component';
 
 export const routes: Routes = [
   {
@@ -13,6 +14,7 @@ export const routes: Routes = [
     component: RootComponent,
   },
   { path: "login", component: LoginComponent, title: "Log in" },
+  { path: "signup", component: RegisterComponent, title: "Register" },
   { path: "appointment/management", component: AppointmentManagementComponent, title: "Citas", canActivate: [AuthGuard] },
   { path: "assistant/management", component: AssistantManagementComponent, title: "Citas", canActivate: [AuthGuard] },
   { path: "client/management", component: ClientManagementComponent, title: "Citas", canActivate: [AuthGuard] },

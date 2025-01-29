@@ -3,7 +3,8 @@ export const ApiRoutes = {
   login: `/Auth/login`,
   logout: `/Auth/logout`,
   refresh: `/Auth/refresh`,
-  getAccountData: `/Auth/account/data`
+  getAccountData: `/Auth/account/data`,
+  registerClient: `/client`
 };
 
 export const ApiVersionRoute = {
