@@ -82,10 +82,6 @@ export class RegisterComponent {
 
             console.log("EmptyError");
             code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          } else {
-            console.log('<<<<');
-            let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-            this.systemMessage = code;
           }
 
           this.systemMessage = code;
