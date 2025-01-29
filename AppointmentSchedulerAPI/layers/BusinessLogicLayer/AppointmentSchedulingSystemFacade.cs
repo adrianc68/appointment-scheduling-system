@@ -528,6 +528,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             if (IsUsernameRegistered)
             {
                 GenericError genericError = new GenericError($"Username <{assistant.Username}> is already registered", []);
+                genericError.AddData("field", "Username");
                 genericError.AddData("username", assistant.Username!);
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_USERNAME_ALREADY_REGISTERED);
             }
@@ -536,6 +537,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             if (IsEmailRegistered)
             {
                 GenericError genericError = new GenericError($"Email <{assistant.Email}> is already registered", []);
+                genericError.AddData("field", "Email");
                 genericError.AddData("email", assistant.Email!);
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_EMAIL_ALREADY_REGISTERED);
             }
@@ -544,6 +546,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             if (IsPhoneNumberRegistered)
             {
                 GenericError genericError = new GenericError($"PhoneNumber <{assistant.PhoneNumber}> is already registered", []);
+                genericError.AddData("field", "PhoneNumber");
                 genericError.AddData("phoneNumber", assistant.PhoneNumber!);
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_PHONE_NUMBER_ALREADY_REGISTERED);
             }
@@ -561,6 +564,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             if (IsUsernameRegistered)
             {
                 GenericError genericError = new GenericError($"Username <{client.Username}> is already registered", []);
+                genericError.AddData("field", "Username");
                 genericError.AddData("username", client.Username!);
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_USERNAME_ALREADY_REGISTERED);
             }
@@ -569,6 +573,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             if (IsEmailRegistered)
             {
                 GenericError genericError = new GenericError($"Email <{client.Email}> is already registered", []);
+                genericError.AddData("field", "Email");
                 genericError.AddData("email", client.Email!);
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_EMAIL_ALREADY_REGISTERED);
             }
@@ -577,6 +582,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             if (IsPhoneNumberRegistered)
             {
                 GenericError genericError = new GenericError($"PhoneNumber <{client.PhoneNumber}> is already registered", []);
+                genericError.AddData("field", "PhoneNumber");
                 genericError.AddData("phoneNumber", client.PhoneNumber!);
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_PHONE_NUMBER_ALREADY_REGISTERED);
             }
