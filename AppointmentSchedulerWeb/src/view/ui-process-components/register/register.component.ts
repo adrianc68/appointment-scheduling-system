@@ -41,37 +41,53 @@ export class RegisterComponent {
   }
 
   constructor(private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService) { }
-
   onSubmit() {
     if (!this.isLoading) {
       this.isLoading = true;
       this.dataLoaded = false;
       this.systemMessage = "";
+      this.errorValidationMessage = {};
     }
 
 
     this.accountService.registerClient(this.username, this.email, this.phoneNumber, this.name, this.password).pipe(
       switchMap((response) => {
+        console.log(response);
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.systemMessage = code;
           return of(response.result);
         } else {
+          let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
           if (isGenericErrorResponse(response.error)) {
             console.log("genericError");
+            let codeMesasge = getStringEnumKeyByValue(MessageCodeType, response.error.message);
+            if (response.error.additionalData?.["field"] !== undefined) {
+              this.setErrorValidationMessage(response.error.additionalData["field"], [codeMesasge!]);
+            }
+            code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
           } else if (isValidationErrorResponse(response.error)) {
+
+            console.log("ValidationError");
+
             response.error.forEach(errorItem => {
-              this.errorValidationMessage[errorItem.field] = errorItem.messages;
+              this.setErrorValidationMessage(errorItem.field, errorItem.messages);
             });
+            code = this.translationCodes.TC_VALIDATION_ERROR;
           } else if (isServerErrorResponse(response.error)) {
 
-            console.log("servererror error");
+            console.log("SErverError");
+            code = getStringEnumKeyByValue(MessageCodeType, response.code);
           } else if (isEmptyErrorResponse(response.error)) {
 
-            console.log("empty error");
+            console.log("EmptyError");
+            code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          } else {
+            console.log('<<<<');
+            let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+            this.systemMessage = code;
           }
 
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.systemMessage = code;
           return of("");
         }
@@ -81,18 +97,19 @@ export class RegisterComponent {
       })
     ).subscribe({
       next: (result) => {
-        console.log(result);
+        if (result)
+          console.log(result);
       },
       error: (err) => {
         console.log(err);
       }
 
     });
-
-
   }
 
 
-
+  private setErrorValidationMessage(key: string, value: string[]) {
+    this.errorValidationMessage[key.toLowerCase()] = value;
+  }
 
 }

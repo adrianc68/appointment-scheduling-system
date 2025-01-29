@@ -7,7 +7,9 @@ export type ApiDataErrorResponse = GenericErrorResponse | ValidationErrorRespons
 
 
 export function isGenericErrorResponse(error: any): error is GenericErrorResponse {
-  return (error as GenericErrorResponse).additionalData !== undefined;
+  const expectedKeys = ["message", "additionalData"];
+  const actualKeys = Object.keys(error);
+  return actualKeys.every(key => expectedKeys.includes(key));
 }
 
 export function isValidationErrorResponse(error: any): error is ValidationErrorResponse[] {
@@ -15,7 +17,9 @@ export function isValidationErrorResponse(error: any): error is ValidationErrorR
 }
 
 export function isServerErrorResponse(error: any): error is ServerErrorResponse {
-  return (error as ServerErrorResponse).identifier !== undefined;
+  const expectedKeys = ["details", "error", "identifier", "message"];
+  const actualKeys = Object.keys(error);
+  return actualKeys.every(key => expectedKeys.includes(key));
 }
 
 export function isEmptyErrorResponse(error: any): error is EmptyErrorResponse {

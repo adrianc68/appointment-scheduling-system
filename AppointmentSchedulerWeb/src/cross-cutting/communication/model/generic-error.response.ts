@@ -1,4 +1,6 @@
+import { MessageCodeType } from "./message-code.types";
+
 export interface GenericErrorResponse {
-  message?: string,
+  message: MessageCodeType,
   additionalData?: { [key: string]: any };
 }

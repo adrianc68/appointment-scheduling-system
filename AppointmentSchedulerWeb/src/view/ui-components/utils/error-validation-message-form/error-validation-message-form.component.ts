@@ -14,7 +14,7 @@ export class ErrorValidationMessageFormComponent {
 
   @Input() messages: string[] = [];
 
-  constructor(private i18nService: I18nService) {}
+  constructor(private i18nService: I18nService) { }
 
   translate(key: string): string {
     return this.i18nService.translate(key);

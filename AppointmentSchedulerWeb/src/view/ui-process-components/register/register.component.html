@@ -9,7 +9,7 @@
     </label>
     <app-text-input id="username" type="text" [(ngModel)]="username" name="username" required
       placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
-    <app-error-validation-message-form [messages]="errorValidationMessage['Username']" />
+    <app-error-validation-message-form [messages]="errorValidationMessage['username']" />
 
 
     <label for="email">
@@ -17,7 +17,7 @@
     </label>
     <app-text-input id="email" type="text" [(ngModel)]="email" name="email" required
       placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
-    <app-error-validation-message-form [messages]="errorValidationMessage['Email']" />
+    <app-error-validation-message-form [messages]="errorValidationMessage['email']" />
 
 
     <label for="phoneNumber">
@@ -25,7 +25,7 @@
     </label>
     <app-text-input id="phoneNumber" type="text" [(ngModel)]="phoneNumber" name="phoneNumber" required
       placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
-    <app-error-validation-message-form [messages]="errorValidationMessage['PhoneNumber']" />
+    <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
 
 
     <label for="name">
@@ -33,7 +33,7 @@
     </label>
     <app-text-input id="name" type="text" [(ngModel)]="name" name="name" required
       placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
-    <app-error-validation-message-form [messages]="errorValidationMessage['Name']" />
+    <app-error-validation-message-form [messages]="errorValidationMessage['name']" />
 
 
     <label for="password">
@@ -41,7 +41,7 @@
     </label>
     <app-text-input id="password" type="password" [(ngModel)]="password" name="password" required
       placeholder={{translate(translationCodes.TC_PASSWORD_PLACEHOLDER_LABEL)}} />
-    <app-error-validation-message-form [messages]="errorValidationMessage['Password']" />
+    <app-error-validation-message-form [messages]="errorValidationMessage['password']" />
 
 
     <app-button type="submit" [disabled]="isLoading">

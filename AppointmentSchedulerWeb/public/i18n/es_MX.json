@@ -82,6 +82,8 @@
   "TC_SIGN_UP": "Registrarse",
   "TC_WELCOME": "Bienvenido",
   "TC_EMPTY": "",
+  "TC_VALIDATION_ERROR": "Los datos enviados son inválidos",
+  "TC_GENERIC_ERROR_CONFLICT": "Hay un conflicto con los datos",
   "TC_EMAIL_DATA_LABEL": "Correo electrónico:",
   "TC_PASSWORD_DATA_LABEL": "Contraseña:",
   "TC_ACCOUNT_DATA_LABEL": "Usuario:",

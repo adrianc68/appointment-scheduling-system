@@ -5,7 +5,7 @@ import { ApiErrorResponse, ApiResponse, ApiSuccessResponse } from '../model/api-
 import { HttpClientService } from '../http-client-service/http-client.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MessageCodeType } from '../model/message-code.types';
-import { parseStringToEnum } from '../../helper/enum-utils/enum.utils';
+import { getStringEnumKeyByValue, parseStringToEnum } from '../../helper/enum-utils/enum.utils';
 import { ApiVersionType } from '../model/api-version.types';
 import { GenericErrorResponse } from '../model/generic-error.response';
 import { ValidationErrorResponse } from '../model/validation-error.response';
@@ -13,6 +13,7 @@ import { ServerErrorResponse } from '../model/server-error.response';
 import { ApiDataErrorResponse } from '../model/api-response.error';
 import { EmptyErrorResponse } from '../model/empty-error.response';
 import { InvalidSuccessResponseError } from '../model/exceptions/invalid-success-response.exception';
+import { InvalidValueEnumValueException } from '../../../model/dtos/exceptions/invalid-enum.exception';
 
 
 @Injectable({
@@ -48,8 +49,14 @@ export class HttpClientAdapter {
           const emptyError: EmptyErrorResponse = {};
           return of(this.createErrorResponse(error.status, MessageCodeType.NO_CONNECTION_WITH_SERVER, emptyError));
         case 401: // Unauthorized
+        case 409: // Conflict
+          const parsedMessage = parseStringToEnum(MessageCodeType, error.error.message);
+
+          if (parsedMessage === undefined) {
+            throw new InvalidValueEnumValueException("Not possible to parse MessageCodeType");
+          }
           const genericError: GenericErrorResponse = {
-            message: error.error.data?.message,
+            message: parsedMessage,
             additionalData: error.error.data?.additionalData,
           };
           return of(this.createErrorResponse(error.status, parseStringToEnum(MessageCodeType, error.error.message) ?? MessageCodeType.UNKNOWN_ERROR, genericError));
