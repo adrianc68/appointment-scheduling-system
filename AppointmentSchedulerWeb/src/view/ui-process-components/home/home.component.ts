@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from '../../../cross-cutting/security/authentication/authentication.service';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
@@ -15,7 +15,7 @@ import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, ClientHomeComponent, AssistantHomeComponent, AdministratorHomeComponent],
+  imports: [CommonModule, RouterModule, ClientHomeComponent, AssistantHomeComponent, AdministratorHomeComponent],
   standalone: true,
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'

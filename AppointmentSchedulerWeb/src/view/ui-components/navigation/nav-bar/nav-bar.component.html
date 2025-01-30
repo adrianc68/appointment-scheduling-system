@@ -1,1 +1,7 @@
-<p>nav-bar works!</p>
+<button class="menu-btn" (click)="toggleSidebar()">☰</button>
+
+
+
+<button *ngIf="isAuthenticated" (click)="logout()">
+  {{translate(translationCodes.TC_LOGOUT_BUTTON_LABEL)}}
+</button>

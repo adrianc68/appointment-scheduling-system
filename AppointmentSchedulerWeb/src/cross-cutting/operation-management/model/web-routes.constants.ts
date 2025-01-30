@@ -2,9 +2,12 @@ export const WebRoutes = {
   root: "/",
   login: "/login",
   signup: "/signup",
-  appointment_management: "/appointment/management",
-  assistant_management: "/assistant/management",
-  client_management: "/client/management",
-  service_management: "/service/management"
+  configuration: "/configuration",
+  appointment_create: "/appointment/create",
+  availability_time_slot_management: "/maangement/availability-time-slot",
+  appointment_management: "/management/appointment",
+  assistant_management: "/management/assistant",
+  client_management: "/management/client",
+  service_management: "/management/service"
 
 }

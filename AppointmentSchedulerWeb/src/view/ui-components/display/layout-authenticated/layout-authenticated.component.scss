@@ -1,0 +1,67 @@
+/* Estilos Base - Mobile First */
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: red;
+}
+
+/* Navbar (siempre arriba) */
+.navbar {
+  height: 60px;
+  background: #333;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+/* Contenedor principal con Sidebar y Contenido */
+.main-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Sidebar (oculto por defecto en móviles) */
+.sidebar {
+  position: fixed;
+  left: -250px;
+  width: 250px;
+  height: calc(100vh - 60px);
+  background: #222;
+  color: white;
+  padding: 20px;
+  transition: left 0.3s ease-in-out;
+}
+
+/* Mostrar sidebar cuando tiene la clase 'open' */
+.sidebar.open {
+  left: -270px;
+}
+
+/* Contenido principal */
+.content {
+  flex: 1;
+  padding: 20px;
+  background: #f4f4f4;
+  overflow-y: auto;
+}
+
+/* Desktop: Mostrar Sidebar fijo */
+@media (min-width: 768px) {
+  .main-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+  }
+
+  .sidebar {
+    position: relative;
+    left: 0;
+    height: auto;
+  }
+
+  .content {
+    width: 100%;
+  }
+}

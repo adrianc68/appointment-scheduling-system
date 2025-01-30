@@ -5,10 +5,12 @@ import { CommonModule } from '@angular/common';
 import { HomeComponent } from '../home/home.component';
 import { LandingPageComponent } from '../landing-page/landing-page.component';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
+import { LayoutAuthenticatedComponent } from '../../ui-components/display/layout-authenticated/layout-authenticated.component';
 
 @Component({
   selector: 'app-root-container',
-  imports: [CommonModule, RouterModule, HomeComponent, LandingPageComponent],
+  imports: [CommonModule, RouterModule, LandingPageComponent, LayoutAuthenticatedComponent],
+  standalone: true,
   templateUrl: './root.component.html'
 })
 export class RootComponent {
