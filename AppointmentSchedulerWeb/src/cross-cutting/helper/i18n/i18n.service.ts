@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { LanguageTypes } from './model/languages.types';
 import { HttpClientService } from '../../communication/http-client-service/http-client.service';
 import { getStringEnumKeyByValue } from '../enum-utils/enum.utils';
@@ -10,7 +10,9 @@ import { LocalStorageService } from '../../security/local-storage/local-storage.
 })
 export class I18nService {
   private currentLanguage = new BehaviorSubject<LanguageTypes>(LanguageTypes.es_MX);
-  private translations: { [key: string]: any } = {};
+  private translations = new BehaviorSubject<{ [key: string]: string }>({});
+
+  private isTranslationsLoaded = new BehaviorSubject<boolean>(false);
 
 
   constructor(private httpClientService: HttpClientService, private localStorageService: LocalStorageService) {
@@ -31,12 +33,21 @@ export class I18nService {
     return this.currentLanguage.getValue();
   }
 
+  getTranslationsLoaded(): Observable<boolean> {
+    return this.isTranslationsLoaded.asObservable();
+  }
+
+  getTranslations(): Observable<{ [key: string]: string }> {
+    return this.translations.asObservable();
+  }
+
   private loadTranslations(lang: LanguageTypes): void {
     const langKey = getStringEnumKeyByValue(LanguageTypes, lang);
 
     this.httpClientService.get<{ [key: string]: string }>(`i18n/${langKey}.json`).subscribe({
       next: (response) => {
-        this.translations = response;
+        this.translations.next(response);
+        this.isTranslationsLoaded.next(true);
       },
       error: (err) => {
         console.error(err);
@@ -45,7 +56,7 @@ export class I18nService {
   }
 
   translate(key: string): string {
-    return this.translations[key] || key;
+    return this.translations.getValue()[key] || key;
   }
 
 

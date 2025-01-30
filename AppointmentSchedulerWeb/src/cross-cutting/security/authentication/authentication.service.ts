@@ -5,7 +5,7 @@ import { OperationResult } from '../../communication/model/operation-result.resp
 import { MessageCodeType } from '../../communication/model/message-code.types';
 import { OperationResultService } from '../../communication/model/operation-result.service';
 import { HttpClientAdapter } from '../../communication/http-client-adapter-service/http-client-adapter.service';
-import { ApiResponse, ApiSuccessResponse } from '../../communication/model/api-response';
+import { ApiResponse } from '../../communication/model/api-response';
 import { JwtTokenDTO } from '../../../model/dtos/jwt-token.dto';
 import { ConfigService } from '../../operation-management/configService/config.service';
 import { ApiDataErrorResponse } from '../../communication/model/api-response.error';
@@ -28,14 +28,16 @@ export class AuthenticationService {
   private apiUrl: string;
   private tokenLocalStorageKey: string = "token";
   private expirationTokenLocalStorageKey: string = "expiration_token";
+  private accountDataLocalStorageKey: string = "account_data";
 
   constructor(private httpServiceAdapter: HttpClientAdapter, private localStorageService: LocalStorageService, private configService: ConfigService) {
 
     this.apiUrl = this.configService.getApiBaseUrl() + ApiVersionRoute.v1;
     const storedToken = this.localStorageService.getItem<string>(this.tokenLocalStorageKey);
     const storedExpiration = this.localStorageService.getItem<string>(this.expirationTokenLocalStorageKey);
+    const accountData = this.localStorageService.getItem<AccountData>(this.accountDataLocalStorageKey);
     this.currentTokenData = new BehaviorSubject<UserCredentialsJwt | null>(storedToken && storedExpiration ? this.parseJwtToken(storedToken, storedExpiration) : null);
-    this.currentUserData = new BehaviorSubject<AccountData | null>(null);
+    this.currentUserData = new BehaviorSubject<AccountData | null>(accountData);
   }
 
   getCredentials(): Observable<UserCredentialsJwt | null> {
@@ -61,6 +63,7 @@ export class AuthenticationService {
         if (this.httpServiceAdapter.isSuccessResponse<AccountDataDTO>(response)) {
           const accountData = this.parseAccountData(response.data);
           this.currentUserData.next(accountData);
+          this.localStorageService.setItem<AccountData>(this.accountDataLocalStorageKey, accountData);
           return OperationResultService.createSuccess(true, response.message);
         }
         return OperationResultService.createFailure(response.data, response.message);
@@ -110,7 +113,9 @@ export class AuthenticationService {
   logout(): void {
     this.localStorageService.removeItem(this.tokenLocalStorageKey);
     this.localStorageService.removeItem(this.expirationTokenLocalStorageKey);
+    this.localStorageService.removeItem(this.accountDataLocalStorageKey);
     this.currentTokenData.next(null);
+    this.currentUserData.next(null);
   }
 
   private parseJwtToken(storedToken: string, storedExpiration: string): UserCredentialsJwt {

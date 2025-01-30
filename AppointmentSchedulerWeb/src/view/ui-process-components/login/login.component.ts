@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
@@ -7,7 +7,7 @@ import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { AuthenticationService } from '../../../cross-cutting/security/authentication/authentication.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { finalize, of, switchMap, take } from 'rxjs';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
@@ -15,6 +15,7 @@ import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isS
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { TaskStateManagerService } from '../../model/task-state-manager.service';
 import { LoadingState } from '../../model/loading-state.type';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-login',
@@ -24,7 +25,8 @@ import { LoadingState } from '../../model/loading-state.type';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+
+export class LoginComponent implements OnInit {
   translationCodes = TranslationCodes;
   account: string = '';
   password: string = '';
@@ -34,13 +36,30 @@ export class LoginComponent {
   currentTaskState: LoadingState;
 
 
-  constructor(private authenticationService: AuthenticationService, private router: Router, private ngZone: NgZone, private i18nService: I18nService, private logginService: LoggingService, private stateManagerService: TaskStateManagerService) {
+  constructor(private titleService: Title, private authenticationService: AuthenticationService, private router: Router, private ngZone: NgZone, private i18nService: I18nService, private logginService: LoggingService, private stateManagerService: TaskStateManagerService) {
     this.currentTaskState = this.stateManagerService.getState();
     this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
   }
 
+  private updateTitle(): void {
+    const titleKey = this.translationCodes.TC_LOGIN_DIRECTORY;
+    const title = this.i18nService.translate(titleKey);
+    this.titleService.setTitle(title);
+  }
+
+  ngOnInit(): void {
+
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.updateTitle();
+      }
+    });
+
+    this.updateTitle();
+  }
+
+
   onSubmit() {
-    //if (!this.isLoading) {
     this.systemMessage = "";
     this.errorValidationMessage = {};
 
@@ -55,7 +74,6 @@ export class LoginComponent {
 
     this.authenticationService.loginJwt(this.account, this.password).pipe(
       switchMap((response) => {
-        console.log(response)
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.systemMessage = code;
@@ -123,9 +141,10 @@ export class LoginComponent {
 
   private setUnsuccessfulTask(state: LoadingState): void {
     this.stateManagerService.setState(state);
+
     setTimeout(() => {
       this.stateManagerService.setState(LoadingState.NO_ACTION_PERFORMED);
-    }, 2500);
+    }, 1000);
   }
 
   private setSuccessfulTask(): void {
@@ -134,7 +153,7 @@ export class LoginComponent {
       this.ngZone.run(() => {
         this.router.navigate([WebRoutes.root]);
       });
-    }, 3000)
+    }, 1000)
   }
 
 

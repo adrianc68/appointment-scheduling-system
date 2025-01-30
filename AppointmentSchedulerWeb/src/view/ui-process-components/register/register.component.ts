@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +15,7 @@ import { OperationResult } from '../../../cross-cutting/communication/model/oper
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { TaskStateManagerService } from '../../model/task-state-manager.service';
 import { LoadingState } from '../../model/loading-state.type';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-register',
@@ -24,7 +25,7 @@ import { LoadingState } from '../../model/loading-state.type';
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
 
   translationCodes = TranslationCodes;
 
@@ -44,15 +45,30 @@ export class RegisterComponent {
     return this.i18nService.translate(key);
   }
 
-  constructor(private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private stateManagerService: TaskStateManagerService) {
+  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private stateManagerService: TaskStateManagerService) {
     this.currentTaskState = this.stateManagerService.getState();
     this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
   }
 
 
-  onSubmit() {
-    console.log(this.stateManagerService.getState());
+  private updateTitle(): void {
+    const titleKey = this.translationCodes.TC_SIGN_UP_DIRECTORY;
+    const title = this.i18nService.translate(titleKey);
+    this.titleService.setTitle(title);
+  }
 
+  ngOnInit(): void {
+
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.updateTitle();
+      }
+    });
+
+    this.updateTitle();
+  }
+
+  onSubmit() {
     if (this.currentTaskState === LoadingState.LOADING) {
       return;
     }
@@ -66,7 +82,7 @@ export class RegisterComponent {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.systemMessage = code;
-          return of(response.isSuccessful);
+          return of(true);
         } else {
           this.handleErrorResponse(response);
           return of(false);
@@ -75,7 +91,7 @@ export class RegisterComponent {
     ).subscribe({
       next: (result) => {
         if (result) {
-            this.setSuccessfulTask();
+          this.setSuccessfulTask();
         } else {
           this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
         }
@@ -119,7 +135,7 @@ export class RegisterComponent {
     this.stateManagerService.setState(state);
     setTimeout(() => {
       this.stateManagerService.setState(LoadingState.NO_ACTION_PERFORMED);
-    }, 500);
+    }, 1500);
   }
 
   private setSuccessfulTask(): void {

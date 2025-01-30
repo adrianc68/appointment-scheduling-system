@@ -1,1 +1,19 @@
-<h1>Pagina Home</h1>
+<div *ngIf="(accountData | async ) as accountData">
+
+  <app-client-home *ngIf="accountData.role === roleTypes.CLIENT">
+    <p>¡Bienvenido cliente!</p>
+
+  </app-client-home>
+
+  <app-assistant-home *ngIf="accountData.role === roleTypes.ASSISTANT">
+    <p>¡Bienvenido asistente!</p>
+  </app-assistant-home>
+
+  <app-administrator-home *ngIf="accountData.role === roleTypes.ADMINISTRATOR">
+    <p>¡Bienvenido administrador!</p>
+  </app-administrator-home>
+</div>
+
+<button *ngIf="isAuthenticated" (click)="logout()">
+  {{translate(translationCodes.TC_LOGOUT_BUTTON_LABEL)}}
+</button>

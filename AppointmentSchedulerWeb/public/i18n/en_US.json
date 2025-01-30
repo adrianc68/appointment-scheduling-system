@@ -83,6 +83,9 @@
   "TC_SIGN_UP": "Sign up",
   "TC_WELCOME": "Welcome",
   "TC_EMPTY": "",
+  "TC_HOME_DIRECTORY": "Home",
+  "TC_LOGIN_DIRECTORY": "Log in",
+  "TC_SIGN_UP_DIRECTORY": "Sign up",
   "TC_VALIDATION_ERROR": "The data sent is invalid",
   "TC_GENERIC_ERROR_CONFLICT": "There is a conflict with the data",
   "TC_EMAIL_DATA_LABEL": "Email:",
@@ -100,9 +103,6 @@
   "TC_USERNAME_PLACEHOLDER_LABEL": "Enter your username",
   "TC_PHONE_NUMBER_PLACEHOLDER_LABEL": "Enter your phone number",
   "TC_NAME_PLACEHOLDER_LABEL": "Enter your full name",
-
-
-
   "TC_LOADING_STATE_NO_ACTION_PERFORMED": "No action performed",
   "TC_LOADING_STATE_LOADING": "Loading...",
   "TC_LOADING_STATE_UNSUCCESSFUL_TASK": "Task not completed",

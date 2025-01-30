@@ -7,17 +7,20 @@ import { AssistantManagementComponent } from '../view/ui-process-components/assi
 import { ClientManagementComponent } from '../view/ui-process-components/client-management/client-management.component';
 import { ServiceManagementComponent } from '../view/ui-process-components/service-management/service-management.component';
 import { RegisterComponent } from '../view/ui-process-components/register/register.component';
+import { RedirectIfAuthenticatedGuard } from '../view/model/redirect-if-authenticated-guard';
+import { RoleType } from '../view-model/business-entities/types/role.types';
+import { RoleGuard } from '../view/model/role-guard';
 
 export const routes: Routes = [
   {
     path: "",
     component: RootComponent,
   },
-  { path: "login", component: LoginComponent, title: "Log in" },
-  { path: "signup", component: RegisterComponent, title: "Register" },
-  { path: "appointment/management", component: AppointmentManagementComponent, title: "Citas", canActivate: [AuthGuard] },
-  { path: "assistant/management", component: AssistantManagementComponent, title: "Citas", canActivate: [AuthGuard] },
-  { path: "client/management", component: ClientManagementComponent, title: "Citas", canActivate: [AuthGuard] },
-  { path: "service/management", component: ServiceManagementComponent, title: "Citas", canActivate: [AuthGuard] },
+  { path: "login", component: LoginComponent, canActivate: [RedirectIfAuthenticatedGuard] },
+  { path: "signup", component: RegisterComponent, canActivate: [RedirectIfAuthenticatedGuard] },
+  { path: "management/appointment", component: AppointmentManagementComponent, title: "Administrar citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  { path: "management/assistant", component: AssistantManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  { path: "management/client", component: ClientManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  { path: "management/service", component: ServiceManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
   { path: '**', redirectTo: "" }
 ];
