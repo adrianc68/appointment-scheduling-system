@@ -7,6 +7,15 @@ import { LoggingService } from '../cross-cutting/operation-management/logginServ
 import { WebRoutes } from '../cross-cutting/operation-management/model/web-routes.constants';
 import { TranslationCodes } from '../cross-cutting/helper/i18n/model/translation-codes.types';
 import { LanguageTypes } from '../cross-cutting/helper/i18n/model/languages.types';
+import { SignalRService } from '../cross-cutting/communication/signalr-service/signalr.service';
+import { NotificationService } from '../cross-cutting/communication/notification-service/notification.service';
+import { OperationResult } from '../cross-cutting/communication/model/operation-result.response';
+import { NotificationDTO } from '../model/dtos/notification.dto';
+import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../cross-cutting/communication/model/api-response.error';
+import { getStringEnumKeyByValue } from '../cross-cutting/helper/enum-utils/enum.utils';
+import { MessageCodeType } from '../cross-cutting/communication/model/message-code.types';
+import { Observable, of, switchMap } from 'rxjs';
+import { AppNotification } from '../view-model/business-entities/notification/notification';
 
 
 @Component({
@@ -22,15 +31,21 @@ import { LanguageTypes } from '../cross-cutting/helper/i18n/model/languages.type
 export class AppComponent {
   translationCodes = TranslationCodes;
   isAuthenticated: boolean = false;
+  notificationMessages: string[] = [];
 
-  constructor(private i18nService: I18nService, private loggingService: LoggingService, private authService: AuthenticationService, private router: Router) {
-    this.i18nService.setLanguage(this.i18nService.getLanguage());
+
+  constructor(private notificationService: NotificationService, private i18nService: I18nService, private loggingService: LoggingService, private authService: AuthenticationService, private router: Router) {
   }
 
   ngOnInit(): void {
 
+    this.i18nService.setLanguage(this.i18nService.getLanguage());
     this.authService.isAuthenticated().subscribe({
       next: (authenticated: boolean) => {
+        if (authenticated) {
+          this.getAllNotifications();
+          this.getUnreadNotifications();
+        }
         this.isAuthenticated = authenticated;
       },
       error: (err) => {
@@ -41,7 +56,7 @@ export class AppComponent {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate([WebRoutes.login]);
+    //this.router.navigate([WebRoutes.login]);
   }
 
   changeLanguageToEnglish(): void {
@@ -55,6 +70,39 @@ export class AppComponent {
   translate(key: string): string {
     return this.i18nService.translate(key);
   }
+
+  getAllNotifications(): void {
+    this.notificationService.getAllNotifications().pipe(
+      switchMap((response: OperationResult<AppNotification[], ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          //this.systemMessage = code;
+        }
+        // Retornar el response o transformarlo si es necesario
+        return of(response);
+      })
+    ).subscribe(response => {
+      console.log(response);
+    })
+  }
+
+  getUnreadNotifications(): void {
+    this.notificationService.getUnreadNotifications().pipe(
+      switchMap((response: OperationResult<AppNotification[], ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          //this.systemMessage = code;
+        }
+        // Retornar el response o transformarlo si es necesario
+        return of(response);
+      })
+    ).subscribe(response => {
+      console.log(response);
+    })
+  }
+
+
+
 
 
 }

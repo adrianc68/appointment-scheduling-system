@@ -15,17 +15,17 @@ export class AuthenticationInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    if(!this.UrlRequiresAuthorization(req.url)) {
+    if (!this.UrlRequiresAuthorization(req.url)) {
       return next.handle(req);
     }
 
     return this.authService.getCredentials().pipe(
       take(1),
       switchMap((credentials: UserCredentialsJwt | null) => {
-        if (credentials != null && credentials.token) {
+        if (credentials != null && credentials.accessToken) {
           const cloneReq = req.clone({
             setHeaders: {
-              Authorization: `Bearer ${credentials.token}`,
+              Authorization: `Bearer ${credentials.accessToken}`,
             },
           });
           return next.handle(cloneReq);

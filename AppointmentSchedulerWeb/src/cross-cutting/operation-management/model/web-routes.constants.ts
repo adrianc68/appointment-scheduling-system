@@ -8,6 +8,7 @@ export const WebRoutes = {
   appointment_management: "/management/appointment",
   assistant_management: "/management/assistant",
   client_management: "/management/client",
-  service_management: "/management/service"
+  service_management: "/management/service",
+  notification_hub: "/notificationHub",
 
 }

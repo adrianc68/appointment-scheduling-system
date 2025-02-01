@@ -30,11 +30,6 @@ export class HomeComponent implements OnInit {
   constructor(private authService: AuthenticationService, private router: Router, private i18nService: I18nService, private titleService: Title) {
     this.accountData = this.authService.getAccountData();
     this.isAuthenticated = this.authService.isAuthenticated();
-    this.isAuthenticated.subscribe(isAuth => {
-      if (!isAuth) {
-        this.router.navigate([WebRoutes.login]);
-      }
-    });
   }
 
   private updateTitle(): void {

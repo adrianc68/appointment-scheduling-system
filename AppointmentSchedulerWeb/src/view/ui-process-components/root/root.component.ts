@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { AuthenticationService } from '../../../cross-cutting/security/authentication/authentication.service';
 import { CommonModule } from '@angular/common';
-import { HomeComponent } from '../home/home.component';
 import { LandingPageComponent } from '../landing-page/landing-page.component';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { LayoutAuthenticatedComponent } from '../../ui-components/display/layout-authenticated/layout-authenticated.component';
@@ -13,10 +12,13 @@ import { LayoutAuthenticatedComponent } from '../../ui-components/display/layout
   standalone: true,
   templateUrl: './root.component.html'
 })
-export class RootComponent {
+export class RootComponent implements OnInit {
   isAuthenticated: boolean = false;
+  messages: string[] = [];
 
-  constructor(private authService: AuthenticationService, private loggingService: LoggingService) {
+  constructor(private authService: AuthenticationService, private loggingService: LoggingService) { }
+
+  ngOnInit(): void {
     this.authService.isAuthenticated().subscribe({
       next: (authenticated: boolean) => {
         this.isAuthenticated = authenticated;
@@ -25,7 +27,7 @@ export class RootComponent {
         this.loggingService.warn(err);
       }
     });
-
-
   }
+
+
 }

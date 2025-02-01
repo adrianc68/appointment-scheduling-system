@@ -18,6 +18,9 @@ import { parseStringToEnum } from '../../helper/enum-utils/enum.utils';
 import { RoleType } from '../../../view-model/business-entities/types/role.types';
 import { AccountStatusType } from '../../../view-model/business-entities/types/account-status.types';
 import { InvalidValueEnumValueException } from '../../../model/dtos/exceptions/invalid-enum.exception';
+import { Router } from '@angular/router';
+import { WebRoutes } from '../../operation-management/model/web-routes.constants';
+import { LocalStorageKeys } from '../model/local-storage-keys.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -25,18 +28,16 @@ import { InvalidValueEnumValueException } from '../../../model/dtos/exceptions/i
 export class AuthenticationService {
   private currentTokenData: BehaviorSubject<UserCredentialsJwt | null>;
   private currentUserData: BehaviorSubject<AccountData | null>;
-  private apiUrl: string;
-  private tokenLocalStorageKey: string = "token";
-  private expirationTokenLocalStorageKey: string = "expiration_token";
-  private accountDataLocalStorageKey: string = "account_data";
 
-  constructor(private httpServiceAdapter: HttpClientAdapter, private localStorageService: LocalStorageService, private configService: ConfigService) {
+  constructor(private httpServiceAdapter: HttpClientAdapter, private localStorageService: LocalStorageService, private configService: ConfigService, private router: Router) {
+    let tokenData = this.localStorageService.getItem<UserCredentialsJwt>(LocalStorageKeys.token);
+    let accountData = this.localStorageService.getItem<AccountData>(LocalStorageKeys.account_data);
 
-    this.apiUrl = this.configService.getApiBaseUrl() + ApiVersionRoute.v1;
-    const storedToken = this.localStorageService.getItem<string>(this.tokenLocalStorageKey);
-    const storedExpiration = this.localStorageService.getItem<string>(this.expirationTokenLocalStorageKey);
-    const accountData = this.localStorageService.getItem<AccountData>(this.accountDataLocalStorageKey);
-    this.currentTokenData = new BehaviorSubject<UserCredentialsJwt | null>(storedToken && storedExpiration ? this.parseJwtToken(storedToken, storedExpiration) : null);
+    if (tokenData?.expiration) {
+      tokenData.expiration = new Date(tokenData.expiration);
+    }
+
+    this.currentTokenData = new BehaviorSubject<UserCredentialsJwt | null>(tokenData);
     this.currentUserData = new BehaviorSubject<AccountData | null>(accountData);
   }
 
@@ -49,21 +50,23 @@ export class AuthenticationService {
   }
 
   isAuthenticated(): Observable<boolean> {
-
     return this.currentTokenData.pipe(
-      map(credentials => {
+      map((credentials: UserCredentialsJwt | null) => {
+
+
+
         return !!credentials && credentials.expiration.getTime() > Date.now();
       })
     )
   }
 
   getAccountDataFromServer(): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
-    return this.httpServiceAdapter.get<AccountDataDTO>(`${this.apiUrl}${ApiRoutes.getAccountData}`).pipe(
+    return this.httpServiceAdapter.get<AccountDataDTO>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.getAccountData}`).pipe(
       map((response: ApiResponse<AccountDataDTO, ApiDataErrorResponse>) => {
         if (this.httpServiceAdapter.isSuccessResponse<AccountDataDTO>(response)) {
           const accountData = this.parseAccountData(response.data);
           this.currentUserData.next(accountData);
-          this.localStorageService.setItem<AccountData>(this.accountDataLocalStorageKey, accountData);
+          this.localStorageService.setItem<AccountData>(LocalStorageKeys.account_data, accountData);
           return OperationResultService.createSuccess(true, response.message);
         }
         return OperationResultService.createFailure(response.data, response.message);
@@ -87,12 +90,15 @@ export class AuthenticationService {
       password: password
     };
 
-    return this.httpServiceAdapter.post<JwtTokenDTO>(`${this.apiUrl}${ApiRoutes.login}`, loginData).pipe(
+    return this.httpServiceAdapter.post<JwtTokenDTO>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.login}`, loginData).pipe(
       map((response: ApiResponse<JwtTokenDTO, ApiDataErrorResponse>) => {
         if (this.httpServiceAdapter.isSuccessResponse<JwtTokenDTO>(response)) { // 200 < Http Status Code 200 OK
-          this.localStorageService.setItem(this.tokenLocalStorageKey, response.data.token);
-          this.localStorageService.setItem(this.expirationTokenLocalStorageKey, response.data.expiration);
-          this.currentTokenData.next(this.parseJwtToken(response.data.token, response.data.expiration.toString()));
+          let tokenDataa = {
+            accessToken: response.data.token,
+            expiration: new Date(response.data.expiration)
+          };
+          this.localStorageService.setItem<UserCredentialsJwt>(LocalStorageKeys.token, tokenDataa);
+          this.currentTokenData.next(tokenDataa);
           return OperationResultService.createSuccess<boolean>(true, response.message);
         }
         return OperationResultService.createFailure<ApiDataErrorResponse>(response.data, response.message);
@@ -111,18 +117,11 @@ export class AuthenticationService {
   }
 
   logout(): void {
-    this.localStorageService.removeItem(this.tokenLocalStorageKey);
-    this.localStorageService.removeItem(this.expirationTokenLocalStorageKey);
-    this.localStorageService.removeItem(this.accountDataLocalStorageKey);
+    this.localStorageService.removeItem(LocalStorageKeys.token);
+    this.localStorageService.removeItem(LocalStorageKeys.account_data);
     this.currentTokenData.next(null);
     this.currentUserData.next(null);
-  }
-
-  private parseJwtToken(storedToken: string, storedExpiration: string): UserCredentialsJwt {
-    return {
-      token: storedToken,
-      expiration: new Date(storedExpiration),
-    };
+    this.router.navigate([WebRoutes.root]);
   }
 
   private parseAccountData(accountData: AccountDataDTO): AccountData {

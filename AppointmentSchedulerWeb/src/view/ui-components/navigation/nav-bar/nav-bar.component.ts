@@ -4,8 +4,6 @@ import { CommonModule } from '@angular/common';
 import { AuthenticationService } from '../../../../cross-cutting/security/authentication/authentication.service';
 import { Observable } from 'rxjs';
 import { AccountData } from '../../../../view-model/business-entities/account';
-import { WebRoutes } from '../../../../cross-cutting/operation-management/model/web-routes.constants';
-import { Router } from '@angular/router';
 import { I18nService } from '../../../../cross-cutting/helper/i18n/i18n.service';
 import { TranslationCodes } from '../../../../cross-cutting/helper/i18n/model/translation-codes.types';
 
@@ -17,20 +15,14 @@ import { TranslationCodes } from '../../../../cross-cutting/helper/i18n/model/tr
   styleUrl: './nav-bar.component.scss'
 })
 export class NavBarComponent {
-  isAuthenticated: Observable<boolean>
+  //isAuthenticated: Observable<boolean>
   accountData: Observable<AccountData | null>;
   translationCodes = TranslationCodes;
 
   @Output() menuToggle = new EventEmitter<void>();
 
-  constructor(private authService: AuthenticationService, private router: Router, private i18nService: I18nService) {
+  constructor(private authService: AuthenticationService, private i18nService: I18nService) {
     this.accountData = this.authService.getAccountData();
-    this.isAuthenticated = this.authService.isAuthenticated();
-    this.isAuthenticated.subscribe(isAuth => {
-      if (!isAuth) {
-        this.router.navigate([WebRoutes.login]);
-      }
-    });
   }
 
   toggleSidebar() {
@@ -39,7 +31,6 @@ export class NavBarComponent {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate([WebRoutes.login]);
   }
 
   translate(key: string): string {

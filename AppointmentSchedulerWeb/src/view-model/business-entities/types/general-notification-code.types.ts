@@ -1,0 +1,6 @@
+export enum GeneralNotificationCodeType {
+  GENERAL_WELCOME,
+  GENERAL_NEWS,
+  GENERAL_PROMOTION,
+  GENERAL_SERVICE_UPDATE
+}

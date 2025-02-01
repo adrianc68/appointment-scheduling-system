@@ -7,15 +7,15 @@ export class LoggingService {
 
   constructor() { }
 
-  log(message: string): void {
+  log(message: any): void {
     console.log(`INFO: ${message}`);
   }
 
-  warn(message: string): void {
+  warn(message: any): void {
     console.warn(`WARN: ${message}`);
   }
 
-  error(message: string): void {
+  error(message: any): void {
     console.error(`ERROR: ${message}`);
   }
 

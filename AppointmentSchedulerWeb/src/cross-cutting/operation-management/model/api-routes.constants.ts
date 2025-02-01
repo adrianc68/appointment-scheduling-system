@@ -4,7 +4,11 @@ export const ApiRoutes = {
   logout: `/Auth/logout`,
   refresh: `/Auth/refresh`,
   getAccountData: `/Auth/account/data`,
-  registerClient: `/client`
+  registerClient: `/client`,
+  getAllNotification: `/Notification/all`,
+  getUnreadNotification: `/Notification/unread`,
+  markNotificationAsRead: `/Notification/read`,
+
 };
 
 export const ApiVersionRoute = {

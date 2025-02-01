@@ -1,7 +1,5 @@
 <button class="menu-btn" (click)="toggleSidebar()">☰</button>
 
-
-
-<button *ngIf="isAuthenticated" (click)="logout()">
+<button (click)="logout()">
   {{translate(translationCodes.TC_LOGOUT_BUTTON_LABEL)}}
 </button>

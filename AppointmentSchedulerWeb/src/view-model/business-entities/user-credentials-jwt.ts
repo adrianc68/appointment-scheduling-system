@@ -1,4 +1,4 @@
 export interface UserCredentialsJwt {
-  token: string,
+  accessToken: string,
   expiration: Date
 }
