@@ -34,25 +34,25 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             var accountData = await accountMgr.GetAccountIdByUuidAsync(claims.Uuid);
 
 
-            AppointmentNotification notificationApp = new AppointmentNotification
-            {
-                Type = NotificationType.APPOINTMENT_NOTIFICATION,
-                Message = $"La cita se ha cancelado.",
-                Code = AppointmentNotificationCodeType.APPOINTMENT_CANCELED,
-                Options = new NotificationOptions
-                {
-                    Channels = new List<NotificationChannelType>
-                    {
-                        NotificationChannelType.WEB_APPLICATION
-                    }
-                },
-                Appointment = new BusinessLogicLayer.Model.AppointmentIdentifiers
-                {
-                    Id = appointmentData!.Id!.Value,
-                    Uuid = request.AppointmentUuid.Value
-                },
-                Recipients = []
-            };
+            // AppointmentNotification notificationApp = new AppointmentNotification
+            // {
+            //     Type = NotificationType.APPOINTMENT_NOTIFICATION,
+            //     Message = $"La cita se ha cancelado.",
+            //     Code = AppointmentNotificationCodeType.APPOINTMENT_CANCELED,
+            //     Options = new NotificationOptions
+            //     {
+            //         Channels = new List<NotificationChannelType>
+            //         {
+            //             NotificationChannelType.WEB_APPLICATION
+            //         }
+            //     },
+            //     Appointment = new BusinessLogicLayer.Model.AppointmentIdentifiers
+            //     {
+            //         Id = appointmentData!.Id!.Value,
+            //         Uuid = request.AppointmentUuid.Value
+            //     },
+            //     Recipients = []
+            // };
 
             GeneralNotification notificationGen = new GeneralNotification
             {
@@ -86,7 +86,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
             // await this.notificationMgr.CreateNotification(notification, NotificationUsersToSendType.SEND_TO_EVERYONE);
-            await this.notificationMgr.CreateNotificationAsync(notificationApp);
+            // await this.notificationMgr.CreateNotificationAsync(notificationApp);
             await this.notificationMgr.CreateNotificationAsync(notificationGen);
             await this.notificationMgr.CreateNotificationAsync(notificationSys);
 

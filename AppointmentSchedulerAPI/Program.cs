@@ -156,6 +156,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             OnAuthenticationFailed = context =>
             {
+        Console.WriteLine("Authentication failed: " + context.Exception.Message);
+
                 return Task.CompletedTask;
             },
             OnTokenValidated = context =>
@@ -163,11 +165,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 var userClaims = context.Principal!.Claims;
                 return Task.CompletedTask;
             },
-        };
-
-        options.Events = new JwtBearerEvents
-        {
-            OnMessageReceived = context =>
+              OnMessageReceived = context =>
             {
                 var accessToken = context.Request.Query["access_token"];
 
@@ -179,7 +177,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 return Task.CompletedTask;
             }
         };
-
     });
 
 builder.Services.AddControllers()
@@ -194,7 +191,7 @@ var app = builder.Build();
 
 app.UseStaticFiles();
 app.UseCors(policy => policy
-    .WithOrigins("http://localhost:4200")
+    .WithOrigins("http://localhost:4200", "http://localhost:8080")
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials());
@@ -248,6 +245,12 @@ app.UseAuthentication();
 app.UseMiddleware<HttpResponseAuthorizationMiddleware>();
 app.UseAuthorization();
 
+// app.UseWhen(context => !context.Request.Path.StartsWithSegments("/notificationHub/negotiate"), appBuilder =>
+// {
+//     appBuilder.UseAuthentication();
+//     appBuilder.UseMiddleware<HttpResponseAuthorizationMiddleware>();
+//     appBuilder.UseAuthorization();
+// });
 
 
 

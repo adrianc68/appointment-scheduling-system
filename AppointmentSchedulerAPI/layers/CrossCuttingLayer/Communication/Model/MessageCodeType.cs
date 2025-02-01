@@ -30,6 +30,7 @@ namespace AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model
         ACCOUNT_NOT_FOUND,
         ACCOUNT_NOT_AVAILABLE,
         ACCOUNT_WAS_DELETED,
+        ACCOUNT_LOGIN_WRONG_CREDENTIALS,
         // Client codes
         CLIENT_NOT_FOUND,
         CLIENT_NOT_AVAILABLE,

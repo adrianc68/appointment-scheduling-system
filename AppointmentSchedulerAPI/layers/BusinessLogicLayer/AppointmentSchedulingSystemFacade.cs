@@ -1382,7 +1382,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             AccountData? accountData = await accountMgr.GetAccountDataByEmailOrUsernameOrPhoneNumberAsync(account, password);
             if (accountData == null)
             {
-                return OperationResult<JwtTokenResult, GenericError>.Failure(new GenericError("Account not found"), MessageCodeType.ACCOUNT_NOT_FOUND);
+                GenericError genericError = new GenericError($"Account <{account}> not found", []);
+                genericError.AddData("field", "Account");
+                genericError.AddData("account", account);
+                return OperationResult<JwtTokenResult, GenericError>.Failure(genericError, MessageCodeType.ACCOUNT_LOGIN_WRONG_CREDENTIALS);
             }
 
             JwtUserCredentials credentials = new JwtUserCredentials
