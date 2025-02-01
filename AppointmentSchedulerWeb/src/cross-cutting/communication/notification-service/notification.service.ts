@@ -16,6 +16,7 @@ import { SystemNotification } from '../../../view-model/business-entities/notifi
 import { AppNotification } from '../../../view-model/business-entities/notification/notification';
 import { AppointmentNotification } from '../../../view-model/business-entities/notification/appointment-notification';
 import { GeneralNotification } from '../../../view-model/business-entities/notification/general-notification';
+import { NotificationUuidDTO } from '../../../model/dtos/request/notification-uuid-request.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -43,6 +44,33 @@ export class NotificationService {
 
   getMessages(): Observable<string[]> {
     return this.messagesSubject.asObservable();
+  }
+
+  markNotificationAsRead(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    let requestDto = {
+      Uuid: uuid
+    } as NotificationUuidDTO
+
+    return this.httpServiceAdapter.post<NotificationUuidDTO>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.markNotificationAsRead}`, requestDto).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        console.log(response);
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) { // 500 < Http Status Code 500 Internal Server Error
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+
+    );
   }
 
 

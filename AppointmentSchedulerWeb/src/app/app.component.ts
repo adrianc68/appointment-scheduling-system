@@ -75,10 +75,8 @@ export class AppComponent {
     this.notificationService.getAllNotifications().pipe(
       switchMap((response: OperationResult<AppNotification[], ApiDataErrorResponse>) => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          //this.systemMessage = code;
+          //let code = getStringEnumKeyByValue(MessageCodeType, response.code);
         }
-        // Retornar el response o transformarlo si es necesario
         return of(response);
       })
     ).subscribe(response => {
@@ -90,13 +88,17 @@ export class AppComponent {
     this.notificationService.getUnreadNotifications().pipe(
       switchMap((response: OperationResult<AppNotification[], ApiDataErrorResponse>) => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          //let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           //this.systemMessage = code;
         }
-        // Retornar el response o transformarlo si es necesario
         return of(response);
       })
     ).subscribe(response => {
+      if (response.result) {
+        //this.notificationService.markNotificationAsRead(response.result[0].uuid).subscribe((response) => {
+        //  console.log(response);
+        //});
+      }
       console.log(response);
     })
   }
