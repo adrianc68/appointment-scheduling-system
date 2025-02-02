@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { AccountData } from '../../../../view-model/business-entities/account';
 import { I18nService } from '../../../../cross-cutting/helper/i18n/i18n.service';
 import { TranslationCodes } from '../../../../cross-cutting/helper/i18n/model/translation-codes.types';
+import { LanguageTypes } from '../../../../cross-cutting/helper/i18n/model/languages.types';
 
 @Component({
   selector: 'app-nav-bar',
@@ -36,6 +37,16 @@ export class NavBarComponent {
   translate(key: string): string {
     return this.i18nService.translate(key);
   }
+
+  changeLanguageToEnglish(): void {
+    this.i18nService.setLanguage(LanguageTypes.en_US);
+  }
+
+  changeLanguageToSpanish(): void {
+    this.i18nService.setLanguage(LanguageTypes.es_MX);
+  }
+
+
 
 
 }
