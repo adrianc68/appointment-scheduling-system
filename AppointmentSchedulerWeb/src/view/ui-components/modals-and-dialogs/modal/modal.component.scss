@@ -1,0 +1,45 @@
+.modal-content {
+  padding: 20px;
+  text-align: center;
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+
+  button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .modal-content {
+    padding: 15px;
+
+    h2 {
+      font-size: 20px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+}

@@ -3,8 +3,8 @@ import { SystemNotificationSeverityCode } from "../../view-model/business-entiti
 import { NotificationDTO } from "./notification.dto";
 
 export interface SystemNotificationDTO extends NotificationDTO {
-  code: SystemNotificationCodeType,
-  severity: SystemNotificationSeverityCode
+  Code: SystemNotificationCodeType,
+  Severity: SystemNotificationSeverityCode
 }
 
 

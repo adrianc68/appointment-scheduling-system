@@ -2,5 +2,5 @@ import { GeneralNotificationCodeType } from "../../view-model/business-entities/
 import { NotificationDTO } from "./notification.dto";
 
 export interface GeneralNotificationDTO extends NotificationDTO {
-  code: GeneralNotificationCodeType
+  Code: GeneralNotificationCodeType
 }

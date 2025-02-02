@@ -4,10 +4,10 @@ import { GeneralNotificationDTO } from "./general-notification.dto";
 import { SystemNotificationDTO } from "./system-notification.dto";
 
 export interface NotificationDTO {
-  createdAt: Date,
-  uuid: string,
-  message: string,
-  type: NotificationType
+  CreatedAt: Date,
+  Uuid: string,
+  Message: string,
+  Type: NotificationType
 }
 
 

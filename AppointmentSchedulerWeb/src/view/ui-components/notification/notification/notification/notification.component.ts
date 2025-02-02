@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-notification',
-  imports: [],
   templateUrl: './notification.component.html',
   styleUrl: './notification.component.scss'
 })
-export class NotificationComponent {
-
+export abstract class NotificationComponent {
+  @Input() data: any;
 }

@@ -30,6 +30,53 @@ export class SignalRService implements OnDestroy {
     });
   }
 
+  public removeMessageListener(methodName: string) {
+    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.off(methodName);
+    }
+  }
+
+  public addMessageListener(methodName: string) {
+    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.on(methodName, (message: string) => {
+        this.messageReceived.next(message);
+      });
+    } else {
+      this.logginService.error(`SignalR cannot add listener ${methodName}, connection not established`);
+    }
+  }
+
+  public sendMessage(methodName: string, message: string) {
+    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
+      this.hubConnection.invoke(methodName, message)
+        .catch(err => this.logginService.error(err));
+    } else {
+      this.logginService.error("SignalR cannot send message, connection not established");
+    }
+  }
+
+
+  stopConnection() {
+    if (this.hubConnection) {
+      this.hubConnection.stop()
+        .then(() => this.logginService.log("SignalR connection finished"))
+        .catch(err => this.logginService.error(err));
+      this.connectionEstablished.next(false);
+
+    }
+  }
+
+  getConnectionStatus(): Observable<boolean> {
+    return this.connectionEstablished.asObservable();
+  }
+
+  ngOnDestroy(): void {
+    this.stopConnection();
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+  }
+
   private initConnection(accessToken: string) {
     if (this.hubConnection) {
       this.stopConnection();
@@ -56,44 +103,10 @@ export class SignalRService implements OnDestroy {
     }
   }
 
-  stopConnection() {
-    if (this.hubConnection) {
-      this.hubConnection.stop()
-        .then(() => this.logginService.log("SignalR connection finished"))
-        .catch(err => this.logginService.error(err));
-      this.connectionEstablished.next(false);
 
-    }
-  }
 
-  public addMessageListener(methodName: string) {
-    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
-      this.hubConnection.on(methodName, (message: string) => {
-        this.messageReceived.next(message);
-      });
-    } else {
-      this.logginService.error(`SignalR cannot add listener ${methodName}, connection not established`);
-    }
-  }
 
-  public sendMessage(methodName: string, message: string) {
-    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
-      this.hubConnection.invoke(methodName, message)
-        .catch(err => this.logginService.error(err));
-    } else {
-      this.logginService.error("SignalR cannot send message, connection not established");
-    }
-  }
 
-  getConnectionStatus(): Observable<boolean> {
-    return this.connectionEstablished.asObservable();
-  }
 
-  ngOnDestroy(): void {
-    this.stopConnection();
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
-    }
-  }
 }
 
