@@ -1,5 +1,5 @@
 export enum SystemNotificationSeverityCode {
-  INFO,
-  WARNING,
-  CRITICAL
+  INFO = "INFO",
+  WARNING = "WARNING",
+  CRITICAL = "CRITICAL"
 }

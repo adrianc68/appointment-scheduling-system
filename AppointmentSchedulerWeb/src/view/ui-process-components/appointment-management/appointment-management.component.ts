@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-appointment-management',
   imports: [],
+  standalone: true,
   templateUrl: './appointment-management.component.html',
   styleUrl: './appointment-management.component.scss'
 })

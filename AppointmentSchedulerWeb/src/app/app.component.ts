@@ -11,7 +11,6 @@ import { OperationResult } from '../cross-cutting/communication/model/operation-
 import { ApiDataErrorResponse } from '../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../cross-cutting/communication/model/message-code.types';
 import { of, switchMap } from 'rxjs';
-import { AppNotification } from '../view-model/business-entities/notification/notification';
 import { ModalComponent } from '../view/ui-components/modals-and-dialogs/modal/modal.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AppointmentNotificationComponent } from '../view/ui-components/notification/notification/appointment-notification/appointment-notification.component';
@@ -44,7 +43,7 @@ export class AppComponent {
       next: (authenticated: boolean) => {
         if (authenticated) {
           //this.getAllNotifications();
-          //this.getUnreadNotifications();
+          this.getUnreadNotifications();
         }
         this.isAuthenticated = authenticated;
       },
@@ -75,40 +74,8 @@ export class AppComponent {
     return this.i18nService.translate(key);
   }
 
-  //getAllNotifications(): void {
-  //  this.notificationService.getAllNotifications().pipe(
-  //    switchMap((response: OperationResult<AppNotification[], ApiDataErrorResponse>) => {
-  //      if (response.isSuccessful && response.code === MessageCodeType.OK) {
-  //        //let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-  //      }
-  //      return of(response);
-  //    })
-  //  ).subscribe(response => {
-  //    console.log(response);
-  //  })
-  //}
-  //
-  //getUnreadNotifications(): void {
-  //  this.notificationService.getUnreadNotifications().pipe(
-  //    switchMap((response: OperationResult<AppNotification[], ApiDataErrorResponse>) => {
-  //      if (response.isSuccessful && response.code === MessageCodeType.OK) {
-  //        //let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-  //        //this.systemMessage = code;
-  //      }
-  //      return of(response);
-  //    })
-  //  ).subscribe(response => {
-  //    if (response.result) {
-  //      //this.notificationService.markNotificationAsRead(response.result[0].uuid).subscribe((response) => {
-  //      //  console.log(response);
-  //      //});
-  //    }
-  //    console.log(response);
-  //  })
-  //}
-
-
-
-
+  getUnreadNotifications(): void {
+    this.notificationService.getUnreadNotifications().subscribe(() => { })
+  }
 
 }

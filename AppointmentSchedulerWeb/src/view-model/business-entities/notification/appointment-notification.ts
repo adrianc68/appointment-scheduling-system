@@ -1,8 +1,17 @@
-import { AppointmentUuidDTO } from "../../../model/dtos/appointment-uuid.dto";
 import { AppointmentNotificationCodeType } from "../types/appointment-notification-code.types";
-import { NotificationBase } from "./notification";
+import { NotificationType } from "../types/notification.types";
+import { NotificationBase } from "./notification-base";
 
-export interface AppointmentNotification extends NotificationBase {
-  code: AppointmentNotificationCodeType,
-  appointment: AppointmentUuidDTO
+export class AppointmentNotification extends NotificationBase {
+  constructor(
+    createdAt: Date,
+    uuid: string,
+    message: string,
+    type: NotificationType,
+    public code: AppointmentNotificationCodeType,
+    public appointmentUuid: string,
+  ) {
+    super(createdAt, uuid, message, type);
+  }
+
 }

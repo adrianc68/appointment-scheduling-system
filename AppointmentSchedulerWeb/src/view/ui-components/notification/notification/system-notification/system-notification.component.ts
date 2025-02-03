@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NotificationComponent } from '../notification/notification.component';
 import { CommonModule } from '@angular/common';
+import { SystemNotification } from '../../../../../view-model/business-entities/notification/system-notification';
 
 @Component({
   selector: 'app-system-notification',
@@ -9,8 +10,13 @@ import { CommonModule } from '@angular/common';
   templateUrl: './system-notification.component.html',
   styleUrl: './system-notification.component.scss'
 })
-export class SystemNotificationComponent extends NotificationComponent {
+export class SystemNotificationComponent extends NotificationComponent implements OnInit {
+  override data: SystemNotification = {} as SystemNotification;
 
+
+  ngOnInit(): void {
+    this.data = this.data as SystemNotification;
+  }
 
 
 }

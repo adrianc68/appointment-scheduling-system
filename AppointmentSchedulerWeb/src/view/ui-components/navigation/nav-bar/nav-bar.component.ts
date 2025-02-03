@@ -7,6 +7,7 @@ import { AccountData } from '../../../../view-model/business-entities/account';
 import { I18nService } from '../../../../cross-cutting/helper/i18n/i18n.service';
 import { TranslationCodes } from '../../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { LanguageTypes } from '../../../../cross-cutting/helper/i18n/model/languages.types';
+import { NotificationService } from '../../../../cross-cutting/communication/notification-service/notification.service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -18,12 +19,25 @@ import { LanguageTypes } from '../../../../cross-cutting/helper/i18n/model/langu
 export class NavBarComponent {
   //isAuthenticated: Observable<boolean>
   accountData: Observable<AccountData | null>;
+  notificationsPendingNumber: number = 0;
+
+
   translationCodes = TranslationCodes;
 
   @Output() menuToggle = new EventEmitter<void>();
 
-  constructor(private authService: AuthenticationService, private i18nService: I18nService) {
+  constructor(private authService: AuthenticationService, private i18nService: I18nService, private notificatinService: NotificationService) {
     this.accountData = this.authService.getAccountData();
+
+
+    this.notificatinService.getMessages().subscribe((response) => {
+      this.notificationsPendingNumber = response?.length ?? 0;
+    })
+
+
+    //this.notificatinService.getUnreadNotifications().subscribe((response) => {
+    //  console.log(response);
+    //});
   }
 
   toggleSidebar() {

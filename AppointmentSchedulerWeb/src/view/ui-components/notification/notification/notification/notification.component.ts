@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { NotificationBase } from '../../../../../view-model/business-entities/notification/notification-base';
 
 @Component({
   selector: 'app-notification',
@@ -6,5 +7,5 @@ import { Component, Input } from '@angular/core';
   styleUrl: './notification.component.scss'
 })
 export abstract class NotificationComponent {
-  @Input() data: any;
+  @Input() data!: NotificationBase;
 }

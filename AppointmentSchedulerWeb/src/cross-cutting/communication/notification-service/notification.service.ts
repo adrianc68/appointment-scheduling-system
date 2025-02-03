@@ -1,19 +1,18 @@
 import { Injectable, OnInit, Type } from '@angular/core';
-import { BehaviorSubject, catchError, filter, finalize, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, filter, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { SignalRService } from '../signalr-service/signalr.service';
 import { HttpClientAdapter } from '../http-client-adapter-service/http-client-adapter.service';
 import { ConfigService } from '../../operation-management/configService/config.service';
 import { OperationResult } from '../model/operation-result.response';
 import { ApiDataErrorResponse } from '../model/api-response.error';
 import { ApiRoutes, ApiVersionRoute } from '../../operation-management/model/api-routes.constants';
-import { isAppointmentNotificationDTO, isGeneralNotificationDTO, isSystemNotificationDTO, NotificationDTO } from '../../../model/dtos/notification.dto';
 import { ApiResponse } from '../../communication/model/api-response';
 import { OperationResultService } from '../model/operation-result.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MessageCodeType } from '../model/message-code.types';
 import { TranslationCodes } from '../../helper/i18n/model/translation-codes.types';
 import { SystemNotification } from '../../../view-model/business-entities/notification/system-notification';
-import { AppNotification, NotificationBase } from '../../../view-model/business-entities/notification/notification';
+import { NotificationBase } from '../../../view-model/business-entities/notification/notification-base';
 import { AppointmentNotification } from '../../../view-model/business-entities/notification/appointment-notification';
 import { GeneralNotification } from '../../../view-model/business-entities/notification/general-notification';
 import { NotificationUuidDTO } from '../../../model/dtos/request/notification-uuid-request.dto';
@@ -24,21 +23,23 @@ import { SystemNotificationComponent } from '../../../view/ui-components/notific
 import { GeneralNotificationComponent } from '../../../view/ui-components/notification/notification/general-notification/general-notification.component';
 import { NotificationType } from '../../../view-model/business-entities/types/notification.types';
 import { AppointmentNotificationComponent } from '../../../view/ui-components/notification/notification/appointment-notification/appointment-notification.component';
-import { SystemNotificationDTO } from '../../../model/dtos/system-notification.dto';
-import { AppointmentNotificationDTO } from '../../../model/dtos/appointment-notification.dto';
-import { GeneralNotificationDTO } from '../../../model/dtos/general-notification.dto';
-import { getStringEnumKeyByValue, parseStringToEnum } from '../../helper/enum-utils/enum.utils';
-import { AuthenticationService } from '../../security/authentication/authentication.service';
+import { parseStringToEnum } from '../../helper/enum-utils/enum.utils';
+import { plainToInstance } from 'class-transformer';
+import { NotificationDTO } from '../../../model/dtos/response/notification.dto';
+import { SystemNotificationDTO } from '../../../model/dtos/response/system-notification.dto';
+import { GeneralNotificationDTO } from '../../../model/dtos/response/general-notification.dto';
+import { AppointmentNotificationDTO } from '../../../model/dtos/response/appointment-notification.dto';
+import { InvalidValueEnumValueException } from '../../../model/dtos/exceptions/invalid-enum.exception';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NotificationService {
-  private messagesSubject = new BehaviorSubject<NotificationBase[]>([]);
   private isListenerAdded = false;
   translationCodes = TranslationCodes;
   private isModalOpen = false;
-  private notificationQueue: any[] = [];
+  private notificationQueue: NotificationBase[] = [];
+  private notificationsList: BehaviorSubject<NotificationBase[] | null> = new BehaviorSubject<NotificationBase[] | null>([]);
 
   constructor(private signalRService: SignalRService, private httpServiceAdapter: HttpClientAdapter, private configService: ConfigService, private dialog: MatDialog) {
     this.signalRService.getConnectionStatus().pipe(
@@ -62,20 +63,20 @@ export class NotificationService {
     ).subscribe((message: string) => {
       this.receiveNotification(message);
     });
-
-
   }
 
 
   private receiveNotification(message: string): void {
-    const rawObject = JSON.parse(message);
-    console.log(rawObject);
-    //const mappedMessage = this.mapNotificationDtoToNotification(rawObject);
-    //this.addToQueue(mappedMessage);
-    this.addToQueue(rawObject);
+    const mappedNotification = this.mapNotificationDtoStringToNotification(message);
+    this.addToQueueAndShowModal(mappedNotification);
   }
 
-  private addToQueue(notification: any): void {
+  private addToQueue(notification: NotificationBase): void {
+    this.notificationQueue.push(notification);
+  }
+
+
+  private addToQueueAndShowModal(notification: NotificationBase): void {
     this.notificationQueue.push(notification);
     this.processQueue();
   }
@@ -89,12 +90,11 @@ export class NotificationService {
     const notification = this.notificationQueue.shift();
 
     if (notification) {
-      let dataType = parseStringToEnum(NotificationType, notification.Type);
-      if (dataType === NotificationType.SYSTEM_NOTIFICATION) {
+      if (notification.type === NotificationType.SYSTEM_NOTIFICATION) {
         this.openModalComp(SystemNotificationComponent, notification)
-      } else if (dataType === NotificationType.GENERAL_NOTIFICATION) {
+      } else if (notification.type === NotificationType.GENERAL_NOTIFICATION) {
         this.openModalComp(GeneralNotificationComponent, notification)
-      } else if (dataType === NotificationType.APPOINTMENT_NOTIFICATION) {
+      } else if (notification.type === NotificationType.APPOINTMENT_NOTIFICATION) {
         this.openModalComp(AppointmentNotificationComponent, notification)
       } else {
         throw Error("Unknown notification type");
@@ -102,7 +102,7 @@ export class NotificationService {
     }
   }
 
-  private openModalComp(component: Type<NotificationComponent>, data: any): void {
+  private openModalComp(component: Type<NotificationComponent>, data: NotificationBase): void {
     const dialogRef = this.dialog.open(ModalComponent, {
       data: {
         component: component,
@@ -112,87 +112,73 @@ export class NotificationService {
 
     dialogRef.afterClosed().subscribe(() => {
       this.isModalOpen = false;
+      this.markNotificationAsRead(data.uuid).subscribe(() => {});
       this.processQueue();
     });
   }
 
+  getMessages(): Observable<NotificationBase[] | null> {
+    return this.notificationsList;
+  }
+
+  markNotificationAsRead(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    let requestDto = {
+      Uuid: uuid
+    } as NotificationUuidDTO
+
+    return this.httpServiceAdapter.post<NotificationUuidDTO>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.markNotificationAsRead}`, requestDto).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) { // 500 < Http Status Code 500 Internal Server Error
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+
+    );
+  }
 
 
+  getUnreadNotifications(): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.get<NotificationDTO[]>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.getUnreadNotification}`).pipe(
+      map((response: ApiResponse<NotificationDTO[], ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<NotificationDTO[]>(response)) {
+          const notifications: NotificationBase[] = response.data.map(dto => this.mapNotificationDTOToNotification(dto));
+          this.notificationsList.next(notifications);
+          return OperationResultService.createSuccess(true, response.message);
+        }
+        return OperationResultService.createFailure(false, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) { // 500 < Http Status Code 500 Internal Server Error
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
 
 
-
-
-
-
-
-
-
-
-
-  //
-  //getMessages(): Observable<NotificationBase[]> {
-  //  return this.messagesSubject.asObservable();
-  //}
-  //
-  //markNotificationAsRead(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
-  //  let requestDto = {
-  //    Uuid: uuid
-  //  } as NotificationUuidDTO
-  //
-  //  return this.httpServiceAdapter.post<NotificationUuidDTO>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.markNotificationAsRead}`, requestDto).pipe(
-  //    map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
-  //      console.log(response);
-  //      if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
-  //        return OperationResultService.createSuccess(response.data, response.message);
-  //      }
-  //      return OperationResultService.createFailure(response.data, response.message);
-  //    }),
-  //    catchError((err) => {
-  //      if (err instanceof HttpErrorResponse) {
-  //        let codeError = MessageCodeType.UNKNOWN_ERROR;
-  //        if (err.status == 500) { // 500 < Http Status Code 500 Internal Server Error
-  //          codeError = MessageCodeType.SERVER_ERROR;
-  //        }
-  //        return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
-  //      }
-  //      return throwError(() => err);
-  //    })
-  //
-  //  );
-  //}
-
-
-  //getUnreadNotifications(): Observable<OperationResult<AppNotification[], ApiDataErrorResponse>> {
-  //  return this.httpServiceAdapter.get<NotificationDTO[]>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.getUnreadNotification}`).pipe(
-  //    map((response: ApiResponse<NotificationDTO[], ApiDataErrorResponse>) => {
-  //      console.log(response);
-  //      if (this.httpServiceAdapter.isSuccessResponse<NotificationDTO[]>(response)) {
-  //        const notifications: AppNotification[] = response.data.map(dto => this.mapNotificationDtoToNotification(dto));
-  //        return OperationResultService.createSuccess(notifications, response.message);
-  //      }
-  //      return OperationResultService.createFailure([], response.message);
-  //    }),
-  //    catchError((err) => {
-  //      if (err instanceof HttpErrorResponse) {
-  //        let codeError = MessageCodeType.UNKNOWN_ERROR;
-  //        if (err.status == 500) { // 500 < Http Status Code 500 Internal Server Error
-  //          codeError = MessageCodeType.SERVER_ERROR;
-  //        }
-  //        return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
-  //      }
-  //      return throwError(() => err);
-  //    })
-  //  );
-  //}
-
-
-  //getAllNotifications(): Observable<OperationResult<AppNotification[], ApiDataErrorResponse>> {
+  //getAllNotifications(): Observable<OperationResult<NotificationBase[], ApiDataErrorResponse>> {
   //  return this.httpServiceAdapter.get<NotificationDTO[]>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.getAllNotification}`).pipe(
   //    map((response: ApiResponse<NotificationDTO[], ApiDataErrorResponse>) => {
   //      console.log(response);
   //      if (this.httpServiceAdapter.isSuccessResponse<NotificationDTO[]>(response)) {
-  //        const notifications: AppNotification[] = response.data.map(dto => this.mapNotificationDtoToNotification(dto));
-  //        return OperationResultService.createSuccess(notifications, response.message);
+  //        //const notifications: NotificationBase[] = response.data.map(dto => this.mapNotificationDtoToNotification(dto));
+  //        return OperationResultService.createSuccess(response.data, response.message);
   //      }
   //      return OperationResultService.createFailure([], response.message);
   //    }),
@@ -208,80 +194,39 @@ export class NotificationService {
   //    })
   //  );
   //}
+  //
+  //
+  private mapNotificationDtoStringToNotification(message: string): NotificationBase {
 
+    const rawObject = JSON.parse(message);
+    let notificationType = parseStringToEnum(NotificationType, rawObject.Type);
+    if (notificationType == NotificationType.GENERAL_NOTIFICATION) {
+      let dto = plainToInstance(GeneralNotificationDTO, rawObject);
+      return new GeneralNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code);
+    } else if (notificationType == NotificationType.SYSTEM_NOTIFICATION) {
+      let dto = plainToInstance(SystemNotificationDTO, rawObject);
+      return new SystemNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code, dto.severity);
+    } else if (notificationType == NotificationType.APPOINTMENT_NOTIFICATION) {
+      let dto = plainToInstance(AppointmentNotificationDTO, rawObject);
+      return new AppointmentNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code, dto.appointmentUuid);
+    }
+    throw new InvalidValueEnumValueException("Cannot get notification type from json");
+  }
 
-
-  //
-  //private mapNotificationDtoToNotification(dto: any): AppNotification {
-  //  // Mapeamos el DTO con las claves correctamente formateadas
-  //  const normalizedDto: NotificationDTO = {
-  //    createdAt: new Date(dto.CreatedAt), // Convertimos CreatedAt a createdAt
-  //    uuid: dto.Uuid, // Convertimos Uuid a uuid
-  //    message: dto.Message, // Convertimos Message a message
-  //    type: dto.Type as NotificationType, // Convertimos Type a type
-  //  };
-  //
-  //  // Determinar el tipo de notificación y hacer el mapeo en consecuencia
-  //  switch (dto.Type) {
-  //    case NotificationType.SYSTEM_NOTIFICATION: // Para SystemNotification
-  //      return {
-  //        ...normalizedDto,
-  //        code: dto.Code, // Convertimos Code a code
-  //        severity: dto.Severity, // Convertimos Severity a severity
-  //      } as SystemNotification;
-  //
-  //    case NotificationType.APPOINTMENT_NOTIFICATION: // Para AppointmentNotification
-  //      return {
-  //        ...normalizedDto,
-  //        code: dto.Code, // Convertimos Code a code
-  //        appointment: dto.Appointment, // Convertimos Appointment a appointment
-  //      } as AppointmentNotification;
-  //
-  //    case NotificationType.GENERAL_NOTIFICATION: // Para GeneralNotification
-  //      return {
-  //        ...normalizedDto,
-  //        code: dto.Code, // Convertimos Code a code
-  //      } as GeneralNotification;
-  //
-  //    default:
-  //      throw new Error("Tipo de notificación desconocido");
-  //  }
-  //}
-  //
-
-
-  //
-  //
-  //private mapNotificationDtoToNotification(dto: any): AppNotification {
-  //  const normalizedDto: NotificationDTO = {
-  //    createdAt: new Date(dto.CreatedAt),
-  //    uuid: dto.Uuid,
-  //    message: dto.Message,
-  //    type: dto.Type as NotificationType
-  //  };
-  //
-  //  if (isSystemNotificationDTO(normalizedDto)) {
-  //    return {
-  //      ...normalizedDto,
-  //      code: dto.Code,
-  //      severity: dto.Severity
-  //    } as SystemNotification;
-  //  } else if (isAppointmentNotificationDTO(normalizedDto)) {
-  //    return {
-  //      ...normalizedDto,
-  //      code: dto.Code,
-  //      appointment: dto.Appointment
-  //    } as AppointmentNotification;
-  //  } else if (isGeneralNotificationDTO(normalizedDto)) {
-  //    return {
-  //      ...normalizedDto,
-  //      code: dto.Code
-  //    } as GeneralNotification;
-  //  } else {
-  //    throw Error("Not posibble to convert");
-  //  }
-  //}
-
+  private mapNotificationDTOToNotification(notification: NotificationDTO): NotificationBase {
+    let notificationType = notification.type;
+    if (notificationType == NotificationType.GENERAL_NOTIFICATION) {
+      let dto = notification as GeneralNotification;
+      return new GeneralNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code);
+    } else if (notificationType == NotificationType.SYSTEM_NOTIFICATION) {
+      let dto = notification as SystemNotification;
+      return new SystemNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code, dto.severity);
+    } else if (notificationType == NotificationType.APPOINTMENT_NOTIFICATION) {
+      let dto = notification as AppointmentNotification;
+      return new AppointmentNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code, dto.appointmentUuid);
+    }
+    throw new InvalidValueEnumValueException("Cannot get notification type from json");
+  }
 
 
 }
