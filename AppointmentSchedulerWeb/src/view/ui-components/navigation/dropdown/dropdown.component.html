@@ -1,1 +1,11 @@
-<p>dropdown works!</p>
+<div class="dropdown">
+  <button class="dropdown-btn" (click)="toggleDropdown()" aria-haspopup="true">
+    {{ label }} ▼
+  </button>
+
+  <ul class="dropdown-menu" *ngIf="isOpen()" role="menu">
+    <li role="menuitem"><a href="#">Opción 1</a></li>
+    <li role="menuitem"><a href="#">Opción 2</a></li>
+    <li role="menuitem"><a href="#">Opción 3</a></li>
+  </ul>
+</div>

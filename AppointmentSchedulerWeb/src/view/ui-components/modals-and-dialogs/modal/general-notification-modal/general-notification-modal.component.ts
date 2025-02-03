@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { NotificationComponent } from '../notification/notification.component';
 import { CommonModule } from '@angular/common';
 import { GeneralNotification } from '../../../../../view-model/business-entities/notification/general-notification';
+import { NotificationComponent } from '../../../notification/notification/notification/notification.component';
 
 @Component({
-  selector: 'app-general-notification',
+  selector: 'app-general-notification-modal',
   imports: [CommonModule],
   standalone: true,
-  templateUrl: './general-notification.component.html',
-  styleUrl: './general-notification.component.scss'
+  templateUrl: './general-notification-modal.component.html',
+  styleUrl: './general-notification-modal.component.scss'
 })
-export class GeneralNotificationComponent extends NotificationComponent implements OnInit {
+export class GeneralNotificationModalComponent extends NotificationComponent implements OnInit {
   override data: GeneralNotification = {} as GeneralNotification;
 
 

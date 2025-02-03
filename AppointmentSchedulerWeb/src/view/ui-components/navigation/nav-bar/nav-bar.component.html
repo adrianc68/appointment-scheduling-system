@@ -4,9 +4,13 @@
   {{translate(translationCodes.TC_LOGOUT_BUTTON_LABEL)}}
 </app-button>
 
-<app-button>
+<app-button (click)="showNotifications()" >
   Notificaciones {{ notificationsPendingNumber > 0 ? '(' + notificationsPendingNumber + ')' : '' }}
 </app-button>
+
+
+
+<app-dropdown></app-dropdown>
 
 <app-button (click)="changeLanguageToEnglish()">To English</app-button>
 

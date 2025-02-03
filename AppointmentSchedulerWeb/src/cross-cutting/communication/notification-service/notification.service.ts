@@ -19,10 +19,7 @@ import { NotificationUuidDTO } from '../../../model/dtos/request/notification-uu
 import { MatDialog } from '@angular/material/dialog';
 import { ModalComponent } from '../../../view/ui-components/modals-and-dialogs/modal/modal.component';
 import { NotificationComponent } from '../../../view/ui-components/notification/notification/notification/notification.component';
-import { SystemNotificationComponent } from '../../../view/ui-components/notification/notification/system-notification/system-notification.component';
-import { GeneralNotificationComponent } from '../../../view/ui-components/notification/notification/general-notification/general-notification.component';
 import { NotificationType } from '../../../view-model/business-entities/types/notification.types';
-import { AppointmentNotificationComponent } from '../../../view/ui-components/notification/notification/appointment-notification/appointment-notification.component';
 import { parseStringToEnum } from '../../helper/enum-utils/enum.utils';
 import { plainToInstance } from 'class-transformer';
 import { NotificationDTO } from '../../../model/dtos/response/notification.dto';
@@ -30,6 +27,9 @@ import { SystemNotificationDTO } from '../../../model/dtos/response/system-notif
 import { GeneralNotificationDTO } from '../../../model/dtos/response/general-notification.dto';
 import { AppointmentNotificationDTO } from '../../../model/dtos/response/appointment-notification.dto';
 import { InvalidValueEnumValueException } from '../../../model/dtos/exceptions/invalid-enum.exception';
+import { SystemNotificationModalComponent } from '../../../view/ui-components/modals-and-dialogs/modal/system-notification-modal/system-notification-modal.component';
+import { GeneralNotificationModalComponent } from '../../../view/ui-components/modals-and-dialogs/modal/general-notification-modal/general-notification-modal.component';
+import { AppointmentNotificationModalComponent } from '../../../view/ui-components/modals-and-dialogs/modal/appointment-notification-modal/appointment-notification-modal.component';
 
 @Injectable({
   providedIn: 'root',
@@ -91,11 +91,11 @@ export class NotificationService {
 
     if (notification) {
       if (notification.type === NotificationType.SYSTEM_NOTIFICATION) {
-        this.openModalComp(SystemNotificationComponent, notification)
+        this.openModalComp(SystemNotificationModalComponent, notification)
       } else if (notification.type === NotificationType.GENERAL_NOTIFICATION) {
-        this.openModalComp(GeneralNotificationComponent, notification)
+        this.openModalComp(GeneralNotificationModalComponent, notification)
       } else if (notification.type === NotificationType.APPOINTMENT_NOTIFICATION) {
-        this.openModalComp(AppointmentNotificationComponent, notification)
+        this.openModalComp(AppointmentNotificationModalComponent, notification)
       } else {
         throw Error("Unknown notification type");
       }

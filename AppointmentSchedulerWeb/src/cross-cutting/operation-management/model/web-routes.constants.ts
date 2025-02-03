@@ -3,6 +3,7 @@ export const WebRoutes = {
   login: "/login",
   signup: "/signup",
   configuration: "/configuration",
+  notifications: "/notifications",
   appointment_create: "/appointment/create",
   availability_time_slot_management: "/maangement/availability-time-slot",
   appointment_management: "/management/appointment",

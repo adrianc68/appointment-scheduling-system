@@ -4,6 +4,7 @@ import { NotificationBase } from '../../../../../view-model/business-entities/no
 @Component({
   selector: 'app-notification',
   templateUrl: './notification.component.html',
+  standalone: true,
   styleUrl: './notification.component.scss'
 })
 export abstract class NotificationComponent {

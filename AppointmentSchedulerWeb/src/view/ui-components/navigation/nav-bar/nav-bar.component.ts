@@ -8,6 +8,8 @@ import { I18nService } from '../../../../cross-cutting/helper/i18n/i18n.service'
 import { TranslationCodes } from '../../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { LanguageTypes } from '../../../../cross-cutting/helper/i18n/model/languages.types';
 import { NotificationService } from '../../../../cross-cutting/communication/notification-service/notification.service';
+import { WebRoutes } from '../../../../cross-cutting/operation-management/model/web-routes.constants';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-nav-bar',
@@ -20,13 +22,13 @@ export class NavBarComponent {
   //isAuthenticated: Observable<boolean>
   accountData: Observable<AccountData | null>;
   notificationsPendingNumber: number = 0;
-
+  webRoutes = WebRoutes
 
   translationCodes = TranslationCodes;
 
   @Output() menuToggle = new EventEmitter<void>();
 
-  constructor(private authService: AuthenticationService, private i18nService: I18nService, private notificatinService: NotificationService) {
+  constructor(private router: Router, private authService: AuthenticationService, private i18nService: I18nService, private notificatinService: NotificationService) {
     this.accountData = this.authService.getAccountData();
 
 
@@ -46,6 +48,10 @@ export class NavBarComponent {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  showNotifications(): void {
+    this.router.navigate([WebRoutes.notifications]);
   }
 
   translate(key: string): string {

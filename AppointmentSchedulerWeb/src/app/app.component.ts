@@ -7,13 +7,7 @@ import { LoggingService } from '../cross-cutting/operation-management/logginServ
 import { TranslationCodes } from '../cross-cutting/helper/i18n/model/translation-codes.types';
 import { LanguageTypes } from '../cross-cutting/helper/i18n/model/languages.types';
 import { NotificationService } from '../cross-cutting/communication/notification-service/notification.service';
-import { OperationResult } from '../cross-cutting/communication/model/operation-result.response';
-import { ApiDataErrorResponse } from '../cross-cutting/communication/model/api-response.error';
-import { MessageCodeType } from '../cross-cutting/communication/model/message-code.types';
-import { of, switchMap } from 'rxjs';
-import { ModalComponent } from '../view/ui-components/modals-and-dialogs/modal/modal.component';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { AppointmentNotificationComponent } from '../view/ui-components/notification/notification/appointment-notification/appointment-notification.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 
 @Component({
