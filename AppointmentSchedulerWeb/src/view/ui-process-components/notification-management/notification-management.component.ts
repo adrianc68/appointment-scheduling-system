@@ -24,7 +24,7 @@ export class NotificationManagementComponent {
   translationCodes = TranslationCodes;
 
   constructor(private notificationService: NotificationService, private i18nService: I18nService) {
-    this.notificationService.getAllNotificationsObservable().subscribe((allResponse) => {
+    this.notificationService.getNotificationsObservable().subscribe((allResponse) => {
       if (allResponse) {
         const orderedList = [...allResponse];
         this.notificationList = orderedList.sort((a, b) => {

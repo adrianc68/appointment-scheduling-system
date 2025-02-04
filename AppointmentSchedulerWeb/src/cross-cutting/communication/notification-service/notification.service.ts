@@ -30,6 +30,7 @@ import { InvalidValueEnumValueException } from '../../../model/dtos/exceptions/i
 import { SystemNotificationModalComponent } from '../../../view/ui-components/modals-and-dialogs/modal/system-notification-modal/system-notification-modal.component';
 import { GeneralNotificationModalComponent } from '../../../view/ui-components/modals-and-dialogs/modal/general-notification-modal/general-notification-modal.component';
 import { AppointmentNotificationModalComponent } from '../../../view/ui-components/modals-and-dialogs/modal/appointment-notification-modal/appointment-notification-modal.component';
+import { NotificationStatusType } from '../../../view-model/business-entities/types/notification-status.types';
 
 @Injectable({
   providedIn: 'root',
@@ -39,7 +40,8 @@ export class NotificationService {
   translationCodes = TranslationCodes;
   private isModalOpen = false;
   private notificationQueue: NotificationBase[] = [];
-  private unreadNotificationsList: BehaviorSubject<NotificationBase[] | null> = new BehaviorSubject<NotificationBase[] | null>([]);
+  private unreadNotificationsCount: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  //private unreadNotificationsList: BehaviorSubject<NotificationBase[] | null> = new BehaviorSubject<NotificationBase[] | null>([]);
   private allNotificationsList: BehaviorSubject<NotificationBase[] | null> = new BehaviorSubject<NotificationBase[] | null>([]);
 
   constructor(private signalRService: SignalRService, private httpServiceAdapter: HttpClientAdapter, private configService: ConfigService, private dialog: MatDialog) {
@@ -64,6 +66,16 @@ export class NotificationService {
     ).subscribe((message: string) => {
       this.receiveNotification(message);
     });
+
+    this.allNotificationsList.pipe(
+      map((notifications) => {
+        let unreadNotifications = notifications?.filter(n => n.status === NotificationStatusType.UNREAD);
+        return unreadNotifications ? unreadNotifications.length : 0;
+      })
+    ).subscribe((count) => {
+      this.unreadNotificationsCount.next(count);
+    });
+
   }
 
   private receiveNotification(message: string): void {
@@ -110,16 +122,24 @@ export class NotificationService {
 
     dialogRef.afterClosed().subscribe(() => {
       this.isModalOpen = false;
-      this.markNotificationAsRead(data.uuid).subscribe(() => { });
+      this.markNotificationAsRead(data.uuid).subscribe((response) => {
+        if (response.isSuccessful && response.result) {
+          let currentNotifications = this.allNotificationsList.value || [];
+          let updatedNotifications = currentNotifications.map(notification =>
+            notification.uuid === data.uuid ? { ...notification, status: NotificationStatusType.READ } : notification
+          );
+          this.allNotificationsList.next(updatedNotifications);
+        }
+      });
       this.processQueue();
     });
   }
 
-  getUnreadNotificationsObservable(): Observable<NotificationBase[] | null> {
-    return this.unreadNotificationsList.asObservable();
+  getUnreadNotificationsObservable(): Observable<number> {
+    return this.unreadNotificationsCount.asObservable();
   }
 
-  getAllNotificationsObservable(): Observable<NotificationBase[] | null> {
+  getNotificationsObservable(): Observable<NotificationBase[] | null> {
     return this.allNotificationsList.asObservable();
   }
 
@@ -155,7 +175,7 @@ export class NotificationService {
       map((response: ApiResponse<NotificationDTO[], ApiDataErrorResponse>) => {
         if (this.httpServiceAdapter.isSuccessResponse<NotificationDTO[]>(response)) {
           const notifications: NotificationBase[] = response.data.map(dto => this.mapNotificationDTOToNotification(dto));
-          this.unreadNotificationsList.next(notifications);
+          this.allNotificationsList.next(notifications);
           return OperationResultService.createSuccess(true, response.message);
         }
         return OperationResultService.createFailure(false, response.message);
@@ -200,7 +220,6 @@ export class NotificationService {
 
 
   private mapNotificationDtoStringToNotification(message: string): NotificationBase {
-
     const rawObject = JSON.parse(message);
     let notificationType = parseStringToEnum(NotificationType, rawObject.Type);
     if (notificationType == NotificationType.GENERAL_NOTIFICATION) {

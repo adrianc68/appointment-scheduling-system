@@ -9,7 +9,7 @@ export class SystemNotificationDTO extends NotificationDTO {
   @Expose({ name: "Code" })
   @Transform(({ value }) => {
     let data = parseStringToEnum(SystemNotificationCodeType, value);
-    if (data === null && data === undefined) {
+    if (data === null || data === undefined) {
       throw new InvalidValueEnumValueException(`Invalid SystemNotificationCodeType value casting: ${value}`);
     }
     return data;
@@ -19,7 +19,7 @@ export class SystemNotificationDTO extends NotificationDTO {
   @Expose({ name: "Severity" })
   @Transform(({ value }) => {
     let data = parseStringToEnum(SystemNotificationSeverityCodeType, value);
-    if (data === null && data === undefined) {
+    if (data === null || data === undefined) {
       throw new InvalidValueEnumValueException(`Invalid SystemNotificationSeverityCode value casting: ${value}`);
     }
     return data;

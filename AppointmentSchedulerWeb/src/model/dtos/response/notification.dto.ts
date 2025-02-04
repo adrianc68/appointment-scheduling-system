@@ -15,11 +15,11 @@ export class NotificationDTO {
   @Expose({ name: "Message" })
   message!: string;
 
-  @Expose({ name: "Status"})
+  @Expose({ name: "Status" })
   @Transform(({ value }) => {
     let data = parseStringToEnum(NotificationStatusType, value);
-    if(data === null && data === undefined) {
-      throw new InvalidValueEnumValueException(`Invalid NotificationType value casting: ${value}`);
+    if (data === null || data === undefined) {
+      throw new InvalidValueEnumValueException(`Invalid NotificationStatusType value casting: ${value}`);
     }
     return data;
   })
@@ -28,7 +28,7 @@ export class NotificationDTO {
   @Expose({ name: "Type" })
   @Transform(({ value }) => {
     let data = parseStringToEnum(NotificationType, value);
-    if (data === null && data === undefined) {
+    if (data === null || data === undefined) {
       throw new InvalidValueEnumValueException(`Invalid NotificationType value casting: ${value}`);
     }
     return data;

@@ -8,7 +8,7 @@ export class GeneralNotificationDTO extends NotificationDTO {
   @Expose({ name: "Code" })
   @Transform(({ value }) => {
     let data = parseStringToEnum(GeneralNotificationCodeType, value);
-    if (data === null && data === undefined) {
+    if (data === null || data === undefined) {
       throw new InvalidValueEnumValueException(`Invalid GeneralNotificationCodeType value casting: ${value}`);
     }
     return data;

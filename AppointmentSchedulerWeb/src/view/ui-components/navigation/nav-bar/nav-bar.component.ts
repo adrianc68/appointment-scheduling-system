@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { SHARED_STANDALONE_COMPONENTS } from '../../shared-components';
 import { CommonModule } from '@angular/common';
 import { AuthenticationService } from '../../../../cross-cutting/security/authentication/authentication.service';
-import { Observable } from 'rxjs';
+import { Observable, takeUntil } from 'rxjs';
 import { AccountData } from '../../../../view-model/business-entities/account';
 import { I18nService } from '../../../../cross-cutting/helper/i18n/i18n.service';
 import { TranslationCodes } from '../../../../cross-cutting/helper/i18n/model/translation-codes.types';
@@ -10,6 +10,7 @@ import { LanguageTypes } from '../../../../cross-cutting/helper/i18n/model/langu
 import { NotificationService } from '../../../../cross-cutting/communication/notification-service/notification.service';
 import { WebRoutes } from '../../../../cross-cutting/operation-management/model/web-routes.constants';
 import { Router } from '@angular/router';
+import { Subject } from '@microsoft/signalr';
 
 @Component({
   selector: 'app-nav-bar',
@@ -19,10 +20,9 @@ import { Router } from '@angular/router';
   styleUrl: './nav-bar.component.scss'
 })
 export class NavBarComponent {
-  //isAuthenticated: Observable<boolean>
   accountData: Observable<AccountData | null>;
   notificationsPendingNumber: number = 0;
-  webRoutes = WebRoutes
+  webRoutes = WebRoutes;
 
   translationCodes = TranslationCodes;
 
@@ -31,8 +31,8 @@ export class NavBarComponent {
   constructor(private router: Router, private authService: AuthenticationService, private i18nService: I18nService, private notificatinService: NotificationService) {
     this.accountData = this.authService.getAccountData();
 
-    this.notificatinService.getUnreadNotificationsObservable().subscribe((response) => {
-      this.notificationsPendingNumber = response?.length ?? 0;
+    this.notificatinService.getUnreadNotificationsObservable().subscribe((count) => {
+      this.notificationsPendingNumber = count;
     })
 
   }

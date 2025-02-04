@@ -1,4 +1,4 @@
 export enum NotificationStatusType {
-  READ,
-  UNREAD,
+  READ = "READ",
+  UNREAD = "UNREAD"
 }
