@@ -1,1 +1,19 @@
-<p>appointment-notification-card works!</p>
+<div class="container">
+  <div>
+
+    <h2>{{data.type}}</h2>
+    <h3>{{data.code}}</h3>
+    <p>{{data.createdAt}}</p>
+    <p>{{data.appointmentUuid}}</p>
+    <p>{{data.uuid}}</p>
+
+  </div>
+  <hr>
+
+  <p>{{data.message}}</p>
+
+
+
+  <pre>{{data | json}}</pre>
+  <ng-content></ng-content>
+</div>

@@ -1,8 +1,34 @@
-<p>notification-management works!</p>
+<h1>{{translate(translationCodes.TC_NOTIFICATION_DIRECTORY)}}</h1>
+<hr>
+<div>
+  <app-button (click)="getAllNotificationsData()">Actualizar</app-button>
+  <ng-container *ngFor="let notification of notificationList">
 
-<ng-container *ngFor="let notification of notificationList">
-  <div>
-    {{notification | json}}
-  </div>
-  <br>
-</ng-container>
+    <ng-container [ngSwitch]="notification.type">
+
+      <div (click)="markNotificationAsRead(notification)">
+        <app-appointment-notification-card *ngSwitchCase="notificationTypes.APPOINTMENT_NOTIFICATION"
+          [data]="castNotification(notification)">
+        </app-appointment-notification-card>
+
+      </div>
+      <app-system-notification-card (click)="markNotificationAsRead(notification)"
+        *ngSwitchCase="notificationTypes.SYSTEM_NOTIFICATION"
+        [data]="castNotification(notification)"></app-system-notification-card>
+
+      <div>
+      </div>
+
+      <div (click)="markNotificationAsRead(notification)">
+        <app-general-notification-card *ngSwitchCase="notificationTypes.GENERAL_NOTIFICATION"
+          [data]="castNotification(notification)"> ></app-general-notification-card>
+      </div>
+    </ng-container>
+    <br>
+    <br>
+
+    <!--<pre>{{notification | json}}</pre>-->
+  </ng-container>
+
+
+</div>

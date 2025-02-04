@@ -1,3 +1,4 @@
+import { NotificationStatusType } from "../types/notification-status.types";
 import { NotificationType } from "../types/notification.types";
 import { SystemNotificationCodeType } from "../types/system-notification-code.types";
 import { SystemNotificationSeverityCodeType } from "../types/system-notification-severity-code.types";
@@ -10,10 +11,11 @@ export class SystemNotification extends NotificationBase {
     uuid: string,
     message: string,
     type: NotificationType,
+    status: NotificationStatusType,
     public code: SystemNotificationCodeType,
     public severity: SystemNotificationSeverityCodeType,
   ) {
-    super(createdAt, uuid, message, type);
+    super(createdAt, uuid, message, type, status);
   }
 
 }

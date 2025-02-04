@@ -31,15 +31,10 @@ export class NavBarComponent {
   constructor(private router: Router, private authService: AuthenticationService, private i18nService: I18nService, private notificatinService: NotificationService) {
     this.accountData = this.authService.getAccountData();
 
-
-    this.notificatinService.getMessages().subscribe((response) => {
+    this.notificatinService.getUnreadNotificationsObservable().subscribe((response) => {
       this.notificationsPendingNumber = response?.length ?? 0;
     })
 
-
-    //this.notificatinService.getUnreadNotifications().subscribe((response) => {
-    //  console.log(response);
-    //});
   }
 
   toggleSidebar() {

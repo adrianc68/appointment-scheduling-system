@@ -1,1 +1,16 @@
-<p>system-notification-card works!</p>
+<div class="container">
+  <div>
+    <h2>{{data.type}}</h2>
+    <h2>{{data.code}}</h2>
+    <h3>{{data.severity}}</h3>
+    <p>{{data.createdAt}}</p>
+    <p>{{data.uuid}}</p>
+  </div>
+
+  <hr>
+  <p>{{data.message}}</p>
+
+
+
+  <pre>{{data | json}}</pre>
+</div>

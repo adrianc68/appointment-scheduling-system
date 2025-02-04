@@ -39,7 +39,8 @@ export class NotificationService {
   translationCodes = TranslationCodes;
   private isModalOpen = false;
   private notificationQueue: NotificationBase[] = [];
-  private notificationsList: BehaviorSubject<NotificationBase[] | null> = new BehaviorSubject<NotificationBase[] | null>([]);
+  private unreadNotificationsList: BehaviorSubject<NotificationBase[] | null> = new BehaviorSubject<NotificationBase[] | null>([]);
+  private allNotificationsList: BehaviorSubject<NotificationBase[] | null> = new BehaviorSubject<NotificationBase[] | null>([]);
 
   constructor(private signalRService: SignalRService, private httpServiceAdapter: HttpClientAdapter, private configService: ConfigService, private dialog: MatDialog) {
     this.signalRService.getConnectionStatus().pipe(
@@ -65,16 +66,10 @@ export class NotificationService {
     });
   }
 
-
   private receiveNotification(message: string): void {
     const mappedNotification = this.mapNotificationDtoStringToNotification(message);
     this.addToQueueAndShowModal(mappedNotification);
   }
-
-  private addToQueue(notification: NotificationBase): void {
-    this.notificationQueue.push(notification);
-  }
-
 
   private addToQueueAndShowModal(notification: NotificationBase): void {
     this.notificationQueue.push(notification);
@@ -88,17 +83,20 @@ export class NotificationService {
 
     this.isModalOpen = true;
     const notification = this.notificationQueue.shift();
-
     if (notification) {
-      if (notification.type === NotificationType.SYSTEM_NOTIFICATION) {
-        this.openModalComp(SystemNotificationModalComponent, notification)
-      } else if (notification.type === NotificationType.GENERAL_NOTIFICATION) {
-        this.openModalComp(GeneralNotificationModalComponent, notification)
-      } else if (notification.type === NotificationType.APPOINTMENT_NOTIFICATION) {
-        this.openModalComp(AppointmentNotificationModalComponent, notification)
-      } else {
-        throw Error("Unknown notification type");
-      }
+      this.showModalNotification(notification)
+    }
+  }
+
+  showModalNotification(notification: NotificationBase): void {
+    if (notification.type === NotificationType.SYSTEM_NOTIFICATION) {
+      this.openModalComp(SystemNotificationModalComponent, notification)
+    } else if (notification.type === NotificationType.GENERAL_NOTIFICATION) {
+      this.openModalComp(GeneralNotificationModalComponent, notification)
+    } else if (notification.type === NotificationType.APPOINTMENT_NOTIFICATION) {
+      this.openModalComp(AppointmentNotificationModalComponent, notification)
+    } else {
+      throw Error("Unknown notification type");
     }
   }
 
@@ -112,13 +110,17 @@ export class NotificationService {
 
     dialogRef.afterClosed().subscribe(() => {
       this.isModalOpen = false;
-      this.markNotificationAsRead(data.uuid).subscribe(() => {});
+      this.markNotificationAsRead(data.uuid).subscribe(() => { });
       this.processQueue();
     });
   }
 
-  getMessages(): Observable<NotificationBase[] | null> {
-    return this.notificationsList;
+  getUnreadNotificationsObservable(): Observable<NotificationBase[] | null> {
+    return this.unreadNotificationsList.asObservable();
+  }
+
+  getAllNotificationsObservable(): Observable<NotificationBase[] | null> {
+    return this.allNotificationsList.asObservable();
   }
 
   markNotificationAsRead(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
@@ -153,7 +155,7 @@ export class NotificationService {
       map((response: ApiResponse<NotificationDTO[], ApiDataErrorResponse>) => {
         if (this.httpServiceAdapter.isSuccessResponse<NotificationDTO[]>(response)) {
           const notifications: NotificationBase[] = response.data.map(dto => this.mapNotificationDTOToNotification(dto));
-          this.notificationsList.next(notifications);
+          this.unreadNotificationsList.next(notifications);
           return OperationResultService.createSuccess(true, response.message);
         }
         return OperationResultService.createFailure(false, response.message);
@@ -172,43 +174,44 @@ export class NotificationService {
   }
 
 
-  //getAllNotifications(): Observable<OperationResult<NotificationBase[], ApiDataErrorResponse>> {
-  //  return this.httpServiceAdapter.get<NotificationDTO[]>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.getAllNotification}`).pipe(
-  //    map((response: ApiResponse<NotificationDTO[], ApiDataErrorResponse>) => {
-  //      console.log(response);
-  //      if (this.httpServiceAdapter.isSuccessResponse<NotificationDTO[]>(response)) {
-  //        //const notifications: NotificationBase[] = response.data.map(dto => this.mapNotificationDtoToNotification(dto));
-  //        return OperationResultService.createSuccess(response.data, response.message);
-  //      }
-  //      return OperationResultService.createFailure([], response.message);
-  //    }),
-  //    catchError((err) => {
-  //      if (err instanceof HttpErrorResponse) {
-  //        let codeError = MessageCodeType.UNKNOWN_ERROR;
-  //        if (err.status == 500) { // 500 < Http Status Code 500 Internal Server Error
-  //          codeError = MessageCodeType.SERVER_ERROR;
-  //        }
-  //        return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
-  //      }
-  //      return throwError(() => err);
-  //    })
-  //  );
-  //}
-  //
-  //
+  getAllNotifications(): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.get<NotificationDTO[]>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.getAllNotification}`).pipe(
+      map((response: ApiResponse<NotificationDTO[], ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<NotificationDTO[]>(response)) {
+          const notifications: NotificationBase[] = response.data.map(dto => this.mapNotificationDTOToNotification(dto));
+          this.allNotificationsList.next(notifications);
+          return OperationResultService.createSuccess(true, response.message);
+        }
+        return OperationResultService.createFailure(false, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) { // 500 < Http Status Code 500 Internal Server Error
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+
+
   private mapNotificationDtoStringToNotification(message: string): NotificationBase {
 
     const rawObject = JSON.parse(message);
     let notificationType = parseStringToEnum(NotificationType, rawObject.Type);
     if (notificationType == NotificationType.GENERAL_NOTIFICATION) {
       let dto = plainToInstance(GeneralNotificationDTO, rawObject);
-      return new GeneralNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code);
+      return new GeneralNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.status, dto.code);
     } else if (notificationType == NotificationType.SYSTEM_NOTIFICATION) {
       let dto = plainToInstance(SystemNotificationDTO, rawObject);
-      return new SystemNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code, dto.severity);
+      return new SystemNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.status, dto.code, dto.severity);
     } else if (notificationType == NotificationType.APPOINTMENT_NOTIFICATION) {
       let dto = plainToInstance(AppointmentNotificationDTO, rawObject);
-      return new AppointmentNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code, dto.appointmentUuid);
+      return new AppointmentNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.status, dto.code, dto.appointmentUuid);
     }
     throw new InvalidValueEnumValueException("Cannot get notification type from json");
   }
@@ -217,13 +220,13 @@ export class NotificationService {
     let notificationType = notification.type;
     if (notificationType == NotificationType.GENERAL_NOTIFICATION) {
       let dto = notification as GeneralNotification;
-      return new GeneralNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code);
+      return new GeneralNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.status, dto.code);
     } else if (notificationType == NotificationType.SYSTEM_NOTIFICATION) {
       let dto = notification as SystemNotification;
-      return new SystemNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code, dto.severity);
+      return new SystemNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.status, dto.code, dto.severity);
     } else if (notificationType == NotificationType.APPOINTMENT_NOTIFICATION) {
       let dto = notification as AppointmentNotification;
-      return new AppointmentNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.code, dto.appointmentUuid);
+      return new AppointmentNotification(dto.createdAt, dto.uuid, dto.message, dto.type, dto.status, dto.code, dto.appointmentUuid);
     }
     throw new InvalidValueEnumValueException("Cannot get notification type from json");
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GeneralNotification } from '../../../../../view-model/business-entities/notification/general-notification';
 import { NotificationComponent } from '../../../notification/notification/notification/notification.component';
@@ -10,13 +10,6 @@ import { NotificationComponent } from '../../../notification/notification/notifi
   templateUrl: './general-notification-modal.component.html',
   styleUrl: './general-notification-modal.component.scss'
 })
-export class GeneralNotificationModalComponent extends NotificationComponent implements OnInit {
-  override data: GeneralNotification = {} as GeneralNotification;
-
-
-  ngOnInit(): void {
-    this.data = this.data as GeneralNotification;
-  }
-
-
+export class GeneralNotificationModalComponent extends NotificationComponent {
+  declare data: GeneralNotification;
 }

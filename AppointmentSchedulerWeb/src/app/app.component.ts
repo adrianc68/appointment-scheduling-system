@@ -36,7 +36,6 @@ export class AppComponent {
     this.authService.isAuthenticated().subscribe({
       next: (authenticated: boolean) => {
         if (authenticated) {
-          //this.getAllNotifications();
           this.getUnreadNotifications();
         }
         this.isAuthenticated = authenticated;
@@ -53,7 +52,6 @@ export class AppComponent {
 
   logout(): void {
     this.authService.logout();
-    //this.router.navigate([WebRoutes.login]);
   }
 
   changeLanguageToEnglish(): void {
