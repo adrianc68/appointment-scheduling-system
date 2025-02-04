@@ -71,7 +71,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     IdNotificationBase = notificationDB.Id,
                     IdUserAccount = recipient.RecipientData.UserAccountId,
-                    Status = (Model.Types.NotificationStatusType?)recipient.Status,
+                    Status = Model.Types.NotificationStatusType.UNREAD,
                     ChangedAt = DateTime.UtcNow
                 }).ToList();
                 await dbContext.NotificationRecipients.AddRangeAsync(recipients);
@@ -139,6 +139,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
             var notificationDB = await dbContext.UserAccounts
                 .Where(ua => ua.Uuid == uuid)
+                .Include(ac => ac.UserInformation)
                 .Include(a => a.NotificationRecipients)
                     .ThenInclude(nb => nb!.NotificationBase)
                     .ThenInclude(napp => napp!.AppointmentNotification)
@@ -157,19 +158,18 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
                 notifications = notificationDB.NotificationRecipients.Select<NotificationRecipient, BusinessLogicLayer.Model.Notification>(notification =>
                 {
-                    PropToString.PrintData(notification);
-                    // var recipientdata = new BusinessLogicLayer.Model.NotificationRecipient
-                    // {
-                    //     RecipientData = new BusinessLogicLayer.Model.NotificationRecipientData
-                    //     {
-                    //         Email = notification.UserAccount!.Email!,
-                    //         UserAccountId = notification.UserAccount.Id!.Value,
-                    //         UserAccountUuid = notification.UserAccount.Uuid!.Value,
-                    //         PhoneNumber = notification.UserAccount.UserInformation!.PhoneNumber!
-                    //     },
-                    //     Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
-                    //     ChangedAt = notification.ChangedAt!.Value
-                    // };
+                    var recipientdata = new BusinessLogicLayer.Model.NotificationRecipient
+                    {
+                        RecipientData = new BusinessLogicLayer.Model.NotificationRecipientData
+                        {
+                            Email = notification.UserAccount!.Email!,
+                            UserAccountId = notification.UserAccount.Id!.Value,
+                            UserAccountUuid = notification.UserAccount.Uuid!.Value,
+                            PhoneNumber = notification.UserAccount.UserInformation!.PhoneNumber!
+                        },
+                        Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
+                        ChangedAt = notification.ChangedAt!.Value
+                    };
 
 
                     if (notification.NotificationBase!.Type == Model.Types.NotificationType.APPOINTMENT_NOTIFICATION)
@@ -182,8 +182,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Message = notification.NotificationBase.Message!,
                             Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
                             Code = (BusinessLogicLayer.Model.Types.Notification.AppointmentNotificationCodeType)notification.NotificationBase.AppointmentNotification!.Code!.Value,
-                            // Recipients = [recipientdata],
-                            Recipients = [],
+                            Recipients = [recipientdata],
+                            // Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType)notification.Status!.Value,
+                            // Recipients = [],
                             Appointment = new BusinessLogicLayer.Model.AppointmentIdentifiers
                             {
                                 Uuid = notification.NotificationBase.AppointmentNotification!.Appointment!.Uuid!.Value,
@@ -205,7 +206,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Message = notification.NotificationBase.Message!,
                             Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
                             Code = (BusinessLogicLayer.Model.Types.Notification.SystemNotificationCodeType)notification.NotificationBase.SystemNotification!.Code!.Value,
-                            Recipients = [],
+                            // Recipients = [],
+                            Recipients = [recipientdata],
+                            // Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType)notification.Status!.Value,
                             Severity = (BusinessLogicLayer.Model.Types.Notification.SystemNotificationSeverityCodeType?)notification.NotificationBase.SystemNotification!.Severity!.Value,
                             Options = new NotificationOptions
                             {
@@ -221,9 +224,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = notification.NotificationBase.Id,
                             CreatedAt = notification.NotificationBase.CreatedAt,
                             Message = notification.NotificationBase.Message!,
+                            // Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType)notification.Status!.Value,
                             Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
                             Code = (BusinessLogicLayer.Model.Types.Notification.GeneralNotificationCodeType)notification.NotificationBase.GeneralNotification!.Code!.Value,
-                            Recipients = [],
+                            // Recipients = [],
+                            Recipients = [recipientdata],
                             Options = new NotificationOptions
                             {
                                 Channels = []
@@ -247,6 +252,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
             var notificationDB = await dbContext.UserAccounts
             .Where(ua => ua.Uuid == uuid)
+            .Include(ac => ac.UserInformation)
             .Include(ua => ua.NotificationRecipients)
                 .ThenInclude(nr => nr.NotificationBase)
                 .ThenInclude(nb => nb!.AppointmentNotification)
@@ -267,18 +273,20 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 notifications = notificationDB.Select<NotificationRecipient, BusinessLogicLayer.Model.Notification>(notification =>
                 {
 
-                    // var recipientdata = new BusinessLogicLayer.Model.NotificationRecipient
-                    // {
-                    //     RecipientData = new BusinessLogicLayer.Model.NotificationRecipientData
-                    //     {
-                    //         Email = notification.UserAccount!.Email!,
-                    //         UserAccountId = notification.UserAccount.Id!.Value,
-                    //         UserAccountUuid = notification.UserAccount.Uuid!.Value,
-                    //         PhoneNumber = notification.UserAccount.UserInformation!.PhoneNumber!
-                    //     },
-                    //     Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
-                    //     ChangedAt = notification.ChangedAt!.Value
-                    // };
+                    PropToString.PrintData(notification);
+
+                    var recipientdata = new BusinessLogicLayer.Model.NotificationRecipient
+                    {
+                        RecipientData = new BusinessLogicLayer.Model.NotificationRecipientData
+                        {
+                            Email = notification.UserAccount!.Email!,
+                            UserAccountId = notification.UserAccount.Id!.Value,
+                            UserAccountUuid = notification.UserAccount.Uuid!.Value,
+                            PhoneNumber = notification.UserAccount.UserInformation!.PhoneNumber!
+                        },
+                        Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
+                        ChangedAt = notification.ChangedAt!.Value
+                    };
 
 
                     return notification.NotificationBase!.Type switch
@@ -289,6 +297,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = notification.NotificationBase.Id,
                             CreatedAt = notification.NotificationBase.CreatedAt,
                             Message = notification.NotificationBase.Message!,
+                            // Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType)notification.Status!.Value,
                             Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
                             Code = (BusinessLogicLayer.Model.Types.Notification.AppointmentNotificationCodeType)notification.NotificationBase.AppointmentNotification!.Code!.Value,
                             Appointment = new BusinessLogicLayer.Model.AppointmentIdentifiers
@@ -296,8 +305,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                                 Uuid = notification.NotificationBase.AppointmentNotification!.Appointment!.Uuid!.Value,
                                 Id = notification.NotificationBase.AppointmentNotification!.Appointment.Id!.Value
                             },
-                            // Recipients = [recipientdata],
-                            Recipients = [],
+                            Recipients = [recipientdata],
+                            // Recipients = [],
                             Options = new NotificationOptions
                             {
                                 Channels = []
@@ -309,11 +318,12 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = notification.NotificationBase.Id,
                             CreatedAt = notification.NotificationBase.CreatedAt,
                             Message = notification.NotificationBase.Message!,
+                            // Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType)notification.Status!.Value,
                             Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
                             Code = (BusinessLogicLayer.Model.Types.Notification.SystemNotificationCodeType)notification.NotificationBase.SystemNotification!.Code!.Value,
                             Severity = (BusinessLogicLayer.Model.Types.Notification.SystemNotificationSeverityCodeType?)notification.NotificationBase.SystemNotification!.Severity!.Value,
-                            // Recipients = [recipientdata],
-                            Recipients = [],
+                            Recipients = [recipientdata],
+                            // Recipients = [],
                             Options = new NotificationOptions
                             {
                                 Channels = []
@@ -325,10 +335,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                             Id = notification.NotificationBase.Id,
                             CreatedAt = notification.NotificationBase.CreatedAt,
                             Message = notification.NotificationBase.Message!,
+                            // Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType)notification.Status!.Value,
                             Type = (BusinessLogicLayer.Model.Types.Notification.NotificationType)notification.NotificationBase.Type.Value,
                             Code = (BusinessLogicLayer.Model.Types.Notification.GeneralNotificationCodeType)notification.NotificationBase.GeneralNotification!.Code!.Value,
-                            // Recipients = [recipientdata],
-                            Recipients = [],
+                            Recipients = [recipientdata],
+                            // Recipients = [],
                             Options = new NotificationOptions
                             {
                                 Channels = []

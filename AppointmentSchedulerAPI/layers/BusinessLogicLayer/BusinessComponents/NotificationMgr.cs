@@ -2,6 +2,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces.ObserverPattern;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types.Notification;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using System.Text.Json;
@@ -68,11 +69,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     Uuid = notification.Uuid.Value,
                     Message = notification.Message,
                     Type = notification.Type,
+                    Status = NotificationStatusType.UNREAD,
                     Code = appointmentNotification.Code,
-                    Appointment = new AppointmentUuidDTO
-                    {
-                        Uuid = appointmentNotification.Appointment!.Uuid!
-                    }
+                    AppointmentUuid = appointmentNotification.Appointment!.Uuid!
                 };
                 SendNotificationToUsers(notificationDTO, notification.Recipients, notification.Options.Channels);
             }
@@ -83,6 +82,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     CreatedAt = notification.CreatedAt!.Value,
                     Uuid = notification.Uuid.Value,
                     Message = notification.Message,
+                    Status = NotificationStatusType.UNREAD,
                     Type = notification.Type,
                     Code = systemNotification.Code,
                     Severity = systemNotification.Severity!.Value
@@ -95,6 +95,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 {
                     CreatedAt = notification.CreatedAt!.Value,
                     Uuid = notification.Uuid.Value,
+                    Status = NotificationStatusType.UNREAD,
                     Message = notification.Message,
                     Type = notification.Type,
                     Code = generalNotification.Code,
@@ -120,20 +121,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             bool isStatusChanged = await notificationRepository.ChangeNotificationStatusByNotificationUuidAsync(uuid, accountUuid, status);
             return isStatusChanged;
-        }
-
-        private string SerializeObjectToJson<T>(T data)
-        {
-            var options = new JsonSerializerOptions
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                WriteIndented = true,
-                Converters =
-                {
-                    new JsonStringEnumConverter(),
-                 },
-            };
-            return JsonSerializer.Serialize(data, options);
         }
 
         private async void SendNotificationToUsers<TNotification>(TNotification dto, HashSet<NotificationRecipient> users, List<NotificationChannelType> channels)

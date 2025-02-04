@@ -185,9 +185,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 await transaction.CommitAsync();
                 isRegistered = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                System.Console.WriteLine(ex);
                 await transaction.RollbackAsync();
                 throw;
             }

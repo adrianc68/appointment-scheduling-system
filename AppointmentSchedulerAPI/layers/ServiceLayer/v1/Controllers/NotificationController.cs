@@ -47,10 +47,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                             Message = appointmentNotification.Message!,
                             Type = appointmentNotification.Type,
                             Code = appointmentNotification!.Code,
-                            Appointment = new AppointmentUuidDTO
-                            {
-                                Uuid = appointmentNotification.Appointment!.Uuid,
-                            }
+                            AppointmentUuid = appointmentNotification.Appointment!.Uuid,
+                            // Status = appointmentNotification.Status
+                            Status = appointmentNotification.Recipients.FirstOrDefault(n => n.RecipientData.UserAccountUuid == claims.Uuid)!.Status!.Value
                         });
                     }
                     else if (notification is SystemNotification systemNotification)
@@ -62,7 +61,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                             Message = systemNotification.Message!,
                             Type = systemNotification.Type,
                             Code = systemNotification!.Code,
-                            Severity = systemNotification.Severity!.Value
+                            Severity = systemNotification.Severity!.Value,
+                            // Status = systemNotification.Status
+                            Status = systemNotification.Recipients.FirstOrDefault(n => n.RecipientData.UserAccountUuid == claims.Uuid)!.Status!.Value
                         });
                     }
                     else if (notification is GeneralNotification generalNotification)
@@ -74,6 +75,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                             Message = generalNotification.Message!,
                             Type = generalNotification.Type,
                             Code = generalNotification!.Code!,
+                            // Status = generalNotification.Status
+                            Status = generalNotification.Recipients.FirstOrDefault(n => n.RecipientData.UserAccountUuid == claims.Uuid)!.Status!.Value
                         });
                     }
                     else
@@ -114,10 +117,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                             Message = appointmentNotification.Message!,
                             Type = appointmentNotification.Type,
                             Code = appointmentNotification!.Code,
-                            Appointment = new AppointmentUuidDTO
-                            {
-                                Uuid = appointmentNotification.Appointment!.Uuid,
-                            }
+                            AppointmentUuid = appointmentNotification.Appointment!.Uuid,
+                            Status = appointmentNotification.Recipients.FirstOrDefault(n => n.RecipientData.UserAccountUuid == claims.Uuid)!.Status!.Value
+
                         });
                     }
                     else if (notification is SystemNotification systemNotification)
@@ -129,7 +131,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                             Message = systemNotification.Message!,
                             Type = systemNotification.Type,
                             Code = systemNotification!.Code,
-                            Severity = systemNotification.Severity!.Value
+                            Severity = systemNotification.Severity!.Value,
+                            // Status = systemNotification.Status
+                            Status = systemNotification.Recipients.FirstOrDefault(n => n.RecipientData.UserAccountUuid == claims.Uuid)!.Status!.Value
                         });
                     }
                     else if (notification is GeneralNotification generalNotification)
@@ -141,6 +145,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                             Message = generalNotification.Message!,
                             Type = generalNotification.Type,
                             Code = generalNotification!.Code!,
+                            // Status = generalNotification.Status
+                            Status = generalNotification.Recipients.FirstOrDefault(n => n.RecipientData.UserAccountUuid == claims.Uuid)!.Status!.Value
                         });
                     }
                     else

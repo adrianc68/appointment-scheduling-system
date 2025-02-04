@@ -245,15 +245,6 @@ app.UseAuthentication();
 app.UseMiddleware<HttpResponseAuthorizationMiddleware>();
 app.UseAuthorization();
 
-// app.UseWhen(context => !context.Request.Path.StartsWithSegments("/notificationHub/negotiate"), appBuilder =>
-// {
-//     appBuilder.UseAuthentication();
-//     appBuilder.UseMiddleware<HttpResponseAuthorizationMiddleware>();
-//     appBuilder.UseAuthorization();
-// });
-
-
-
 
 app.MapHub<NotificationHub>("/notificationHub");
 app.MapControllers();
