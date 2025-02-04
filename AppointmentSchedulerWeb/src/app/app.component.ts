@@ -67,7 +67,7 @@ export class AppComponent {
   }
 
   getUnreadNotifications(): void {
-    this.notificationService.getUnreadNotifications().subscribe(() => { })
+    this.notificationService.updateNotificationList().subscribe(() => { })
   }
 
 }

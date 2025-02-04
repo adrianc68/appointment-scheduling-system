@@ -49,7 +49,7 @@ export class NotificationManagementComponent {
   }
 
   markNotificationAsRead(notification: NotificationBase) {
-    this.notificationService.showModalNotification(notification);
+    this.notificationService.processUnreadNotification(notification);
   }
 
 

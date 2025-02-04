@@ -39,9 +39,8 @@ export class NotificationService {
   private isListenerAdded = false;
   translationCodes = TranslationCodes;
   private isModalOpen = false;
-  private notificationQueue: NotificationBase[] = [];
+  private notificationHubQueue: NotificationBase[] = [];
   private unreadNotificationsCount: BehaviorSubject<number> = new BehaviorSubject<number>(0);
-  //private unreadNotificationsList: BehaviorSubject<NotificationBase[] | null> = new BehaviorSubject<NotificationBase[] | null>([]);
   private allNotificationsList: BehaviorSubject<NotificationBase[] | null> = new BehaviorSubject<NotificationBase[] | null>([]);
 
   constructor(private signalRService: SignalRService, private httpServiceAdapter: HttpClientAdapter, private configService: ConfigService, private dialog: MatDialog) {
@@ -75,67 +74,9 @@ export class NotificationService {
     ).subscribe((count) => {
       this.unreadNotificationsCount.next(count);
     });
-
   }
 
-  private receiveNotification(message: string): void {
-    const mappedNotification = this.mapNotificationDtoStringToNotification(message);
-    this.addToQueueAndShowModal(mappedNotification);
-  }
-
-  private addToQueueAndShowModal(notification: NotificationBase): void {
-    this.notificationQueue.push(notification);
-    this.processQueue();
-  }
-
-  private processQueue(): void {
-    if (this.isModalOpen || this.notificationQueue.length === 0) {
-      return;
-    }
-
-    this.isModalOpen = true;
-    const notification = this.notificationQueue.shift();
-    if (notification) {
-      this.showModalNotification(notification)
-    }
-  }
-
-  showModalNotification(notification: NotificationBase): void {
-    if (notification.type === NotificationType.SYSTEM_NOTIFICATION) {
-      this.openModalComp(SystemNotificationModalComponent, notification)
-    } else if (notification.type === NotificationType.GENERAL_NOTIFICATION) {
-      this.openModalComp(GeneralNotificationModalComponent, notification)
-    } else if (notification.type === NotificationType.APPOINTMENT_NOTIFICATION) {
-      this.openModalComp(AppointmentNotificationModalComponent, notification)
-    } else {
-      throw Error("Unknown notification type");
-    }
-  }
-
-  private openModalComp(component: Type<NotificationComponent>, data: NotificationBase): void {
-    const dialogRef = this.dialog.open(ModalComponent, {
-      data: {
-        component: component,
-        data: data,
-      },
-    });
-
-    dialogRef.afterClosed().subscribe(() => {
-      this.isModalOpen = false;
-      this.markNotificationAsRead(data.uuid).subscribe((response) => {
-        if (response.isSuccessful && response.result) {
-          let currentNotifications = this.allNotificationsList.value || [];
-          let updatedNotifications = currentNotifications.map(notification =>
-            notification.uuid === data.uuid ? { ...notification, status: NotificationStatusType.READ } : notification
-          );
-          this.allNotificationsList.next(updatedNotifications);
-        }
-      });
-      this.processQueue();
-    });
-  }
-
-  getUnreadNotificationsObservable(): Observable<number> {
+  getUnreadNotificationsCountObservable(): Observable<number> {
     return this.unreadNotificationsCount.asObservable();
   }
 
@@ -143,34 +84,19 @@ export class NotificationService {
     return this.allNotificationsList.asObservable();
   }
 
-  markNotificationAsRead(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
-    let requestDto = {
-      Uuid: uuid
-    } as NotificationUuidDTO
-
-    return this.httpServiceAdapter.post<NotificationUuidDTO>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.markNotificationAsRead}`, requestDto).pipe(
-      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
-        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
-          return OperationResultService.createSuccess(response.data, response.message);
-        }
-        return OperationResultService.createFailure(response.data, response.message);
-      }),
-      catchError((err) => {
-        if (err instanceof HttpErrorResponse) {
-          let codeError = MessageCodeType.UNKNOWN_ERROR;
-          if (err.status == 500) { // 500 < Http Status Code 500 Internal Server Error
-            codeError = MessageCodeType.SERVER_ERROR;
-          }
-          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
-        }
-        return throwError(() => err);
-      })
-
-    );
+  processUnreadNotification(notification: NotificationBase): void {
+    if (notification.type === NotificationType.SYSTEM_NOTIFICATION) {
+      this.openModalComponent(SystemNotificationModalComponent, notification)
+    } else if (notification.type === NotificationType.GENERAL_NOTIFICATION) {
+      this.openModalComponent(GeneralNotificationModalComponent, notification)
+    } else if (notification.type === NotificationType.APPOINTMENT_NOTIFICATION) {
+      this.openModalComponent(AppointmentNotificationModalComponent, notification)
+    } else {
+      throw Error("Unknown notification type");
+    }
   }
 
-
-  getUnreadNotifications(): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+  updateNotificationList(): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
     return this.httpServiceAdapter.get<NotificationDTO[]>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.getUnreadNotification}`).pipe(
       map((response: ApiResponse<NotificationDTO[], ApiDataErrorResponse>) => {
         if (this.httpServiceAdapter.isSuccessResponse<NotificationDTO[]>(response)) {
@@ -217,7 +143,78 @@ export class NotificationService {
     );
   }
 
+  private markNotificationAsRead(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    let requestDto = {
+      Uuid: uuid
+    } as NotificationUuidDTO
 
+    return this.httpServiceAdapter.post<NotificationUuidDTO>(`${this.configService.getApiBaseUrl()}${ApiVersionRoute.v1}${ApiRoutes.markNotificationAsRead}`, requestDto).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) { // 500 < Http Status Code 500 Internal Server Error
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+
+    );
+  }
+
+  private openModalComponent(component: Type<NotificationComponent>, data: NotificationBase): void {
+    const dialogRef = this.dialog.open(ModalComponent, {
+      data: {
+        component: component,
+        data: data,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.isModalOpen = false;
+      if (data.status === NotificationStatusType.UNREAD) {
+        this.markNotificationAsRead(data.uuid).subscribe((response) => {
+          if (response.isSuccessful && response.result) {
+            let currentNotifications = this.allNotificationsList.value || [];
+            let updatedNotifications = currentNotifications.map(notification =>
+              notification.uuid === data.uuid ? { ...notification, status: NotificationStatusType.READ } : notification
+            );
+            this.allNotificationsList.next(updatedNotifications);
+          }
+        });
+      }
+      this.processNotificationHubQueue();
+    });
+  }
+
+  private receiveNotification(message: string): void {
+    const mappedNotification = this.mapNotificationDtoStringToNotification(message);
+    this.notificationHubQueue.push(mappedNotification);
+    this.processNotificationHubQueue();
+  }
+
+  private processNotificationHubQueue(): void {
+    if (this.isModalOpen || this.notificationHubQueue.length === 0) {
+      return;
+    }
+
+    this.isModalOpen = true;
+    const notification = this.notificationHubQueue.shift();
+    if (notification) {
+
+
+      this.allNotificationsList.next([...this.allNotificationsList.value!, notification]);
+
+      this.processUnreadNotification(notification)
+    }
+  }
 
   private mapNotificationDtoStringToNotification(message: string): NotificationBase {
     const rawObject = JSON.parse(message);
@@ -249,6 +246,5 @@ export class NotificationService {
     }
     throw new InvalidValueEnumValueException("Cannot get notification type from json");
   }
-
 
 }

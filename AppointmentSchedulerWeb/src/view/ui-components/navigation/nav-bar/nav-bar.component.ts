@@ -31,7 +31,7 @@ export class NavBarComponent {
   constructor(private router: Router, private authService: AuthenticationService, private i18nService: I18nService, private notificatinService: NotificationService) {
     this.accountData = this.authService.getAccountData();
 
-    this.notificatinService.getUnreadNotificationsObservable().subscribe((count) => {
+    this.notificatinService.getUnreadNotificationsCountObservable().subscribe((count) => {
       this.notificationsPendingNumber = count;
     })
 
