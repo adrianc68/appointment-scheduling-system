@@ -1,5 +1,5 @@
 export enum AccountStatusType {
-  ENABLED,
-  DISABLED,
-  DELETED
+  ENABLED = "ENABLED",
+  DISABLED = "DISABLED",
+  DELETED = "DELETED"
 }

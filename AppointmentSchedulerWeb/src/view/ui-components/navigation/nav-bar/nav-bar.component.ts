@@ -10,7 +10,6 @@ import { LanguageTypes } from '../../../../cross-cutting/helper/i18n/model/langu
 import { NotificationService } from '../../../../cross-cutting/communication/notification-service/notification.service';
 import { WebRoutes } from '../../../../cross-cutting/operation-management/model/web-routes.constants';
 import { Router } from '@angular/router';
-import { Subject } from '@microsoft/signalr';
 
 @Component({
   selector: 'app-nav-bar',

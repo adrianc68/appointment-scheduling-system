@@ -8,6 +8,7 @@ export const ApiRoutes = {
   getAllNotification: `/Notification/all`,
   getUnreadNotification: `/Notification/unread`,
   markNotificationAsRead: `/Notification/read`,
+  getAllClients: `/client`
 
 };
 

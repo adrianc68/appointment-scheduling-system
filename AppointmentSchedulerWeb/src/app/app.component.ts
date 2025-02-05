@@ -28,7 +28,7 @@ export class AppComponent {
   notificationMessages: string[] = [];
 
 
-  constructor(private notificationService: NotificationService, private i18nService: I18nService, private loggingService: LoggingService, private authService: AuthenticationService, private router: Router) {
+  constructor(private notificationService: NotificationService, private i18nService: I18nService, private loggingService: LoggingService, private authService: AuthenticationService) {
   }
 
   ngOnInit(): void {
