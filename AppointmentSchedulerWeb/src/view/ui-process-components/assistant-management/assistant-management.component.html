@@ -1,1 +1,5 @@
 <p>assistant-management works!</p>
+
+<ng-container *ngFor="let assistant of assistants">
+  <pre>{{assistant | json}}</pre>
+</ng-container>

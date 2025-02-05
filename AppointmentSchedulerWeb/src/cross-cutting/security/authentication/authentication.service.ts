@@ -124,17 +124,8 @@ export class AuthenticationService {
     this.router.navigate([WebRoutes.root]);
   }
 
-  private parseAccountData(accountData: AccountDataDTO): AccountData {
-    let data: AccountData = {
-      uuid: accountData.uuid,
-      email: accountData.email,
-      phoneNumber: accountData.phoneNumber,
-      username: accountData.username,
-      name: accountData.name,
-      role: parseStringToEnum(RoleType, accountData.role.toString()) ?? (() => { throw new InvalidValueEnumValueException("Invalid role: Unable to parse role to enum."); })(),
-      status: parseStringToEnum(AccountStatusType, accountData.status.toString()) ?? (() => { throw new InvalidValueEnumValueException("Invalid account status type: Unable to parse role to enum"); })(),
-      createdAt: accountData.createdAt
-    };
+  private parseAccountData(dto: AccountDataDTO): AccountData {
+    let data = new AccountData(dto.uuid, dto.email, dto.phoneNumber, dto.username, dto.name, dto.role, dto.status, dto.createdAt);
     return data;
   }
 

@@ -20,7 +20,7 @@ export class ClientDTO {
   @Transform(({ value }) => {
     let data = parseStringToEnum(AccountStatusType, value);
     if (data === null || data === undefined) {
-      throw new InvalidValueEnumValueException(`Invalid NotificationType value casting: ${value}`);
+      throw new InvalidValueEnumValueException(`Invalid AccountStatusType value casting: ${value}`);
     }
     return data;
   })

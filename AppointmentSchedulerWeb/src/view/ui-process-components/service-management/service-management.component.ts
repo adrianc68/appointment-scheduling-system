@@ -1,11 +1,78 @@
 import { Component } from '@angular/core';
+import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
+import { CommonModule } from '@angular/common';
+import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
+import { ServiceService } from '../../../model/communication-components/service';
+import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
+import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
+import { Service } from '../../../view-model/business-entities/service';
+import { Observable, of, switchMap } from 'rxjs';
+import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
+import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
+import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 
 @Component({
   selector: 'app-service-management',
-  imports: [],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  standalone: true,
   templateUrl: './service-management.component.html',
   styleUrl: './service-management.component.scss'
 })
 export class ServiceManagementComponent {
+  systemMessage?: string = '';
+  translationCodes = TranslationCodes;
+  services: Service[] = [];
+
+  constructor(private serviceService: ServiceService, private i18nService: I18nService, private loggingService: LoggingService) {
+    this.serviceService.getServiceList().pipe(
+      switchMap((response: OperationResult<Service[], ApiDataErrorResponse>): Observable<boolean> => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          this.services = [...response.result!];
+          this.services.map(s => console.log(s));
+          this.systemMessage = code;
+          return of(true);
+        }
+        this.handleErrorResponse(response);
+        return of(false);
+
+      })
+
+    ).subscribe({
+      next: (result) => {
+        console.log(result);
+        //if(result) {
+        //  thos.setSuccessfulTask();
+        //} else {
+        //  this.setUn
+        //}
+      },
+      error: (err) => {
+        this.loggingService.error(err);
+
+      }
+    })
+  }
+
+  private handleErrorResponse(response: OperationResult<Service[], ApiDataErrorResponse>): void {
+
+    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
+    if (isGenericErrorResponse(response.error)) {
+      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
+    } else if (isValidationErrorResponse(response.error)) {
+      code = this.translationCodes.TC_VALIDATION_ERROR;
+    } else if (isServerErrorResponse(response.error)) {
+      code = getStringEnumKeyByValue(MessageCodeType, response.code);
+    } else if (isEmptyErrorResponse(response.error)) {
+      code = getStringEnumKeyByValue(MessageCodeType, response.code);
+    }
+
+    this.systemMessage = code;
+  }
+
+
+
+
 
 }

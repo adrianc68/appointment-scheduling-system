@@ -11,7 +11,6 @@ import { MessageCodeType } from '../../../cross-cutting/communication/model/mess
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { CommonModule } from '@angular/common';
-import { ɵInternalFormsSharedModule } from '@angular/forms';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
 
 @Component({

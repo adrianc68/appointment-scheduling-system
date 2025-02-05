@@ -1,1 +1,5 @@
 <p>service-management works!</p>
+
+<ng-container *ngFor="let service of services">
+  <pre>{{service | json}}</pre>
+</ng-container>
