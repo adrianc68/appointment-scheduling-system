@@ -1,4 +1,4 @@
-import { Injectable, OnInit, Type } from '@angular/core';
+import { Injectable, Type } from '@angular/core';
 import { BehaviorSubject, catchError, filter, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { SignalRService } from '../signalr-service/signalr.service';
 import { HttpClientAdapter } from '../http-client-adapter-service/http-client-adapter.service';
