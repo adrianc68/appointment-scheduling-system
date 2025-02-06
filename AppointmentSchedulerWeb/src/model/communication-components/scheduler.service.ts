@@ -15,6 +15,7 @@ import { ServiceOffer } from "../../view-model/business-entities/service-offer";
 import { ServiceOfferDTO } from "../dtos/response/service-offer.dto";
 import { AppointmentDTO } from "../dtos/response/appointment.dto";
 import { Appointment } from "../../view-model/business-entities/appointment";
+import { UnavailableTimeSlot } from "../../view-model/business-entities/unavailable-time-slot";
 
 @Injectable({
   providedIn: 'root'
@@ -97,6 +98,60 @@ export class SchedulerService {
   }
 
 
+  registerAvailabilityTimeSlot(date: string, startTime: string, endTime: string, assistantUuid: string, unavailableTimeSlots: UnavailableTimeSlot[]) {
+    const slotsData = {
+      date: date,
+      startTime: startTime,
+      endTime: endTime,
+      assistantUuid: assistantUuid,
+      unavailableTimeSlots: unavailableTimeSlots
+    };
+
+    return this.httpServiceAdapter.post<string>(`${this.apiUrl}${ApiRoutes.registerAvailabilityTimeSlot}`, slotsData).pipe(
+      map((response: ApiResponse<string, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<string>(response)) {
+          const guid = response.data;
+          return OperationResultService.createSuccess(guid, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  editAvailabilityTimeSlot(slot: AvailabilityTimeSlot) {
+
+    return this.httpServiceAdapter.put<AvailabilityTimeSlot>(`${this.apiUrl}${ApiRoutes.editAvailabilityTimeSlot}`, slot).pipe(
+      map((response: ApiResponse<string, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<string>(response)) {
+          const guid = response.data;
+          return OperationResultService.createSuccess(guid, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+
   private parseSlot(dto: AvailabilityTimeSlotDTO): AvailabilityTimeSlot {
     let data = new AvailabilityTimeSlot(dto.uuid, dto.date, dto.startTime, dto.endTime, dto.assistant, dto.status, dto.unavailableTimeSlots);
     return data;
@@ -108,7 +163,7 @@ export class SchedulerService {
   }
 
   private parseAppointments(dto: AppointmentDTO): Appointment {
-    let data = new Appointment(dto.uuid, dto.startTime, dto.endTime, dto.date, dto.createdAt, dto.assistants ,dto.status, dto.totalCost);
+    let data = new Appointment(dto.uuid, dto.startTime, dto.endTime, dto.date, dto.createdAt, dto.assistants, dto.status, dto.totalCost);
     return data;
   }
 

@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { CommonModule } from '@angular/common';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
-import { ServiceService } from '../../../model/communication-components/service';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { Service } from '../../../view-model/business-entities/service';
@@ -11,6 +10,9 @@ import { OperationResult } from '../../../cross-cutting/communication/model/oper
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
+import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
+import { Router } from '@angular/router';
+import { ServiceService } from '../../../model/communication-components/service.service';
 
 @Component({
   selector: 'app-service-management',
@@ -24,7 +26,7 @@ export class ServiceManagementComponent {
   translationCodes = TranslationCodes;
   services: Service[] = [];
 
-  constructor(private serviceService: ServiceService, private i18nService: I18nService, private loggingService: LoggingService) {
+  constructor(private serviceService: ServiceService, private i18nService: I18nService, private loggingService: LoggingService, private router: Router) {
     this.serviceService.getServiceList().pipe(
       switchMap((response: OperationResult<Service[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
@@ -55,6 +57,7 @@ export class ServiceManagementComponent {
     })
   }
 
+
   private handleErrorResponse(response: OperationResult<Service[], ApiDataErrorResponse>): void {
 
     let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
@@ -70,6 +73,18 @@ export class ServiceManagementComponent {
 
     this.systemMessage = code;
   }
+
+
+
+
+  redirectToEditService(service: Service) {
+    this.router.navigate([WebRoutes.service_management_edit_service], { state: { service } });
+  }
+
+  redirectToRegisterService() {
+    this.router.navigate([WebRoutes.service_management_register_service]);
+  }
+
 
 
 

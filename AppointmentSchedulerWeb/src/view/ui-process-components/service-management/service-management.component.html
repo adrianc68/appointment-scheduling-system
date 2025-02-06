@@ -1,5 +1,35 @@
 <p>service-management works!</p>
 
-<ng-container *ngFor="let service of services">
-  <pre>{{service | json}}</pre>
-</ng-container>
+<!--<ng-container *ngFor="let service of services">-->
+<!--  <pre>{{service | json}}</pre>-->
+<!--</ng-container>-->
+
+<app-button (click)="redirectToRegisterService()">Añadir</app-button>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Minutes</th>
+      <th>Price</th>
+      <th>Status</th>
+      <th>createdAt</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let service of services">
+      <td>{{service.name}}</td>
+      <td>{{service.description}}</td>
+      <td>{{service.minutes}}</td>
+      <td>{{service.price}}</td>
+      <td>{{service.status}}</td>
+      <td>{{service.createdAt}}</td>
+      <td>
+        <app-button (click)="redirectToEditService(service)">Editar</app-button>
+      </td>
+    </tr>
+
+  </tbody>
+</table>

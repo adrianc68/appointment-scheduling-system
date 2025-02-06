@@ -1,8 +1,43 @@
 <p>availability-time-slot-management works!</p>
 
 
-<ng-container *ngFor="let slot of slots">
-  <pre>{{slot | json}}</pre>
-</ng-container>
+<app-button (click)="redirectToRegisterSlot()">Añadir</app-button>
 
+<!--<ng-container *ngFor="let slot of slots">-->
+<!--  <pre>{{slot | json}}</pre>-->
+<!--</ng-container>-->
 
+<table border="1">
+  <thead>
+    <tr>
+      <th>UUID</th>
+      <th>Fecha</th>
+      <th>Inicio</th>
+      <th>Fin</th>
+      <th>Asistente</th>
+      <th>Estado</th>
+      <th>Horarios No Disponibles</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let slot of slots">
+      <td>{{ slot.uuid }}</td>
+      <td>{{ slot.date }}</td>
+      <td>{{ slot.startTime }}</td>
+      <td>{{ slot.endTime }}</td>
+      <td>{{ slot.assistant.name }}</td>
+      <td>{{ slot.status }}</td>
+      <td>
+        <ul>
+          <li *ngFor="let slot of slot.unavailableTimeSlots">
+            {{ slot.startTime }} - {{ slot.endTime }}
+          </li>
+        </ul>
+      </td>
+      <td>
+        <app-button (click)="redirectToEditSlot(slot)">Editar</app-button>
+      </td>
+    </tr>
+  </tbody>
+</table>

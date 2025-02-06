@@ -1,0 +1,64 @@
+<p>register-availability-time-slot works!</p>
+
+<div class="register-container">
+  <h1>
+    <!--{{translate(translationCodes.TC_SIGN_UP)}}-->
+    Registrar availability time slot
+  </h1>
+  <form (ngSubmit)="onSubmit()">
+
+    <label for="date">
+      date
+    </label>
+    <input id="date" type="date" [(ngModel)]="date" name="date" required
+      placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['date']" />
+
+
+    <label for="startTime">
+      startTime
+    </label>
+    <input id="startTime" type="time" step="1" [(ngModel)]="startTime" name="startTime" required
+      placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['startTime']" />
+
+
+    <label for="endTime">
+      endTime
+    </label>
+    <input id="endTime" type="time" step="1" [(ngModel)]="endTime" name="endTime" required
+      placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
+
+
+    <label for="assistantUuid">
+      <!--{{ translate(translationCodes.TC_NAME_DATA_LABEL)}}-->
+      assistantUuid
+    </label>
+    <app-text-input id="assistantUuid" type="text" [(ngModel)]="assistantUuid" name="assistantUuid" required
+      placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['assistantUuid']" />
+
+    <h4>Horarios No Disponibles</h4>
+    <div *ngFor="let slot of unavailableTimeSlots; let i = index">
+      <label>Inicio</label>
+      <input type="time" step="1" [(ngModel)]="slot.startTime" name="startTime{{i}}" required />
+
+      <label>Fin</label>
+      <input type="time" step="1" [(ngModel)]="slot.endTime" name="endTime{{i}}" required />
+
+      <button type="button" (click)="removeUnavailableTimeSlot(i)" class="btn btn-danger">Eliminar</button>
+    </div>
+
+    <button type="button" (click)="addUnavailableTimeSlot()" class="btn btn-secondary">Agregar Horario</button>
+
+    <br><br>
+
+
+    <app-button-task type="submit" [loadingState]="currentTaskState"
+      [text]="translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)" />
+    <br>
+    <br>
+    {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
+  </form>
+</div>

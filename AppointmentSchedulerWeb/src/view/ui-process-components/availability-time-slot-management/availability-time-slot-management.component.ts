@@ -11,6 +11,8 @@ import { OperationResult } from '../../../cross-cutting/communication/model/oper
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
+import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-availability-time-slot-management',
@@ -25,7 +27,7 @@ export class AvailabilityTimeSlotManagementComponent {
   slots: AvailabilityTimeSlot[] = [];
 
 
-  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService) {
+  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
     this.schedulerService.getAvailabilityTimeSlots("2024-1-11", "2026-1-11").pipe(
       switchMap((response: OperationResult<AvailabilityTimeSlot[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
@@ -71,6 +73,16 @@ export class AvailabilityTimeSlotManagementComponent {
 
     this.systemMessage = code;
   }
+
+  redirectToRegisterSlot() {
+    this.router.navigate([WebRoutes.availability_time_slot_management_register_slot])
+  }
+
+  redirectToEditSlot(slot: AvailabilityTimeSlot) {
+    this.router.navigate([WebRoutes.availability_time_slot_management_edit_slot], { state: { slot } });
+  }
+
+
 
 
 }
