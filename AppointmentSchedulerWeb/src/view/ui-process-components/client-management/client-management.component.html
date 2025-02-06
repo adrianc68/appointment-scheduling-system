@@ -1,6 +1,38 @@
 <h1>Client Directory TC CODE</h1>
 
 <p>client-management works!</p>
-<ng-container *ngFor="let client of clients">
-  <pre>{{client | json}}</pre>
-</ng-container>
+<!--<ng-container *ngFor="let client of clients">-->
+<!--  <pre>{{client | json}}</pre>-->
+<!--</ng-container>-->
+<!---->
+<!---->
+<!---->
+<app-button (click)="redirectToRegisterClient()">Añadir</app-button>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>PhoneNumber</th>
+      <th>Username</th>
+      <th>Status</th>
+      <th>createdAt</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let client of clients">
+      <td>{{client.name}}</td>
+      <td>{{client.email}}</td>
+      <td>{{client.phoneNumber}}</td>
+      <td>{{client.username}}</td>
+      <td>{{client.status}}</td>
+      <td>{{client.createdAt}}</td>
+      <td>
+        <app-button (click)="redirectToEditClient(client)">Editar</app-button>
+      </td>
+    </tr>
+
+  </tbody>
+</table>

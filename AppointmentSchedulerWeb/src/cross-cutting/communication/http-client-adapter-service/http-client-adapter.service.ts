@@ -38,6 +38,20 @@ export class HttpClientAdapter {
     );
   }
 
+  put<TData>(uri: string, value: any, isFormData: boolean = false): Observable<ApiResponse<TData, ApiDataErrorResponse>> {
+    return this.httpClientService.put<ApiResponse<TData, ApiDataErrorResponse>>(uri, value, isFormData).pipe(
+      map((response: ApiResponse<TData, ApiDataErrorResponse>) => this.handleSuccessResponse<TData>(response)),
+      catchError((error: HttpErrorResponse) => this.handleErrorResponse(error))
+    );
+  }
+
+  patch<TData>(uri: string, value: any, isFormData: boolean = false): Observable<ApiResponse<TData, ApiDataErrorResponse>> {
+    return this.httpClientService.patch<ApiResponse<TData, ApiDataErrorResponse>>(uri, value, isFormData).pipe(
+      map((response: ApiResponse<TData, ApiDataErrorResponse>) => this.handleSuccessResponse<TData>(response)),
+      catchError((error: HttpErrorResponse) => this.handleErrorResponse(error))
+    );
+  }
+
   isSuccessResponse<TData>(response: ApiResponse<TData, ApiDataErrorResponse>): response is ApiSuccessResponse<TData> {
     return response.status >= 200 && response.status < 300;
   }

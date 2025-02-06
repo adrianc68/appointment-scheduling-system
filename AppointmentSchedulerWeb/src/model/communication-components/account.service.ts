@@ -9,6 +9,7 @@ import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { ApiResponse } from '../../cross-cutting/communication/model/api-response';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MessageCodeType } from '../../cross-cutting/communication/model/message-code.types';
+import { Client } from '../../view-model/business-entities/client';
 
 @Injectable({
   providedIn: 'root'
@@ -51,10 +52,73 @@ export class AccountService {
         return throwError(() => err);
       })
     );
-
-
   }
 
+  editClient(client: Client): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.put<boolean>(`${this.apiUrl}${ApiRoutes.editClient}`, client).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    )
+  }
+
+  disableClient(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.disableClient}`, {uuid: uuid}).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        console.log(response);
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  enableClient(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.enableClient}`, { uuid: uuid }).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+
+        console.log(response);
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
 
 
 

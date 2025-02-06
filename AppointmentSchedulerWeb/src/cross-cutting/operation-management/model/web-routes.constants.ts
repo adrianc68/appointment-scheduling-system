@@ -9,6 +9,8 @@ export const WebRoutes = {
   appointment_management: "/management/appointment",
   assistant_management: "/management/assistant",
   client_management: "/management/client",
+  client_management_register_client: "/management/client/register",
+  client_management_edit_client: "/management/client/edit",
   service_management: "/management/service",
   notification_hub: "/notificationHub",
 

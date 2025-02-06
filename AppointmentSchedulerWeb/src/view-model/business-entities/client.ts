@@ -4,8 +4,8 @@ import { RoleType } from "./types/role.types";
 
 export class Client extends AccountData {
 
-constructor(uuid: string, email: string, phoneNumber: string, username: string, name: string, role: RoleType, status: AccountStatusType, createdAt: Date) {
-    super(uuid, email, phoneNumber, username, name, role, status, createdAt);
+constructor(uuid: string, email: string, phoneNumber: string, username: string, name: string, role: RoleType, status: AccountStatusType, createdAt: Date, password?: string) {
+    super(uuid, email, phoneNumber, username, name, role, status, createdAt, password);
   }
 
 }

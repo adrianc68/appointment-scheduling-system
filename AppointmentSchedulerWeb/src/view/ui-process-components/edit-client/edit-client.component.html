@@ -1,0 +1,60 @@
+<p>edit-client works!</p>
+
+<div class="edit-container">
+  <h1>
+    <!--{{translate(translationCodes.TC_SIGN_UP)}}-->
+    Editar cliente
+  </h1>
+
+  <app-button (click)="disableClient(client.uuid)" type="button">Desactivar</app-button>
+  <app-button (click)="enableClient(client.uuid)" type="button">Activar</app-button>
+
+  <form (ngSubmit)="onSubmit()">
+
+    <label for="username">
+      {{ translate(translationCodes.TC_USERNAME_DATA_LABEL)}}
+    </label>
+    <app-text-input id="username" type="text" [(ngModel)]="this.client.username" name="username" required
+      placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['username']" />
+
+
+    <label for="email">
+      {{ translate(translationCodes.TC_EMAIL_DATA_LABEL)}}
+    </label>
+    <app-text-input id="email" type="text" [(ngModel)]="this.client.email" name="email" required
+      placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['email']" />
+
+
+    <label for="phoneNumber">
+      {{ translate(translationCodes.TC_PHONE_NUMBER_DATA_LABEL)}}
+    </label>
+    <app-text-input id="phoneNumber" type="text" [(ngModel)]="this.client.phoneNumber" name="phoneNumber" required
+      placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
+
+
+    <label for="name">
+      {{ translate(translationCodes.TC_NAME_DATA_LABEL)}}
+    </label>
+    <app-text-input id="name" type="text" [(ngModel)]="this.client.name" name="name" required
+      placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['name']" />
+
+
+    <label for="password">
+      {{ translate(translationCodes.TC_PASSWORD_DATA_LABEL)}}
+    </label>
+    <app-text-input id="password" type="password" [(ngModel)]="this.client.password" name="password" required
+      placeholder={{translate(translationCodes.TC_PASSWORD_PLACEHOLDER_LABEL)}} />
+    <app-error-validation-message-form [messages]="errorValidationMessage['password']" />
+
+
+    <app-button-task type="submit" [loadingState]="currentTaskState"
+      [text]="translate(translationCodes.TC_WELCOME)" />
+    <br>
+    <br>
+    {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
+  </form>
+</div>

@@ -12,6 +12,8 @@ import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-util
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { CommonModule } from '@angular/common';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
+import { Router } from '@angular/router';
+import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 
 @Component({
   selector: 'app-client-management',
@@ -25,7 +27,7 @@ export class ClientManagementComponent {
   translationCodes = TranslationCodes;
   clients: Client[] = [];
 
-  constructor(private clientService: ClientService, private i18nService: I18nService, private logginService: LoggingService) {
+  constructor(private clientService: ClientService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
     this.clientService.getClientList().pipe(
       switchMap((response: OperationResult<Client[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
@@ -74,7 +76,13 @@ export class ClientManagementComponent {
 
 
 
+  redirectToRegisterClient() {
+    this.router.navigate([WebRoutes.client_management_register_client])
+  }
 
+  redirectToEditClient(client: Client) {
+    this.router.navigate([WebRoutes.client_management_edit_client], { state: { client } });
+  }
 
 
 

@@ -14,6 +14,8 @@ import { HomeComponent } from '../view/ui-process-components/home/home.component
 import { ConfigManagementComponent } from '../view/ui-process-components/config-management/config-management.component';
 import { NotificationManagementComponent } from '../view/ui-process-components/notification-management/notification-management.component';
 import { AvailabilityTimeSlotManagementComponent } from '../view/ui-process-components/availability-time-slot-management/availability-time-slot-management.component';
+import { RegisterClientComponent } from '../view/ui-process-components/register-client/register-client.component';
+import { EditClientComponent } from '../view/ui-process-components/edit-client/edit-client.component';
 
 export const routes: Routes = [
   {
@@ -27,6 +29,8 @@ export const routes: Routes = [
       { path: "management/appointment", component: AppointmentManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
       { path: "management/assistant", component: AssistantManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
       { path: "management/client", component: ClientManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+      { path: "management/client/register", component: RegisterClientComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+      { path: "management/client/edit", component: EditClientComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
       { path: "management/service", component: ServiceManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
     ]
   },
