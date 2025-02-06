@@ -1,5 +1,36 @@
 <p>assistant-management works!</p>
 
-<ng-container *ngFor="let assistant of assistants">
-  <pre>{{assistant | json}}</pre>
-</ng-container>
+<!--<ng-container *ngFor="let assistant of assistants">-->
+<!--  <pre>{{assistant | json}}</pre>-->
+<!--</ng-container>-->
+
+<!---->
+<app-button (click)="redirectToRegisterAssistant()">Añadir</app-button>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>PhoneNumber</th>
+      <th>Username</th>
+      <th>Status</th>
+      <th>createdAt</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let assistant of assistants">
+      <td>{{assistant.name}}</td>
+      <td>{{assistant.email}}</td>
+      <td>{{assistant.phoneNumber}}</td>
+      <td>{{assistant.username}}</td>
+      <td>{{assistant.status}}</td>
+      <td>{{assistant.createdAt}}</td>
+      <td>
+        <app-button (click)="redirectToEditAssistant(assistant)">Editar</app-button>
+      </td>
+    </tr>
+
+  </tbody>
+</table>

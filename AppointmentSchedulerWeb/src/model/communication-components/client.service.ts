@@ -47,6 +47,95 @@ export class ClientService {
     );
   }
 
+  editClient(client: Client): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.put<boolean>(`${this.apiUrl}${ApiRoutes.editClient}`, client).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    )
+  }
+
+  disableClient(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.disableClient}`, { uuid: uuid }).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        console.log(response);
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  enableClient(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.enableClient}`, { uuid: uuid }).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+
+        console.log(response);
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+
+  deleteClient(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.delete<boolean>(`${this.apiUrl}${ApiRoutes.deleteClient}?uuid=${uuid}`).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+
+        console.log(response);
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
 
   private parseClient(dto: ClientDTO): Client {
     let data = new Client(dto.uuid, dto.email, dto.phoneNumber, dto.username, dto.name, RoleType.CLIENT, dto.status, dto.createdAt);

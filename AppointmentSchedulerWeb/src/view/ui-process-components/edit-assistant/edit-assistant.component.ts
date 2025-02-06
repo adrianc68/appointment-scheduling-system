@@ -5,42 +5,41 @@ import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-compone
 import { TaskStateManagerService } from '../../model/task-state-manager.service';
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { LoadingState } from '../../model/loading-state.type';
+import { Assistant } from '../../../view-model/business-entities/assistant';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { AccountService } from '../../../model/communication-components/account.service';
-import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
+import { AssistantService } from '../../../model/communication-components/assistant.service';
 import { Observable, of, switchMap } from 'rxjs';
+import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
-import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
-import { Client } from '../../../view-model/business-entities/client';
-import { ClientService } from '../../../model/communication-components/client.service';
 
 @Component({
-  selector: 'app-edit-client',
+  selector: 'app-edit-assistant',
   imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS],
-  providers: [TaskStateManagerService],
   standalone: true,
-  templateUrl: './edit-client.component.html',
-  styleUrl: './edit-client.component.scss'
+  providers: [TaskStateManagerService],
+  templateUrl: './edit-assistant.component.html',
+  styleUrl: './edit-assistant.component.scss'
 })
-export class EditClientComponent {
+export class EditAssistantComponent {
   translationCodes = TranslationCodes;
   errorValidationMessage: { [field: string]: string[] } = {};
   systemMessage?: string = '';
   currentTaskState: LoadingState;
 
-  client: Client;
+  assistant: Assistant;
 
   translate(key: string): string {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private clientService: ClientService, private stateManagerService: TaskStateManagerService) {
-    this.client = this.router.getCurrentNavigation()?.extras.state?.["client"];
+  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private assistantService: AssistantService, private stateManagerService: TaskStateManagerService) {
+    this.assistant = this.router.getCurrentNavigation()?.extras.state?.["assistant"];
     this.currentTaskState = this.stateManagerService.getState();
     this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
   }
@@ -56,7 +55,7 @@ export class EditClientComponent {
     this.errorValidationMessage = {};
 
 
-    this.clientService.editClient(this.client).pipe(
+    this.assistantService.editAssistant(this.assistant).pipe(
       switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
         console.log("editclient called")
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
@@ -85,8 +84,8 @@ export class EditClientComponent {
     });
   }
 
-  disableClient(uuid: string) {
-    this.clientService.disableClient(uuid).pipe(
+  disableAssistant(uuid: string) {
+    this.assistantService.disableAssistant(uuid).pipe(
       switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
@@ -112,8 +111,8 @@ export class EditClientComponent {
     });
   }
 
-  enableClient(uuid: string) {
-    this.clientService.enableClient(uuid).pipe(
+  enableAssistant(uuid: string) {
+    this.assistantService.enableAssistant(uuid).pipe(
       switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
@@ -139,8 +138,8 @@ export class EditClientComponent {
     });
   }
 
-  deleteClient(uuid: string) {
-    this.clientService.deleteClient(uuid).pipe(
+  deleteAssistant(uuid: string) {
+    this.assistantService.deleteAssistant(uuid).pipe(
       switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
@@ -208,4 +207,5 @@ export class EditClientComponent {
       //
     }, 1500)
   }
+
 }

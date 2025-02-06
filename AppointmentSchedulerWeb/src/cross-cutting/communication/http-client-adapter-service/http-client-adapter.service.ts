@@ -5,7 +5,7 @@ import { ApiErrorResponse, ApiResponse, ApiSuccessResponse } from '../model/api-
 import { HttpClientService } from '../http-client-service/http-client.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MessageCodeType } from '../model/message-code.types';
-import { getStringEnumKeyByValue, parseStringToEnum } from '../../helper/enum-utils/enum.utils';
+import { parseStringToEnum } from '../../helper/enum-utils/enum.utils';
 import { ApiVersionType } from '../model/api-version.types';
 import { GenericErrorResponse } from '../model/generic-error.response';
 import { ValidationErrorResponse } from '../model/validation-error.response';
@@ -47,6 +47,13 @@ export class HttpClientAdapter {
 
   patch<TData>(uri: string, value: any, isFormData: boolean = false): Observable<ApiResponse<TData, ApiDataErrorResponse>> {
     return this.httpClientService.patch<ApiResponse<TData, ApiDataErrorResponse>>(uri, value, isFormData).pipe(
+      map((response: ApiResponse<TData, ApiDataErrorResponse>) => this.handleSuccessResponse<TData>(response)),
+      catchError((error: HttpErrorResponse) => this.handleErrorResponse(error))
+    );
+  }
+
+  delete<TData>(uri: string): Observable<ApiResponse<TData, ApiDataErrorResponse>> {
+    return this.httpClientService.delete<ApiResponse<TData, ApiDataErrorResponse>>(uri).pipe(
       map((response: ApiResponse<TData, ApiDataErrorResponse>) => this.handleSuccessResponse<TData>(response)),
       catchError((error: HttpErrorResponse) => this.handleErrorResponse(error))
     );

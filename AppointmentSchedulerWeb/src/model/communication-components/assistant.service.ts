@@ -49,6 +49,97 @@ export class AssistantService {
   }
 
 
+  editAssistant(assistant: Assistant): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.put<boolean>(`${this.apiUrl}${ApiRoutes.editAssistant}`, assistant).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    )
+  }
+
+  disableAssistant(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.disableAssistant}`, { uuid: uuid }).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        console.log(response);
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  enableAssistant(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.enableAssistant}`, { uuid: uuid }).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+
+        console.log(response);
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+
+  deleteAssistant(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.delete<boolean>(`${this.apiUrl}${ApiRoutes.deleteAssistant}?uuid=${uuid}`).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+
+        console.log(response);
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(response.data, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+
   private parseAssistant(dto: AssistantDTO): Assistant {
     let data = new Assistant(dto.uuid, dto.email, dto.phoneNumber, dto.username, dto.name, RoleType.ASSISTANT, dto.status, dto.createdAt);
     return data;

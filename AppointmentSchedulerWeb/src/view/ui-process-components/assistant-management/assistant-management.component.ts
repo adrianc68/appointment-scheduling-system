@@ -11,6 +11,8 @@ import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isS
 import { Observable, of, switchMap } from 'rxjs';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
+import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-assistant-management',
@@ -24,7 +26,7 @@ export class AssistantManagementComponent {
   translationCodes = TranslationCodes;
   assistants: Assistant[] = [];
 
-  constructor(private assistantService: AssistantService, private i18nService: I18nService, private logginService: LoggingService) {
+  constructor(private router: Router, private assistantService: AssistantService, private i18nService: I18nService, private logginService: LoggingService) {
     this.assistantService.getAssistantList().pipe(
       switchMap((response: OperationResult<Assistant[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
@@ -71,7 +73,12 @@ export class AssistantManagementComponent {
     this.systemMessage = code;
   }
 
+  redirectToRegisterAssistant() {
+    this.router.navigate([WebRoutes.assistant_management_register_assistant])
+  }
 
-
+  redirectToEditAssistant(assistant: Assistant) {
+    this.router.navigate([WebRoutes.assistant_management_edit_assistant], { state: { assistant } });
+  }
 
 }

@@ -16,6 +16,8 @@ import { NotificationManagementComponent } from '../view/ui-process-components/n
 import { AvailabilityTimeSlotManagementComponent } from '../view/ui-process-components/availability-time-slot-management/availability-time-slot-management.component';
 import { RegisterClientComponent } from '../view/ui-process-components/register-client/register-client.component';
 import { EditClientComponent } from '../view/ui-process-components/edit-client/edit-client.component';
+import { RegisterAssistantComponent } from '../view/ui-process-components/register-assistant/register-assistant.component';
+import { EditAssistantComponent } from '../view/ui-process-components/edit-assistant/edit-assistant.component';
 
 export const routes: Routes = [
   {
@@ -28,6 +30,8 @@ export const routes: Routes = [
       { path: "management/availability-time-slots", component: AvailabilityTimeSlotManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
       { path: "management/appointment", component: AppointmentManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
       { path: "management/assistant", component: AssistantManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+      { path: "management/assistant/edit", component: EditAssistantComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+      { path: "management/assistant/register", component: RegisterAssistantComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
       { path: "management/client", component: ClientManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
       { path: "management/client/register", component: RegisterClientComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
       { path: "management/client/edit", component: EditClientComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },

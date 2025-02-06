@@ -10,43 +10,43 @@ import { Router } from '@angular/router';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { AccountService } from '../../../model/communication-components/account.service';
-import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { Observable, of, switchMap } from 'rxjs';
+import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
-import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
-import { Client } from '../../../view-model/business-entities/client';
-import { ClientService } from '../../../model/communication-components/client.service';
 
 @Component({
-  selector: 'app-edit-client',
+  selector: 'app-register-assistant',
   imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS],
-  providers: [TaskStateManagerService],
   standalone: true,
-  templateUrl: './edit-client.component.html',
-  styleUrl: './edit-client.component.scss'
+  providers: [TaskStateManagerService],
+  templateUrl: './register-assistant.component.html',
+  styleUrl: './register-assistant.component.scss'
 })
-export class EditClientComponent {
+export class RegisterAssistantComponent {
   translationCodes = TranslationCodes;
+
+  phoneNumber: string = '';
+  email: string = '';
+  name: string = '';
+  username: string = '';
+  password: string = '';
+
   errorValidationMessage: { [field: string]: string[] } = {};
   systemMessage?: string = '';
   currentTaskState: LoadingState;
-
-  client: Client;
 
   translate(key: string): string {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private clientService: ClientService, private stateManagerService: TaskStateManagerService) {
-    this.client = this.router.getCurrentNavigation()?.extras.state?.["client"];
+  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private stateManagerService: TaskStateManagerService) {
     this.currentTaskState = this.stateManagerService.getState();
     this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
   }
 
   onSubmit() {
-    console.log("called ")
     if (this.currentTaskState === LoadingState.LOADING) {
       return;
     }
@@ -55,39 +55,8 @@ export class EditClientComponent {
     this.systemMessage = "";
     this.errorValidationMessage = {};
 
-
-    this.clientService.editClient(this.client).pipe(
-      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
-        console.log("editclient called")
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          console.log("<<<<");
-          this.setSuccessfulTask();
-        } else {
-          console.log("<<<<");
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-      }
-    });
-  }
-
-  disableClient(uuid: string) {
-    this.clientService.disableClient(uuid).pipe(
-      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
+    this.accountService.registerAssistant(this.username, this.email, this.phoneNumber, this.name, this.password).pipe(
+      switchMap((response: OperationResult<string, ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.systemMessage = code;
@@ -112,62 +81,7 @@ export class EditClientComponent {
     });
   }
 
-  enableClient(uuid: string) {
-    this.clientService.enableClient(uuid).pipe(
-      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          this.setSuccessfulTask();
-        } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-      }
-    });
-  }
-
-  deleteClient(uuid: string) {
-    this.clientService.deleteClient(uuid).pipe(
-      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          this.setSuccessfulTask();
-        } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-      }
-    });
-  }
-
-
-  private handleErrorResponse(response: OperationResult<boolean, ApiDataErrorResponse>): void {
+  private handleErrorResponse(response: OperationResult<string, ApiDataErrorResponse>): void {
 
     let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
     if (isGenericErrorResponse(response.error)) {
@@ -205,7 +119,11 @@ export class EditClientComponent {
   private setSuccessfulTask(): void {
     this.stateManagerService.setState(LoadingState.SUCCESSFUL_TASK);
     setTimeout(() => {
-      //
+      //this.router.navigate([WebRoutes.login])
     }, 1500)
   }
+
+
+
+
 }
