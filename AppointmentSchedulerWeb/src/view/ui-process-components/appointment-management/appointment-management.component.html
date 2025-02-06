@@ -1,1 +1,14 @@
 <p>appointment-management works!</p>
+
+
+<h2>Available Services</h2>
+<ng-container *ngFor="let serviceOffer of servicesAvailable">
+  <pre>{{serviceOffer | json}}</pre>
+</ng-container>
+
+
+<h2>Scheduled Appointments </h2>
+
+<ng-container *ngFor="let appointment of scheduledAppointments">
+  <pre>{{appointment | json }}</pre>
+</ng-container>

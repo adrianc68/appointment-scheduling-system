@@ -10,6 +10,11 @@
           translate(translationCodes.TC_MANAGEMENT_APPOINTMENT_DIRECTORY) }}</a>
       </li>
       <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
+        <a [routerLink]="[webRoutes.availability_time_slot_management]">{{
+          translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY) }}</a>
+      </li>
+
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
         <a [routerLink]="[webRoutes.assistant_management]">{{
           translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY) }}</a>
       </li>

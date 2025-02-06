@@ -5,7 +5,7 @@ import { LoggingService } from '../../../cross-cutting/operation-management/logg
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { ApiResponse } from '../../../cross-cutting/communication/model/api-response';
 import { Client } from '../../../view-model/business-entities/client';
-import { map, Observable, of, switchMap } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';

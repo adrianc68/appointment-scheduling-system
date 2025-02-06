@@ -1,4 +1,3 @@
-// api-routes.constants.ts
 export const ApiRoutes = {
   login: `/Auth/login`,
   logout: `/Auth/logout`,
@@ -11,6 +10,9 @@ export const ApiRoutes = {
   getAllClients: `/client`,
   getAllServices: `/service`,
   getAllAssistants: `/assistant`,
+  getAvailabilityTimeSlots: `/scheduling/availabilityTimeSlot`,
+  getAvailableServices: `/scheduling/services/available`,
+  getScheduledAppointments: `/scheduling/appointment`
 
 };
 

@@ -92,6 +92,7 @@
   "TC_MANAGEMENT_ASSISTANT_DIRECTORY": "Asistentes",
   "TC_MANAGEMENT_SERVICE_DIRECTORY": "Servicios",
   "TC_MANAGEMENT_CLIENT_DIRECTORY": "Clientes",
+  "TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY": "Horarios de disponibilidad",
   "TC_APPOINTMENT_CREATE_DIRECTORY": "Citas",
   "TC_VALIDATION_ERROR": "Los datos enviados son inválidos",
   "TC_GENERIC_ERROR_CONFLICT": "Hay un conflicto con los datos",

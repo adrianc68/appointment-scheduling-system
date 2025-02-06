@@ -5,7 +5,7 @@ export const WebRoutes = {
   configuration: "/configuration",
   notifications: "/notifications",
   appointment_create: "/appointment/create",
-  availability_time_slot_management: "/maangement/availability-time-slot",
+  availability_time_slot_management: "management/availability-time-slots",
   appointment_management: "/management/appointment",
   assistant_management: "/management/assistant",
   client_management: "/management/client",
