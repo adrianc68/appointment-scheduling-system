@@ -80,12 +80,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [HttpDelete("delete")]
         [Authorize]
         [AllowedRoles(RoleType.ADMINISTRATOR)]
-        public async Task<IActionResult> DeleteAssistant([FromBody] DeleteAssistantDTO dto)
+        public async Task<IActionResult> DeleteAssistant([FromQuery] Guid uuid)
         {
             bool isStatusChanged = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.DeleteAssistantAsync(dto.Uuid);
+                OperationResult<bool, GenericError> result = await systemFacade.DeleteAssistantAsync(uuid);
                 if (result.IsSuccessful)
                 {
                     isStatusChanged = result.Result;

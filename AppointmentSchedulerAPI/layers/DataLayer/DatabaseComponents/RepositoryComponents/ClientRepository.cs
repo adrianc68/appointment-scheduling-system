@@ -148,6 +148,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 userAccount.Role = RoleType.CLIENT;
                 userAccount.UserInformation!.Name = client.Name;
                 userAccount.UserInformation.PhoneNumber = client.PhoneNumber;
+                userAccount.Password = passwordHasherService.HashPassword(client.Password!);
 
                 await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();

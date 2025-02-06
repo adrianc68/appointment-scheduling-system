@@ -2,7 +2,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Respons
 {
     public class AsisstantOfferDTO
     {
-        public AssistantOccupiedServiceOfferDTO? Assistant { get; set; }
+        // public AssistantOccupiedServiceOfferDTO? Assistant { get; set; }
+        public required string Name { get; set; }
+        public required Guid Uuid { get; set; }
         public ServiceOfferRangeDTO? OccupiedTimeRange { get; set; }
     }
 }
