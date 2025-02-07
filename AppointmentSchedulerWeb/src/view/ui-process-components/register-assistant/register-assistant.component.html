@@ -1,9 +1,6 @@
-<p>register-assistant works!</p>
-
 <div class="register-container">
   <h1>
-    <!--{{translate(translationCodes.TC_SIGN_UP)}}-->
-    Registrar assistant
+    {{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_REGISTER_DIRECTORY)}}
   </h1>
   <form (ngSubmit)="onSubmit()">
 
@@ -48,7 +45,7 @@
 
 
     <app-button-task type="submit" [loadingState]="currentTaskState"
-      [text]="translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)" />
+      [text]="translate(translationCodes.TC_REGISTER_BUTTON_LABEL)" />
     <br>
     <br>
     {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}

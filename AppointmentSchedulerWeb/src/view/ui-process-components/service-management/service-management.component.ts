@@ -85,6 +85,12 @@ export class ServiceManagementComponent {
     this.router.navigate([WebRoutes.service_management_register_service]);
   }
 
+  translate(key: string): string {
+    return this.i18nService.translate(key);
+  }
+
+
+
 
 
 

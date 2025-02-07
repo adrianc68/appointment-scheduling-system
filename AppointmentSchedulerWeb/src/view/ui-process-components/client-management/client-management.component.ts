@@ -3,7 +3,6 @@ import { ClientService } from '../../../model/communication-components/client.se
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
-import { ApiResponse } from '../../../cross-cutting/communication/model/api-response';
 import { Client } from '../../../view-model/business-entities/client';
 import { Observable, of, switchMap } from 'rxjs';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
@@ -83,6 +82,12 @@ export class ClientManagementComponent {
   redirectToEditClient(client: Client) {
     this.router.navigate([WebRoutes.client_management_edit_client], { state: { client } });
   }
+
+  translate(key: string): string {
+    return this.i18nService.translate(key);
+  }
+
+
 
 
 

@@ -1,21 +1,20 @@
-<p>service-management works!</p>
+<h1>{{translate(translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY)}}</h1>
 
-<!--<ng-container *ngFor="let service of services">-->
-<!--  <pre>{{service | json}}</pre>-->
-<!--</ng-container>-->
-
-<app-button (click)="redirectToRegisterService()">Añadir</app-button>
+<app-button (click)="redirectToRegisterService()">
+  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
+</app-button>
 
 <table border="1">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Description</th>
-      <th>Minutes</th>
-      <th>Price</th>
-      <th>Status</th>
-      <th>createdAt</th>
-      <th>Acciones</th>
+      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_NAME_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_DESCRIPTION_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_MINUTES_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_PRICE_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>
+
     </tr>
   </thead>
   <tbody>
@@ -27,7 +26,9 @@
       <td>{{service.status}}</td>
       <td>{{service.createdAt}}</td>
       <td>
-        <app-button (click)="redirectToEditService(service)">Editar</app-button>
+        <app-button (click)="redirectToEditService(service)">
+          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
+        </app-button>
       </td>
     </tr>
 

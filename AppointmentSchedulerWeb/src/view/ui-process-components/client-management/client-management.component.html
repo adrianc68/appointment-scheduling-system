@@ -1,24 +1,18 @@
-<h1>Client Directory TC CODE</h1>
-
-<p>client-management works!</p>
-<!--<ng-container *ngFor="let client of clients">-->
-<!--  <pre>{{client | json}}</pre>-->
-<!--</ng-container>-->
-<!---->
-<!---->
-<!---->
-<app-button (click)="redirectToRegisterClient()">Añadir</app-button>
+<h1>{{translate(translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY)}}</h1>
+<app-button (click)="redirectToRegisterClient()">
+  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
+</app-button>
 
 <table border="1">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Email</th>
-      <th>PhoneNumber</th>
-      <th>Username</th>
-      <th>Status</th>
-      <th>createdAt</th>
-      <th>Acciones</th>
+      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_NAME_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_EMAIL_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_PHONE_NUMBER_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_USERNAME_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_ACTIONS)}}</th>
     </tr>
   </thead>
   <tbody>
@@ -30,7 +24,9 @@
       <td>{{client.status}}</td>
       <td>{{client.createdAt}}</td>
       <td>
-        <app-button (click)="redirectToEditClient(client)">Editar</app-button>
+        <app-button (click)="redirectToEditClient(client)">
+          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
+        </app-button>
       </td>
     </tr>
 

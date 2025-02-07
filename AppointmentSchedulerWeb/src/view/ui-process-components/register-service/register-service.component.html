@@ -1,53 +1,45 @@
-<p>register-service works!</p>
-
 <div class="register-container">
-  <h1>
-    <!--{{translate(translationCodes.TC_SIGN_UP)}}-->
-    Registrar service
-  </h1>
+  <h1>{{translate(translationCodes.TC_MANAGEMENT_SERVICE_REGISTER_DIRECTORY)}}</h1>
+
   <form (ngSubmit)="onSubmit()">
 
     <label for="name">
-      <!--{{ translate(translationCodes.TC_USERNAME_DATA_LABEL)}}-->
-      name
+      {{ translate(translationCodes.TC_SERVICE_NAME_DATA_LABEL)}}
     </label>
     <app-text-input id="name" type="text" [(ngModel)]="name" name="name" required
-      placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
+      placeholder={{translate(translationCodes.TC_SERVICE_NAME_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['name']" />
 
 
     <label for="description">
-      <!--{{ translate(translationCodes.TC_EMAIL_DATA_LABEL)}}-->
-      description
+      {{ translate(translationCodes.TC_SERVICE_DESCRIPTION_DATA_LABEL)}}
     </label>
     <app-text-input id="description" type="text" [(ngModel)]="description" name="description" required
-      placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
+      placeholder={{translate(translationCodes.TC_SERVICE_DESCRIPTION_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['description']" />
 
 
     <label for="minutes">
-      <!--{{ translate(translationCodes.TC_PHONE_NUMBER_DATA_LABEL)}}-->
-      minutes
+      {{ translate(translationCodes.TC_SERVICE_MINUTES_DATA_LABEL)}}
     </label>
     <app-text-input id="minutes" type="text" [(ngModel)]="minutes" name="minutes" required
-      placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
+      placeholder={{translate(translationCodes.TC_SERVICE_MINUTES_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['minutes']" />
 
 
     <label for="price">
-      <!--{{ translate(translationCodes.TC_NAME_DATA_LABEL)}}-->
-      price
+      {{ translate(translationCodes.TC_SERVICE_PRICE_DATA_LABEL)}}
     </label>
     <app-text-input id="price" type="text" [(ngModel)]="price" name="price" required
-      placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
+      placeholder={{translate(translationCodes.TC_SERVICE_PRICE_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['price']" />
 
 
 
     <app-button-task type="submit" [loadingState]="currentTaskState"
-      [text]="translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)" />
+      [text]="translate(translationCodes.TC_REGISTER_BUTTON_LABEL)" />
     <br>
     <br>
     {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
-  </form>
+    </form>
 </div>

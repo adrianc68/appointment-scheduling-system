@@ -15,7 +15,6 @@ import { Observable, of, switchMap } from 'rxjs';
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
-import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { Client } from '../../../view-model/business-entities/client';
 import { ClientService } from '../../../model/communication-components/client.service';
 

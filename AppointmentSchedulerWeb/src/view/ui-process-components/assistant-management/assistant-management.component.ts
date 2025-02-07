@@ -81,4 +81,9 @@ export class AssistantManagementComponent {
     this.router.navigate([WebRoutes.assistant_management_edit_assistant], { state: { assistant } });
   }
 
+  translate(key: string): string {
+    return this.i18nService.translate(key);
+  }
+
+
 }

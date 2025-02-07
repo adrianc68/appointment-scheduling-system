@@ -1,22 +1,19 @@
-<p>assistant-management works!</p>
+<h1>{{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY)}}</h1>
 
-<!--<ng-container *ngFor="let assistant of assistants">-->
-<!--  <pre>{{assistant | json}}</pre>-->
-<!--</ng-container>-->
-
-<!---->
-<app-button (click)="redirectToRegisterAssistant()">Añadir</app-button>
+<app-button (click)="redirectToRegisterAssistant()">
+  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
+</app-button>
 
 <table border="1">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Email</th>
-      <th>PhoneNumber</th>
-      <th>Username</th>
-      <th>Status</th>
-      <th>createdAt</th>
-      <th>Acciones</th>
+      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_NAME_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_EMAIL_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_PHONE_NUMBER_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_USERNAME_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_ACTIONS)}}</th>
     </tr>
   </thead>
   <tbody>
@@ -28,7 +25,9 @@
       <td>{{assistant.status}}</td>
       <td>{{assistant.createdAt}}</td>
       <td>
-        <app-button (click)="redirectToEditAssistant(assistant)">Editar</app-button>
+        <app-button (click)="redirectToEditAssistant(assistant)">
+          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
+        </app-button>
       </td>
     </tr>
 

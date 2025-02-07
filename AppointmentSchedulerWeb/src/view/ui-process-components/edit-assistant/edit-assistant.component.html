@@ -1,14 +1,15 @@
-<p>edit-assistant works!</p>
-
 <div class="edit-container">
   <h1>
-    <!--{{translate(translationCodes.TC_SIGN_UP)}}-->
-    Editar assistante
+    {{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_EDIT_DIRECTORY)}}
   </h1>
 
-  <app-button (click)="disableAssistant(assistant.uuid)" type="button">Desactivar</app-button>
-  <app-button (click)="enableAssistant(assistant.uuid)" type="button">Activar</app-button>
-  <app-button (click)="deleteAssistant(assistant.uuid)" type="button">Eliminar</app-button>
+
+  <app-button (click)="disableAssistant(assistant.uuid)"
+    type="button">{{translate(translationCodes.TC_DISABLE_BUTTON_LABEL)}}</app-button>
+  <app-button (click)="enableAssistant(assistant.uuid)"
+    type="button">{{translate(translationCodes.TC_ENABLE_BUTTON_LABEL)}}</app-button>
+  <app-button (click)="deleteAssistant(assistant.uuid)"
+    type="button">{{translate(translationCodes.TC_DELETE_BUTTON_LABEL)}}</app-button>
 
   <form (ngSubmit)="onSubmit()">
 
@@ -52,7 +53,8 @@
     <app-error-validation-message-form [messages]="errorValidationMessage['password']" />
 
 
-    <app-button-task type="submit" [loadingState]="currentTaskState" [text]="translate(translationCodes.TC_WELCOME)" />
+    <app-button-task type="submit" [loadingState]="currentTaskState"
+      [text]="translate(translationCodes.TC_EDIT_BUTTON_LABEL)" />
     <br>
     <br>
     {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
