@@ -1,33 +1,53 @@
 <nav class="sidebar">
   <ul *ngIf="accountData | async as accountData">
-    <li><a [routerLink]="[webRoutes.root]">{{translate(translationCodes.TC_HOME_DIRECTORY)}}</a></li>
+    <li><a [routerLink]="[webRoutes.root]">
+        <mat-icon>home</mat-icon>
+        {{translate(translationCodes.TC_HOME_DIRECTORY)}}
+      </a></li>
 
     <ng-container [ngSwitch]="accountData.role">
-      <li *ngSwitchCase="roleTypes.CLIENT"><a
-          [routerLink]="[webRoutes.root]">{{translate(translationCodes.TC_APPOINTMENT_CREATE_DIRECTORY)}}</a></li>
-      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
-        <a [routerLink]="[webRoutes.appointment_management]">{{
-          translate(translationCodes.TC_MANAGEMENT_APPOINTMENT_DIRECTORY) }}</a>
+      <li *ngSwitchCase="roleTypes.CLIENT">
+        <a [routerLink]="[webRoutes.root]">
+          <mat-icon>calendar_month</mat-icon>
+          {{translate(translationCodes.TC_APPOINTMENT_CREATE_DIRECTORY)}}
+        </a>
       </li>
       <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
-        <a [routerLink]="[webRoutes.availability_time_slot_management]">{{
-          translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY) }}</a>
-      </li>
-
-      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
-        <a [routerLink]="[webRoutes.assistant_management]">{{
-          translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY) }}</a>
+        <a [routerLink]="[webRoutes.appointment_management]">
+          <mat-icon>calendar_month</mat-icon>
+          {{translate(translationCodes.TC_MANAGEMENT_APPOINTMENT_DIRECTORY) }}
+        </a>
       </li>
       <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
-        <a [routerLink]="[webRoutes.service_management]">{{
-          translate(translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY) }}</a>
+        <a [routerLink]="[webRoutes.availability_time_slot_management]">
+          <mat-icon>access_time</mat-icon>
+          {{translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY) }}
+        </a>
       </li>
       <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
-        <a [routerLink]="[webRoutes.client_management]">{{ translate(translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY)
-          }}</a>
+        <a [routerLink]="[webRoutes.assistant_management]">
+          <mat-icon>supervisor_account</mat-icon>
+          {{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY) }}
+        </a>
+      </li>
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
+        <a [routerLink]="[webRoutes.service_management]">
+          <mat-icon>business_center</mat-icon>
+          {{translate(translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY) }}
+        </a>
+      </li>
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
+        <a [routerLink]="[webRoutes.client_management]">
+          <mat-icon>groups_3</mat-icon>
+          {{ translate(translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY)}}
+        </a>
       </li>
     </ng-container>
-    <li><a [routerLink]="[webRoutes.configuration]">{{translate(translationCodes.TC_CONFIGURATION_DIRECTORY)}}</a>
+    <li>
+      <a [routerLink]="[webRoutes.configuration]">
+        <mat-icon>settings</mat-icon>
+        {{translate(translationCodes.TC_CONFIGURATION_DIRECTORY)}}
+      </a>
     </li>
 
 

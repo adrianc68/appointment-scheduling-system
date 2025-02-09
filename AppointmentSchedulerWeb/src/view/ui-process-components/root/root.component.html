@@ -1,10 +1,10 @@
-<ng-container *ngIf="isAuthenticated; else landing">
-
-  <app-layout-authenticated>
-    <router-outlet></router-outlet>
-  </app-layout-authenticated>
-
-</ng-container>
-<ng-template #landing>
-  <app-landing-page></app-landing-page>
-</ng-template>
+<main>
+  <ng-container *ngIf="isAuthenticated; else landing">
+    <app-layout-authenticated>
+      <router-outlet></router-outlet>
+    </app-layout-authenticated>
+  </ng-container>
+  <ng-template #landing>
+    <app-landing-page></app-landing-page>
+  </ng-template>
+</main>

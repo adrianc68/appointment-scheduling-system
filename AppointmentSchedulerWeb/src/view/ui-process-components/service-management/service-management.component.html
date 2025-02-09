@@ -1,8 +1,8 @@
 <h1>{{translate(translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY)}}</h1>
 
-<app-button (click)="redirectToRegisterService()">
+<button class="button" (click)="redirectToRegisterService()">
   {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
-</app-button>
+</button>
 
 <table border="1">
   <thead>
@@ -26,9 +26,9 @@
       <td>{{service.status}}</td>
       <td>{{service.createdAt}}</td>
       <td>
-        <app-button (click)="redirectToEditService(service)">
+        <button class="button" (click)="redirectToEditService(service)">
           {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
-        </app-button>
+        </button>
       </td>
     </tr>
 

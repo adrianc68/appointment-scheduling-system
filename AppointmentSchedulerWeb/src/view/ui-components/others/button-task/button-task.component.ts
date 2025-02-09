@@ -2,10 +2,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LoadingState } from '../../../model/loading-state.type';
 import { CommonModule } from '@angular/common';
 import { I18nService } from '../../../../cross-cutting/helper/i18n/i18n.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-button-task',
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule],
   standalone: true,
   templateUrl: './button-task.component.html',
   styleUrl: './button-task.component.scss'
@@ -18,10 +19,11 @@ export class ButtonTaskComponent {
   @Input() id: string = '';
   @Input() placeholder: string = '';
   @Input() disabled: boolean = false;
+  @Input() class: string = "button";
   @Output() clicked = new EventEmitter<void>();
   loadingStateType = LoadingState;
 
-  constructor(private i18nService: I18nService) {}
+  constructor(private i18nService: I18nService) { }
 
 
   onClick() {

@@ -1,3 +1,5 @@
+@use '../../../../styles/variables' as variables;
+
 /* Mobile First */
 .layout {
   display: flex;
@@ -7,7 +9,8 @@
 }
 
 .navbar {
-  height: 60px;
+  // height: 60px;
+  height: variables.$header-height;
   width: 100%;
   background: blue;
   color: white;
@@ -24,13 +27,12 @@
 }
 
 .sidebar {
-  position:fixed;
-  width:0px;
+  position: fixed;
+  width: 0px;
   height: calc(100vh - 60px);
-  background: #8a8a8a;
   color: white;
   transition: width 0.3s ease-in-out;
-  overflow:hidden;
+  overflow: hidden;
 }
 
 .sidebar.open {
@@ -58,7 +60,7 @@
   }
 
   .sidebar.open {
-    width:250px;
+    width: 250px;
   }
 
   .content {

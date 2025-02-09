@@ -1,0 +1,23 @@
+.sidebar {
+  background-color: green;
+  height: 100%;
+
+  li {
+    background-color: red;
+
+    a {
+      background-color: gray;
+      text-decoration: none;
+      display: flex;
+      height: 24px;
+    }
+
+    a:hover {
+      background-color: green;
+    }
+
+  }
+
+
+
+}

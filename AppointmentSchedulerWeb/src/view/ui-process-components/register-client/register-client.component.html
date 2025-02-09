@@ -2,20 +2,19 @@
   <h1>
     {{translate(translationCodes.TC_MANAGEMENT_CLIENT_REGISTER_DIRECTORY)}}
   </h1>
-  <form (ngSubmit)="onSubmit()">
+  <form class="form" (ngSubmit)="onSubmit()">
 
     <label for="username">
       {{ translate(translationCodes.TC_USERNAME_DATA_LABEL)}}
     </label>
-    <app-text-input id="username" type="text" [(ngModel)]="username" name="username" required
+    <input class="input" id="username" type="text" [(ngModel)]="username" name="username" required
       placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['username']" />
-
 
     <label for="email">
       {{ translate(translationCodes.TC_EMAIL_DATA_LABEL)}}
     </label>
-    <app-text-input id="email" type="text" [(ngModel)]="email" name="email" required
+    <input class="input" id="email" type="text" [(ngModel)]="email" name="email" required
       placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['email']" />
 
@@ -23,7 +22,7 @@
     <label for="phoneNumber">
       {{ translate(translationCodes.TC_PHONE_NUMBER_DATA_LABEL)}}
     </label>
-    <app-text-input id="phoneNumber" type="text" [(ngModel)]="phoneNumber" name="phoneNumber" required
+    <input class="input" id="phoneNumber" type="text" [(ngModel)]="phoneNumber" name="phoneNumber" required
       placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
 
@@ -31,7 +30,7 @@
     <label for="name">
       {{ translate(translationCodes.TC_NAME_DATA_LABEL)}}
     </label>
-    <app-text-input id="name" type="text" [(ngModel)]="name" name="name" required
+    <input class="input" id="name" type="text" [(ngModel)]="name" name="name" required
       placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['name']" />
 
@@ -39,7 +38,7 @@
     <label for="password">
       {{ translate(translationCodes.TC_PASSWORD_DATA_LABEL)}}
     </label>
-    <app-text-input id="password" type="password" [(ngModel)]="password" name="password" required
+    <input class="input" id="password" type="password" [(ngModel)]="password" name="password" required
       placeholder={{translate(translationCodes.TC_PASSWORD_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['password']" />
 

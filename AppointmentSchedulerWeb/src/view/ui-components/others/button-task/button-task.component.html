@@ -1,11 +1,25 @@
-<button [type]="type" [name]="name" [id]="id" [disabled]="isLoading" (click)="onClick()">
+<button [class]="class" [type]="type" [name]="name" [id]="id" [disabled]="isLoading" (click)="onClick()">
   <ng-container [ngSwitch]="loadingState">
     <ng-container *ngSwitchCase="loadingStateType.NO_ACTION_PERFORMED">{{text}}</ng-container>
-    <ng-container *ngSwitchCase="loadingStateType.LOADING">{{ translate(loadingState) }}</ng-container>
-    <ng-container *ngSwitchCase="loadingStateType.SUCCESSFUL_TASK">{{ translate(loadingState) }}</ng-container>
-    <ng-container *ngSwitchCase="loadingStateType.UNSUCCESSFUL_TASK">{{ translate(loadingState) }}</ng-container>
-    <ng-container *ngSwitchCase="loadingStateType.WORK_DONE">{{ translate(loadingState) }}</ng-container>
-    <ng-container *ngSwitchDefault>{{ text }}</ng-container>
+    <ng-container *ngSwitchCase="loadingStateType.LOADING">
+      {{ translate(loadingState) }}
+      <mat-icon>done</mat-icon>
+    </ng-container>
+    <ng-container *ngSwitchCase="loadingStateType.SUCCESSFUL_TASK">
+      {{ translate(loadingState) }}
+      <mat-icon>check_circle</mat-icon>
+    </ng-container>
+    <ng-container *ngSwitchCase="loadingStateType.UNSUCCESSFUL_TASK">
+      {{ translate(loadingState) }}
+      <mat-icon>highlight_off</mat-icon>
+    </ng-container>
+    <ng-container *ngSwitchCase="loadingStateType.WORK_DONE">
+      {{ translate(loadingState) }}
+      <mat-icon>task_alt</mat-icon>
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+      {{ text }}
+    </ng-container>
   </ng-container>
 
 </button>

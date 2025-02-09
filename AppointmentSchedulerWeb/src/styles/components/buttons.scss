@@ -1,0 +1,44 @@
+@use '../mixins' as mixins;
+@use '../breakpoints' as breakpoints;
+@use '../variables' as variables;
+
+.button {
+  // padding: variables.$spacing-small variables.$spacing-medium;
+  background-color: variables.$primary-color;
+  color: white;
+  border: none;
+  border-radius: variables.$border-radius-sm;
+  padding: variables.$padding-sm;
+  cursor: pointer;
+
+  // &:hover {
+  //   background-color: darken(variables.$primary-color, 10%);
+  // }
+
+  @include mixins.respond-to(breakpoints.$breakpoint-md) {
+    // padding: variables.$spacing-medium variables.$spacing-large;
+    padding: variables.$padding-sm;
+  }
+
+  &:hover {
+    background-color: blue;
+  }
+}
+
+.button.primary {
+  background-color: variables.$primary-color;
+
+  &:hover {
+    background-color: green;
+  }
+
+}
+
+.button.secondary {
+  background-color: variables.$secondary-color;
+
+  &:hover {
+    background-color: yellow;
+  }
+
+}

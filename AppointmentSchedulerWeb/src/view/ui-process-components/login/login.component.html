@@ -2,11 +2,11 @@
   <h1>
     {{translate(translationCodes.TC_LOGIN)}}
   </h1>
-  <form (ngSubmit)="onSubmit()">
+  <form class="form" (ngSubmit)="onSubmit()">
     <label for="email">
       {{ translate(translationCodes.TC_ACCOUNT_DATA_LABEL)}}
     </label>
-    <app-text-input id="account" type="account" [(ngModel)]="account" name="account" required
+    <input class="input" id="account" type="account" [(ngModel)]="account" name="account" required
       placeholder={{translate(translationCodes.TC_ACCOUNT_PLACEHOLDER_LABEL)}} />
 
 
@@ -19,7 +19,7 @@
       {{ translate(translationCodes.TC_PASSWORD_DATA_LABEL)}}
     </label>
 
-    <app-text-input id="password" type="password" [(ngModel)]="password" name="password" required
+    <input class="input" id="password" type="password" [(ngModel)]="password" name="password" required
       placeholder={{translate(translationCodes.TC_PASSWORD_PLACEHOLDER_LABEL)}} />
 
     <app-error-validation-message-form
@@ -39,9 +39,9 @@
 
   <br>
 
-  <app-button (click)="signUp()">
+  <button class="button primary" (click)="signUp()">
     {{translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)}}
-  </app-button>
+  </button>
 
 
 

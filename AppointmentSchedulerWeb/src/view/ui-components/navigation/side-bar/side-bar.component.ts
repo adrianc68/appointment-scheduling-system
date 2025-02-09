@@ -8,10 +8,11 @@ import { AuthenticationService } from '../../../../cross-cutting/security/authen
 import { Observable } from 'rxjs';
 import { AccountData } from '../../../../view-model/business-entities/account';
 import { RoleType } from '../../../../view-model/business-entities/types/role.types';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-side-bar',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatIconModule],
   standalone: true,
   templateUrl: './side-bar.component.html',
   styleUrl: './side-bar.component.scss'

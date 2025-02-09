@@ -4,22 +4,22 @@
   </h1>
 
 
-  <app-button (click)="disableService(service.uuid)" type="button">
+  <button class="button" (click)="disableService(service.uuid)" type="button">
     {{translate(translationCodes.TC_DISABLE_BUTTON_LABEL)}}
-  </app-button>
-  <app-button (click)="enableService(service.uuid)" type="button">
+  </button>
+  <button class="button" (click)="enableService(service.uuid)" type="button">
     {{translate(translationCodes.TC_ENABLE_BUTTON_LABEL)}}
-  </app-button>
-  <app-button (click)="deleteService(service.uuid)" type="button">
+  </button>
+  <button class="button" (click)="deleteService(service.uuid)" type="button">
     {{translate(translationCodes.TC_DELETE_BUTTON_LABEL)}}
-  </app-button>
+  </button>
 
-  <form (ngSubmit)="onSubmit()">
+  <form class="form" (ngSubmit)="onSubmit()">
 
     <label for="name">
       {{ translate(translationCodes.TC_SERVICE_NAME_DATA_LABEL)}}
     </label>
-    <app-text-input id="name" type="text" [(ngModel)]="service.name" name="name" required
+    <input class="input" id="name" type="text" [(ngModel)]="service.name" name="name" required
       placeholder={{translate(translationCodes.TC_SERVICE_NAME_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['name']" />
 
@@ -27,7 +27,7 @@
     <label for="description">
       {{ translate(translationCodes.TC_SERVICE_DESCRIPTION_DATA_LABEL)}}
     </label>
-    <app-text-input id="description" type="text" [(ngModel)]="service.description" name="description" required
+    <input class="input" id="description" type="text" [(ngModel)]="service.description" name="description" required
       placeholder={{translate(translationCodes.TC_SERVICE_DESCRIPTION_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['description']" />
 
@@ -35,7 +35,7 @@
     <label for="minutes">
       {{ translate(translationCodes.TC_SERVICE_MINUTES_DATA_LABEL)}}
     </label>
-    <app-text-input id="minutes" type="text" [(ngModel)]="service.minutes" name="minutes" required
+    <input class="input" id="minutes" type="text" [(ngModel)]="service.minutes" name="minutes" required
       placeholder={{translate(translationCodes.TC_SERVICE_MINUTES_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['minutes']" />
 
@@ -43,7 +43,7 @@
     <label for="price">
       {{ translate(translationCodes.TC_SERVICE_PRICE_DATA_LABEL)}}
     </label>
-    <app-text-input id="price" type="text" [(ngModel)]="service.price" name="price" required
+    <input class="input" id="price" type="text" [(ngModel)]="service.price" name="price" required
       placeholder={{translate(translationCodes.TC_SERVICE_PRICE_PLACEHOLDER_LABEL)}} />
     <app-error-validation-message-form [messages]="errorValidationMessage['price']" />
 

@@ -1,8 +1,8 @@
 <h1>{{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY)}}</h1>
 
-<app-button (click)="redirectToRegisterAssistant()">
+<button class="button" (click)="redirectToRegisterAssistant()">
   {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
-</app-button>
+</button>
 
 <table border="1">
   <thead>
@@ -13,7 +13,7 @@
       <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_USERNAME_LABEL)}}</th>
       <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
       <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_ACTIONS)}}</th>
+      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>
     </tr>
   </thead>
   <tbody>
@@ -25,9 +25,9 @@
       <td>{{assistant.status}}</td>
       <td>{{assistant.createdAt}}</td>
       <td>
-        <app-button (click)="redirectToEditAssistant(assistant)">
+        <button class="button" (click)="redirectToEditAssistant(assistant)">
           {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
-        </app-button>
+        </button>
       </td>
     </tr>
 

@@ -1,0 +1,124 @@
+// Fonts
+$font-family-primary: 'Roboto', sans-serif;
+$font-family-secondary: 'Open Sans', sans-serif;
+
+// Font size
+$font-size-small: 0.9rem;
+$font-size-base: 1rem;
+$font-size-large: 1.2rem;
+$font-size-xlarge: 1.5rem;
+
+// Font weigths
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-bold: 700;
+
+// Line heights
+$line-height-base: 1.5;
+$line-height-heading: 1.2;
+
+// Primary colors
+$primary-color: #000;
+$primary-dark: #004ba0;
+$primary-light: #63a4ff;
+
+// Secondary colors
+$secondary-color: #ff4081;
+$secondary-dark: #c60055;
+$secondary-light: #ff79b0;
+
+// Neutral colors
+$background-color: #f4f4f4;
+$surface-color: #ffffff;
+$error-color: #d32f2f;
+$text-color:#000;
+
+
+// Info colors
+$success-color: #28a745;
+$danger-color: #dc3545;
+$warning-color: #ffc107;
+$info-color: #17a2b8;
+$active-link-color: blue;
+
+
+// Text
+$text-primary: rgba(0, 0, 0, 0.87);
+$text-secondary: rgba(0, 0, 0, 0.54);
+$text-disabled: rgba(0, 0, 0, 0.38);
+
+// Spacings
+$spacing-unit: 8px;
+$spacing-small: $spacing-unit * 1;
+$spacing-medium: $spacing-unit * 2;
+$spacing-large: $spacing-unit * 4;
+
+// Shadow base
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
+
+// Shadow hover
+$shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+// Borders
+$border-width: 1px;
+$border-style: solid;
+$border-color: #ddd;
+
+// Border radius
+$border-radius-none: 0;
+$border-radius-xs: 2px;
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 16px;
+$border-radius-pill: 9999px;
+$border-radius-circle: 50%;
+
+// Transition duration
+$transition-duration-fast: 0.2s;
+$transition-duration-medium: 0.3s;
+$transition-duration-slow: 0.5s;
+
+// Animation ease
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+// Z-Index
+$z-index-dropdown: 100;
+$z-index-modal: 200;
+$z-index-tooltip: 300;
+$z-index-notification: 400;
+
+// Containers
+$container-sm: 540px;
+$container-md: 720px;
+$container-lg: 960px;
+$container-xl: 1140px;
+$container-xxl: 1320px;
+
+// Opacity
+$opacity-low: 0.5;
+$opacity-medium: 0.75;
+$opacity-high: 0.9;
+
+// Heights and widths
+$header-height: 60px;
+$footer-height: 120px;
+$sidebar-width: 240px;
+
+// Icons
+$icon-size-sm: 16px;
+$icon-size-md: 24px;
+$icon-size-lg: 32px;
+
+// Padding
+
+$padding-none: 0; // No padding
+$padding-xs: $spacing-unit * 0.5; // 4px
+$padding-sm: $spacing-unit * 1; // 8px
+$padding-md: $spacing-unit * 2; // 16px
+$padding-lg: $spacing-unit * 3; // 24px
+$padding-xl: $spacing-unit * 4; // 32px
+$padding-xxl: $spacing-unit * 6; // 48px

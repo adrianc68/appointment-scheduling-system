@@ -1,7 +1,7 @@
 <h1>{{translate(translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY)}}</h1>
-<app-button (click)="redirectToRegisterClient()">
+<button class="button" (click)="redirectToRegisterClient()">
   {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
-</app-button>
+</button>
 
 <table border="1">
   <thead>
@@ -12,7 +12,7 @@
       <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_USERNAME_LABEL)}}</th>
       <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
       <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_ACTIONS)}}</th>
+      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>
     </tr>
   </thead>
   <tbody>
@@ -24,9 +24,9 @@
       <td>{{client.status}}</td>
       <td>{{client.createdAt}}</td>
       <td>
-        <app-button (click)="redirectToEditClient(client)">
+        <button class="button" (click)="redirectToEditClient(client)">
           {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
-        </app-button>
+        </button>
       </td>
     </tr>
 

@@ -1,23 +1,23 @@
-<p>availability-time-slot-management works!</p>
+<h1>
+  {{translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY)}}
+</h1>
 
-
-<app-button (click)="redirectToRegisterSlot()">Añadir</app-button>
-
-<!--<ng-container *ngFor="let slot of slots">-->
-<!--  <pre>{{slot | json}}</pre>-->
-<!--</ng-container>-->
+<button class="button" (click)="redirectToRegisterSlot()">
+  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
+</button>
 
 <table border="1">
   <thead>
     <tr>
-      <th>UUID</th>
-      <th>Fecha</th>
-      <th>Inicio</th>
-      <th>Fin</th>
-      <th>Asistente</th>
-      <th>Estado</th>
-      <th>Horarios No Disponibles</th>
-      <th>Acciones</th>
+
+      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_UUID_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_DATE_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_START_TIME_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_END_TIME_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_ASSISTANT_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_UNAVAILABLE_SLOTS_LABEL)}}</th>
+      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>
     </tr>
   </thead>
   <tbody>
@@ -36,7 +36,9 @@
         </ul>
       </td>
       <td>
-        <app-button (click)="redirectToEditSlot(slot)">Editar</app-button>
+        <button class="button" (click)="redirectToEditSlot(slot)">
+          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
+        </button>
       </td>
     </tr>
   </tbody>

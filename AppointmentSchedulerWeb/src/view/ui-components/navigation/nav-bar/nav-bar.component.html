@@ -1,17 +1,17 @@
-<button class="menu-btn" (click)="toggleSidebar()">☰</button>
+<button class="button" (click)="toggleSidebar()">☰</button>
 
-<app-button (click)="logout()">
+<button class="button" (click)="logout()">
   {{translate(translationCodes.TC_LOGOUT_BUTTON_LABEL)}}
-</app-button>
+</button>
 
-<app-button (click)="showNotifications()" >
+<button class="button" (click)="showNotifications()">
   Notificaciones {{ notificationsPendingNumber > 0 ? '(' + notificationsPendingNumber + ')' : '' }}
-</app-button>
+</button>
 
 
 
 <app-dropdown></app-dropdown>
 
-<app-button (click)="changeLanguageToEnglish()">To English</app-button>
+<button class="button" (click)="changeLanguageToEnglish()">To English</button>
 
-<app-button (click)="changeLanguageToSpanish()">To Spanish</app-button>
+<button class="button " (click)="changeLanguageToSpanish()">To Spanish</button>

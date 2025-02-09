@@ -1,10 +1,49 @@
+@use '@angular/material' as mat;
+@use 'styles/variables' as variables;
+@use 'styles/mixins' as mixins;
+@use 'styles/breakpoints' as breakpoints;
+@use 'styles/components/buttons.scss' as button;
+@use 'styles/components/input.scss' as input;
+@use 'styles/components/form.scss' as form;
+@use 'styles/components/card.scss' as card;
+@use 'styles/components/image.scss' as image;
+
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
 
+body {
+  font-family: variables.$font-family-primary;
+  font-size: variables.$font-size-base;
+  background-color: variables.$background-color;
+  color: variables.$text-color;
+
+  @include mixins.respond-to(breakpoints.$breakpoint-sm) {
+    font-size: variables.$font-size-large;
+  }
+
+  @include mixins.respond-to(breakpoints.$breakpoint-xl) {
+    // font-size: variables.$font-size-xlarge;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: variables.$primary-color;
+}
+
+p {
+  color: variables.$text-primary;
+}
+
+p.secondary {
+  color: variables.$text-secondary;
+}
 

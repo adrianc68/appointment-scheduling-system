@@ -1,0 +1,12 @@
+@use '../mixins' as mixins;
+@use '../breakpoints' as breakpoints;
+@use '../variables' as variables;
+
+.card {
+  border: variables.$border-width;
+  border-color: variables.$border-color;
+  border-style: variables.$border-style;
+  border-radius: variables.$border-radius-md;
+  box-shadow: variables.$shadow-sm;
+  background-color: variables.$surface-color;
+}

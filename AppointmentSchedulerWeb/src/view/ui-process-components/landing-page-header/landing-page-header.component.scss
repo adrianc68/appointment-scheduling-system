@@ -1,0 +1,101 @@
+@use '../../../styles/variables.scss' as variables;
+@use '../../../styles/mixins.scss' as mixins;
+@use '../../../styles/breakpoints.scss' as breakpoints;
+
+.header {
+  background-color: variables.$surface-color;
+  border-bottom: variables.$border-width;
+  border-color: variables.$border-color;
+  box-shadow: variables.$shadow-sm;
+  height: variables.$header-height;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: variables.$padding-md;
+  padding-right: variables.$padding-md;
+}
+
+
+.header-logo {
+  font-size: variables.$font-size-xlarge;
+  font-weight: variables.$font-weight-bold;
+}
+
+.header-button-toggle {
+  color: variables.$text-color;
+  background: none;
+  border: none;
+  cursor: pointer;
+  @include mixins.flex-center;
+}
+
+.header-nav {
+  background-color: variables.$surface-color;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  display: none;
+  height: calc(100vh - variables.$header-height);
+  flex-direction: column;
+  text-align: center;
+
+  ul {
+    list-style: none;
+    height: auto;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    height: auto;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid variables.$border-color;
+    }
+  }
+
+  a {
+    color: variables.$text-color;
+    padding: variables.$padding-md;
+    display: block;
+    text-decoration: none;
+    width: 100%;
+
+  }
+
+}
+
+// a:router-link-active {
+//   border-bottom: 2px solid variables.$active-link-color;
+// }
+
+.open {
+  display: flex;
+  background-color: variables.$surface-color;
+}
+
+
+@include mixins.respond-to(breakpoints.$breakpoint-lg) {
+  .header-button-toggle {
+    display: none;
+  }
+
+  .header-nav {
+    position: static;
+    display: flex;
+    height: auto;
+    background: none;
+
+    ul {
+      @include mixins.flex-center;
+      gap: 1.5rem;
+    }
+
+    ul li {
+      border-bottom: 0;
+      font-size: variables.$font-size-small;
+    }
+  }
+}

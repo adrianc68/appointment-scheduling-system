@@ -1,0 +1,81 @@
+@use '../../../styles/mixins' as mixins;
+@use '../../../styles/breakpoints' as breakpoints;
+@use '../../../styles/variables' as variables;
+
+.header {
+  width: 100%;
+  position: fixed;
+  top:0;
+}
+
+.container {
+  @include mixins.flex-center;
+  flex-direction: column;
+  width: 100%;
+
+  .container-body {
+    width: 100%;
+    margin-top: variables.$header-height * 1.5;
+
+    @include mixins.respond-to(breakpoints.$breakpoint-lg) {
+      max-width: breakpoints.$breakpoint-lg;
+    }
+  }
+}
+
+.presentation {
+  @include mixins.flex-center;
+  flex-direction: column;
+  overflow: hidden;
+
+  @include mixins.respond-to(breakpoints.$breakpoint-lg) {
+    flex-direction: row;
+  }
+}
+
+.presentation-data {
+  @include mixins.flex-center;
+  padding-top: variables.$padding-xl * 2;
+  padding-bottom: variables.$padding-xl * 2;
+  padding-left: variables.$padding-xl;
+  padding-right: variables.$padding-xl;
+  flex-direction: column;
+  gap: variables.$spacing-medium;
+  text-align: center;
+
+  @include mixins.respond-to(breakpoints.$breakpoint-lg) {
+    @include mixins.flex-start;
+    padding-top: variables.$padding-xl * 4;
+    padding-bottom: variables.$padding-xl * 4;
+    text-align: left;
+  }
+}
+
+.presentation-data>h1 {
+  font-size: variables.$font-size-xlarge * 2;
+}
+
+.presentation-data-buttons {
+  @include mixins.flex-center;
+  flex-direction: column;
+  gap: variables.$spacing-medium;
+  width: 100%;
+
+  button {
+    width: 100%;
+  }
+
+  @include mixins.respond-to(breakpoints.$breakpoint-lg) {
+    width:60%;
+  }
+
+}
+
+.presentation-img {
+  @include mixins.flex-center;
+  padding-top: variables.$padding-xl;
+  padding-bottom: variables.$padding-xl;
+  width: 95%;
+  // background-color: blue;
+
+}

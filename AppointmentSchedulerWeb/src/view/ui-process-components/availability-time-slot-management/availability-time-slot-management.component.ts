@@ -82,6 +82,10 @@ export class AvailabilityTimeSlotManagementComponent {
     this.router.navigate([WebRoutes.availability_time_slot_management_edit_slot], { state: { slot } });
   }
 
+  translate(key: string): string {
+    return this.i18nService.translate(key);
+  }
+
 
 
 

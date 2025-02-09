@@ -2,6 +2,8 @@ export const WebRoutes = {
   root: "/",
   login: "/login",
   signup: "/signup",
+  prices: "/prices",
+  contact: "/contact",
   configuration: "/configuration",
   notifications: "/notifications",
   appointment_create: "/appointment/create",
