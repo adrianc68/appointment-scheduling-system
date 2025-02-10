@@ -1,0 +1,18 @@
+@use "../../../styles/variables.scss" as variables;
+@use "../../../styles/mixins.scss" as mixins;
+@use "../../../styles/breakpoints.scss" as breakpoints;
+@use "sass:math";
+
+
+.login-container {
+  @include mixins.flex-center;
+  padding-top: math.div(variables.$header-height, 2);
+  flex-direction: column;
+  width: 100%;
+  gap: variables.$spacing-large;
+}
+
+.form {
+  max-width: variables.$container-xs;
+}
+

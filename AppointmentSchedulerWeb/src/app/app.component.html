@@ -1,18 +1,7 @@
-<router-outlet></router-outlet>
+<ng-container *ngIf="isAuthenticated; else landing">
+  <router-outlet></router-outlet>
+</ng-container>
+<ng-template #landing>
+  <app-layout-unauthenticated></app-layout-unauthenticated>
+</ng-template>
 
-<!--<button *ngIf="isAuthenticated" (click)="logout()">-->
-<!--  Appcomponenthtml-->
-<!--  {{translate(translationCodes.TC_LOGOUT_BUTTON_LABEL)}}-->
-<!--</button>-->
-<!---->
-<!---->
-<!--<br><br><br>-->
-<!---->
-<!--<!--<button (click)="openModal()">Open Modal</button>-->
-<!---->
-<!--<br>-->
-<!---->
-<!---->
-<!--<button (click)="changeLanguageToEnglish()">To English</button>-->
-<!--<>-->
-<!--<button (click)="changeLanguageToSpanish()">To Spanish</button>-->

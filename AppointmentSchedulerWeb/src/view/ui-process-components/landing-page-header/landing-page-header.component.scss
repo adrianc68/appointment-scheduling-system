@@ -18,7 +18,7 @@
 
 
 .header-logo {
-  font-size: variables.$font-size-xlarge;
+  font-size: variables.$font-size-xlg;
   font-weight: variables.$font-weight-bold;
 }
 
@@ -67,10 +67,6 @@
 
 }
 
-// a:router-link-active {
-//   border-bottom: 2px solid variables.$active-link-color;
-// }
-
 .open {
   display: flex;
   background-color: variables.$surface-color;
@@ -95,7 +91,7 @@
 
     ul li {
       border-bottom: 0;
-      font-size: variables.$font-size-small;
+      font-size: variables.$font-size-sm;
     }
   }
 }

@@ -27,7 +27,7 @@ body {
   color: variables.$text-color;
 
   @include mixins.respond-to(breakpoints.$breakpoint-sm) {
-    font-size: variables.$font-size-large;
+    font-size: variables.$font-size-lg;
   }
 
   @include mixins.respond-to(breakpoints.$breakpoint-xl) {
@@ -35,15 +35,33 @@ body {
   }
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: variables.$primary-color;
 }
 
 p {
   color: variables.$text-primary;
+  font-size: variables.$font-size-base;
 }
 
 p.secondary {
   color: variables.$text-secondary;
 }
 
+label {
+  color: variables.$text-primary;
+  font-size: variables.$font-size-base;
+}
+
+label.error {
+  color: variables.$error-color;
+}
+
+li {
+  font-size: variables.$font-size-base;
+}

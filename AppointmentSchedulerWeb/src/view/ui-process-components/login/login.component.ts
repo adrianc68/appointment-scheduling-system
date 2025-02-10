@@ -144,7 +144,7 @@ export class LoginComponent implements OnInit {
 
     setTimeout(() => {
       this.stateManagerService.setState(LoadingState.NO_ACTION_PERFORMED);
-    }, 1000);
+    }, 0);
   }
 
   private setSuccessfulTask(): void {
@@ -153,7 +153,7 @@ export class LoginComponent implements OnInit {
       this.ngZone.run(() => {
         this.router.navigate([WebRoutes.root]);
       });
-    }, 1000)
+    }, 0)
   }
 
 

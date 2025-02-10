@@ -3,42 +3,46 @@
 @use '../variables' as variables;
 
 .button {
-  // padding: variables.$spacing-small variables.$spacing-medium;
-  background-color: variables.$primary-color;
-  color: white;
-  border: none;
   border-radius: variables.$border-radius-sm;
-  padding: variables.$padding-sm;
+  background-color: variables.$button-primary-color;
+  color: variables.$button-primary-text-color;
+  padding: variables.$padding-md;
   cursor: pointer;
+  border: none;
+  width: 100%;
 
-  // &:hover {
-  //   background-color: darken(variables.$primary-color, 10%);
-  // }
-
-  @include mixins.respond-to(breakpoints.$breakpoint-md) {
-    // padding: variables.$spacing-medium variables.$spacing-large;
-    padding: variables.$padding-sm;
-  }
 
   &:hover {
-    background-color: blue;
+    background-color: scale(variables.$button-primary-color, variables.$lighten-factor)
   }
 }
 
 .button.primary {
-  background-color: variables.$primary-color;
+  background-color: variables.$button-primary-color;
+  color: variables.$button-primary-text-color;
 
   &:hover {
-    background-color: green;
+    background-color: scale(variables.$button-primary-color, variables.$lighten-factor)
   }
 
 }
 
 .button.secondary {
-  background-color: variables.$secondary-color;
+  background-color: variables.$button-secondary-color;
+  color: variables.$button-secondary-text-color;
 
   &:hover {
-    background-color: yellow;
+    background-color: scale(variables.$button-secondary-color, variables.$lighten-factor)
   }
+}
 
+.button.success {
+  background-color: variables.$button-success-color;
+  color: variables.$button-success-text-color;
+}
+
+
+.button.danger {
+  background-color: variables.$button-danger-color;
+  color: variables.$button-danger-text-color;
 }

@@ -15,9 +15,7 @@ export class LandingPageHeaderComponent {
   menuOpen = false;
   webRoutes = WebRoutes;
 
-  constructor(private router: Router) {
-
-  }
+  constructor(private router: Router) { }
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;

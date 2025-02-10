@@ -14,10 +14,6 @@ import { ApiRoutes, ApiVersionRoute } from '../../operation-management/model/api
 import { HttpErrorResponse } from '@angular/common/http';
 import { AccountDataDTO } from '../../../model/dtos/account-data.dto';
 import { AccountData } from '../../../view-model/business-entities/account';
-import { parseStringToEnum } from '../../helper/enum-utils/enum.utils';
-import { RoleType } from '../../../view-model/business-entities/types/role.types';
-import { AccountStatusType } from '../../../view-model/business-entities/types/account-status.types';
-import { InvalidValueEnumValueException } from '../../../model/dtos/exceptions/invalid-enum.exception';
 import { Router } from '@angular/router';
 import { WebRoutes } from '../../operation-management/model/web-routes.constants';
 import { LocalStorageKeys } from '../model/local-storage-keys.constants';

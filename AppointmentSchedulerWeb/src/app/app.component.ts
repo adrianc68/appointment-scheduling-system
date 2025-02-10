@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { I18nService } from '../cross-cutting/helper/i18n/i18n.service';
 import { AuthenticationService } from '../cross-cutting/security/authentication/authentication.service';
 import { CommonModule } from '@angular/common';
@@ -8,6 +8,7 @@ import { TranslationCodes } from '../cross-cutting/helper/i18n/model/translation
 import { LanguageTypes } from '../cross-cutting/helper/i18n/model/languages.types';
 import { NotificationService } from '../cross-cutting/communication/notification-service/notification.service';
 import { MatDialogModule } from '@angular/material/dialog';
+import { LayoutUnauthenticatedComponent } from '../view/ui-components/display/layout-unauthenticated/layout-unauthenticated.component';
 
 
 @Component({
@@ -15,7 +16,8 @@ import { MatDialogModule } from '@angular/material/dialog';
   imports: [
     RouterModule,
     CommonModule,
-    MatDialogModule
+    MatDialogModule,
+    LayoutUnauthenticatedComponent
   ],
   standalone: true,
   templateUrl: './app.component.html',

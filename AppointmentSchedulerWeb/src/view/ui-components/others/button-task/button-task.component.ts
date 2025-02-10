@@ -19,7 +19,7 @@ export class ButtonTaskComponent {
   @Input() id: string = '';
   @Input() placeholder: string = '';
   @Input() disabled: boolean = false;
-  @Input() class: string = "button";
+  @Input() class: string = "";
   @Output() clicked = new EventEmitter<void>();
   loadingStateType = LoadingState;
 

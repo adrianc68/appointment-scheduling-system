@@ -1,12 +1,7 @@
 @use '../../../styles/mixins' as mixins;
 @use '../../../styles/breakpoints' as breakpoints;
 @use '../../../styles/variables' as variables;
-
-.header {
-  width: 100%;
-  position: fixed;
-  top:0;
-}
+@use "sass:math";
 
 .container {
   @include mixins.flex-center;
@@ -14,11 +9,12 @@
   width: 100%;
 
   .container-body {
-    width: 100%;
-    margin-top: variables.$header-height * 1.5;
+    width: 90%;
+    padding-top: math.div(variables.$header-height, 2);
 
     @include mixins.respond-to(breakpoints.$breakpoint-lg) {
-      max-width: breakpoints.$breakpoint-lg;
+      max-width: variables.$container-xl;
+      padding-top: variables.$header-height;
     }
   }
 }
@@ -52,21 +48,21 @@
 }
 
 .presentation-data>h1 {
-  font-size: variables.$font-size-xlarge * 2;
+  font-size: variables.$font-size-xlg * 2;
 }
 
 .presentation-data-buttons {
   @include mixins.flex-center;
   flex-direction: column;
   gap: variables.$spacing-medium;
-  width: 100%;
+  width: 70%;
 
   button {
     width: 100%;
   }
 
   @include mixins.respond-to(breakpoints.$breakpoint-lg) {
-    width:60%;
+    width: 60%;
   }
 
 }

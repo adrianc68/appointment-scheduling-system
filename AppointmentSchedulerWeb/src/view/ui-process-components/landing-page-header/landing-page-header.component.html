@@ -9,19 +9,19 @@
   <nav [ngClass]="{ 'open': menuOpen }" class="header-nav">
     <ul>
       <li>
-        <a [routerLink]="[webRoutes.root]">Inicio</a>
+        <a [routerLink]="[webRoutes.root]" (click)="toggleMenu()">Inicio</a>
       </li>
       <li>
-        <a [routerLink]="[webRoutes.prices]">Prices</a>
+        <a [routerLink]="[webRoutes.prices]" (click)="toggleMenu()">Prices</a>
       </li>
       <li>
-        <a [routerLink]="[webRoutes.contact]">Contacto</a>
+        <a [routerLink]="[webRoutes.contact]" (click)="toggleMenu()">Contacto</a>
       </li>
       <li>
-        <a [routerLink]="[webRoutes.login]">Iniciar sesión</a>
+        <a [routerLink]="[webRoutes.login]" (click)="toggleMenu()">Iniciar sesión</a>
       </li>
       <li>
-        <a [routerLink]="[webRoutes.signup]">Registrarse</a>
+        <a [routerLink]="[webRoutes.signup]" (click)="toggleMenu()">Registrarse</a>
       </li>
     </ul>
   </nav>

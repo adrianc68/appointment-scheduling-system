@@ -3,10 +3,10 @@ $font-family-primary: 'Roboto', sans-serif;
 $font-family-secondary: 'Open Sans', sans-serif;
 
 // Font size
-$font-size-small: 0.9rem;
+$font-size-sm: 0.9rem;
 $font-size-base: 1rem;
-$font-size-large: 1.2rem;
-$font-size-xlarge: 1.5rem;
+$font-size-lg: 1.2rem;
+$font-size-xlg: 1.5rem;
 
 // Font weigths
 $font-weight-light: 300;
@@ -31,7 +31,7 @@ $secondary-light: #ff79b0;
 $background-color: #f4f4f4;
 $surface-color: #ffffff;
 $error-color: #d32f2f;
-$text-color:#000;
+$text-color: #000;
 
 
 // Info colors
@@ -39,13 +39,29 @@ $success-color: #28a745;
 $danger-color: #dc3545;
 $warning-color: #ffc107;
 $info-color: #17a2b8;
-$active-link-color: blue;
+$active-link-color: #64b5f6;
+$hover-color: #90caf9;
+$selected-color: #64b5f6;
+
+// Button colors
+$button-primary-color: $primary-color;
+$button-secondary-color: $secondary-color;
+$button-success-color: $success-color;
+$button-danger-color: $error-color;
+
+$button-text-color: #000000;
+$button-primary-text-color: #fff;
+$button-secondary-text-color: #000;
+$button-success-text-color: #fff;
+$button-danger-text-color: #fff;
+
+$input-background-color: #f9f9f9;
 
 
-// Text
+// Text p
 $text-primary: rgba(0, 0, 0, 0.87);
-$text-secondary: rgba(0, 0, 0, 0.54);
-$text-disabled: rgba(0, 0, 0, 0.38);
+$text-secondary: rgba(0, 0, 0, 0.60);
+$text-disabled: rgba(0, 0, 0, 0.50);
 
 // Spacings
 $spacing-unit: 8px;
@@ -92,7 +108,9 @@ $z-index-tooltip: 300;
 $z-index-notification: 400;
 
 // Containers
-$container-sm: 540px;
+
+$container-xs: 480px;
+$container-sm: 576px;
 $container-md: 720px;
 $container-lg: 960px;
 $container-xl: 1140px;
@@ -113,8 +131,13 @@ $icon-size-sm: 16px;
 $icon-size-md: 24px;
 $icon-size-lg: 32px;
 
-// Padding
+// Input sizes
+$input-size-sm: 40px;
+$input-size-base: 44px;
+$input-size-md: 46px;
+$input-size-lg: 48px;
 
+// Padding
 $padding-none: 0; // No padding
 $padding-xs: $spacing-unit * 0.5; // 4px
 $padding-sm: $spacing-unit * 1; // 8px
@@ -122,3 +145,6 @@ $padding-md: $spacing-unit * 2; // 16px
 $padding-lg: $spacing-unit * 3; // 24px
 $padding-xl: $spacing-unit * 4; // 32px
 $padding-xxl: $spacing-unit * 6; // 48px
+
+
+$lighten-factor: 10%;

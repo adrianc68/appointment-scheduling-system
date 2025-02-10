@@ -3,6 +3,25 @@
 @use '../variables' as variables;
 
 .input {
-  height:47px;
-  width:150px;
+  width: 100%;
+  height: variables.$input-size-base;
+  padding: variables.$padding-sm;
+  border: 1px solid variables.$border-color;
+  background-color: variables.$input-background-color;
+  border-radius: variables.$border-radius-sm;
+  outline-color: variables.$selected-color;
+
+  &:hover {
+    border: 1px solid variables.$hover-color;
+  }
+
+}
+
+.input.error {
+  border-color: variables.$error-color;
+}
+
+.input:-webkit-autofill:focus {
+  background-color: variables.$input-background-color;
+  /* Evita que se aplique un borde azul en el enfoque */
 }

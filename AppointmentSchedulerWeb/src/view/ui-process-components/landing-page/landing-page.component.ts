@@ -6,11 +6,10 @@ import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-compone
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { Title } from '@angular/platform-browser';
 import { MatIconModule } from '@angular/material/icon';
-import { LandingPageHeaderComponent } from '../landing-page-header/landing-page-header.component';
 
 @Component({
   selector: 'app-landing-page',
-  imports: [...SHARED_STANDALONE_COMPONENTS, MatIconModule, LandingPageHeaderComponent],
+  imports: [...SHARED_STANDALONE_COMPONENTS, MatIconModule],
   standalone: true,
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.scss'
