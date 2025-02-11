@@ -69,3 +69,7 @@ li {
 span {
   font-size: variables.$font-size-sm;
 }
+
+.active {
+  background-color: variables.$background-active;
+}

@@ -24,4 +24,8 @@ export class LayoutAuthenticatedComponent {
     this.sidebarOpen = !this.sidebarOpen;
   }
 
+  onSidebarStateChange(isOpen: boolean) {
+    this.sidebarOpen = isOpen;
+  }
+
 }

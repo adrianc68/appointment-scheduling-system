@@ -1,50 +1,50 @@
 @use '../../../../styles/variables.scss' as variables;
 @use '../../../../styles/mixins.scss' as mixins;
 @use '../../../../styles/breakpoints.scss' as breakpoints;
+@use "sass:math";
+
 
 .sidebar {
   position: fixed;
   width: 0px;
-  height: 100%;
+  // height: calc(100dvh - variables.$header-height);
+  height: calc(100svh - variables.$header-height);
   transition: width variables.$transition-duration-medium variables.$ease-in-out;
+  padding-bottom: variables.$padding-md;
+  display: flex;
   overflow: hidden;
+  flex-direction: column;
   background-color: variables.$sidebar-background-color;
 
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  .sidebar-bs-operations {
+    flex-grow: 1;
   }
 
   li {
-    background-color: green;
 
-
-    a {
+    a,
+    button {
       display: flex;
       align-items: center;
       justify-content: flex-start;
       text-decoration: none;
-      background-color: gold;
       gap: variables.$spacing-small;
-      padding: variables.$padding-md;
-      padding-left: calc(variables.$padding-md + 3px);
+      padding-top: variables.$padding-md;
+      padding-bottom: variables.$padding-md;
+      padding-left: calc(math.div((math.div(1, 4) * variables.$sidebar-width), 2) - math.div(variables.$icon-size-md, 2));
       color: variables.$sidebar-text-color;
-
 
       .sidebar-icon {
         min-width: variables.$icon-size-md;
         max-width: variables.$icon-size-md;
         width: variables.$icon-size-md;
         height: variables.$icon-size-md;
-        background-color: blue;
       }
 
       span {
         font-weight: variables.$font-weight-light;
         font-size: variables.$font-size-sm;
         opacity: 0;
-        background-color: blue;
         white-space: nowrap;
       }
     }
@@ -52,13 +52,20 @@
     a:hover {
       background-color: variables.$sidebar-hover-color;
     }
+
+    a:focus {
+      background-color: variables.$background-active;
+    }
+
+
   }
 }
 
 .sidebar.open {
-  width: variables.$sidebar-container-size;
+  width: variables.$sidebar-width;
 
-  li a {
+  li a,
+  li button {
     span {
       width: auto;
       opacity: 1;
@@ -68,10 +75,11 @@
 
 @include mixins.respond-to(breakpoints.$breakpoint-md) {
   .sidebar {
-
+    height: 100%;
     position: relative;
     left: 0;
-    width: calc(1/4 * variables.$sidebar-container-size);
+    // width: calc(1/4 * variables.$sidebar-width);
+    // width: #{(1 / 4) * variables.$sidebar-width};
+    width: math.div(1, 4) * variables.$sidebar-width;
   }
-
 }

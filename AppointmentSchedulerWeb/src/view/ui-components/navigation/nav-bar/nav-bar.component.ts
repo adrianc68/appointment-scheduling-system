@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { SHARED_STANDALONE_COMPONENTS } from '../../shared-components';
 import { CommonModule } from '@angular/common';
 import { AuthenticationService } from '../../../../cross-cutting/security/authentication/authentication.service';
-import { Observable, takeUntil } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AccountData } from '../../../../view-model/business-entities/account';
 import { I18nService } from '../../../../cross-cutting/helper/i18n/i18n.service';
 import { TranslationCodes } from '../../../../cross-cutting/helper/i18n/model/translation-codes.types';

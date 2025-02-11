@@ -8,18 +8,15 @@
   width: 100%;
   display: flex;
   align-items: center;
-  // justify-content: space-between;
+  justify-content: space-between;
   gap: variables.$spacing-large;
   padding-left: variables.$padding-md;
-  padding-right: variables.$padding-md;
+  padding-right: variables.$padding-xl;
   color: variables.$header-text-color;
 }
 
-.navbar-logo {
-  // display:none;
-  // width:0;
-  background-color: red;
-}
+// .navbar-logo {
+// }
 
 .navbar-logo>span {
   font-size: variables.$font-size-xlg;
@@ -38,6 +35,8 @@
 .navbar-actions {
   display: flex;
 }
+
+
 
 .notification {
   @include mixins.flex-center;

@@ -17,9 +17,7 @@
 
   <div class="navbar-actions">
 
-    <button class="button" (click)="logout()">
-      {{translate(translationCodes.TC_LOGOUT_BUTTON_LABEL)}}
-    </button>
+
     <a class="notification" (click)="showNotifications()">
       <div class="notification-icon">
         <mat-icon>
@@ -29,11 +27,8 @@
         <span *ngIf="notificationsPendingNumber > 0" class="notification-badge">
           {{ notificationsPendingNumber }}
         </span>
-
-
       </div>
 
-      <!--<span>Notificaciones</span>-->
     </a>
     <!---->
     <!---->

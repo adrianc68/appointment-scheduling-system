@@ -56,3 +56,8 @@
   background-color: variables.$error-color;
   color: variables.$button-error-text-color;
 }
+
+.button.icon {
+  background-color: transparent;
+  border: 0;
+}

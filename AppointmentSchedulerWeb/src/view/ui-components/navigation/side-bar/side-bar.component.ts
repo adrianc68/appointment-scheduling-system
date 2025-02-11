@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, HostListener, Input, ElementRef, EventEmitter, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { WebRoutes } from '../../../../cross-cutting/operation-management/model/web-routes.constants';
 import { TranslationCodes } from '../../../../cross-cutting/helper/i18n/model/translation-codes.types';
@@ -19,13 +19,17 @@ import { MatIcon, MatIconModule } from '@angular/material/icon';
 })
 export class SideBarComponent {
   @Input() isOpen = false;
+
+  @Output() isOpenChange = new EventEmitter<boolean>();
+
+
   webRoutes = WebRoutes
   translationCodes = TranslationCodes
   accountData: Observable<AccountData | null>;
   roleTypes = RoleType;
 
 
-  constructor(private i18nService: I18nService, private authService: AuthenticationService) {
+  constructor(private i18nService: I18nService, private authService: AuthenticationService, private elementRef: ElementRef) {
     this.accountData = this.authService.getAccountData();
   }
 
@@ -33,8 +37,23 @@ export class SideBarComponent {
     return this.i18nService.translate(key);
   }
 
+  logout(): void {
+    this.authService.logout();
+  }
 
 
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    if (this.isOpen && this.isMobile() && !this.elementRef.nativeElement.contains(event.target)) {
+      this.isOpen = false;
+      this.isOpenChange.emit(this.isOpen);
+
+    }
+  }
+
+  private isMobile(): boolean {
+    return window.innerWidth <= 768;
+  }
 
 
 }
