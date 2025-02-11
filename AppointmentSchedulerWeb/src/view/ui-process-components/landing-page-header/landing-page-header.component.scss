@@ -7,7 +7,7 @@
   border-bottom: variables.$border-width;
   border-color: variables.$border-color;
   box-shadow: variables.$shadow-sm;
-  height: variables.$header-height;
+  height: variables.$header-landing-height;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -37,7 +37,7 @@
   left: 0;
   width: 100%;
   display: none;
-  height: calc(100vh - variables.$header-height);
+  height: calc(100vh - variables.$header-landing-height);
   flex-direction: column;
   text-align: center;
 

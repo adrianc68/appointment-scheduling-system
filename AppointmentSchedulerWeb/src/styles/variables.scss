@@ -3,6 +3,7 @@ $font-family-primary: 'Roboto', sans-serif;
 $font-family-secondary: 'Open Sans', sans-serif;
 
 // Font size
+$font-size-xs: 0.7rem;
 $font-size-sm: 0.9rem;
 $font-size-base: 1rem;
 $font-size-lg: 1.2rem;
@@ -42,20 +43,27 @@ $info-color: #17a2b8;
 $active-link-color: #64b5f6;
 $hover-color: #90caf9;
 $selected-color: #64b5f6;
+$white-color: #fff;
 
 // Button colors
 $button-primary-color: $primary-color;
 $button-secondary-color: $secondary-color;
 $button-success-color: $success-color;
 $button-danger-color: $error-color;
+$button-error-color: $error-color;
 
 $button-text-color: #000000;
 $button-primary-text-color: #fff;
 $button-secondary-text-color: #000;
 $button-success-text-color: #fff;
 $button-danger-text-color: #fff;
+$button-error-text-color: #fff;
 
 $input-background-color: #f9f9f9;
+$sidebar-background-color: #1e1e1e;
+$sidebar-hover-color: #333842;
+$sidebar-text-color: #fff;
+$header-text-color: #fff;
 
 
 // Text p
@@ -116,13 +124,16 @@ $container-lg: 960px;
 $container-xl: 1140px;
 $container-xxl: 1320px;
 
+$sidebar-container-size: 250px;
+
 // Opacity
 $opacity-low: 0.5;
 $opacity-medium: 0.75;
 $opacity-high: 0.9;
 
 // Heights and widths
-$header-height: 60px;
+$header-landing-height: 60px;
+$header-height: 70px;
 $footer-height: 120px;
 $sidebar-width: 240px;
 
@@ -131,11 +142,18 @@ $icon-size-sm: 16px;
 $icon-size-md: 24px;
 $icon-size-lg: 32px;
 
-// Input sizes
+// Input height sizes
 $input-size-sm: 40px;
 $input-size-base: 44px;
 $input-size-md: 46px;
 $input-size-lg: 48px;
+
+// Button height sizes
+$buttons-size-sm: 40px;
+$button-size-base: 44px;
+$button-size-md: 46px;
+$button-size-lg: 48px;
+
 
 // Padding
 $padding-none: 0; // No padding

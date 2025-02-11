@@ -1,17 +1,49 @@
-<button class="button" (click)="toggleSidebar()">☰</button>
+<nav class="navbar">
 
-<button class="button" (click)="logout()">
-  {{translate(translationCodes.TC_LOGOUT_BUTTON_LABEL)}}
-</button>
+  <div class="navbar-toggle-button">
+    <button (click)="toggleSidebar()">
+      <mat-icon>
+        menu
+      </mat-icon>
 
-<button class="button" (click)="showNotifications()">
-  Notificaciones {{ notificationsPendingNumber > 0 ? '(' + notificationsPendingNumber + ')' : '' }}
-</button>
+    </button>
+  </div>
+
+  <div class="navbar-logo">
+    <span>
+      Scheduling.com
+    </span>
+  </div>
+
+  <div class="navbar-actions">
+
+    <button class="button" (click)="logout()">
+      {{translate(translationCodes.TC_LOGOUT_BUTTON_LABEL)}}
+    </button>
+    <a class="notification" (click)="showNotifications()">
+      <div class="notification-icon">
+        <mat-icon>
+          {{ notificationsPendingNumber > 0 ? 'notification_important' : 'notifications' }}
+        </mat-icon>
+
+        <span *ngIf="notificationsPendingNumber > 0" class="notification-badge">
+          {{ notificationsPendingNumber }}
+        </span>
 
 
+      </div>
 
-<app-dropdown></app-dropdown>
+      <!--<span>Notificaciones</span>-->
+    </a>
+    <!---->
+    <!---->
+    <!---->
+    <!--<app-dropdown></app-dropdown>-->
+    <!---->
+    <!--<button class="button" (click)="changeLanguageToEnglish()">To English</button>-->
+    <!---->
+    <!--<button class="button " (click)="changeLanguageToSpanish()">To Spanish</button>-->
 
-<button class="button" (click)="changeLanguageToEnglish()">To English</button>
 
-<button class="button " (click)="changeLanguageToSpanish()">To Spanish</button>
+  </div>
+</nav>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { WebRoutes } from '../../../../cross-cutting/operation-management/model/web-routes.constants';
 import { TranslationCodes } from '../../../../cross-cutting/helper/i18n/model/translation-codes.types';
@@ -18,10 +18,12 @@ import { MatIcon, MatIconModule } from '@angular/material/icon';
   styleUrl: './side-bar.component.scss'
 })
 export class SideBarComponent {
+  @Input() isOpen = false;
   webRoutes = WebRoutes
   translationCodes = TranslationCodes
   accountData: Observable<AccountData | null>;
   roleTypes = RoleType;
+
 
   constructor(private i18nService: I18nService, private authService: AuthenticationService) {
     this.accountData = this.authService.getAccountData();

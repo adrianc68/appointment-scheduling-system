@@ -80,8 +80,6 @@ export class RegisterComponent implements OnInit {
     this.accountService.registerClient(this.username, this.email, this.phoneNumber, this.name, this.password).pipe(
       switchMap((response: OperationResult<string, ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
           return of(true);
         } else {
           this.handleErrorResponse(response);

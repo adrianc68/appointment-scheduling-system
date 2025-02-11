@@ -1,23 +1,9 @@
 @use '../../../../styles/variables' as variables;
 
-/* Mobile First */
 .layout {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: red;
-}
-
-.navbar {
-  // height: 60px;
-  height: variables.$header-height;
-  width: 100%;
-  background: blue;
-  color: white;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-
 }
 
 .main-container {
@@ -26,41 +12,16 @@
   overflow: hidden;
 }
 
-.sidebar {
-  position: fixed;
-  width: 0px;
-  height: calc(100vh - 60px);
-  color: white;
-  transition: width 0.3s ease-in-out;
-  overflow: hidden;
-}
-
-.sidebar.open {
-  width: 250px;
-}
-
 .content {
   flex-grow: 1;
   padding: 20px;
-  background: #f4f4f4;
+  background-color:variables.$background-color;
   overflow-y: auto;
 }
 
-// /* Desktop */
 @media (min-width: 768px) {
   .main-container {
     display: flex;
-  }
-
-  .sidebar {
-    position: relative;
-    left: 0;
-    height: auto;
-    width: calc(1/4 * 250px);
-  }
-
-  .sidebar.open {
-    width: 250px;
   }
 
   .content {

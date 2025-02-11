@@ -16,6 +16,7 @@
         <app-error-validation-message-form [messages]="errorValidationMessage['username']" />
       </div>
 
+
       <div class="form-input">
         <label for="email">
           {{ translate(translationCodes.TC_EMAIL_DATA_LABEL)}}
@@ -23,23 +24,18 @@
         <input class="input" id="email" type="text" [(ngModel)]="email" name="email" required
           placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
         <app-error-validation-message-form [messages]="errorValidationMessage['email']" />
-
       </div>
 
       <div class="form-input">
-
         <label for="phoneNumber">
           {{ translate(translationCodes.TC_PHONE_NUMBER_DATA_LABEL)}}
         </label>
         <input class="input" id="phoneNumber" type="text" [(ngModel)]="phoneNumber" name="phoneNumber" required
           placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
         <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
-
-
       </div>
 
       <div class="form-input">
-
         <label for="name">
           {{ translate(translationCodes.TC_NAME_DATA_LABEL)}}
         </label>
@@ -58,12 +54,9 @@
         <app-error-validation-message-form [messages]="errorValidationMessage['password']" />
       </div>
 
-      <div class="form-input">
-
-      </div>
-
 
     </div>
+
     <div class="form-footer">
       <app-button-task type="submit" [loadingState]="currentTaskState"
         [text]="translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)" />

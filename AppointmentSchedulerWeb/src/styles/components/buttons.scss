@@ -10,6 +10,11 @@
   cursor: pointer;
   border: none;
   width: 100%;
+  height: variables.$button-size-base;
+  max-height: variables.$button-size-base;
+  @include mixins.flex-center;
+  gap: variables.$spacing-small;
+  transition: background-color variables.$transition-duration-fast variables.$ease-in, color variables.$transition-duration-fast variables.$ease-in;
 
 
   &:hover {
@@ -45,4 +50,9 @@
 .button.danger {
   background-color: variables.$button-danger-color;
   color: variables.$button-danger-text-color;
+}
+
+.button.error {
+  background-color: variables.$error-color;
+  color: variables.$button-error-text-color;
 }
