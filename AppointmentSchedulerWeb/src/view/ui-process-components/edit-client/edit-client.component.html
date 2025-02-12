@@ -1,65 +1,66 @@
 <div class="edit-container">
-  <h1>
-    {{translate(translationCodes.TC_MANAGEMENT_CLIENT_EDIT_DIRECTORY)}}
-  </h1>
+  <form class="form card" (ngSubmit)="onSubmit()">
+    <div clas="form-header">
+      <h1>
+        {{translate(translationCodes.TC_MANAGEMENT_CLIENT_EDIT_DIRECTORY)}}
+      </h1>
 
-  <button class="button" (click)="disableClient(client.uuid)" type="button">
-    {{translate(translationCodes.TC_DISABLE_BUTTON_LABEL)}}
-  </button>
-  <button class="button" (click)="enableClient(client.uuid)" type="button">
-    {{translate(translationCodes.TC_ENABLE_BUTTON_LABEL)}}
-  </button>
-  <button class="button" (click)="deleteClient(client.uuid)" type="button">
-    {{translate(translationCodes.TC_DELETE_BUTTON_LABEL)}}
-  </button>
+      <button class="button" (click)="disableClient(client.uuid)" type="button">
+        {{translate(translationCodes.TC_DISABLE_BUTTON_LABEL)}}
+      </button>
+      <button class="button" (click)="enableClient(client.uuid)" type="button">
+        {{translate(translationCodes.TC_ENABLE_BUTTON_LABEL)}}
+      </button>
+      <button class="button" (click)="deleteClient(client.uuid)" type="button">
+        {{translate(translationCodes.TC_DELETE_BUTTON_LABEL)}}
+      </button>
+    </div>
+    <div clas="form-body">
 
-  <form class="form" (ngSubmit)="onSubmit()">
+      <div class="form-input">
+        <label for="username">
+          {{ translate(translationCodes.TC_USERNAME_DATA_LABEL)}}
+        </label>
+        <input class="input" id="username" type="text" [(ngModel)]="this.client.username" name="username" required
+          placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
+        <app-error-validation-message-form [messages]="errorValidationMessage['username']" />
+      </div>
 
-    <label for="username">
-      {{ translate(translationCodes.TC_USERNAME_DATA_LABEL)}}
-    </label>
-    <input class="input" id="username" type="text" [(ngModel)]="this.client.username" name="username" required
-      placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
-    <app-error-validation-message-form [messages]="errorValidationMessage['username']" />
+      <div class="form-input">
+        <label for="email">
+          {{ translate(translationCodes.TC_EMAIL_DATA_LABEL)}}
+        </label>
+        <input class="input" id="email" type="text" [(ngModel)]="this.client.email" name="email" required
+          placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
+        <app-error-validation-message-form [messages]="errorValidationMessage['email']" />
+      </div>
 
+      <div class="form-input">
+        <label for="phoneNumber">
+          {{ translate(translationCodes.TC_PHONE_NUMBER_DATA_LABEL)}}
+        </label>
+        <input class="input" id="phoneNumber" type="text" [(ngModel)]="this.client.phoneNumber" name="phoneNumber"
+          required placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
+        <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
+      </div>
 
-    <label for="email">
-      {{ translate(translationCodes.TC_EMAIL_DATA_LABEL)}}
-    </label>
-    <input class="input" id="email" type="text" [(ngModel)]="this.client.email" name="email" required
-      placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
-    <app-error-validation-message-form [messages]="errorValidationMessage['email']" />
+      <div class="form-input">
+        <label for="name">
+          {{ translate(translationCodes.TC_NAME_DATA_LABEL)}}
+        </label>
+        <input class="input" id="name" type="text" [(ngModel)]="this.client.name" name="name" required
+          placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
+        <app-error-validation-message-form [messages]="errorValidationMessage['name']" />
+      </div>
 
-
-    <label for="phoneNumber">
-      {{ translate(translationCodes.TC_PHONE_NUMBER_DATA_LABEL)}}
-    </label>
-    <input class="input" id="phoneNumber" type="text" [(ngModel)]="this.client.phoneNumber" name="phoneNumber" required
-      placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
-    <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
-
-
-    <label for="name">
-      {{ translate(translationCodes.TC_NAME_DATA_LABEL)}}
-    </label>
-    <input class="input" id="name" type="text" [(ngModel)]="this.client.name" name="name" required
-      placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
-    <app-error-validation-message-form [messages]="errorValidationMessage['name']" />
-
-
-    <label for="password">
-      {{ translate(translationCodes.TC_PASSWORD_DATA_LABEL)}}
-    </label>
-    <input class="input" id="password" type="password" [(ngModel)]="this.client.password" name="password" required
-      placeholder={{translate(translationCodes.TC_PASSWORD_PLACEHOLDER_LABEL)}} />
-    <app-error-validation-message-form [messages]="errorValidationMessage['password']" />
-
-
-    <app-button-task type="submit" [loadingState]="currentTaskState"
-      [text]="translate(translationCodes.TC_EDIT_BUTTON_LABEL)">
-    </app-button-task>
-    <br>
-    <br>
-    {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
+    </div>
+    <div class="form-footer">
+      <app-button-task type="submit" [loadingState]="currentTaskState"
+        [text]="translate(translationCodes.TC_EDIT_BUTTON_LABEL)">
+      </app-button-task>
+      <span class="system-error">
+        {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
+      </span>
+    </div>
   </form>
 </div>

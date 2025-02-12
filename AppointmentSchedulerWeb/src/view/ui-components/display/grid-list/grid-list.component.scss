@@ -1,0 +1,36 @@
+@use '../../../../styles/variables.scss' as variables;
+@use '../../../../styles/mixins.scss' as mixins;
+@use '../../../../styles/breakpoints.scss' as breakpoints;
+@use "sass:math";
+
+.grid-container {
+  background-color: blue;
+  width: 100%;
+
+  .grid-header {
+    display: flex;
+    background-color: green;
+    flex-direction: column;
+    align-items: center;
+    padding: variables.$padding-md;
+  }
+
+
+}
+
+
+.grid-content {
+  padding: variables.$padding-lg;
+  background-color: gold;
+  @include mixins.flex-center;
+  flex-direction: column;
+  gap: variables.$spacing-medium;
+
+  .grid-item {
+    background-color: blue;
+    padding: variables.$padding-md;
+    width: 100%;
+    min-height: math.div(variables.$container-xs, 3);
+  }
+
+}

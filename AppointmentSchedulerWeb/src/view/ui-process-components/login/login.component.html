@@ -34,9 +34,9 @@
     <div class="form-footer">
       <app-button-task type="submit" [loadingState]="currentTaskState"
         [text]="translate(translationCodes.TC_LOGIN_BUTTON_LABEL)" />
-      <label class="error">
+      <span class="system-error">
         {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
-      </label>
+      </span>
     </div>
   </form>
 

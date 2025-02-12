@@ -62,8 +62,6 @@ export class EditAvailabilityTimeSlotComponent {
     this.schedulerService.editAvailabilityTimeSlot(this.availabilitySlot).pipe(
       switchMap((response: OperationResult<string, ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
           return of(true);
         } else {
           this.handleErrorResponse(response);

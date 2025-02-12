@@ -19,7 +19,7 @@
 }
 
 .form-header {
-  display:flex;
+  display: flex;
   flex-direction: column;
   gap: variables.$spacing-medium;
 }
@@ -38,12 +38,13 @@
 }
 
 .form-footer {
-  display:flex;
+  display: flex;
   flex-direction: column;
   gap: variables.$spacing-medium;
 
-  label {
+  .system-error {
     text-align: center;
+    color: variables.$error-color;
   }
 
 }

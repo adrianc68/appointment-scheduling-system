@@ -11,18 +11,20 @@
   justify-content: space-between;
   gap: variables.$spacing-large;
   padding-left: variables.$padding-md;
-  padding-right: variables.$padding-xl;
+  padding-right: variables.$spacing-large;
   color: variables.$header-text-color;
+  position:relative;
 }
 
-// .navbar-logo {
-// }
+.navbar-logo {
+  position: absolute;
+  left:50%;
+  transform: translateX(-50%);
+}
 
 .navbar-logo>span {
   font-size: variables.$font-size-xlg;
   font-weight: variables.$font-weight-bold;
-  // display:none;
-  // width:0;
 }
 
 .navbar-toggle-button>button {
@@ -40,12 +42,12 @@
 
 .notification {
   @include mixins.flex-center;
-  // gap:15px;
 }
 
 .notification-icon {
   position: relative;
-  // background-color: blue;
+  height:variables.$icon-size-md;
+  width:variables.$icon-size-md;
 }
 
 .notification-badge {
@@ -56,14 +58,13 @@
   padding: 3px;
   font-weight: bold;
   position: absolute;
-  left:calc(50% + 6px);
-  top:-50%;
+  left: calc(50% + 7px);
+  top: -50%;
 }
 
 @include mixins.respond-to(breakpoints.$breakpoint-md) {
   .navbar-logo {
     display: block;
     width: auto;
-    background-color: blue;
   }
 }

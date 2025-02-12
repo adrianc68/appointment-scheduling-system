@@ -58,9 +58,8 @@ export class EditClientComponent {
     this.clientService.editClient(this.client).pipe(
       switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
         console.log("editclient called")
+        console.log(response);
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
           return of(true);
         } else {
           this.handleErrorResponse(response);

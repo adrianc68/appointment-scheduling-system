@@ -16,7 +16,6 @@
         <app-error-validation-message-form [messages]="errorValidationMessage['username']" />
       </div>
 
-
       <div class="form-input">
         <label for="email">
           {{ translate(translationCodes.TC_EMAIL_DATA_LABEL)}}
@@ -53,16 +52,14 @@
           placeholder={{translate(translationCodes.TC_PASSWORD_PLACEHOLDER_LABEL)}} />
         <app-error-validation-message-form [messages]="errorValidationMessage['password']" />
       </div>
-
-
     </div>
 
     <div class="form-footer">
       <app-button-task type="submit" [loadingState]="currentTaskState"
         [text]="translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)" />
-      <label class="error">
+      <span class="error">
         {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
-      </label>
+      </span>
     </div>
 
 

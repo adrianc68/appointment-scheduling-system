@@ -26,6 +26,12 @@ export class ClientManagementComponent {
   translationCodes = TranslationCodes;
   clients: Client[] = [];
 
+  data = [
+    { title: 'Item 1', description: 'Description for item 1' },
+    { title: 'Item 2', description: 'Description for item 2' },
+    { title: 'Item 3', description: 'Description for item 3' }
+  ];
+
   constructor(private clientService: ClientService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
     this.clientService.getClientList().pipe(
       switchMap((response: OperationResult<Client[], ApiDataErrorResponse>): Observable<boolean> => {

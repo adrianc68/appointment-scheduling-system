@@ -1,3 +1,4 @@
+import { GridListComponent } from "./display/grid-list/grid-list.component";
 import { TextInputComponent } from "./input/text-input/text-input.component";
 import { DropdownComponent } from "./navigation/dropdown/dropdown.component";
 import { ButtonTaskComponent } from "./others/button-task/button-task.component";
@@ -10,5 +11,6 @@ export const SHARED_STANDALONE_COMPONENTS = [
   TextInputComponent,
   ErrorValidationMessageFormComponent,
   DropdownComponent,
+  GridListComponent
 ]
 

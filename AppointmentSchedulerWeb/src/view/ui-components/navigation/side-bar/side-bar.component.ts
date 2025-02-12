@@ -8,7 +8,7 @@ import { AuthenticationService } from '../../../../cross-cutting/security/authen
 import { Observable } from 'rxjs';
 import { AccountData } from '../../../../view-model/business-entities/account';
 import { RoleType } from '../../../../view-model/business-entities/types/role.types';
-import { MatIcon, MatIconModule } from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-side-bar',
