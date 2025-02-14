@@ -1,0 +1,52 @@
+@use '../../../styles/variables.scss' as variables;
+@use '../../../styles/mixins.scss' as mixins;
+@use '../../../styles/breakpoints.scss' as breakpoints;
+
+.notification-main-container {
+  width: 100%;
+  @include mixins.flex-center;
+}
+
+.notification-management {
+  width: 100%;
+  max-width: variables.$container-lg;
+  display: flex;
+  flex-direction: column;
+  padding: variables.$padding-md;
+}
+
+
+.notification-container {
+  width: 100%;
+  min-height: variables.$notification-card-height;
+  display: flex;
+  flex-direction: column;
+  border-bottom: variables.$border-width solid variables.$border-color;
+}
+
+.notification-container.unread:hover,
+.notification-container:hover {
+  background-color: variables.$hover-color;
+}
+
+.notification-container.unread {
+  background-color: variables.$notification-unread-color;
+}
+
+.notification-mgt-header {
+  position: relative;
+  width: 100%;
+  padding: variables.$padding-md;
+  display: flex;
+  justify-content: space-between;
+}
+
+.update-notifications {
+  height: auto;
+  width: auto;
+  font-size: variables.$icon-size-lg;
+}
+
+.update-notifications:hover {
+  color: variables.$hover-color;
+}

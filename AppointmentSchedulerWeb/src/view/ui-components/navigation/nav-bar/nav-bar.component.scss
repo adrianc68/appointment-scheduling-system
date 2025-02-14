@@ -13,32 +13,37 @@
   padding-left: variables.$padding-md;
   padding-right: variables.$spacing-large;
   color: variables.$header-text-color;
-  position:relative;
+  position: relative;
 }
 
 .navbar-logo {
   position: absolute;
-  left:50%;
+  left: 50%;
   transform: translateX(-50%);
 }
 
 .navbar-logo>span {
-  font-size: variables.$font-size-xlg;
+  font-size: variables.$font-size-xl;
   font-weight: variables.$font-weight-bold;
+  color: variables.$header-text-color;
 }
 
 .navbar-toggle-button>button {
-  border: 0;
+  height: auto;
+  width: auto;
   padding: 5px;
-  background-color: transparent;
-  color: variables.$header-text-color;
+  font-size: variables.$icon-size-lg;
+}
+
+.menu-icon {
+  height: auto;
+  width: auto;
+  font-size: variables.$icon-size-md;
 }
 
 .navbar-actions {
   display: flex;
 }
-
-
 
 .notification {
   @include mixins.flex-center;
@@ -46,8 +51,8 @@
 
 .notification-icon {
   position: relative;
-  height:variables.$icon-size-md;
-  width:variables.$icon-size-md;
+  height: variables.$icon-size-md;
+  width: variables.$icon-size-md;
 }
 
 .notification-badge {

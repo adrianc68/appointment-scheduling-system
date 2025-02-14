@@ -7,14 +7,15 @@
 .sidebar {
   position: fixed;
   width: 0px;
-  // height: calc(100dvh - variables.$header-height);
   height: calc(100svh - variables.$header-height);
   transition: width variables.$transition-duration-medium variables.$ease-in-out;
   padding-bottom: variables.$padding-md;
   display: flex;
   overflow: hidden;
+  overflow-y: auto;
   flex-direction: column;
   background-color: variables.$sidebar-background-color;
+  z-index: variables.$z-index-top;
 
   .sidebar-bs-operations {
     flex-grow: 1;
@@ -44,6 +45,7 @@
       span {
         font-weight: variables.$font-weight-light;
         font-size: variables.$font-size-sm;
+        color: variables.$sidebar-text-color;
         opacity: 0;
         white-space: nowrap;
       }
@@ -78,8 +80,6 @@
     height: 100%;
     position: relative;
     left: 0;
-    // width: calc(1/4 * variables.$sidebar-width);
-    // width: #{(1 / 4) * variables.$sidebar-width};
     width: math.div(1, 4) * variables.$sidebar-width;
   }
 }

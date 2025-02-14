@@ -1,0 +1,15 @@
+@use '../../../../../styles/mixins.scss' as mixins;
+@use '../../../../../styles/breakpoints.scss' as breakpoints;
+@use '../../../../../styles/variables.scss' as variables;
+
+.appointment-modal-container {
+  padding:variables.$padding-lg;
+  width: 90vw;
+  overflow: hidden;
+}
+
+@include mixins.respond-to(breakpoints.$breakpoint-md) {
+  .appointment-modal-container {
+    width: variables.$container-md;
+  }
+}

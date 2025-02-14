@@ -1,34 +1,31 @@
-<h1>{{translate(translationCodes.TC_NOTIFICATION_DIRECTORY)}}</h1>
-<hr>
-<div>
-  <app-button (click)="getAllNotificationsData()">Actualizar</app-button>
-  <ng-container *ngFor="let notification of notificationList">
-
-    <ng-container [ngSwitch]="notification.type">
-
-      <div (click)="markNotificationAsRead(notification)">
-        <app-appointment-notification-card *ngSwitchCase="notificationTypes.APPOINTMENT_NOTIFICATION"
-          [data]="castNotification(notification)">
-        </app-appointment-notification-card>
-
+<div class="notification-main-container">
+  <section class="notification-management">
+    <div class="notification-mgt-header">
+      <h1>{{translationCodes.TC_NOTIFICATION_DIRECTORY | translate }}</h1>
+      <div class="update-btn">
+        <button class="button icon" (click)="getAllNotificationsData()">
+          <mat-icon class="update-notifications t-primary">update</mat-icon>
+        </button>
       </div>
-      <app-system-notification-card (click)="markNotificationAsRead(notification)"
-        *ngSwitchCase="notificationTypes.SYSTEM_NOTIFICATION"
-        [data]="castNotification(notification)"></app-system-notification-card>
+    </div>
+    <div class="notification-mgt-content">
+      <ng-container *ngFor="let notification of notificationList">
+        <ng-container [ngSwitch]="notification.type">
+          <app-appointment-notification-card [data]="castNotification(notification)" class="notification-container"
+            [ngClass]="{ 'unread': notification.status === NotificationStatusTypes.UNREAD}"
+            (click)="markNotificationAsRead(notification)" *ngSwitchCase="notificationTypes.APPOINTMENT_NOTIFICATION" />
 
-      <div>
-      </div>
+          <app-system-notification-card [data]="castNotification(notification)" class="notification-container"
+            [ngClass]="{'unread': notification.status === NotificationStatusTypes.UNREAD}"
+            (click)="markNotificationAsRead(notification)" *ngSwitchCase="notificationTypes.SYSTEM_NOTIFICATION" />
 
-      <div (click)="markNotificationAsRead(notification)">
-        <app-general-notification-card *ngSwitchCase="notificationTypes.GENERAL_NOTIFICATION"
-          [data]="castNotification(notification)"> ></app-general-notification-card>
-      </div>
-    </ng-container>
-    <br>
-    <br>
+          <app-general-notification-card [data]="castNotification(notification)" class="notification-container"
+            (click)="markNotificationAsRead(notification)"
+            [ngClass]="{'unread': notification.status === NotificationStatusTypes.UNREAD}"
+            *ngSwitchCase="notificationTypes.GENERAL_NOTIFICATION" />
 
-    <!--<pre>{{notification | json}}</pre>-->
-  </ng-container>
-
-
+        </ng-container>
+      </ng-container>
+    </div>
+  </section>
 </div>

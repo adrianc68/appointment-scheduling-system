@@ -1,16 +1,28 @@
-<div class="container">
-  <div>
-    <h2>{{data.type}}</h2>
-    <h2>{{data.code}}</h2>
-    <h3>{{data.severity}}</h3>
-    <p>{{data.createdAt}}</p>
-    <p>{{data.uuid}}</p>
+<div class="system-notification-container">
+  <div class="notification-icon">
+    <mat-icon class="icon" [ngClass]="{
+      'info': data.severity === SeverityCodeTypes.INFO,
+      'warning': data.severity === SeverityCodeTypes.WARNING,
+      'critical': data.severity === SeverityCodeTypes.CRITICAL
+      }">
+      warning
+    </mat-icon>
   </div>
 
-  <hr>
-  <p>{{data.message}}</p>
+  <div class="notification-content">
+    <div class="notification-title">
+      <span class="fw-bold">{{data.code | translate}}</span>
+    </div>
+    <div class="notification-data">
+      <div class="notification-message">
+        <p>{{data.message}}</p>
+      </div>
+      <div class="notification-date">
+        <span class="fw-light fs-sm t-secondary">{{data.createdAt.toString() | readableDate }}</span>
+      </div>
+    </div>
+  </div>
+  <div>
+  </div>
 
-
-
-  <pre>{{data | json}}</pre>
 </div>

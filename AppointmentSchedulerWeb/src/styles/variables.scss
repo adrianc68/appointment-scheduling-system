@@ -7,7 +7,7 @@ $font-size-xs: 0.7rem;
 $font-size-sm: 0.9rem;
 $font-size-base: 1rem;
 $font-size-lg: 1.2rem;
-$font-size-xlg: 1.5rem;
+$font-size-xl: 1.5rem;
 
 // Font weigths
 $font-weight-light: 300;
@@ -44,6 +44,7 @@ $active-link-color: #64b5f6;
 $hover-color: #90caf9;
 $selected-color: #64b5f6;
 $white-color: #fff;
+$notification-unread-color: #d6e9fa;
 
 // Button colors
 $button-primary-color: $primary-color;
@@ -67,7 +68,7 @@ $header-text-color: #fff;
 
 
 // Text p
-$text-primary: rgba(0, 0, 0, 0.87);
+$text-primary: rgba(0, 0, 0, 0.90);
 $text-secondary: rgba(0, 0, 0, 0.60);
 $text-disabled: rgba(0, 0, 0, 0.50);
 
@@ -87,6 +88,7 @@ $shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.2);
 
 // Borders
 $border-width: 1px;
+$border-width-md: 2px;
 $border-style: solid;
 $border-color: #ddd;
 
@@ -110,10 +112,11 @@ $ease-in: cubic-bezier(0.4, 0, 1, 1);
 $ease-out: cubic-bezier(0, 0, 0.2, 1);
 
 // Z-Index
-$z-index-dropdown: 100;
-$z-index-modal: 200;
-$z-index-tooltip: 300;
-$z-index-notification: 400;
+$z-index-base-items: 50;
+$z-index-low: 100;
+$z-index-medium: 200;
+$z-index-high: 300;
+$z-index-top: 400;
 
 // Containers
 
@@ -135,11 +138,13 @@ $header-landing-height: 60px;
 $header-height: 70px;
 $footer-height: 120px;
 $sidebar-width: 250px;
+$notification-card-height: 130px;
 
 // Icons
 $icon-size-sm: 16px;
 $icon-size-md: 24px;
 $icon-size-lg: 32px;
+$icon-size-xl: 40px;
 
 // Input height sizes
 $input-size-sm: 40px;

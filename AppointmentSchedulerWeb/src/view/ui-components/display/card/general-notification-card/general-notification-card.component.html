@@ -1,15 +1,23 @@
-<div class="container">
-  <div>
-    <h2>{{data.type}}</h2>
-    <h3>{{data.code}}</h3>
-    <p>{{data.createdAt}}</p>
-    <p>{{data.uuid}}</p>
+<div class="general-notification-container">
+  <div class="notification-icon">
+    <mat-icon class="icon t-secondary">notifications_active </mat-icon>
   </div>
 
-  <hr>
-  <p>{{data.message}}</p>
+  <div class="notification-content">
+    <div class="notification-title">
+      <span class="fw-bold">{{data.code | translate}}</span>
+    </div>
+    <div class="notification-data">
+      <div class="notification-message">
+        <p>{{data.message}}</p>
+      </div>
+      <div class="notification-date">
+        <span class="fw-light fs-sm t-secondary">{{data.createdAt.toString() | readableDate }}</span>
+      </div>
 
-  <br><br>
+    </div>
+  </div>
+  <div>
+  </div>
 
-  <pre>{{data | json}}</pre>
 </div>

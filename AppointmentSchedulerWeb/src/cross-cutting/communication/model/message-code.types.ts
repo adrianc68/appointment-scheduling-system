@@ -89,4 +89,5 @@ export enum MessageCodeType {
   // Events codes (replace $<>$ to set data)
   EVENT_APPOINTMENT_HAS_BEEN_CANCELED,
   EVENT_APPOINTMENT_HAS_BEEN_RESCHEDULED,
+
 }
