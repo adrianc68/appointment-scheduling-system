@@ -191,11 +191,12 @@ var app = builder.Build();
 
 app.UseStaticFiles();
 app.UseCors(policy => policy
-    .WithOrigins("http://localhost:4200", "http://localhost:8080")
+    .WithOrigins("http://localhost:4200", "http://localhost:8080", "http://192.168.50.63:4200")
+    // .AllowAnyOrigin()
     .AllowAnyHeader()
     .AllowAnyMethod()
-    .AllowCredentials());
-
+    .AllowCredentials()
+);
 
 
 using (var scope = app.Services.CreateScope())

@@ -176,7 +176,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Name = dto.Name,
                     Email = dto.Email,
                     PhoneNumber = dto.PhoneNumber,
-                    Password = dto.Password,
                     Username = dto.Username
                 };
                 OperationResult<bool, GenericError> result = await systemFacade.UpdateClientAsync(client);
