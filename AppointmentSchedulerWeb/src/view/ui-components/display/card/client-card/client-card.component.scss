@@ -1,0 +1,54 @@
+@use '../../../../../styles/mixins.scss' as mixins;
+@use '../../../../../styles/variables.scss' as variables;
+@use '../../../../../styles/breakpoints.scss' as breakpoints;
+
+.client-card-container {
+  width: 100%;
+  max-height: variables.$client-card-height;
+  // min-height: variables.$client-card-height;
+  padding: variables.$padding-md;
+  position:relative;
+  // height:100%;
+}
+
+.client-data {
+  // background-color: green;
+  display: flex;
+  gap: variables.$spacing-small;
+  width: 100%;
+
+  .client-icon {
+    @include mixins.flex-center;
+
+    .profile-icon {
+      @include mixins.flex-center;
+      // padding: variables.$padding-sm;
+      font-size: 65px;
+      height: 100%;
+      // background-color: blue;
+      width: 100%;
+    }
+  }
+
+  .client-info {
+    // background-color: red;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+  }
+
+}
+
+.client-buttons {
+  // background-color: red;
+  position:absolute;
+  right:0;
+  bottom:0;
+  padding:variables.$padding-md;
+
+  .button {
+    height: auto;
+    padding:variables.$padding-sm;
+  }
+}

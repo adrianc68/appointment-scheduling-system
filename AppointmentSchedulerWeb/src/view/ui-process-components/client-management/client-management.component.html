@@ -3,36 +3,34 @@
   {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
 </button>
 
-<table border="1">
-  <thead>
-    <tr>
-      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_NAME_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_EMAIL_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_PHONE_NUMBER_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_USERNAME_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let client of clients">
-      <td>{{client.name}}</td>
-      <td>{{client.email}}</td>
-      <td>{{client.phoneNumber}}</td>
-      <td>{{client.username}}</td>
-      <td>{{client.status}}</td>
-      <td>{{client.createdAt}}</td>
-      <td>
-        <button class="button" (click)="redirectToEditClient(client)">
-          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
-        </button>
-      </td>
-    </tr>
+<!--<table border="1">-->
+<!--  <thead>-->
+<!--    <tr>-->
+<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_NAME_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_EMAIL_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_PHONE_NUMBER_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_USERNAME_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>-->
+<!--    </tr>-->
+<!--  </thead>-->
+<!--  <tbody>-->
+<!--    <tr *ngFor="let client of clients">-->
+<!--      <td>{{client.name}}</td>-->
+<!--      <td>{{client.email}}</td>-->
+<!--      <td>{{client.phoneNumber}}</td>-->
+<!--      <td>{{client.username}}</td>-->
+<!--      <td>{{client.status}}</td>-->
+<!--      <td>{{client.createdAt}}</td>-->
+<!--      <td>-->
+<!--        <button class="button" (click)="redirectToEditClient(client)">-->
+<!--          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}-->
+<!--        </button>-->
+<!--      </td>-->
+<!--    </tr>-->
+<!---->
+<!--  </tbody>-->
+<!--</table>-->
 
-  </tbody>
-</table>
-
-
-<app-grid-list [title]="'My Grid'" [items]="data"></app-grid-list>
-
+<app-grid-list [title]="'Clientes'" [items]="clients" [cardComponent]="clientCard"></app-grid-list>

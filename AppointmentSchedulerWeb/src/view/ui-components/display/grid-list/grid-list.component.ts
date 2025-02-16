@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, Type, ViewChild, ViewContainerRef } from '@angular/core';
 
 @Component({
   selector: 'app-grid-list',
@@ -12,4 +12,10 @@ import { Component, Input } from '@angular/core';
 export class GridListComponent {
   @Input() title: string = 'Grid Title';
   @Input() items: any[] = [];
+  @Input() cardComponent!: Type<any>;
+
+
+  //@ViewChild('container', { read: ViewContainerRef }) container!: ViewContainerRef;
+
+
 }

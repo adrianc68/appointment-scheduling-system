@@ -1,5 +1,4 @@
 <div class="grid-container">
-  <!-- Header con título y filtros -->
   <div class="grid-header">
     <h2>{{ title }}</h2>
     <div class="filters">
@@ -23,39 +22,10 @@
     </div>
   </div>
 
-  <!-- Lista de Cards -->
   <div class="grid-content">
-
-    <div class="grid-item card">
-      <p>elemento de prueba</p>
-    </div>
-
-    <div class="grid-item card">
-      <p>elemento de prueba</p>
-    </div>
-
-    <div class="grid-item card">
-      <p>elemento de prueba</p>
-    </div>
-
-    <div class="grid-item card">
-      <p>elemento de prueba</p>
-    </div>
-
-    <div class="grid-item card">
-      <p>elemento de prueba</p>
-    </div>
-
-    <div class="grid-item card">
-      <p>elemento de prueba</p>
-    </div>
-
-    <div class="grid-item card">
-      <p>elemento de prueba</p>
-    </div>
-
-    <!--<div class="grid-item" *ngFor="let item of items">-->
-    <!---->
-    <!--</div>-->
+    <ng-container *ngFor="let item of items">
+      <ng-container *ngComponentOutlet="cardComponent; inputs: { data: item }">
+      </ng-container>
+    </ng-container>
   </div>
 </div>

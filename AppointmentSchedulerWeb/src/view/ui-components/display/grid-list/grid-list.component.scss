@@ -4,33 +4,25 @@
 @use "sass:math";
 
 .grid-container {
-  background-color: blue;
   width: 100%;
+  @include mixins.flex-center;
+  flex-direction: column;
 
   .grid-header {
+    width: 100%;
     display: flex;
     background-color: green;
     flex-direction: column;
     align-items: center;
     padding: variables.$padding-md;
   }
-
-
 }
 
-
 .grid-content {
+  width: 100%;
   padding: variables.$padding-lg;
-  background-color: gold;
-  @include mixins.flex-center;
+  display: flex;
   flex-direction: column;
+  max-width: variables.$container-lg;
   gap: variables.$spacing-medium;
-
-  .grid-item {
-    background-color: blue;
-    padding: variables.$padding-md;
-    width: 100%;
-    min-height: math.div(variables.$container-xs, 3);
-  }
-
 }

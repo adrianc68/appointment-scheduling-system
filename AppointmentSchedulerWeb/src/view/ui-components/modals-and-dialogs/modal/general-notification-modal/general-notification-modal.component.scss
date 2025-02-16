@@ -3,7 +3,10 @@
 @use '../../../../../styles/variables.scss' as variables;
 
 .general-modal-container {
-  padding: variables.$padding-lg;
+  padding-top: variables.$padding-lg;
+  padding-right: variables.$padding-lg;
+  padding-left: variables.$padding-lg;
+  padding-bottom: variables.$padding-md;
   width: 90vw;
   max-height: 70dvh;
   min-height: auto;
@@ -54,6 +57,7 @@
     display: flex;
     width: 100%;
     flex-grow: 1;
+    min-height: 150px;
     flex-direction: column;
     padding-top: variables.$padding-md;
     padding-bottom: variables.$padding-lg * 2;

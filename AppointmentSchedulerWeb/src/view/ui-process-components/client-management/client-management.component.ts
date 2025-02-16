@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
 import { Router } from '@angular/router';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
+import { ClientCardComponent } from '../../ui-components/display/card/client-card/client-card.component';
 
 @Component({
   selector: 'app-client-management',
@@ -25,12 +26,7 @@ export class ClientManagementComponent {
   systemMessage?: string = '';
   translationCodes = TranslationCodes;
   clients: Client[] = [];
-
-  data = [
-    { title: 'Item 1', description: 'Description for item 1' },
-    { title: 'Item 2', description: 'Description for item 2' },
-    { title: 'Item 3', description: 'Description for item 3' }
-  ];
+  clientCard = ClientCardComponent
 
   constructor(private clientService: ClientService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
     this.clientService.getClientList().pipe(

@@ -3,7 +3,10 @@
 @use '../../../../../styles/variables.scss' as variables;
 
 .appointment-modal-container {
-  padding: variables.$padding-lg;
+  padding-top: variables.$padding-lg;
+  padding-right: variables.$padding-lg;
+  padding-left: variables.$padding-lg;
+  padding-bottom: variables.$padding-md;
   width: 90vw;
   max-height: 70dvh;
   min-height: auto;
@@ -15,15 +18,15 @@
 
 .notification-img {
   width: 100%;
-  height:100%;
-  min-width:100px;
-  min-height:100px;
+  height: 100%;
+  min-width: 100px;
+  min-height: 100px;
   @include mixins.flex-center;
 
   .icon {
-    width:100px;
-    height:100px;
-    font-size:100px;
+    width: 100px;
+    height: 100px;
+    font-size: 100px;
   }
 
   img {
@@ -55,8 +58,9 @@
     width: 100%;
     flex-grow: 1;
     flex-direction: column;
-    padding-top: variables.$padding-md;
-    padding-bottom: variables.$padding-lg * 2;
+    min-height: 150px;
+    padding-top: variables.$padding-sm;
+    padding-bottom: variables.$padding-sm;
     gap: variables.$spacing-small;
   }
 
