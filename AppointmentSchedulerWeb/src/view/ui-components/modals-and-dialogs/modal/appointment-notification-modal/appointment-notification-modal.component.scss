@@ -3,13 +3,91 @@
 @use '../../../../../styles/variables.scss' as variables;
 
 .appointment-modal-container {
-  padding:variables.$padding-lg;
+  padding: variables.$padding-lg;
   width: 90vw;
-  overflow: hidden;
+  max-height: 70dvh;
+  min-height: auto;
+  height: auto;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+}
+
+.notification-img {
+  width: 100%;
+  height:100%;
+  min-width:100px;
+  min-height:100px;
+  @include mixins.flex-center;
+
+  .icon {
+    width:100px;
+    height:100px;
+    font-size:100px;
+  }
+
+  img {
+    min-height: 100px;
+    max-width: 100px;
+    max-height: 100px;
+  }
+}
+
+.notification-title {
+  display: flex;
+  width: 100%;
+  height: auto;
+  flex-direction: column;
+  padding: variables.$padding-md;
+  border-bottom: variables.$border-width solid variables.$border-color;
+}
+
+.notification-content {
+  width: 100%;
+  flex-grow: 1;
+  flex-direction: column;
+  @include mixins.flex-start;
+  text-align: left;
+  padding: variables.$padding-md;
+
+  .notification-message {
+    display: flex;
+    width: 100%;
+    flex-grow: 1;
+    flex-direction: column;
+    padding-top: variables.$padding-md;
+    padding-bottom: variables.$padding-lg * 2;
+    gap: variables.$spacing-small;
+  }
+
+  .notification-buttons {
+    width: 100%;
+    height: 100%;
+  }
+
+}
+
+.close-button-container {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  border: none;
+  margin: variables.$padding-md;
+
+  .button {
+    padding: 0;
+    height: auto;
+  }
+
+  .close-button-icon {
+    @include mixins.flex-center;
+    width: variables.$icon-size-lg;
+    height: variables.$icon-size-lg;
+  }
 }
 
 @include mixins.respond-to(breakpoints.$breakpoint-md) {
   .appointment-modal-container {
-    width: variables.$container-md;
+    width: variables.$container-sm;
   }
 }

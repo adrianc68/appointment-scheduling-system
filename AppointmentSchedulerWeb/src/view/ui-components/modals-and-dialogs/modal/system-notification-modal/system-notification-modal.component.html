@@ -1,14 +1,38 @@
-<h1>{{data.type}}</h1>
-<h2>{{data.code}}</h2>
-<h3>{{data.severity}}</h3>
-<p>{{data.createdAt}}</p>
-<hr>
-<p>{{data.message}}</p>
+<div class="system-modal-container">
+  <div class="close-button-container">
+    <button class="button icon t-secondary" (click)="close()">
+      <mat-icon class="close-button-icon">close</mat-icon>
+    </button>
+  </div>
+  <div class="notification-img">
+    <mat-icon class="icon critical" [ngClass]="{
+      'info': data.severity === SeverityCodeTypes.INFO,
+      'warning': data.severity === SeverityCodeTypes.WARNING,
+      'critical': data.severity === SeverityCodeTypes.CRITICAL
+      }">warning</mat-icon>
+  </div>
+  <div class="notification-title">
+    <h1 class="fs-base fw-bold t-primary">{{data.code | translate }}</h1>
+    <div class="notification-date">
+      <p class="fs-sm t-secondary">{{data.createdAt.toString() | readableDate}}</p>
+    </div>
+    <span class="fs-sm t-secondary">{{data.uuid}}</span>
+    <span class="fs-sm t-secondary">{{data.severity}}</span>
+  </div>
 
+  <div class="notification-content">
+    <div class="notification-message">
 
-<p>{{data.uuid}}</p>
+      <span class="fw-bold">
+        {{TranslationCodes.TC_MESSAGE_CONTENT_LABEL | translate}}
+      </span>
+      <p class="t-secondary">{{data.message}}</p>
+    </div>
+    <div class="notification-buttons">
+      <button class="button primary" (click)="close()">
+        {{TranslationCodes.TC_CLOSE_BUTTON_LABEL | translate}}
+      </button>
+    </div>
 
-
-<br><br>
-
-<pre>{{data | json}}</pre>
+  </div>
+</div>

@@ -10,7 +10,6 @@
   cursor: pointer;
   border: none;
   width: 100%;
-  height: variables.$button-size-base;
   max-height: variables.$button-size-base;
   @include mixins.flex-center;
   gap: variables.$spacing-small;

@@ -33,6 +33,10 @@ export class I18nService {
     return this.currentLanguage.getValue();
   }
 
+  getLanguageAsObservable(): Observable<LanguageTypes> {
+    return this.currentLanguage.asObservable();
+  }
+
   getTranslationsLoaded(): Observable<boolean> {
     return this.isTranslationsLoaded.asObservable();
   }

@@ -119,6 +119,7 @@
   "TC_START_TIME_LABEL": "Start time:",
   "TC_END_TIME_LABEL": "End time:",
   "TC_ASSISTANT_IDENTIFIER_LABEL": "Assistant identifier:",
+  "TC_MESSAGE_CONTENT_LABEL": "Message:",
   "TC_CLIENT_DIRECTORY_TABLE_NAME_LABEL": "Name",
   "TC_CLIENT_DIRECTORY_TABLE_EMAIL_LABEL": "Email",
   "TC_CLIENT_DIRECTORY_TABLE_PHONE_NUMBER_LABEL": "Phone Number",
@@ -171,6 +172,8 @@
   "TC_DISABLE_BUTTON_LABEL": "Disable",
   "TC_ENABLE_BUTTON_LABEL": "Enable",
   "TC_DELETE_BUTTON_LABEL": "Delete",
+  "TC_CLOSE_BUTTON_LABEL": "Close",
+  "TC_VIEW_DETAILS_LABEL": "View details",
   "TC_LOADING_STATE_NO_ACTION_PERFORMED": "No action performed",
   "TC_LOADING_STATE_LOADING": "Loading...",
   "TC_LOADING_STATE_UNSUCCESSFUL_TASK": "Task not completed",
@@ -213,8 +216,8 @@
   "SYSTEM_SECURITY": "System security",
   "SYSTEM_THRESHOLD": "System threshold",
   "SYSTEM_CONFIG_CHANGE": "System configuration change",
-  "GENERAL_WELCOME" : "Welcome",
-  "GENERAL_NEWS" : "News",
-  "GENERAL_PROMOTION" : "Promotion",
-  "GENERAL_SERVICE_UPDATE" : "Service update"
+  "GENERAL_WELCOME": "Welcome",
+  "GENERAL_NEWS": "News",
+  "GENERAL_PROMOTION": "Promotion",
+  "GENERAL_SERVICE_UPDATE": "Service update"
 }

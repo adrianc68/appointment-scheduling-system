@@ -11,7 +11,6 @@ export class TranslatePipe implements PipeTransform {
   constructor(private i18nService: I18nService) { }
 
   transform(key: string): string {
-    console.log(key);
     return this.i18nService.translate(key);
   }
 }
