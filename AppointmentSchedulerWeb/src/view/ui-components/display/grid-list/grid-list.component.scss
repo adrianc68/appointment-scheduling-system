@@ -7,53 +7,70 @@
   @include mixins.flex-center;
   flex-direction: column;
   width: 100%;
+  gap: variables.$spacing-medium;
 }
 
 
-// .grid-header {
-//   width: 100%;
-//   display: flex;
-//   background-color: green;
-//   align-items: center;
-//   // border: variables.$border-width;
-//   // border-color: variables.$border-color;
-//   // border-style: variables.$border-style;
-//   // box-shadow: variables.$shadow-sm;
-//   // background-color: variables.$surface-color;
-//   // padding: variables.$padding-md;
-// }
-//
-//
-// .filters {
-//   background-color: blue;
-// }
-//
-// .orders {
-//   background-color: red;
-// }
-
-.grid-title {
+.grid-header {
   width: 100%;
-  padding: variables.$padding-md;
-  background-color: variables.$bg-subtle;
-  border: variables.$border-width solid variables.$border;
-  border-bottom: 0;
-  border-top-left-radius: variables.$border-radius-md;
-  border-top-right-radius: variables.$border-radius-md;
+}
+
+.grid-search {
+  display: flex;
+  justify-content: space-between;
+
+  .grid-input-search {
+    @include mixins.flex-center;
+    gap: variables.$spacing-medium;
+    width: 60%;
+    max-width: 420px;
+  }
+}
+
+
+.grid-filters {
+  width:100%;
+  background-color: green;
+  display: none;
+}
+
+.grid-filters.active {
+  @include mixins.flex-start;
+
+
+
+
 }
 
 .grid-content {
   width: 100%;
   display: flex;
   flex-direction: column;
-  border: variables.$border-width solid variables.$border;
+  gap:variables.$spacing-medium;
+
+  .grid-title {
+    width: 100%;
+    padding: variables.$padding-md;
+    background-color: variables.$bg-subtle;
+    border: variables.$border-width solid variables.$border-subtle;
+    border-bottom: 0;
+    border-top-left-radius: variables.$border-radius-md;
+    border-top-right-radius: variables.$border-radius-md;
+  }
+
+  .grid-items {
+    border: variables.$border-width solid variables.$border-subtle;
+
+  }
 
   .grid-item {
-    border-bottom: variables.$border-width solid variables.$border;
+    border-bottom: variables.$border-width solid variables.$border-subtle;
 
     &:last-child {
       border-bottom: none;
     }
   }
-
 }
+
+
+

@@ -54,12 +54,12 @@ p.secondary {
 }
 
 label {
-  color: variables.$text;
+  color: variables.$text-emphasis;
   font-size: variables.$font-size-base;
 }
 
 label.error {
-  color: variables.$error-color;
+  color: variables.$text-error;
 }
 
 li {
@@ -71,12 +71,12 @@ span {
   color: variables.$text;
 }
 
+
 .active {
   background-color: variables.$bg-subtle;
 }
 
 
--emphasis
 // Font (sizes, weights)
 // Font weight
 .fw-light {
@@ -119,6 +119,10 @@ span {
 
 .t-secondary {
   color: variables.$text-muted;
+}
+
+.t-subtle {
+  color: variables.$text-subtle;
 }
 
 .t-disabled {

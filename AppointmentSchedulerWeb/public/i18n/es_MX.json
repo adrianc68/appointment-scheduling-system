@@ -165,6 +165,7 @@
   "TC_USERNAME_PLACEHOLDER_LABEL": "Ingresa un nombre de usuario",
   "TC_PHONE_NUMBER_PLACEHOLDER_LABEL": "Ingresa un número de celular",
   "TC_NAME_PLACEHOLDER_LABEL": "Ingresa nombre completo",
+  "TC_SEARCH_INPUT_PLACEHOLDER_LABEL" : "Ingresa para buscar...",
   "TC_SERVICE_NAME_PLACEHOLDER_LABEL": "Ingresa el nombre del servicio",
   "TC_SERVICE_DESCRIPTION_PLACEHOLDER_LABEL": "Ingresa la descripción del servicio",
   "TC_SERVICE_MINUTES_PLACEHOLDER_LABEL": "Ingresa la duración del servicio en minutos",

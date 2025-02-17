@@ -31,6 +31,11 @@ export class GridListComponent implements OnInit, OnChanges {
   activeSort: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
+  setFilters: boolean = false;
+
+  toggleFiltersStatus() {
+    this.setFilters = !this.setFilters;
+  }
 
   ngOnInit() {
     this.originalItems = [...this.items];
@@ -65,6 +70,7 @@ export class GridListComponent implements OnInit, OnChanges {
 
 
   applyFilters() {
+
     let tempItems = [...this.items];
 
     if (this.searchTerm.trim()) {
@@ -75,19 +81,25 @@ export class GridListComponent implements OnInit, OnChanges {
       );
     }
 
-    if (this.activeFilters.size > 0) {
-      tempItems = tempItems.filter(item =>
-        Array.from(this.activeFilters).every(filterKey => item[filterKey])
-      );
+    if (this.setFilters) {
+
+      if (this.activeFilters.size > 0) {
+        tempItems = tempItems.filter(item =>
+          Array.from(this.activeFilters).every(filterKey => item[filterKey])
+        );
+      }
+
+      if (this.activeSort) {
+        tempItems.sort((a, b) => {
+          const valA = a[this.activeSort]?.toString().toLowerCase();
+          const valB = b[this.activeSort]?.toString().toLowerCase();
+          return this.sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        });
+      }
+
     }
 
-    if (this.activeSort) {
-      tempItems.sort((a, b) => {
-        const valA = a[this.activeSort]?.toString().toLowerCase();
-        const valB = b[this.activeSort]?.toString().toLowerCase();
-        return this.sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-      });
-    }
+
 
     this.filteredItems = tempItems;
   }
