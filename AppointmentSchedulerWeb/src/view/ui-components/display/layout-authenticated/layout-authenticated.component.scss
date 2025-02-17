@@ -1,4 +1,6 @@
-@use '../../../../styles/variables' as variables;
+@use '../../../../styles/variables.scss' as variables;
+@use '../../../../styles/mixins.scss' as mixins;
+@use '../../../../styles/breakpoints.scss' as breakpoints;
 
 .layout {
   display: flex;
@@ -14,11 +16,11 @@
 
 .content {
   flex-grow: 1;
-  background-color: variables.$background-color;
+  background-color: variables.$bg;
   overflow-y: auto;
 }
 
-@media (min-width: 768px) {
+@include mixins.respond-to(breakpoints.$breakpoint-md) {
   .main-container {
     display: flex;
   }
@@ -26,4 +28,5 @@
   .content {
     flex: 1;
   }
+
 }

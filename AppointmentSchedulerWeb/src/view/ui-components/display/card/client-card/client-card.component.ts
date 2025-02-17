@@ -10,7 +10,7 @@ import { ReadableDatePipe } from '../../../../../cross-cutting/helper/date-utils
 
 @Component({
   selector: 'app-client-card',
-  imports: [CommonModule, MatIconModule, TranslatePipe, ReadableDatePipe],
+  imports: [CommonModule, MatIconModule, TranslatePipe],
   standalone: true,
   templateUrl: './client-card.component.html',
   styleUrl: './client-card.component.scss'

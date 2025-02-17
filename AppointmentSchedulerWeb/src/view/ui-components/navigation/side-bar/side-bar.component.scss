@@ -7,14 +7,14 @@
 .sidebar {
   position: fixed;
   width: 0px;
-  height: calc(100svh - variables.$header-height);
+  height: calc(100dvh - variables.$header-height);
   transition: width variables.$transition-duration-medium variables.$ease-in-out;
   padding-bottom: variables.$padding-md;
   display: flex;
   overflow: hidden;
   overflow-y: auto;
   flex-direction: column;
-  background-color: variables.$sidebar-background-color;
+  background-color: variables.$bg-muted;
   z-index: variables.$z-index-top;
 
   .sidebar-bs-operations {
@@ -33,7 +33,7 @@
       padding-top: variables.$padding-md;
       padding-bottom: variables.$padding-md;
       padding-left: calc(math.div((math.div(1, 4) * variables.$sidebar-width), 2) - math.div(variables.$icon-size-md, 2));
-      color: variables.$sidebar-text-color;
+      color: variables.$text;
 
       .sidebar-icon {
         min-width: variables.$icon-size-md;
@@ -43,20 +43,19 @@
       }
 
       span {
-        font-weight: variables.$font-weight-light;
+        // font-weight: variables.$font-weight-light;
         font-size: variables.$font-size-sm;
-        color: variables.$sidebar-text-color;
         opacity: 0;
         white-space: nowrap;
       }
     }
 
     a:hover {
-      background-color: variables.$sidebar-hover-color;
+      background-color: variables.$bg-subtle;
     }
 
     a:focus {
-      background-color: variables.$background-active;
+      background-color: variables.$bg-emphasis;
     }
 
 

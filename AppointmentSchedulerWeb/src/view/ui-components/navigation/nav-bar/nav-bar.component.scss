@@ -12,7 +12,7 @@
   gap: variables.$spacing-large;
   padding-left: variables.$padding-md;
   padding-right: variables.$spacing-large;
-  color: variables.$header-text-color;
+  color: variables.$text;
   position: relative;
 }
 
@@ -25,7 +25,7 @@
 .navbar-logo>span {
   font-size: variables.$font-size-xl;
   font-weight: variables.$font-weight-bold;
-  color: variables.$header-text-color;
+  color: variables.$text;
 }
 
 .navbar-toggle-button>button {
@@ -39,6 +39,7 @@
   height: auto;
   width: auto;
   font-size: variables.$icon-size-md;
+  color: variables.$text;
 }
 
 .navbar-actions {

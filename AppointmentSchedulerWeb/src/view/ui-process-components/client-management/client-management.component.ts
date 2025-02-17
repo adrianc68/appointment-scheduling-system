@@ -14,10 +14,11 @@ import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-compone
 import { Router } from '@angular/router';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { ClientCardComponent } from '../../ui-components/display/card/client-card/client-card.component';
+import { TranslatePipe } from '../../../cross-cutting/helper/i18n/translate.pipe';
 
 @Component({
   selector: 'app-client-management',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, TranslatePipe],
   standalone: true,
   templateUrl: './client-management.component.html',
   styleUrl: './client-management.component.scss'

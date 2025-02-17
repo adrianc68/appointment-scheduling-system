@@ -158,6 +158,7 @@
   "TC_LOGIN_BUTTON_LABEL": "Iniciar sesión",
   "TC_LOGOUT_BUTTON_LABEL": "Cerrar sesión",
   "TC_SIGN_UP_BUTTON_LABEL": "Registrarse",
+  "TC_FILTER_BUTTON_LABEL": "Filtros",
   "TC_EMAIL_PLACEHOLDER_LABEL": "Ingresa un correo electrónico",
   "TC_ACCOUNT_PLACEHOLDER_LABEL": "Ingresa un nombre de usuario, número celular o correo electrónico",
   "TC_PASSWORD_PLACEHOLDER_LABEL": "Ingresa una contraseña",

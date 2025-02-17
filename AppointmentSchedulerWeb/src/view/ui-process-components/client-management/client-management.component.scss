@@ -1,0 +1,26 @@
+@use '../../../styles/variables.scss' as variables;
+@use '../../../styles/mixins.scss' as mixins;
+@use '../../../styles/breakpoints.scss' as breakpoints;
+
+.client-management-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width:100%;
+  padding: variables.$padding-md;
+}
+
+.client-table-content {
+  // background-color: red;
+  width:100%;
+}
+
+// @include mixins.respond-to(breakpoints.$breakpoint-md) {
+//   .client-table-content {
+//     max-width: variables.$container-lg;
+//   }
+// }
+
+
+
+

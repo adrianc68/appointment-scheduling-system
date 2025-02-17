@@ -1,36 +1,19 @@
-<h1>{{translate(translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY)}}</h1>
-<button class="button" (click)="redirectToRegisterClient()">
-  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
-</button>
+<div class="client-management-container">
 
-<!--<table border="1">-->
-<!--  <thead>-->
-<!--    <tr>-->
-<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_NAME_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_EMAIL_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_PHONE_NUMBER_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_USERNAME_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_CLIENT_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>-->
-<!--    </tr>-->
-<!--  </thead>-->
-<!--  <tbody>-->
-<!--    <tr *ngFor="let client of clients">-->
-<!--      <td>{{client.name}}</td>-->
-<!--      <td>{{client.email}}</td>-->
-<!--      <td>{{client.phoneNumber}}</td>-->
-<!--      <td>{{client.username}}</td>-->
-<!--      <td>{{client.status}}</td>-->
-<!--      <td>{{client.createdAt}}</td>-->
-<!--      <td>-->
-<!--        <button class="button" (click)="redirectToEditClient(client)">-->
-<!--          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}-->
-<!--        </button>-->
-<!--      </td>-->
-<!--    </tr>-->
-<!---->
-<!--  </tbody>-->
-<!--</table>-->
+  <h1>{{translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY | translate}}</h1>
 
-<app-grid-list [title]="'Clientes'" [items]="clients" [cardComponent]="clientCard"></app-grid-list>
+  <div class="client-table-content">
+    <app-grid-list [title]="translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY" [items]="clients"
+      [cardComponent]="clientCard"
+      [filters]="[{key: 'status', label: 'Status'}, {key: 'createdAt', label: 'Creation Date'}]"
+      [sortOptions]="[{key: 'name', label: 'Nombre'}, {key: 'status', label: 'Status'},{key: 'createdAt', label: 'Creation Date'}]">
+
+      <button class="button" (click)="redirectToRegisterClient()">
+        {{translationCodes.TC_REGISTER_BUTTON_LABEL | translate}}
+      </button>
+
+    </app-grid-list>
+
+  </div>
+
+</div>

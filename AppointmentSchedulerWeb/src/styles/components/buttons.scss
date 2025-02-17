@@ -4,8 +4,8 @@
 
 .button {
   border-radius: variables.$border-radius-sm;
-  background-color: variables.$button-primary-color;
-  color: variables.$button-primary-text-color;
+  background-color: variables.$bg-brand;
+  color: variables.$text-inverted;
   padding: variables.$padding-md;
   cursor: pointer;
   border: none;
@@ -17,34 +17,27 @@
 
 
   &:hover {
-    background-color: scale(variables.$button-primary-color, variables.$lighten-factor)
+    // background-color: scale(variables.$button-primary-color, variables.$lighten-factor)
   }
 }
 
 .button.primary {
-  background-color: variables.$button-primary-color;
-  color: variables.$button-primary-text-color;
+  background-color: variables.$bg-brand;
+  color: variables.$text-inverted;
 
-  &:hover {
-    background-color: scale(variables.$button-primary-color, variables.$lighten-factor)
-  }
 
 }
 
 .button.secondary {
-  background-color: variables.$button-secondary-color;
-  color: variables.$button-secondary-text-color;
+  background-color: transparent;
+  color: variables.$text-muted;
 
-  &:hover {
-    background-color: scale(variables.$button-secondary-color, variables.$lighten-factor)
-  }
 }
 
 .button.success {
   background-color: variables.$button-success-color;
   color: variables.$button-success-text-color;
 }
-
 
 .button.danger {
   background-color: variables.$button-danger-color;
@@ -59,4 +52,9 @@
 .button.icon {
   background-color: transparent;
   border: 0;
+}
+
+.button.bordered {
+  background-color: transparent;
+  border: variables.$border-width solid variables.$border-color;
 }

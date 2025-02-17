@@ -1,31 +1,49 @@
 <div class="grid-container">
+
   <div class="grid-header">
-    <h2>{{ title }}</h2>
+    <input class="input" type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
+      placeholder="Search..." />
+
+    <div class="filter-button">
+      <button class="button bordered t-primary">
+        <mat-icon>filter_alt</mat-icon>
+        <span class="t-primary">{{TranslationCodes.TC_FILTER_BUTTON_LABEL | translate }}</span>
+      </button>
+    </div>
+
     <div class="filters">
-      <input type="text" placeholder="Search..." />
-      <select>
-        <option>Filter 1</option>
-        <option>Filter 2</option>
-      </select>
+      <div class="filter-buttons">
+        <button *ngFor="let filter of filters" (click)="toggleFilter(filter.key)"
+          [class.active]="activeFilters.has(filter.key)">
+          {{ filter.label }}
+        </button>
+      </div>
     </div>
+
     <div class="orders">
-      <select>
-        <option>Order by </option>
-      </select>
-      <select>
-        <option>Order by </option>
-      </select>
-      <select>
-        <option>Order by </option>
-      </select>
-
+      <div class="sort-buttons">
+        <button *ngFor="let sort of sortOptions" (click)="toggleSort(sort.key)"
+          [class.active]="activeSort === sort.key">
+          {{ sort.label }} ({{ sortDirection }})
+        </button>
+      </div>
     </div>
-  </div>
 
+    <div class="actions">
+      <ng-content></ng-content>
+    </div>
+
+  </div>
+  <div class="grid-title">
+    <span>{{title | translate}}</span>
+  </div>
   <div class="grid-content">
-    <ng-container *ngFor="let item of items">
-      <ng-container *ngComponentOutlet="cardComponent; inputs: { data: item }">
-      </ng-container>
+    <ng-container *ngFor="let item of filteredItems">
+      <div class="grid-item">
+        <ng-container *ngComponentOutlet="cardComponent; inputs: { data: item }">
+        </ng-container>
+
+      </div>
     </ng-container>
   </div>
 </div>

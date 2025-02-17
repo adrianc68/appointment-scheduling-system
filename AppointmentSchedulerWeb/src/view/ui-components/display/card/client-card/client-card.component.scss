@@ -5,14 +5,11 @@
 .client-card-container {
   width: 100%;
   max-height: variables.$client-card-height;
-  // min-height: variables.$client-card-height;
   padding: variables.$padding-md;
-  position:relative;
-  // height:100%;
+  position: relative;
 }
 
 .client-data {
-  // background-color: green;
   display: flex;
   gap: variables.$spacing-small;
   width: 100%;
@@ -22,33 +19,29 @@
 
     .profile-icon {
       @include mixins.flex-center;
-      // padding: variables.$padding-sm;
       font-size: 65px;
       height: 100%;
-      // background-color: blue;
+      color: variables.$text;
       width: 100%;
     }
   }
 
   .client-info {
-    // background-color: red;
     width: 100%;
     display: flex;
     justify-content: space-between;
     flex-direction: column;
   }
-
 }
 
 .client-buttons {
-  // background-color: red;
-  position:absolute;
-  right:0;
-  bottom:0;
-  padding:variables.$padding-md;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: variables.$padding-md;
 
   .button {
     height: auto;
-    padding:variables.$padding-sm;
+    padding: variables.$padding-sm;
   }
 }

@@ -21,12 +21,12 @@
   min-height: variables.$notification-card-height;
   display: flex;
   flex-direction: column;
-  border-bottom: variables.$border-width solid variables.$border-color;
+  border-bottom: variables.$border-width solid variables.$border;
 }
 
 .notification-container.unread:hover,
 .notification-container:hover {
-  background-color: variables.$hover-color;
+  background-color: variables.$bg-subtle;
 }
 
 .notification-container.unread {
@@ -48,5 +48,5 @@
 }
 
 .update-notifications:hover {
-  color: variables.$hover-color;
+  color: variables.$bg-subtle;
 }

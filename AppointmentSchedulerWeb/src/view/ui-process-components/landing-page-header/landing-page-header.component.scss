@@ -3,9 +3,9 @@
 @use '../../../styles/breakpoints.scss' as breakpoints;
 
 .header {
-  background-color: variables.$surface-color;
+  background-color: variables.$bg-subtle;
   border-bottom: variables.$border-width;
-  border-color: variables.$border-color;
+  border-color: variables.$border;
   box-shadow: variables.$shadow-sm;
   height: variables.$header-landing-height;
   width: 100%;
@@ -20,10 +20,11 @@
 .header-logo {
   font-size: variables.$font-size-lg;
   font-weight: variables.$font-weight-bold;
+  color: variables.$text;
 }
 
 .header-button-toggle {
-  color: variables.$text-color;
+  color: variables.$text;
   background: none;
   border: none;
   cursor: pointer;
@@ -31,7 +32,6 @@
 }
 
 .header-nav {
-  background-color: variables.$surface-color;
   position: absolute;
   top: 100%;
   left: 0;
@@ -52,24 +52,23 @@
     height: auto;
 
     &:not(:last-child) {
-      border-bottom: 1px solid variables.$border-color;
+      border-bottom: variables.$border-width solid variables.$border;
     }
   }
 
   a {
-    color: variables.$text-color;
+    color: variables.$text;
     padding: variables.$padding-md;
     display: block;
     text-decoration: none;
     width: 100%;
-
   }
 
 }
 
 .open {
   display: flex;
-  background-color: variables.$surface-color;
+  background-color: variables.$bg;
 }
 
 

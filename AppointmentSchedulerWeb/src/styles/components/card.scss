@@ -4,9 +4,9 @@
 
 .card {
   border: variables.$border-width;
-  border-color: variables.$border-color;
-  border-style: variables.$border-style;
+  border-color: variables.$border;
+  border-style: solid;
   border-radius: variables.$border-radius-md;
   box-shadow: variables.$shadow-sm;
-  background-color: variables.$surface-color;
+  background-color: variables.$bg;
 }
