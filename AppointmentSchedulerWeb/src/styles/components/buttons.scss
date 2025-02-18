@@ -13,19 +13,12 @@
   max-height: variables.$button-size-base;
   @include mixins.flex-center;
   gap: variables.$spacing-small;
-  transition: background-color variables.$transition-duration-fast variables.$ease-in, color variables.$transition-duration-fast variables.$ease-in;
-
-
-  &:hover {
-    // background-color: scale(variables.$button-primary-color, variables.$lighten-factor)
-  }
 }
 
 .button.primary {
   background-color: variables.$bg-brand;
   color: variables.$text-inverted;
-
-
+  transition: background-color variables.$transition-duration-fast variables.$ease-in, color variables.$transition-duration-fast variables.$ease-in;
 }
 
 .button.secondary {
@@ -56,5 +49,11 @@
 
 .button.bordered {
   background-color: transparent;
-  border: variables.$border-width solid variables.$border-color;
+  border: variables.$border-width solid variables.$border;
+  color: variables.$text;
+
+  &:hover {
+    border: variables.$border-width solid variables.$border-emphasis;
+    color: variables.$text-emphasis;
+  }
 }

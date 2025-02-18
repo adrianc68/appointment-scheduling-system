@@ -1,16 +1,25 @@
 <div class="client-management-container">
-
-  <h1>{{translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY | translate}}</h1>
-
-  <div class="client-table-content">
-    <app-grid-list [title]="translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY" [items]="clients"
-      [cardComponent]="clientCard"
-      [filters]="[{key: 'status', label: 'Status'}, {key: 'createdAt', label: 'Creation Date'}]"
-      [sortOptions]="[{key: 'name', label: 'Nombre'}, {key: 'status', label: 'Status'},{key: 'createdAt', label: 'Creation Date'}]">
-
+  <div class="client-management-title">
+    <h1>{{translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY | translate}}</h1>
+  </div>
+  <div class="client-management-actions">
+    <div class="button-register">
       <button class="button" (click)="redirectToRegisterClient()">
         {{translationCodes.TC_REGISTER_BUTTON_LABEL | translate}}
       </button>
+    </div>
+  </div>
+
+  <div class="client-table-content">
+    <app-grid-list
+      [title]="translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY"
+      [items]="clients"
+      [cardComponent]="clientCard"
+      [filters]="[
+      { key: 'status', label: 'Estado', type: 'enum', enumValues: [AccountStatusType.ENABLED, AccountStatusType.DISABLED] },
+      { key: 'createdAt', label: 'Fecha de Creación', type: 'date' },
+      { key: 'appointmentDateTime', label: 'Fecha y Hora de Cita', type: 'datetime' }
+      ]">
 
     </app-grid-list>
 

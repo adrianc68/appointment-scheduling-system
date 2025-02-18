@@ -42,7 +42,7 @@
   height: auto;
   flex-direction: column;
   padding: variables.$padding-md;
-  border-bottom: variables.$border-width solid variables.$border-color;
+  border-bottom: variables.$border-width solid variables.$border;
 }
 
 .notification-content {

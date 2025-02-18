@@ -6,21 +6,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width:100%;
+  width: 100%;
   padding: variables.$padding-md;
+  gap: variables.$spacing-large;
+}
+
+.client-management-title {
+  width: 100%;
+}
+
+.client-management-actions {
+  width: 100%;
+
+  @include mixins.flex-end;
+
 }
 
 .client-table-content {
-  // background-color: red;
-  width:100%;
+  width: 100%;
 }
-
-// @include mixins.respond-to(breakpoints.$breakpoint-md) {
-//   .client-table-content {
-//     max-width: variables.$container-lg;
-//   }
-// }
-
-
-
-

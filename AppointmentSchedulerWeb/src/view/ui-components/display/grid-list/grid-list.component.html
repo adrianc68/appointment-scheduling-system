@@ -9,51 +9,53 @@
       </div>
 
       <div class="filter-button">
-        <button class="button bordered t-primary" (click)="toggleFiltersStatus()">
+        <button class="button bordered" (click)="toggleFilters()">
           <mat-icon>filter_alt</mat-icon>
-          <span class="t-primary">{{TranslationCodes.TC_FILTER_BUTTON_LABEL | translate }}</span>
+          {{TranslationCodes.TC_FILTER_BUTTON_LABEL | translate }}
         </button>
       </div>
     </div>
-
 
 
     <div class="grid-filters" [ngClass]="{'active': setFilters}">
-      <div class="filter-buttons">
-        <button class="button bordered" *ngFor="let filter of filters" (click)="toggleFilter(filter.key)"
-          [class.active]="activeFilters.has(filter.key)">
-          {{ filter.label }}
-        </button>
-      </div>
+      <div class="filter-dropdowns">
 
-      <div class="orders">
-        <div class="sort-buttons">
-          <button *ngFor="let sort of sortOptions" (click)="toggleSort(sort.key)"
-            [class.active]="activeSort === sort.key">
-            {{ sort.label }} ({{ sortDirection }})
-          </button>
+        <div *ngFor="let filter of filters">
+          <label>{{ filter.label }}</label>
+
+          <ng-container [ngSwitch]="filter.type">
+            <input class="input" *ngSwitchCase="'boolean'" type="checkbox" [(ngModel)]="activeFilters[filter.key]"
+              (change)="applyFilters()" />
+
+            <input class="input" *ngSwitchCase="'date'" type="date" [(ngModel)]="activeFilters[filter.key]"
+              (change)="applyFilters()" />
+
+            <input class="input" *ngSwitchCase="'datetime'" type="datetime-local" [(ngModel)]="activeFilters[filter.key]"
+              (change)="applyFilters()" />
+
+            <select class="input" *ngSwitchCase="'enum'" (change)="onEnumChange($event, filter)">
+              <option *ngFor="let option of filter.enumValues" [value]="option">{{ option | translate }}</option>
+            </select>
+          </ng-container>
         </div>
+
       </div>
-
+      <div class="orders">
+        <!--<div class="sort-buttons">-->
+        <!--<button *ngFor="let sort of sortOptions" (click)="toggleSort(sort.key)"-->
+        <!--  [class.active]="activeSort === sort.key">-->
+        <!--  {{ sort.label }} ({{ sortDirection }})-->
+        <!--</button>-->
+        <!--</div>-->
+      </div>
     </div>
-
-
-
-
-
   </div>
 
   <div class="grid-content">
-
-    <div class="actions">
-      <ng-content></ng-content>
-    </div>
-
     <div class="grid-table">
       <div class="grid-title">
         <span class="t-subtle">{{title | translate}}</span>
       </div>
-
       <div class="grid-items">
         <ng-container *ngFor="let item of filteredItems">
           <div class="grid-item">
@@ -61,10 +63,7 @@
             </ng-container>
           </div>
         </ng-container>
-
       </div>
     </div>
-
-
   </div>
 </div>

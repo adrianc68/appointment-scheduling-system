@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { ClientCardComponent } from '../../ui-components/display/card/client-card/client-card.component';
 import { TranslatePipe } from '../../../cross-cutting/helper/i18n/translate.pipe';
+import { AccountStatusType } from '../../../view-model/business-entities/types/account-status.types';
 
 @Component({
   selector: 'app-client-management',
@@ -27,7 +28,8 @@ export class ClientManagementComponent {
   systemMessage?: string = '';
   translationCodes = TranslationCodes;
   clients: Client[] = [];
-  clientCard = ClientCardComponent
+  clientCard = ClientCardComponent;
+  AccountStatusType = AccountStatusType;
 
   constructor(private clientService: ClientService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
     this.clientService.getClientList().pipe(

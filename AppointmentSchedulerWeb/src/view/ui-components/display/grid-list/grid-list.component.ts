@@ -19,21 +19,29 @@ export class GridListComponent implements OnInit, OnChanges {
   @Input() title: string = 'Grid Title';
   @Input() items: any[] = [];
   @Input() cardComponent!: Type<any>;
-  @Input() filters: { key: string, label: string }[] = [];
-  @Input() sortOptions: { key: string, label: string }[] = [];
+
+
+  //@Input() filters: { key: string, label: string }[] = [];
+  //@Input() sortOptions: { key: string, label: string }[] = [];
 
   searchTerm: string = '';
-
   filteredItems: any[] = [];
   originalItems: any[] = [];
 
-  activeFilters: Set<string> = new Set();
-  activeSort: string = '';
-  sortDirection: 'asc' | 'desc' = 'asc';
-
+  // Enable or disable the filters
   setFilters: boolean = false;
 
-  toggleFiltersStatus() {
+
+  //activeFilters: Set<string> = new Set();
+  //activeSort: string = '';
+  //sortDirection: 'asc' | 'desc' = 'asc';
+
+  @Input() filters: { key: string, label: string, type: 'boolean' | 'enum' | 'date' | 'datetime', enumValues?: any[] }[] = [];
+  activeFilters: { [key: string]: any } = {};
+
+
+
+  toggleFilters() {
     this.setFilters = !this.setFilters;
   }
 
@@ -49,25 +57,11 @@ export class GridListComponent implements OnInit, OnChanges {
     }
   }
 
-  toggleFilter(filterKey: string) {
-    if (this.activeFilters.has(filterKey)) {
-      this.activeFilters.delete(filterKey);
-    } else {
-      this.activeFilters.add(filterKey);
-    }
+  onEnumChange(event: Event, filter: any): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.activeFilters[filter.key] = value;
     this.applyFilters();
   }
-
-  toggleSort(sortKey: string) {
-    if (this.activeSort === sortKey) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.activeSort = sortKey;
-      this.sortDirection = 'asc';
-    }
-    this.applyFilters();
-  }
-
 
   applyFilters() {
 
@@ -82,26 +76,37 @@ export class GridListComponent implements OnInit, OnChanges {
     }
 
     if (this.setFilters) {
+      Object.keys(this.activeFilters).forEach(filterKey => {
+        const filterValue = this.activeFilters[filterKey];
+        if (filterValue !== undefined && filterValue !== null && filterValue !== '') {
+          tempItems = tempItems.filter(item => {
+            const itemValue = item[filterKey];
+            if (typeof filterValue === 'boolean') {
+              return itemValue === filterValue;
+            }
 
-      if (this.activeFilters.size > 0) {
-        tempItems = tempItems.filter(item =>
-          Array.from(this.activeFilters).every(filterKey => item[filterKey])
-        );
-      }
+            if (typeof itemValue === "string" && typeof filterValue === "string") {
+              const itemDateOnly = new Date(itemValue).toISOString().split('T')[0];
+              const filterDateOnly = new Date(filterValue).toISOString().split('T')[0];
+              return itemDateOnly === filterDateOnly;
+            }
 
-      if (this.activeSort) {
-        tempItems.sort((a, b) => {
-          const valA = a[this.activeSort]?.toString().toLowerCase();
-          const valB = b[this.activeSort]?.toString().toLowerCase();
-          return this.sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-        });
-      }
+            if (Array.isArray(filterValue)) {
+              return filterValue.includes(itemValue);
+            }
+
+
+            return true;
+          });
+        }
+      });
 
     }
 
-
-
     this.filteredItems = tempItems;
   }
+
+
+
 
 }
