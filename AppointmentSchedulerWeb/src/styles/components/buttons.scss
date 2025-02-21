@@ -13,6 +13,11 @@
   max-height: variables.$button-size-base;
   @include mixins.flex-center;
   gap: variables.$spacing-small;
+  font-size: variables.$font-size-base;
+
+  .button-icon {
+    font-size: variables.$font-size-xl;
+  }
 }
 
 .button.primary {

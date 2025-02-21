@@ -4,10 +4,11 @@ import { TranslationCodes } from '../../../../../cross-cutting/helper/i18n/model
 import { WebRoutes } from '../../../../../cross-cutting/operation-management/model/web-routes.constants';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-administrator-home',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatIconModule],
   standalone: true,
   templateUrl: './administrator-home.component.html',
   styleUrl: './administrator-home.component.scss'

@@ -1,35 +1,72 @@
-<h1>{{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY)}}</h1>
+<div class="assistant-management-container">
+  <div class="assistant-management-title">
+    <h1>{{translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY | translate}}</h1>
+  </div>
 
-<button class="button" (click)="redirectToRegisterAssistant()">
-  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
-</button>
+  <div class="assistant-summary">
+    <div class="assistant-summary-item card">
+      <span class="t-muted">{{translationCodes.TC_ASSISTANTS_REGISTERED_LABEL | translate}}</span>
+      <span class="fw-bold fs-xl">{{assistants.length}}</span>
+    </div>
+    <div class="assistant-summary-item card">
+      <span class="t-muted">{{translationCodes.TC_ASSISTANTS_AVAILABLE_LABEL | translate}}</span>
+      <span class="fw-bold fs-xl">{{enabledClientsCount}}</span>
+    </div>
+    <div class="assistant-summary-item card">
+      <span class="t-muted">{{translationCodes.TC_ASSISTANTS_NOT_AVAILABLE_LABEL | translate}}</span>
+      <span class="fw-bold fs-xl">{{disabledClientsCount}}</span>
+    </div>
+  </div>
 
-<table border="1">
-  <thead>
-    <tr>
-      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_NAME_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_EMAIL_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_PHONE_NUMBER_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_USERNAME_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let assistant of assistants">
-      <td>{{assistant.name}}</td>
-      <td>{{assistant.email}}</td>
-      <td>{{assistant.phoneNumber}}</td>
-      <td>{{assistant.username}}</td>
-      <td>{{assistant.status}}</td>
-      <td>{{assistant.createdAt}}</td>
-      <td>
-        <button class="button" (click)="redirectToEditAssistant(assistant)">
-          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
-        </button>
-      </td>
-    </tr>
+  <div class="assistant-management-actions">
+    <div class="button-register">
+      <button class="button" (click)="redirectToRegisterAssistant()">
+        {{translationCodes.TC_REGISTER_BUTTON_LABEL | translate}}
+      </button>
+    </div>
+  </div>
 
-  </tbody>
-</table>
+
+  <div class="assistant-table-content">
+    <app-grid-list [title]="translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY" [items]="assistants" [cardComponent]="assistantCard"></app-grid-list>
+
+  </div>
+
+</div>
+<!---->
+<!---->
+<!--<h1>{{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY)}}</h1>-->
+<!---->
+<!--<button class="button" (click)="redirectToRegisterAssistant()">-->
+<!--  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}-->
+<!--</button>-->
+<!---->
+<!--<table border="1">-->
+<!--  <thead>-->
+<!--    <tr>-->
+<!--      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_NAME_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_EMAIL_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_PHONE_NUMBER_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_USERNAME_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_ASSISTANT_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>-->
+<!--    </tr>-->
+<!--  </thead>-->
+<!--  <tbody>-->
+<!--    <tr *ngFor="let assistant of assistants">-->
+<!--      <td>{{assistant.name}}</td>-->
+<!--      <td>{{assistant.email}}</td>-->
+<!--      <td>{{assistant.phoneNumber}}</td>-->
+<!--      <td>{{assistant.username}}</td>-->
+<!--      <td>{{assistant.status}}</td>-->
+<!--      <td>{{assistant.createdAt}}</td>-->
+<!--      <td>-->
+<!--        <button class="button" (click)="redirectToEditAssistant(assistant)">-->
+<!--          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}-->
+<!--        </button>-->
+<!--      </td>-->
+<!--    </tr>-->
+<!---->
+<!--  </tbody>-->
+<!--</table>-->

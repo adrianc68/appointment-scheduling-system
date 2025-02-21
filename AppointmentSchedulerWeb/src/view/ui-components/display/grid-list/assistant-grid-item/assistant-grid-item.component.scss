@@ -2,19 +2,19 @@
 @use '../../../../../styles/variables.scss' as variables;
 @use '../../../../../styles/breakpoints.scss' as breakpoints;
 
-.client-card-container {
+.assistant-card-container {
   width: 100%;
   max-height: 200px;
   padding: variables.$padding-md;
   position: relative;
 }
 
-.client-data {
+.assistant-data {
   display: flex;
   gap: variables.$spacing-small;
   width: 100%;
 
-  .client-icon {
+  .assistant-icon {
     @include mixins.flex-center;
 
     .profile-icon {
@@ -26,7 +26,7 @@
     }
   }
 
-  .client-info {
+  .assistant-info {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -34,7 +34,7 @@
   }
 }
 
-.client-buttons {
+.assistant-buttons {
   position: absolute;
   right: 0;
   bottom: 0;

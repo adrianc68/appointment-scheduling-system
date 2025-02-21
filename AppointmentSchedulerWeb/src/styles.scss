@@ -42,11 +42,13 @@ h4,
 h5,
 h6 {
   color: variables.$text-emphasis;
+  // background-color: variables.$text-emphasis;
 }
 
 p {
-  color: variables.$text;
+  color: variables.$text-muted;
   font-size: variables.$font-size-base;
+  // background-color: variables.$text-muted;
 }
 
 p.secondary {
@@ -56,11 +58,19 @@ p.secondary {
 label {
   color: variables.$text-emphasis;
   font-size: variables.$font-size-base;
+  // background-color: variables.$text-emphasis;
 }
 
 label.error {
   color: variables.$text-error;
 }
+
+// label.container {
+//   width: auto;
+//   height: 100%;
+//   background-color: red;
+//   @include mixins.flex-center;
+// }
 
 li {
   font-size: variables.$font-size-base;
@@ -69,6 +79,7 @@ li {
 span {
   font-size: variables.$font-size-base;
   color: variables.$text;
+  // background-color: variables.$text;
 }
 
 
@@ -108,7 +119,7 @@ span {
   font-size: variables.$font-size-lg;
 }
 
-.fs-xlg {
+.fs-xl {
   font-size: variables.$font-size-xl;
 }
 
@@ -125,6 +136,10 @@ span {
   color: variables.$text-subtle;
 }
 
+.t-muted {
+  color: variables.$text-muted;
+}
+
 .t-disabled {
   color: variables.$text-disabled;
 }
@@ -133,6 +148,20 @@ span {
   color: variables.$text-emphasis;
 }
 
+.t-nowrap {
+  white-space: nowrap;
+}
+
+// Utils
+
+.no-bg {
+  background-color: transparent;
+}
+
+
+.wd-auto {
+  width: auto;
+}
 
 .mat-mdc-dialog-panel {
   max-width: variables.$container-lg !important;

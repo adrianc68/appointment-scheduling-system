@@ -1,36 +1,82 @@
-<h1>{{translate(translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY)}}</h1>
+<div class="service-management-container">
+  <div class="service-management-title">
+    <h1>{{ translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY | translate}}</h1>
+  </div>
 
-<button class="button" (click)="redirectToRegisterService()">
-  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
-</button>
+  <div class="service-summary">
+    <div class="service-summary-item card">
+      <span class="t-muted">{{translationCodes.TC_SERVICES_REGISTERED_LABEL | translate}}</span>
+      <span class="fw-bold fs-xl">{{services.length}}</span>
+    </div>
 
-<table border="1">
-  <thead>
-    <tr>
-      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_NAME_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_DESCRIPTION_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_MINUTES_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_PRICE_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>
+    <div class="service-summary-item card">
+      <span class="t-muted">{{translationCodes.TC_SERVICES_AVAILABLE_LABEL | translate}}</span>
+      <span class="fw-bold fs-xl">{{enabledServiceCount}}</span>
+    </div>
 
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let service of services">
-      <td>{{service.name}}</td>
-      <td>{{service.description}}</td>
-      <td>{{service.minutes}}</td>
-      <td>{{service.price}}</td>
-      <td>{{service.status}}</td>
-      <td>{{service.createdAt}}</td>
-      <td>
-        <button class="button" (click)="redirectToEditService(service)">
-          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
-        </button>
-      </td>
-    </tr>
+    <div class="service-summary-item card">
+      <span class="t-muted">{{translationCodes.TC_SERVICES_NOT_AVAILABLE_LABEL | translate}}</span>
+      <span class="fw-bold fs-xl">{{disabledServiceCount}}</span>
 
-  </tbody>
-</table>
+    </div>
+
+  </div>
+
+  <div class="service-management-actions">
+    <div class="button-register">
+      <button class="button">
+        {{translationCodes.TC_REGISTER_BUTTON_LABEL | translate}}
+      </button>
+    </div>
+  </div>
+
+  <div class="service-table-content">
+    <app-grid-list [title]="'test'" [items]="services" [cardComponent]="serviceCard">
+
+    </app-grid-list>
+
+
+  </div>
+
+
+</div>
+
+
+<!---->
+<!---->
+<!--<h1>{{translate(translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY)}}</h1>-->
+<!---->
+<!--<button class="button" (click)="redirectToRegisterService()">-->
+<!--  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}-->
+<!--</button>-->
+<!---->
+<!--<table border="1">-->
+<!--  <thead>-->
+<!--    <tr>-->
+<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_NAME_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_DESCRIPTION_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_MINUTES_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_PRICE_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_STATUS_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>-->
+<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>-->
+<!---->
+<!--    </tr>-->
+<!--  </thead>-->
+<!--  <tbody>-->
+<!--    <tr *ngFor="let service of services">-->
+<!--      <td>{{service.name}}</td>-->
+<!--      <td>{{service.description}}</td>-->
+<!--      <td>{{service.minutes}}</td>-->
+<!--      <td>{{service.price}}</td>-->
+<!--      <td>{{service.status}}</td>-->
+<!--      <td>{{service.createdAt}}</td>-->
+<!--      <td>-->
+<!--        <button class="button" (click)="redirectToEditService(service)">-->
+<!--          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}-->
+<!--        </button>-->
+<!--      </td>-->
+<!--    </tr>-->
+<!---->
+<!--  </tbody>-->
+<!--</table>-->

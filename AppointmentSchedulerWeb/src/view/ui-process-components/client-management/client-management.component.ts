@@ -30,6 +30,7 @@ export class ClientManagementComponent {
   clients: Client[] = [];
   clientCard = ClientCardComponent;
   AccountStatusType = AccountStatusType;
+  accountStatusType = AccountStatusType;
 
   constructor(private clientService: ClientService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
     this.clientService.getClientList().pipe(
@@ -59,6 +60,15 @@ export class ClientManagementComponent {
 
       }
     })
+  }
+
+
+  get enabledClientsCount(): number {
+    return this.clients.filter(client => client.status === AccountStatusType.ENABLED).length;
+  }
+
+  get disabledClientsCount(): number {
+    return this.clients.filter(client => client.status === AccountStatusType.DISABLED).length;
   }
 
 

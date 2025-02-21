@@ -6,7 +6,6 @@ import { WebRoutes } from '../../../../../cross-cutting/operation-management/mod
 import { TranslatePipe } from '../../../../../cross-cutting/helper/i18n/translate.pipe';
 import { TranslationCodes } from '../../../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { MatIconModule } from '@angular/material/icon';
-import { ReadableDatePipe } from '../../../../../cross-cutting/helper/date-utils/readable-date.pipe';
 
 @Component({
   selector: 'app-client-card',

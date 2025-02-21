@@ -13,10 +13,13 @@ import { MessageCodeType } from '../../../cross-cutting/communication/model/mess
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '../../../cross-cutting/helper/i18n/translate.pipe';
+import { AccountStatusType } from '../../../view-model/business-entities/types/account-status.types';
+import { AssistantGridItemComponent } from '../../ui-components/display/grid-list/assistant-grid-item/assistant-grid-item.component';
 
 @Component({
   selector: 'app-assistant-management',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, TranslatePipe],
   standalone: true,
   templateUrl: './assistant-management.component.html',
   styleUrl: './assistant-management.component.scss'
@@ -25,6 +28,7 @@ export class AssistantManagementComponent {
   systemMessage?: string = '';
   translationCodes = TranslationCodes;
   assistants: Assistant[] = [];
+  assistantCard = AssistantGridItemComponent;
 
   constructor(private router: Router, private assistantService: AssistantService, private i18nService: I18nService, private logginService: LoggingService) {
     this.assistantService.getAssistantList().pipe(
@@ -71,6 +75,15 @@ export class AssistantManagementComponent {
     }
 
     this.systemMessage = code;
+  }
+
+
+  get enabledClientsCount(): number {
+    return this.assistants.filter(assistant => assistant.status === AccountStatusType.ENABLED).length;
+  }
+
+  get disabledClientsCount(): number {
+    return this.assistants.filter(assistant => assistant.status === AccountStatusType.DISABLED).length;
   }
 
   redirectToRegisterAssistant() {

@@ -24,6 +24,12 @@ export class ThemeService {
     localStorage.setItem('theme', theme);
   }
 
+  setSystemTheme() {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let defaultTheme: 'light' | 'dark' = prefersDark ? 'dark' : 'light';
+    this.setTheme(defaultTheme);
+  }
+
   toggleTheme() {
     this.setTheme(this.currentTheme === 'light' ? 'dark' : 'light');
   }

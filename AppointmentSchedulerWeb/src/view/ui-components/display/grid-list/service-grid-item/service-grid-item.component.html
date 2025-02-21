@@ -1,0 +1,19 @@
+<div class="service-card-container">
+  <div class="service-data">
+    <div class="service-icon">
+      <mat-icon class="profile-icon">business_center</mat-icon>
+    </div>
+    <div class="service-info">
+      <span class="fw-bold">{{data.name}} ({{data.name}})</span>
+      <span class="fs-sm t-secondary">{{data.price}}</span>
+      <span class="fs-sm t-secondary">{{data.minutes}}</span>
+      <span class="fs-sm t-secondary">{{data.description}}</span>
+      <span class="fs-sm t-secondary">{{data.status | translate}}</span>
+    </div>
+  </div>
+  <div class="service-buttons">
+    <button class="button bordered" (click)="redirectToEditService(data)">
+      {{TranslationCodes.TC_EDIT_BUTTON_LABEL | translate}}
+    </button>
+  </div>
+</div>

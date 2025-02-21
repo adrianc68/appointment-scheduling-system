@@ -1,13 +1,73 @@
-<p>administrator-home works!</p>
+<section class="admin-home-container">
+  <nav class="admin-sections">
+    <ul>
+      <li>
+        <a [routerLink]="[webRoutes.appointment_management]">
+          <div class="page-icon">
+            <mat-icon class="icon">calendar_month</mat-icon>
+          </div>
+          <span>
+            {{translate(translationCodes.TC_APPOINTMENT_CREATE_DIRECTORY)}}
+          </span>
+        </a>
+      </li>
 
-<a [routerLink]="[webRoutes.client_management]">Client management</a>
-<br>
-<a [routerLink]="[webRoutes.service_management]">Service management</a>
-<br>
-<a [routerLink]="[webRoutes.assistant_management]">Assistant management</a>
-<br>
-<a [routerLink]="[webRoutes.appointment_management]">Appointment management</a>
+      <li>
+        <a [routerLink]="[webRoutes.availability_time_slot_management]">
+          <div class="page-icon">
+            <mat-icon class="icon">access_time</mat-icon>
+          </div>
+          <span>
+            {{translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY) }}
+          </span>
+        </a>
+      </li>
 
 
-<br>
-<br>
+      <li>
+        <a [routerLink]="[webRoutes.assistant_management]">
+          <div class="page-icon">
+            <mat-icon class="icon">supervisor_account</mat-icon>
+          </div>
+          <span>
+            {{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY) }}
+          </span>
+
+        </a>
+      </li>
+
+      <li>
+        <a [routerLink]="[webRoutes.service_management]">
+          <div class="page-icon">
+            <mat-icon class="icon">business_center</mat-icon>
+          </div>
+          <span>
+            {{translate(translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY) }}
+          </span>
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="[webRoutes.client_management]">
+          <div class="page-icon">
+            <mat-icon class="icon">groups_3</mat-icon>
+          </div>
+          <span>
+            {{ translate(translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY)}}
+          </span>
+        </a>
+      </li>
+
+      <li>
+        <a [routerLink]="[webRoutes.configuration]">
+          <div class="page-icon">
+            <mat-icon class="icon">settings</mat-icon>
+          </div>
+          <span>
+            {{translate(translationCodes.TC_CONFIGURATION_DIRECTORY)}}
+          </span>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+</section>

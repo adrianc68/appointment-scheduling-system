@@ -18,7 +18,7 @@
 
 .notification-container {
   width: 100%;
-  min-height: variables.$notification-card-height;
+  min-height: 150px;
   display: flex;
   flex-direction: column;
   border-bottom: variables.$border-width solid variables.$border;

@@ -2,6 +2,22 @@
   <div class="client-management-title">
     <h1>{{translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY | translate}}</h1>
   </div>
+
+  <div class="client-summary">
+    <div class="client-summary-item card">
+      <span class="t-muted">{{translationCodes.TC_CLIENTS_REGISTERED_LABEL | translate}}</span>
+      <span class="fw-bold fs-xl">{{clients.length}}</span>
+    </div>
+    <div class="client-summary-item card">
+      <span class="t-muted">{{translationCodes.TC_CLIENTS_AVAILABLE_LABEL | translate}}</span>
+      <span class="fw-bold fs-xl">{{enabledClientsCount}}</span>
+    </div>
+    <div class="client-summary-item card">
+      <span class="t-muted">{{translationCodes.TC_CLIENTS_NOT_AVAILABLE_LABEL | translate}}</span>
+      <span class="fw-bold fs-xl">{{disabledClientsCount}}</span>
+    </div>
+  </div>
+
   <div class="client-management-actions">
     <div class="button-register">
       <button class="button" (click)="redirectToRegisterClient()">
@@ -10,15 +26,17 @@
     </div>
   </div>
 
+
   <div class="client-table-content">
-    <app-grid-list
-      [title]="translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY"
-      [items]="clients"
-      [cardComponent]="clientCard"
-      [filters]="[
+    <app-grid-list [title]="translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY" [items]="clients"
+      [cardComponent]="clientCard" [filters]="[
       { key: 'status', label: 'Estado', type: 'enum', enumValues: [AccountStatusType.ENABLED, AccountStatusType.DISABLED] },
       { key: 'createdAt', label: 'Fecha de Creación', type: 'date' },
-      { key: 'appointmentDateTime', label: 'Fecha y Hora de Cita', type: 'datetime' }
+      { key: 'appointmentDateTime', label: 'Fecha y Hora de Cita', type: 'datetime' },
+      { key: 'status', label: 'Estados', type: 'multi'},
+      { key: 'status1', label: 'Estados', type: 'multi'},
+      { key: 'status3', label: 'Estados', type: 'multi'},
+      { key: 'status2', label: 'Estados', type: 'multi'}
       ]">
 
     </app-grid-list>

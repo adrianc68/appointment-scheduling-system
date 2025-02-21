@@ -13,10 +13,13 @@ import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-util
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { Router } from '@angular/router';
 import { ServiceService } from '../../../model/communication-components/service.service';
+import { ServiceGridItemComponent } from '../../ui-components/display/grid-list/service-grid-item/service-grid-item.component';
+import { TranslatePipe } from '../../../cross-cutting/helper/i18n/translate.pipe';
+import { ServiceStatusType } from '../../../view-model/business-entities/types/service-status.types';
 
 @Component({
   selector: 'app-service-management',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, TranslatePipe],
   standalone: true,
   templateUrl: './service-management.component.html',
   styleUrl: './service-management.component.scss'
@@ -25,6 +28,7 @@ export class ServiceManagementComponent {
   systemMessage?: string = '';
   translationCodes = TranslationCodes;
   services: Service[] = [];
+  serviceCard = ServiceGridItemComponent;
 
   constructor(private serviceService: ServiceService, private i18nService: I18nService, private loggingService: LoggingService, private router: Router) {
     this.serviceService.getServiceList().pipe(
@@ -75,6 +79,13 @@ export class ServiceManagementComponent {
   }
 
 
+  get enabledServiceCount(): number {
+    return this.services.filter(item => item.status === ServiceStatusType.ENABLED).length;
+  }
+
+ get disabledServiceCount(): number {
+    return this.services.filter(item => item.status === ServiceStatusType.DISABLED).length;
+  }
 
 
   redirectToEditService(service: Service) {

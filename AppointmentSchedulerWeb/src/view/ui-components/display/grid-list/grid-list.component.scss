@@ -21,7 +21,6 @@
 
   .grid-input-search {
     @include mixins.flex-center;
-    gap: variables.$spacing-medium;
     width: 60%;
     max-width: 420px;
   }
@@ -29,26 +28,50 @@
 
 
 .grid-filters {
-  width:100%;
-  background-color: green;
   margin-top: variables.$padding-md;
+  // width:50%;
   display: none;
+  // overflow-x: auto;
 }
 
 .grid-filters.active {
   @include mixins.flex-start;
+  // position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background-color: blue;
+}
 
+
+.filters {
+  background-color: red;
+  width: 100%;
+  max-height:100px;
+  min-height:100px;
+  display: flex;
+  gap: 15px;
+  // overflow-x: auto;
+  // flex-direction: column;
+
+  .multi-option-container {
+    // position:relative;
+    background-color: blue;
+    // height:auto;
+  }
 
 }
+
+
 
 .grid-content {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap:variables.$spacing-medium;
+  gap: variables.$spacing-medium;
+  z-index: variables.$z-index-low;
 
   .actions {
-    display:flex;
+    display: flex;
     gap: variables.$spacing-medium;
   }
 
@@ -76,5 +99,10 @@
   }
 }
 
-
-
+.custom-dropdown-panel {
+  position: absolute;   /* Esto mantiene el dropdown bajo el botón */
+  z-index: 1000;        /* Asegúrate de que esté encima de otros elementos */
+  top: 100%;            /* Colócalo debajo del botón */
+  left: 0;              /* Alineado con el borde izquierdo del botón */
+  width: 100%;          /* Ancho opcional o ajustado a lo que necesites */
+}

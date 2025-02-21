@@ -1,4 +1,49 @@
+<div class="config-management-container">
+  <div class="config-management">
 
-<button class="button" (click)="toggleTheme()">
-  Cambiar a {{ currentTheme === 'light' ? 'Dark' : 'Light' }} Mode
-</button>
+    <section class="item-management card">
+      <div class="item-header">
+        <h1>{{TranslationCodes.TC_CONFIGURATION_DIRECTORY_ASPECT | translate}}</h1>
+        <div class="item-description">
+          <span class="fw-bold t-emphasis fs-lg">{{TranslationCodes.TC_THEME_ASPECT_PANEL_CONTROL | translate}}</span>
+          <p>Este cambia el color del contenido dentro de su navegador</p>
+        </div>
+      </div>
+      <div class="item-content">
+        <div class="color-theme-buttons">
+          <button class="item-theme bg-hover" (click)="setSystemTheme()">
+            <img src="/images/calendar.svg" />
+            <span class="t-muted">Default</span>
+          </button>
+          <button class="item-theme" (click)="setTheme('dark')">
+            <img src="/images/calendar.svg" />
+            <span class="t-muted">Dark Mode</span>
+          </button>
+          <button class="item-theme" (click)="setTheme('light')">
+            <img src="/images/calendar.svg" />
+            <span class="t-muted">Light Mode</span>
+          </button>
+        </div>
+      </div>
+
+
+    </section>
+
+    <section class="item-management card">
+      <div class="item-header">
+        <h1>{{TranslationCodes.TC_CONFIGURATION_DIRECTORY_LANGUAGE | translate}}</h1>
+        <div class="item-description">
+          <span class="fw-bold t-emphasis fs-lg">{{TranslationCodes.TC_LANGUAGE_PANEL_CONTROL | translate}}</span>
+          <p>Este cambia el idioma del contenido dentro de su navegador</p>
+        </div>
+      </div>
+      <div class="item-content">
+        <button class="button" (click)="changeLanguageToEnglish()">To English</button>
+        <button class="button" (click)="changeLanguageToSpanish()">To Spanish</button>
+      </div>
+
+
+    </section>
+  </div>
+
+</div>

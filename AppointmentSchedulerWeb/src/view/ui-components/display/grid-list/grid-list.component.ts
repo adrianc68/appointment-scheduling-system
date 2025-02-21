@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslationCodes } from '../../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { TranslatePipe } from '../../../../cross-cutting/helper/i18n/translate.pipe';
+import { MultiSelectFilterComponent } from '../../input/multi-select-filter/multi-select-filter.component';
 
 @Component({
   selector: 'app-grid-list',
-  imports: [CommonModule, FormsModule, MatIconModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, MatIconModule, TranslatePipe, MultiSelectFilterComponent],
   standalone: true,
 
   templateUrl: './grid-list.component.html',
@@ -36,12 +37,20 @@ export class GridListComponent implements OnInit, OnChanges {
   //activeSort: string = '';
   //sortDirection: 'asc' | 'desc' = 'asc';
 
-  @Input() filters: { key: string, label: string, type: 'boolean' | 'enum' | 'date' | 'datetime', enumValues?: any[] }[] = [];
+  @Input() filters: { key: string, label: string, type: 'boolean' | 'enum' | 'date' | 'datetime' | 'multi', enumValues?: any[] }[] = [];
   activeFilters: { [key: string]: any } = {};
 
+  clearFilters() {
+    this.activeFilters = {};
+    this.searchTerm = '';
+    this.applyFilters();
+  }
 
 
   toggleFilters() {
+    if (this.setFilters) {
+      this.clearFilters();
+    }
     this.setFilters = !this.setFilters;
   }
 
@@ -57,6 +66,10 @@ export class GridListComponent implements OnInit, OnChanges {
     }
   }
 
+  onFilterChange(selectedValues: string[]) {
+    console.log('Valores seleccionados:', selectedValues);
+  }
+
   onEnumChange(event: Event, filter: any): void {
     const value = (event.target as HTMLSelectElement).value;
     this.activeFilters[filter.key] = value;
@@ -64,7 +77,6 @@ export class GridListComponent implements OnInit, OnChanges {
   }
 
   applyFilters() {
-
     let tempItems = [...this.items];
 
     if (this.searchTerm.trim()) {
@@ -81,32 +93,36 @@ export class GridListComponent implements OnInit, OnChanges {
         if (filterValue !== undefined && filterValue !== null && filterValue !== '') {
           tempItems = tempItems.filter(item => {
             const itemValue = item[filterKey];
-            if (typeof filterValue === 'boolean') {
-              return itemValue === filterValue;
+            const filterType = this.filters.find(f => f.key === filterKey)?.type;
+            switch (filterType) {
+              case 'boolean':
+                return itemValue === filterValue;
+              case 'enum':
+                return Array.isArray(filterValue) ? filterValue.includes(itemValue) : itemValue === filterValue;
+              case 'date':
+                return new Date(itemValue).toISOString().split('T')[0] ===
+                  new Date(filterValue).toISOString().split('T')[0];
+              case 'datetime':
+                return new Date(itemValue).toISOString().slice(0, 16) ===
+                  new Date(filterValue).toISOString().slice(0, 16);
+              default:
+                return true;
             }
-
-            if (typeof itemValue === "string" && typeof filterValue === "string") {
-              const itemDateOnly = new Date(itemValue).toISOString().split('T')[0];
-              const filterDateOnly = new Date(filterValue).toISOString().split('T')[0];
-              return itemDateOnly === filterDateOnly;
-            }
-
-            if (Array.isArray(filterValue)) {
-              return filterValue.includes(itemValue);
-            }
-
-
-            return true;
           });
         }
       });
-
     }
-
     this.filteredItems = tempItems;
   }
 
 
-
+  toggleFilter(filterKey: string, value: any, type: 'boolean' | 'date' | 'datetime' | 'enum') {
+    if (type === 'boolean') {
+      this.activeFilters[filterKey] = !this.activeFilters[filterKey];
+    } else if (type === 'enum' || type === 'date' || type === 'datetime') {
+      this.activeFilters[filterKey] = this.activeFilters[filterKey] === value ? null : value;
+    }
+    this.applyFilters();
+  }
 
 }

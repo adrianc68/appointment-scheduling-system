@@ -2,44 +2,85 @@
 
   <div class="grid-header">
     <div class="grid-search">
-      <div class="grid-input-search">
-        <mat-icon class="t-primary">search</mat-icon>
-        <input class="input" type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
+      <div class="grid-input-search input container">
+        <label class="input-icon" for="search">
+          <mat-icon>search</mat-icon>
+        </label>
+        <input id="search" class="input" type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
           placeholder="{{TranslationCodes.TC_SEARCH_INPUT_PLACEHOLDER_LABEL | translate}}" />
       </div>
 
       <div class="filter-button">
         <button class="button bordered" (click)="toggleFilters()">
-          <mat-icon>filter_alt</mat-icon>
+          <mat-icon class="button-icon">filter_alt</mat-icon>
           {{TranslationCodes.TC_FILTER_BUTTON_LABEL | translate }}
         </button>
       </div>
+
+
+      <button class="button bordered wd-auto" (click)="clearFilters()">{{TranslationCodes.TC_CLEAR_FILTERS_LABEL |
+        translate}}</button>
     </div>
 
-
     <div class="grid-filters" [ngClass]="{'active': setFilters}">
-      <div class="filter-dropdowns">
-
-        <div *ngFor="let filter of filters">
-          <label>{{ filter.label }}</label>
-
+      <div class="filters">
+        <ng-container class="filters" *ngFor="let filter of filters">
           <ng-container [ngSwitch]="filter.type">
-            <input class="input" *ngSwitchCase="'boolean'" type="checkbox" [(ngModel)]="activeFilters[filter.key]"
-              (change)="applyFilters()" />
 
-            <input class="input" *ngSwitchCase="'date'" type="date" [(ngModel)]="activeFilters[filter.key]"
-              (change)="applyFilters()" />
+            <div *ngSwitchCase="'enum'">
+              <label>{{ filter.label }}</label>
+              <div *ngFor="let option of filter.enumValues">
 
-            <input class="input" *ngSwitchCase="'datetime'" type="datetime-local" [(ngModel)]="activeFilters[filter.key]"
-              (change)="applyFilters()" />
+                <div class="input container">
+                  <input id="{{option}}" type="checkbox" [checked]=""
+                    (change)="toggleFilter(filter.key, option, 'enum')" />
+                  <label for="{{option}}">{{option | translate}}</label>
+                </div>
 
-            <select class="input" *ngSwitchCase="'enum'" (change)="onEnumChange($event, filter)">
-              <option *ngFor="let option of filter.enumValues" [value]="option">{{ option | translate }}</option>
-            </select>
+
+              </div>
+            </div>
+
+
+            <div class="multi-option-container" *ngSwitchCase="'multi'">
+              <app-multi-select-filter label="Tipo de Evento"
+                [options]="['Reunión de 15 min', 'Reunión de 30 min', 'Reunión Secreta', 'TTest']"
+                (selectionChanged)="onFilterChange($event)">
+              </app-multi-select-filter>
+            </div>
+
+            <div *ngSwitchCase="'boolean'">
+              <label>{{ filter.label }}</label>
+              <button type="button" [ngClass]="{'active': activeFilters[filter.key]}"
+                (click)="toggleFilter(filter.key, null, 'boolean')">
+                {{ activeFilters[filter.key] ? 'Activo' : 'Inactivo' }}
+              </button>
+            </div>
+
+            <div class="input container wd-auto" *ngSwitchCase="'date'">
+              <label class="input-placeholder" for="{{filter.label}}">{{ filter.label }}</label>
+              <input id="{{filter.label}}" class="input none" type="date"
+                [indeterminate]="activeFilters[filter.key] === undefined" [value]="activeFilters[filter.key] || ''"
+                [(ngModel)]="activeFilters[filter.key]" (change)="applyFilters()" />
+            </div>
+
+            <div class="input container wd-auto" *ngSwitchCase="'datetime'">
+              <label class="input-placeholder" for="{{filter.label}}">{{ filter.label }}</label>
+              <input id="{{filter.label}}" class="input none" type="datetime-local"
+                [value]="activeFilters[filter.key] || ''" [(ngModel)]="activeFilters[filter.key]"
+                (change)="applyFilters()" />
+            </div>
+
+
+
           </ng-container>
-        </div>
-
+        </ng-container>
       </div>
+
+
+
+
+
       <div class="orders">
         <!--<div class="sort-buttons">-->
         <!--<button *ngFor="let sort of sortOptions" (click)="toggleSort(sort.key)"-->
