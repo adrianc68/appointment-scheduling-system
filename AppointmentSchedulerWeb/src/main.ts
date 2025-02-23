@@ -5,7 +5,7 @@ import { ThemeService } from './cross-cutting/operation-management/configService
 
 
 const themeService = new ThemeService();
-themeService.setTheme(themeService.getCurrentTheme());
+themeService.setCurrentTheme();
 
 bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));

@@ -16,23 +16,26 @@ import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/trans
 })
 export class ConfigManagementComponent {
   TranslationCodes = TranslationCodes;
+  currentTheme!: 'light' | 'dark' | 'default';
+  currentLanguage!: LanguageTypes;
+  LanguagesTypes = LanguageTypes;
 
-  constructor(private themeService: ThemeService, private i18nService: I18nService) { }
+  constructor(private themeService: ThemeService, private i18nService: I18nService) {
+    this.themeService.currentTheme$.subscribe(theme => {
+      this.currentTheme = theme;
+    });
+
+    this.i18nService.getLanguageAsObservable().subscribe((language: LanguageTypes) => {
+      this.currentLanguage = language;
+    })
+  }
 
   toggleTheme() {
-    this.themeService.toggleTheme();
+    this.themeService.setTheme(this.currentTheme);
   }
 
-  setTheme(theme: 'light' | 'dark') {
+  setTheme(theme: 'light' | 'dark' | 'default') {
     this.themeService.setTheme(theme);
-  }
-
-  setSystemTheme() {
-    this.themeService.setSystemTheme();
-  }
-
-  get currentTheme(): 'light' | 'dark' {
-    return this.themeService.getCurrentTheme();
   }
 
   changeLanguageToEnglish(): void {
@@ -42,7 +45,4 @@ export class ConfigManagementComponent {
   changeLanguageToSpanish(): void {
     this.i18nService.setLanguage(LanguageTypes.es_MX);
   }
-
-
-
 }

@@ -29,6 +29,8 @@
       align-items: center;
       justify-content: flex-start;
       text-decoration: none;
+      border:0;
+      border-radius:0px;
       gap: variables.$spacing-small;
       padding-top: variables.$padding-md;
       padding-bottom: variables.$padding-md;
@@ -49,11 +51,13 @@
       }
     }
 
-    a:hover {
+    a:hover,
+    button:hover {
       background-color: variables.$bg-subtle;
     }
 
-    a:focus {
+    a:focus,
+    button:hover {
       background-color: variables.$bg-emphasis;
     }
 

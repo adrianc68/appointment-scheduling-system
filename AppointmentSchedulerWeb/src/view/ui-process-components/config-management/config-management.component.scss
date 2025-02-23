@@ -22,7 +22,6 @@
   width: 100%;
   @include mixins.flex-start;
   flex-direction: column;
-  // background-color: red;
 
   .item-header {
     width: 100%;
@@ -42,7 +41,6 @@
   .item-content {
     padding: variables.$padding-lg;
     width: 100%;
-    // background-color: green;
   }
 }
 
@@ -50,13 +48,10 @@
   display: flex;
   flex-direction: column;
   gap: variables.$spacing-medium;
-  // background-color: blue;
 
   button {
     background-color: transparent;
     border: 0;
-    // border:variables.$border-width solid variables.$border-emphasis;
-    // border-radius: variables.$border-radius-sm;
   }
 
 
@@ -67,23 +62,63 @@
     flex-direction: column;
     width: 100%;
     max-width: 100%;
-    // height: 180px;
     gap: variables.$spacing-medium;
 
     img {
-      width: 100%;
+      width: 90%;
       height: 90%;
       border: variables.$border-width solid variables.$border;
       border-radius: variables.$border-radius-sm;
+      cursor: pointer;
+    }
 
-      &:focus-within {
-        border:2px;
-      }
-
+    img.selected {
+      outline: solid variables.$selected-color 4px;
     }
   }
 }
 
+.language-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  width: 100%;
+  gap: variables.$spacing-medium;
+
+  button {
+    background-color: transparent;
+    border: 0;
+  }
+
+
+  .item-button {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    width: calc(variables.$container-md / 4 - variables.$padding-lg - variables.$spacing-medium);
+    gap: variables.$spacing-medium;
+
+    img {
+      width: 90%;
+      height: 90%;
+      object-fit: cover;
+      border: variables.$border-width solid variables.$border;
+      border-radius: variables.$border-radius-sm;
+      cursor: pointer;
+    }
+
+    img.selected {
+      outline: solid variables.$selected-color 4px;
+    }
+
+    img.disabled {
+      background-color: red;
+    }
+  }
+
+}
 
 
 @include mixins.respond-to(breakpoints.$breakpoint-sm) {
@@ -92,7 +127,7 @@
   }
 
   .color-theme-buttons {
-    display: flex;
     flex-direction: row;
   }
+
 }
