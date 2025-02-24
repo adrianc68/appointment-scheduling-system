@@ -1688,5 +1688,26 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
             return OperationResult<AccountData, GenericError>.Success(accountData, MessageCodeType.OK);
         }
+
+        public async Task<OperationResult<List<ServiceOffer>, GenericError>> GetAllAssignedServicesAsync(Guid uuid)
+        {
+            Assistant? assistantData = await assistantMgr.GetAssistantByUuidAsync(uuid);
+            if (assistantData == null)
+            {
+                GenericError genericError = new GenericError($"Assistant with UUID <{uuid}> is not registered", []);
+                genericError.AddData("AssistantUuid", uuid);
+                return OperationResult<List<ServiceOffer>, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_NOT_FOUND);
+            }
+
+            if (assistantData.Status == AccountStatusType.DELETED)
+            {
+                GenericError genericError = new GenericError($"Cannot modify Assistant with UUID <{assistantData.Uuid}>. Assistant was deleted!", []);
+                genericError.AddData("AssistantUuid", assistantData.Uuid!.Value);
+                genericError.AddData("Status", AssistantStatusType.DELETED.ToString());
+                return OperationResult<List<ServiceOffer>, GenericError>.Failure(genericError, MessageCodeType.ASSISTANT_WAS_DELETED);
+            }
+            List<ServiceOffer> services = await assistantMgr.GetAssignedServicesOfAssistantByUuidAsync(uuid);
+            return OperationResult<List<ServiceOffer>, GenericError>.Success(services);
+        }
     }
 }

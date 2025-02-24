@@ -69,6 +69,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             }
             return assistant.Uuid.Value;
         }
+        public async Task<List<ServiceOffer>> GetAssignedServicesOfAssistantByUuidAsync(Guid uuid)
+        {
+            return (List<ServiceOffer>)await assistantRepository.GetServicesAssignedToAssistantByUuidAsync(uuid);
+        }
 
         public async Task<bool> UpdateAssistantAsync(Assistant assistant)
         {
@@ -99,5 +103,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 observers.Remove(assistantObserver);
             }
         }
+
     }
 }

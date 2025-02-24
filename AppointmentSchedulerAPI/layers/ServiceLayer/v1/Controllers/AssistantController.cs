@@ -223,5 +223,39 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
 
 
+        [HttpGet("service")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> GetAssignedServicesOfAssistant([FromQuery] Guid uuid)
+        {
+            List<ServiceOfferDTO> servicesDtos = [];
+            try
+            {
+                var result = await systemFacade.GetAllAssignedServicesAsync(uuid);
+                if (!result.IsSuccessful)
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+
+                if (result.Result != null)
+                {
+                    servicesDtos = result.Result.Select(a => new ServiceOfferDTO
+                    {
+                        Uuid = a.Uuid,
+                        Name = a.Service!.Name,
+                        Price = a.Service.Price,
+                        Minutes = a.Service.Minutes,
+                        Description = a.Service.Description,
+                        Status = a.Status!.Value,
+                    }).ToList();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
+            }
+            return httpResponseService.OkResponse(servicesDtos, ApiVersionEnum.V1);
+        }
+
     }
 }

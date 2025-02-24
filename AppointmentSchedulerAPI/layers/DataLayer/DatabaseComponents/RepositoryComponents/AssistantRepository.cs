@@ -164,9 +164,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return serviceId;
         }
 
-        public async Task<List<BusinessLogicLayer.Model.Service>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid)
+        public async Task<IEnumerable<BusinessLogicLayer.Model.ServiceOffer>> GetServicesAssignedToAssistantByUuidAsync(Guid uuid)
         {
-            IEnumerable<BusinessLogicLayer.Model.Service> businessService = [];
+            IEnumerable<BusinessLogicLayer.Model.ServiceOffer> businessServicesOffers = [];
             using var dbContext = context.CreateDbContext();
             var assistantDB = await dbContext.Assistants
                 .Include(a => a.ServiceOffers!)
@@ -178,22 +178,28 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 return [];
             }
 
-            businessService = assistantDB.ServiceOffers!
+            businessServicesOffers = assistantDB.ServiceOffers!
                 .Where(ase => ase.Service!.Status == ServiceStatusType.ENABLED)
-                .Select(ase => new BusinessLogicLayer.Model.Service
+                .Select(ase => new BusinessLogicLayer.Model.ServiceOffer
                 {
                     Id = ase.Service!.Id!.Value,
-                    Name = ase.Service.Name,
-                    Description = ase.Service.Description,
-                    Minutes = ase.Service.Minutes,
-                    Price = ase.Service.Price,
-                    Uuid = ase.Service.Uuid,
-                    CreatedAt = ase.Service.CreatedAt,
-                    Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)ase.Service.Status
+                    Uuid = ase.Uuid,
+                    Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType?)ase.Status,
+                    Service = new BusinessLogicLayer.Model.Service
+                    {
+                        Id = ase.Service.Id,
+                        Description = ase.Service.Description,
+                        Minutes = ase.Service.Minutes,
+                        Name = ase.Service.Name,
+                        Price = ase.Service.Price,
+                        Uuid = ase.Service.Uuid,
+                        Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)ase.Service.Status,
+                        CreatedAt = ase.Service.CreatedAt,
+                    },
                 })
                 .ToList();
 
-            return (List<BusinessLogicLayer.Model.Service>)businessService;
+            return (List<BusinessLogicLayer.Model.ServiceOffer>)businessServicesOffers;
         }
 
         public async Task<BusinessLogicLayer.Model.ServiceOffer?> GetServiceOfferByUuidAsync(Guid uuid)

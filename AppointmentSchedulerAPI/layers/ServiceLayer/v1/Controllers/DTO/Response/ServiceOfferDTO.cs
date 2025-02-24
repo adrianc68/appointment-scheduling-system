@@ -1,3 +1,5 @@
+using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
+
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response
 {
     public class ServiceOfferDTO
@@ -7,5 +9,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Respons
         public int? Minutes { get; set; }
         public string? Description { get; set; }
         public Guid? Uuid { get; set; }
+        public ServiceOfferStatusType Status { get; set;}
     }
 }
