@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Validation
 {
@@ -17,11 +18,11 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Validat
                 }
                 else
                 {
-                    return new ValidationResult(ErrorMessage ?? "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+                    return new ValidationResult(ErrorMessage ?? ValidationCodeType.VALIDATION_PASSWORD_INVALID_FORMAT);
                 }
             }
 
-            return new ValidationResult("Password must be a string.");
+            return new ValidationResult(ValidationCodeType.VALIDATION_PASSWORD_INVALID_TYPE);
         }
     }
 }

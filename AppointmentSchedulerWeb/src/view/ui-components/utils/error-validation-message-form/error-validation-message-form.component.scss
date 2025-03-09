@@ -1,0 +1,33 @@
+@use '../../../../styles/variables.scss' as variables;
+
+.error-messages {
+  display: flex;
+  align-items: center;
+
+  ul {
+    width: 100%;
+    text-decoration: none;
+    list-style-type: none;
+  }
+
+  li {
+    width: 100%;
+  }
+
+  .error {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .error-icon {
+    font-size: variables.$font-size-base;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+
+  }
+}

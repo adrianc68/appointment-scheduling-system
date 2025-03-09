@@ -1,0 +1,51 @@
+<div class="dropdown">
+  <button class="input" (click)="toggleDropdown()" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
+    <span class="t-muted fs-sm t-nowrap">
+      {{ label }}: {{ this.selectedOptions.length === 0 ? '' : this.selectedOptions.length }} {{ getSelectedText()
+      |translate }}
+    </span>
+  </button>
+
+
+  <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="dropdownOpen"
+    [cdkConnectedOverlayHasBackdrop]="false" (backdropClick)="dropdownOpen = false"
+    cdkConnectedOverlayPanelClass="custom-dropdown-panel" cdkConnectedOverlayPanelClass="custom-dropdown-panel">
+
+    <div class="dropdown-menu card" *ngIf="dropdownOpen">
+      <div class="dropdown-menu-header">
+
+        <div class="search-box">
+          <div class="input container">
+            <label class="input-icon" for="searchFilter">
+              <mat-icon>search</mat-icon>
+            </label>
+            <input id="searchFilter" type="text" [(ngModel)]="searchTerm"
+              placeholder="{{TranslationCodes.TC_SEARCH_INPUT_PLACEHOLDER_LABEL | translate}}" />
+          </div>
+        </div>
+        <div class="input container no-bg bg-hover select-all-box">
+          <label class="input-checkbox">
+            <input id="selectAll" type="checkbox" [checked]="areAllSelected()" (change)="toggleAll()" />
+          </label>
+          <label class="input-placeholder" for="selectAll">Seleccionar todos</label>
+        </div>
+      </div>
+
+      <div class="dropdown-filters">
+        <div *ngFor="let option of filteredOptions()" class="checkbox-item">
+          <div class="input container no-bg bg-hover">
+            <label class="input-checkbox">
+              <input id="{{option}}" type="checkbox" [checked]="selectedOptions.includes(option)"
+                (change)="toggleSelection(option)" />
+
+            </label>
+            <label class="input-placeholder" for="{{option}}">{{ option }}</label>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </ng-template>
+
+</div>

@@ -1,0 +1,15 @@
+@use '../../../styles/mixins.scss' as mixins;
+@use '../../../styles/variables.scss' as variables;
+
+.register-container {
+  @include mixins.flex-center;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  padding-top: variables.$padding-lg;
+}
+
+
+.form {
+  max-width: variables.$container-sm;
+}

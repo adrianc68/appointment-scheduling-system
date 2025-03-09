@@ -1,0 +1,28 @@
+<header class="header">
+  <div class="header-logo">
+    Scheduling.com
+  </div>
+  <button class="header-button-toggle" (click)="toggleMenu()">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <nav [ngClass]="{ 'open': menuOpen }" class="header-nav">
+    <ul>
+      <li>
+        <a [routerLink]="[webRoutes.root]" (click)="toggleMenu()">Inicio</a>
+      </li>
+      <li>
+        <a [routerLink]="[webRoutes.prices]" (click)="toggleMenu()">Prices</a>
+      </li>
+      <li>
+        <a [routerLink]="[webRoutes.contact]" (click)="toggleMenu()">Contacto</a>
+      </li>
+      <li>
+        <a [routerLink]="[webRoutes.login]" (click)="toggleMenu()">Iniciar sesión</a>
+      </li>
+      <li>
+        <a [routerLink]="[webRoutes.signup]" (click)="toggleMenu()">Registrarse</a>
+      </li>
+    </ul>
+  </nav>
+</header>

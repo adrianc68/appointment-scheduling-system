@@ -1,0 +1,7 @@
+export enum AppointmentStatusType {
+  SCHEDULED = "SCHEDULED",
+  CONFIRMED = "CONFIRMED",
+  CANCELED = "CANCELED",
+  FINISHED = "FINISHED",
+  RESCHEDULED = "RESCHEDULED"
+}

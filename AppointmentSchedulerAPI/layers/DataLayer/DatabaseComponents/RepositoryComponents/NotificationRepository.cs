@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -70,7 +71,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     IdNotificationBase = notificationDB.Id,
                     IdUserAccount = recipient.RecipientData.UserAccountId,
-                    Status = (Model.Types.NotificationStatusType?)recipient.Status,
+                    Status = Model.Types.NotificationStatusType.UNREAD,
                     ChangedAt = DateTime.UtcNow
                 }).ToList();
                 await dbContext.NotificationRecipients.AddRangeAsync(recipients);
@@ -136,6 +137,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             IEnumerable<BusinessLogicLayer.Model.Notification> notifications = [];
             using var dbContext = context.CreateDbContext();
 
+            var dataClient = await dbContext.UserAccounts
+             .Where(ua => ua.Uuid == uuid)
+             .Include(ac => ac.UserInformation)
+             .FirstOrDefaultAsync();
+
             var notificationDB = await dbContext.UserAccounts
                 .Where(ua => ua.Uuid == uuid)
                 .Include(a => a.NotificationRecipients)
@@ -153,17 +159,19 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
             if (notificationDB != null)
             {
+                var recipientInfoData = new BusinessLogicLayer.Model.NotificationRecipientData
+                {
+                    Email = dataClient!.Email!,
+                    UserAccountId = dataClient.Id!.Value,
+                    UserAccountUuid = dataClient.Uuid!.Value,
+                    PhoneNumber = dataClient.UserInformation!.PhoneNumber!
+                };
+
                 notifications = notificationDB.NotificationRecipients.Select<NotificationRecipient, BusinessLogicLayer.Model.Notification>(notification =>
                 {
                     var recipientdata = new BusinessLogicLayer.Model.NotificationRecipient
                     {
-                        RecipientData = new BusinessLogicLayer.Model.NotificationRecipientData
-                        {
-                            Email = notification.UserAccount!.Email!,
-                            UserAccountId = notification.UserAccount.Id!.Value,
-                            UserAccountUuid = notification.UserAccount.Uuid!.Value,
-                            PhoneNumber = notification.UserAccount.UserInformation!.PhoneNumber!
-                        },
+                        RecipientData = recipientInfoData,
                         Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
                         ChangedAt = notification.ChangedAt!.Value
                     };
@@ -239,10 +247,12 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
             var dataClient = await dbContext.UserAccounts
                 .Where(ua => ua.Uuid == uuid)
+                .Include(ac => ac.UserInformation)
                 .FirstOrDefaultAsync();
 
             var notificationDB = await dbContext.UserAccounts
             .Where(ua => ua.Uuid == uuid)
+            .Include(ac => ac.UserInformation)
             .Include(ua => ua.NotificationRecipients)
                 .ThenInclude(nr => nr.NotificationBase)
                 .ThenInclude(nb => nb!.AppointmentNotification)
@@ -259,23 +269,22 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
             if (notificationDB != null)
             {
+                var recipientInfoData = new BusinessLogicLayer.Model.NotificationRecipientData
+                {
+                    Email = dataClient!.Email!,
+                    UserAccountId = dataClient.Id!.Value,
+                    UserAccountUuid = dataClient.Uuid!.Value,
+                    PhoneNumber = dataClient.UserInformation!.PhoneNumber!
+                };
 
                 notifications = notificationDB.Select<NotificationRecipient, BusinessLogicLayer.Model.Notification>(notification =>
                 {
-
                     var recipientdata = new BusinessLogicLayer.Model.NotificationRecipient
                     {
-                        RecipientData = new BusinessLogicLayer.Model.NotificationRecipientData
-                        {
-                            Email = notification.UserAccount!.Email!,
-                            UserAccountId = notification.UserAccount.Id!.Value,
-                            UserAccountUuid = notification.UserAccount.Uuid!.Value,
-                            PhoneNumber = notification.UserAccount.UserInformation!.PhoneNumber!
-                        },
+                        RecipientData = recipientInfoData,
                         Status = (BusinessLogicLayer.Model.Types.Notification.NotificationStatusType?)notification.Status!.Value,
                         ChangedAt = notification.ChangedAt!.Value
                     };
-
 
                     return notification.NotificationBase!.Type switch
                     {

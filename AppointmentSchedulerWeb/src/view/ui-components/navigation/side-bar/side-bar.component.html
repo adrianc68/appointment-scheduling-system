@@ -1,0 +1,91 @@
+<nav class="sidebar" [class.open]="isOpen">
+  <ul class="sidebar-bs-operations" *ngIf="accountData | async as accountData">
+    <li>
+      <a [routerLink]="[webRoutes.root]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon class="sidebar-icon">home</mat-icon>
+        <span>
+          {{translate(translationCodes.TC_HOME_DIRECTORY)}}
+        </span>
+      </a>
+    </li>
+
+    <ng-container [ngSwitch]="accountData.role">
+      <li *ngSwitchCase="roleTypes.CLIENT">
+        <a [routerLink]="[webRoutes.root]" routerLinkActive="active">
+          <mat-icon class="sidebar-icon">calendar_month</mat-icon>
+          <span>
+            {{translate(translationCodes.TC_APPOINTMENT_CREATE_DIRECTORY)}}
+          </span>
+        </a>
+      </li>
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
+        <a [routerLink]="[webRoutes.appointment_management]" routerLinkActive="active">
+          <mat-icon class="sidebar-icon">calendar_month</mat-icon>
+          <span>
+            {{translate(translationCodes.TC_MANAGEMENT_APPOINTMENT_DIRECTORY) }}
+          </span>
+        </a>
+      </li>
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
+        <a [routerLink]="[webRoutes.availability_time_slot_management]" routerLinkActive="active">
+          <mat-icon class="sidebar-icon">access_time</mat-icon>
+          <span>
+            {{translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY) }}
+          </span>
+        </a>
+      </li>
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
+        <a [routerLink]="[webRoutes.service_offer_management]" routerLinkActive="active">
+          <mat-icon class="sidebar-icon">assignment</mat-icon>
+          <span>
+            {{translate(translationCodes.TC_MANAGEMENT_SERVICE_OFFER_DIRECTORY) }}
+          </span>
+        </a>
+      </li>
+
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
+        <a [routerLink]="[webRoutes.assistant_management]" routerLinkActive="active">
+          <mat-icon class="sidebar-icon">support_agent</mat-icon>
+          <span>
+            {{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY) }}
+          </span>
+        </a>
+      </li>
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
+        <a [routerLink]="[webRoutes.service_management]" routerLinkActive="active">
+          <mat-icon class="sidebar-icon">business_center</mat-icon>
+          <span>
+            {{translate(translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY) }}
+          </span>
+        </a>
+      </li>
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
+        <a [routerLink]="[webRoutes.client_management]" routerLinkActive="active">
+          <mat-icon class="sidebar-icon">groups_3</mat-icon>
+          <span>
+            {{ translate(translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY)}}
+          </span>
+        </a>
+      </li>
+    </ng-container>
+    <li>
+      <a [routerLink]="[webRoutes.configuration]" routerLinkActive="active">
+        <mat-icon class="sidebar-icon">settings</mat-icon>
+        <span>
+          {{translate(translationCodes.TC_CONFIGURATION_DIRECTORY)}}
+        </span>
+      </a>
+    </li>
+
+  </ul>
+  <ul>
+    <li>
+      <button class="button icon" (click)="logout()">
+        <mat-icon class="sidebar-icon">logout</mat-icon>
+        <span>
+          {{translate(translationCodes.TC_LOGOUT_BUTTON_LABEL)}}
+        </span>
+      </button>
+    </li>
+  </ul>
+</nav>

@@ -1,0 +1,123 @@
+@use '../mixins' as mixins;
+@use '../breakpoints' as breakpoints;
+@use '../variables' as variables;
+
+.input {
+  width: 100%;
+  min-width: auto;
+  height: variables.$input-size-base;
+  max-height: variables.$input-size-base;
+  min-height: variables.$input-size-base;
+  padding: variables.$padding-sm;
+  border: variables.$border-width solid variables.$border;
+  background-color: variables.$bg-subtle;
+  border-radius: variables.$border-radius-sm;
+  outline-color: variables.$selected-color;
+  color: variables.$text;
+  font-size: variables.$font-size-sm;
+  cursor: pointer;
+
+  &::placeholder {
+    color: variables.$text-muted;
+  }
+
+  &:hover {
+    border: variables.$border-width solid variables.$bg-inverted;
+  }
+
+  &:focus-within {
+    outline: variables.$border-width solid variables.$selected-color ;
+    border: variables.$border-width solid variables.$selected-color;
+  }
+}
+
+.input.error {
+  border-color: variables.$text-error;
+}
+
+.input.container {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  min-width: auto;
+  width:100%;
+
+  input {
+    background-color: transparent;
+    color: variables.$text;
+
+    &::placeholder {
+      color: variables.$text-muted;
+    }
+  }
+
+  .input-icon {
+    padding: variables.$padding-xs;
+    @include mixins.flex-center;
+    height: 100%;
+    font-size: variables.$font-size-lg;
+    color: variables.$text-muted;
+    cursor: pointer;
+  }
+
+  .input-placeholder {
+    padding-left: variables.$padding-sm;
+    padding-right: variables.$padding-sm;
+    height: 100%;
+    flex: 1;
+    min-width: auto;
+    font-size: variables.$font-size-sm;
+    color: variables.$text-muted;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: left;
+    cursor: pointer;
+    white-space: nowrap;
+    width: auto;
+
+  }
+
+  .input-checkbox {
+    height: 100%;
+    width: auto;
+    padding-left: variables.$padding-sm;
+    padding-top: variables.$padding-sm;
+    padding-bottom: variables.$padding-sm;
+    @include mixins.flex-center;
+    cursor: pointer;
+  }
+
+  input {
+    border-radius: 0;
+    border: none;
+    padding: variables.$padding-sm;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    color: variables.$text;
+  }
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    max-width: 16px;
+    min-width: 16px;
+    max-height: 16px;
+    min-height: 16px;
+    cursor: pointer;
+  }
+}
+
+.input.bg-hover {
+
+  &:hover {
+    background-color: variables.$bg-emphasis;
+  }
+}
+
+.input.wd-auto {
+  width:auto;
+}

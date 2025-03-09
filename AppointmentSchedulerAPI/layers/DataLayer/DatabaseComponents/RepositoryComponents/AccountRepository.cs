@@ -1,5 +1,4 @@
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
@@ -64,10 +63,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }
 
             var isCorrectPassword = passwordHasherService.VerifyPassword(password, userDB.Password!);
-            if(!isCorrectPassword)
+            if (!isCorrectPassword)
             {
                 return null;
-            }            
+            }
 
             return new BusinessLogicLayer.Model.AccountData
             {
@@ -75,8 +74,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 Email = userDB.Email,
                 Uuid = userDB.Uuid,
                 PhoneNumber = userDB.UserInformation!.PhoneNumber,
+                Name = userDB.UserInformation!.Name,
                 Username = userDB.Username,
                 CreatedAt = userDB.CreatedAt,
+                Status = (BusinessLogicLayer.Model.Types.AccountStatusType?)userDB.Status,
                 Role = (BusinessLogicLayer.Model.Types.RoleType)userDB.Role!.Value
             };
         }
@@ -152,17 +153,47 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 return [];
             }
 
-            List<AccountData> accounts =  accountsData.Select(e => new AccountData {
+            List<AccountData> accounts = accountsData.Select(e => new AccountData
+            {
                 Id = e.Id,
                 Uuid = e.Uuid,
                 Email = e.Email,
                 PhoneNumber = e.UserInformation!.PhoneNumber,
                 Username = e.Username,
+                Name = e.UserInformation!.Name,
+                Status = (BusinessLogicLayer.Model.Types.AccountStatusType?)e.Status,
                 Role = (BusinessLogicLayer.Model.Types.RoleType?)e.Role,
                 CreatedAt = e.CreatedAt
             }).ToList();
 
             return accounts;
+        }
+
+        public async Task<AccountData?> GetAccountDataByUuid(Guid uuid)
+        {
+            using var dbContext = context.CreateDbContext();
+            var userDB = await dbContext.UserAccounts
+                .Include(a => a.UserInformation)
+               .Where(a => a.Uuid == uuid)
+               .FirstOrDefaultAsync();
+
+            if (userDB == null)
+            {
+                return null;
+            }
+
+            return new BusinessLogicLayer.Model.AccountData
+            {
+                Id = userDB.Id,
+                Email = userDB.Email,
+                Uuid = userDB.Uuid,
+                PhoneNumber = userDB.UserInformation!.PhoneNumber,
+                Username = userDB.Username,
+                Name = userDB.UserInformation!.Name,
+                Status = (BusinessLogicLayer.Model.Types.AccountStatusType?)userDB.Status,
+                CreatedAt = userDB.CreatedAt,
+                Role = (BusinessLogicLayer.Model.Types.RoleType)userDB.Role!.Value
+            };
         }
     }
 }

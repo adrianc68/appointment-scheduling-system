@@ -580,8 +580,8 @@ The iteration goal is to establish an initial overall structure for the system c
 * CRN-2 Avoid introducing technical debt
 * CRN-1 Establishing an overall system architecture
 
+![](images/any/context%20diagram.png)
 
-![](images/any/context_diagram.png)
 #### Step 3: Choose Elements of the System to Refine
 
 The iteration goal is to achieve the architectural concern CRN-1 and refine the entire Appointment Scheduling System. In this case, refinement is performed through decomposition.
@@ -843,11 +843,11 @@ The instantiation design decisions considered and made are summarized in the fol
 | enableAssistant()                            | ![](images/any/interaction%20enableAssistant().png)                     |
 | IGetAssistant                                | ![](images/any/systeminterface%20IGetAssistant.png)                     |
 | IDisableClient                               | ![](images/any/systeminterface%20IDisableClient.png)                    |
+| DisableClientAsync()                         | ![](images/any/interaction%20disableClient().png)                       |
 | IDeleteClient                                | ![](images/any/systeminterface%20IDeleteClient.png)                     |
 | DeleteClientAsync                            | ![](images/any/interaction%20deleteClient().png)                        |
 | IEditClient                                  | ![](images/any/systeminterface%20IEditClient.png)                       |
-| UpdateClientAsync()                          | ![](images/any/interaction%20editClient().png)                          |
-| disableClient()                              | ![](images/any/interaction%20disableClient().png)                       |
+| UpdateClientAsync(                           | ![](images/any/interaction%20editClient().png)                          |
 | IEnableClient                                | ![](images/any/systeminterface%20IEnableClient.png)                     |
 | enableClient()                               | ![](images/any/interaction%20enableClient().png)                        |
 | IRegisterClient                              | ![](images/any/systeminterface%20IRegisterClient.png)                   |
@@ -888,3 +888,47 @@ The instantiation design decisions considered and made are summarized in the fol
 |               |                     | QA-8      | A Jwt token service was used to allow secure login to the system via Jwt tokens, protecting endpoints.                                                                                                                      |
 |               | QA-9                |           | Github Actions were configured to deploy the system to Docker Hub, enabling container creation and automated deployment in a production environment.                                                                        |
 |               |                     | QA-10     | A lock was implemented to avoid race condition issues during appointment scheduling, ensuring that users cannot modify the same time slots simultaneously.                                                                  |
+
+### Iteration 3: Identifying Structures to Support Primary Functionality
+
+#### Step 2. Establish Iteration Goal by Selecting Drivers
+
+In this iteration, the design focuses on the client side of the application. The goal is identify structures that support primary functionality, including necessary components to allow communication with the back-end application.
+#### Step 3. Choose Elements of the System to Refine
+
+In this iteration, the elements to be refined are all the modules located across the different layers defined by the reference architecture selected in previous iteration. For the client, I will choose a variation of layered architecture called Model View ViewModel with a CrossCutting Layer. 
+
+This decision is based on the advantages MVVM offeres over a traditional three-layer architecture. MVVM provides a clearer separation of concerns, as it introduces a ViewModel to act as intermediary between the View and the Model, reducing the coupling between these components.  MVVM supports modern UI frmaeworks with data binding and reactivity, enabling the UI to automatically reflect changes in the underlying data.
+
+The inclusion of a CrossCutting Layer ensures consistente handling of concerns such as logging, security, and validation across all components, further improving maintainability and scalability.
+#### Step 4. Choose Design Concepts That Satisfy the Selected Drivers
+
+The following table summarizes the design decisions. 
+
+| Design Decisions and Location                                         | Rational and Assumptions                                                                                                                        |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create a Cross Cutting Layer                                          | To handle common concerns such as logging, security, and error handling across componentes, ensuring consistency and reducing code duplication. |
+| Use Data Transfer Objects (DTOS)                                      | To encapsulate and standardize data exchange between the client and server, reducing coupling and improving maintainability.                    |
+| Select Mapping Strategy for API Responses                             | To define a clear mechanism for transforming backend responses into formats suitable for the frontend, ensuring compatibility and performance.  |
+| Choose a UI Component development                                     | To modularize the UI into reusable and maintainable components, improving scalability and team collaboration.                                   |
+| Implement State Management Solution                                   | To manage application state efficiently, ensuring consistency between components and reducing redundant API calls.                              |
+| Use Responsive Design Principles and adopting a Mobile First Approach | To ensure the application provides a consistent and user-friendly experience across different devices and screen sizes.                         |
+| Adopt Lazy Loading for Modules                                        | To improve initial load performance byo nly loading modules when needed, especially for large applications.                                     |
+
+#### Step 5. Instantiate Architectural Elements, Allocate Responsibilities and Define Interfaces
+
+The instantiation design decisions considered and made are summarized in the following table:
+
+| Design Decision and Location       | Rational and Assumptions                                                                                                               |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Locate DTOS into Model Layer       | To centralize data transformation logic and ensure a clear separation of concerns, making the data layer easier to maintain and test.  |
+| Use Services for API Communication | To encapsulate and reuse the logic for API calls, reducing duplication and improving maintainability.                                  |
+| Define Interfaces for reusability  | To standardize interactions between components, promoting consistency and enabling scalability.                                        |
+| Allocate State Management to Store | To centralize application state, reduce direct component coupling, and improve maintainability.                                        |
+| Implement Dependency Injection     | To inject required services dynamically and decouple component logic, improving testability and adherence to architectural principles. |
+
+#### Step 6. Sketch Views and Record Design Decisions
+
+![](images/any/client%20side%20module%20view.png)
+
+#### Step 7. Perform Analysis of the Current Design and Review the Iteration Goal and Achievement of Design Purpose

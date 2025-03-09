@@ -288,18 +288,15 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
                 assistantServiceDTO = assistantsAvailable.Select(a => new ServiceAvailableDTO
                 {
+                    Uuid = a.Uuid!.Value,
+                    Name = a.Service!.Name!,
+                    Price = a.Service!.Price!.Value,
+                    Minutes = a.Service!.Minutes!.Value,
+                    Description = a.Service!.Description!,
                     Assistant = new AssistantServiceOfferDTO
                     {
                         Uuid = a.Assistant!.Uuid!.Value,
                         Name = a.Assistant!.Name,
-                    },
-                    Service = new ServiceOfferDTO
-                    {
-                        Uuid = a.Uuid,
-                        Name = a.Service!.Name,
-                        Price = a.Service!.Price,
-                        Minutes = a.Service!.Minutes,
-                        Description = a.Service!.Description
                     },
 
                 }).ToList();
@@ -317,25 +314,28 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public async Task<IActionResult> GetAllAvailabilityTimeSlot([FromQuery] DateOnlyRangeDTO rangeDTO)
         {
-            List<AvailabilityTimeSlotRegisteredDTO> availabilityTimeslotsDTO = [];
+            List<AvailabilityTimeSlotDTO> availabilityTimeslotsDTO = [];
             try
             {
                 var availabilityTimeSlots = await systemFacade.GetAllAvailabilityTimeSlotsAsync(rangeDTO.StartDate, rangeDTO.EndDate);
 
-                availabilityTimeslotsDTO = availabilityTimeSlots.Select(a => new AvailabilityTimeSlotRegisteredDTO
+                availabilityTimeslotsDTO = availabilityTimeSlots.Select(a => new AvailabilityTimeSlotDTO
                 {
                     Assistant = new AssistantAvailabilityTimeSlotDTO
                     {
                         Uuid = a.Assistant!.Uuid,
                         Name = a.Assistant.Name
                     },
-                    AvailabilityTimeSlot = new AvailabilityTimeSlotDTO
+                    UnavailableTimeSlots = a.UnavailableTimeSlots!.Select(una => new DTO.Response.UnavailableTimeSlotDTO
                     {
-                        Date = a.Date,
-                        EndTime = a.EndTime,
-                        StartTime = a.StartTime,
-                        Uuid = a.Uuid,
-                    }
+                        StartTime = una.StartTime,
+                        EndTime = una.EndTime
+                    }).ToList(),
+                    Date = a.Date!.Value,
+                    EndTime = a.EndTime!.Value,
+                    StartTime = a.StartTime!.Value,
+                    Uuid = a.Uuid!.Value,
+                    Status = a.Status
                 }).ToList();
             }
             catch (System.Exception ex)
@@ -437,22 +437,16 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 List<Appointment> result = await systemFacade.GetScheduledOrConfirmedAppoinmentsAsync(dto.StartDate, dto.EndDate);
                 appointments = result.Select(app => new AppointmentDetailsDTO
                 {
-                    Appointment = new AppointmentDTO
-                    {
-                        Uuid = app.Uuid,
-                        StartTime = app.StartTime,
-                        EndTime = app.EndTime,
-                        Date = app.Date,
-                        Status = app.Status.ToString(),
-                        CreatedAt = app.CreatedAt!.Value,
-                    },
+                    Uuid = app.Uuid!.Value,
+                    StartTime = app.StartTime!.Value,
+                    EndTime = app.EndTime!.Value,
+                    Date = app.Date!.Value,
+                    Status = app.Status,
+                    CreatedAt = app.CreatedAt!.Value,
                     Assistants = app.ScheduledServices!.Select(se => new AsisstantOfferDTO
                     {
-                        Assistant = new AssistantOccupiedServiceOfferDTO
-                        {
-                            Name = se.ServiceOffer!.Assistant!.Name,
-                            Uuid = se.ServiceOffer!.Assistant.Uuid!.Value,
-                        },
+                        Name = se.ServiceOffer!.Assistant!.Name!,
+                        Uuid = se.ServiceOffer!.Assistant.Uuid!.Value,
                         OccupiedTimeRange = new ServiceOfferRangeDTO
                         {
                             StartTime = se.ServiceStartTime!.Value,
@@ -480,23 +474,21 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 List<Appointment> result = await systemFacade.GetAllAppoinmentsAsync(dto.StartDate, dto.EndDate);
                 appointments = result.Select(app => new AppointmentDetailsDTO
                 {
-                    Appointment = new AppointmentDTO
-                    {
-                        Uuid = app.Uuid,
-                        StartTime = app.StartTime,
-                        EndTime = app.EndTime,
-                        Date = app.Date,
-                        TotalCost = app.TotalCost,
-                        Status = app.Status.ToString(),
-                        CreatedAt = app.CreatedAt!.Value,
-                    },
+                    Uuid = app.Uuid!.Value,
+                    StartTime = app.StartTime!.Value,
+                    EndTime = app.EndTime!.Value,
+                    Date = app.Date!.Value,
+                    TotalCost = app.TotalCost,
+                    Status = app.Status,
+                    CreatedAt = app.CreatedAt!.Value,
                     Client = new ClientAppointmentDTO
                     {
                         Name = app.Client!.Name,
                         Uuid = app.Client.Uuid,
                         PhoneNumber = app.Client.PhoneNumber,
                         Email = app.Client.Email,
-                    }
+                    },
+                    Assistants = [],
                 }).ToList();
             }
             catch (System.Exception ex)

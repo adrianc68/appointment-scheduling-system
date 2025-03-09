@@ -1,0 +1,36 @@
+@use '../../../../styles/variables.scss' as variables;
+@use '../../../../styles/breakpoints.scss' as breakpoints;
+@use '../../../../styles/mixins.scss' as mixins;
+
+.layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  height: variables.$header-landing-height;
+  width: 100%;
+  position: fixed;
+  top: 0;
+}
+
+.main-container {
+  display: flex;
+  flex: 1;
+  margin-top: variables.$header-height;
+}
+
+.content {
+  flex: 1;
+}
+
+
+@include mixins.respond-to(breakpoints.$breakpoint-md) {
+  .main-container {
+    display: flex;
+  }
+
+  .content {
+    flex: 1;
+  }
+}

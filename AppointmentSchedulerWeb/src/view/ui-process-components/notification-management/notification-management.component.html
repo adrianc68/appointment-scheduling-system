@@ -1,0 +1,31 @@
+<div class="notification-main-container">
+  <section class="notification-management">
+    <div class="notification-mgt-header">
+      <h1>{{translationCodes.TC_NOTIFICATION_DIRECTORY | translate }}</h1>
+      <div class="update-btn">
+        <button class="button icon" (click)="getAllNotificationsData()">
+          <mat-icon class="update-notifications t-primary">update</mat-icon>
+        </button>
+      </div>
+    </div>
+    <div class="notification-mgt-content">
+      <ng-container *ngFor="let notification of notificationList">
+        <ng-container [ngSwitch]="notification.type">
+          <app-appointment-notification-card [data]="castNotification(notification)" class="notification-container"
+            [ngClass]="{ 'unread': notification.status === NotificationStatusTypes.UNREAD}"
+            (click)="markNotificationAsRead(notification)" *ngSwitchCase="notificationTypes.APPOINTMENT_NOTIFICATION" />
+
+          <app-system-notification-card [data]="castNotification(notification)" class="notification-container"
+            [ngClass]="{'unread': notification.status === NotificationStatusTypes.UNREAD}"
+            (click)="markNotificationAsRead(notification)" *ngSwitchCase="notificationTypes.SYSTEM_NOTIFICATION" />
+
+          <app-general-notification-card [data]="castNotification(notification)" class="notification-container"
+            (click)="markNotificationAsRead(notification)"
+            [ngClass]="{'unread': notification.status === NotificationStatusTypes.UNREAD}"
+            *ngSwitchCase="notificationTypes.GENERAL_NOTIFICATION" />
+
+        </ng-container>
+      </ng-container>
+    </div>
+  </section>
+</div>

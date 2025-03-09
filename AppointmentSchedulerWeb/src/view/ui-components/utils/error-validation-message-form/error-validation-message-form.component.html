@@ -1,0 +1,12 @@
+<div class="error-messages" *ngIf="messages && messages.length > 0">
+  <ul>
+    <li *ngFor="let message of messages">
+      <label class="error">
+        <mat-icon class="error-icon">
+          error_outline
+        </mat-icon>
+        {{ translate(message) }}
+      </label>
+    </li>
+  </ul>
+</div>

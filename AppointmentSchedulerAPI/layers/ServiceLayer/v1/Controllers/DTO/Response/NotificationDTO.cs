@@ -8,5 +8,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Respons
         public required Guid Uuid { get; set; }
         public required string Message { get; set; }
         public required NotificationType Type { get; set;}
+        public required NotificationStatusType Status { get; set; }
     }
 }

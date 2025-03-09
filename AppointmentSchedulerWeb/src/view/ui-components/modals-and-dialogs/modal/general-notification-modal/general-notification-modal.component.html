@@ -1,0 +1,33 @@
+<div class="general-modal-container">
+  <div class="close-button-container">
+    <button class="button icon t-secondary" (click)="close()">
+      <mat-icon class="close-button-icon">close</mat-icon>
+    </button>
+  </div>
+  <div class="notification-img">
+    <mat-icon class="icon t-primary">notifications_active</mat-icon>
+  </div>
+  <div class="notification-title">
+    <h1 class="fs-base fw-bold t-primary">{{data.code | translate }}</h1>
+    <div class="notification-date">
+      <p class="fs-sm t-secondary">{{data.createdAt.toString() | readableDate}}</p>
+    </div>
+    <span class="fs-sm t-secondary">{{data.uuid}}</span>
+  </div>
+
+  <div class="notification-content">
+    <div class="notification-message">
+
+      <span class="fw-bold">
+        {{TranslationCodes.TC_MESSAGE_CONTENT_LABEL | translate}}
+      </span>
+      <p class="t-secondary">{{data.message}}</p>
+    </div>
+    <div class="notification-buttons">
+      <button class="button primary" (click)="close()">
+        {{TranslationCodes.TC_CLOSE_BUTTON_LABEL| translate}}
+      </button>
+    </div>
+
+  </div>
+</div>

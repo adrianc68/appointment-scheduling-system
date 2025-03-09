@@ -1,0 +1,162 @@
+@use '@angular/material' as mat;
+@use 'styles/variables' as variables;
+@use 'styles/mixins' as mixins;
+@use 'styles/breakpoints' as breakpoints;
+@use 'styles/components/buttons.scss' as button;
+@use 'styles/components/input.scss' as input;
+@use 'styles/components/form.scss' as form;
+@use 'styles/components/card.scss' as card;
+@use 'styles/components/image.scss' as image;
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: variables.$font-family-primary;
+  font-size: variables.$font-size-base;
+  background-color: variables.$bg;
+  color: variables.$brand-text;
+
+  @include mixins.respond-to(breakpoints.$breakpoint-sm) {
+    font-size: variables.$font-size-lg;
+  }
+
+  @include mixins.respond-to(breakpoints.$breakpoint-xl) {
+    // font-size: variables.$font-size-xlarge;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: variables.$text-emphasis;
+  // background-color: variables.$text-emphasis;
+}
+
+p {
+  color: variables.$text-muted;
+  font-size: variables.$font-size-base;
+  // background-color: variables.$text-muted;
+}
+
+p.secondary {
+  color: variables.$text-muted;
+}
+
+label {
+  color: variables.$text-emphasis;
+  font-size: variables.$font-size-base;
+  // background-color: variables.$text-emphasis;
+}
+
+label.error {
+  color: variables.$text-error;
+}
+
+li {
+  font-size: variables.$font-size-base;
+}
+
+span {
+  font-size: variables.$font-size-base;
+  color: variables.$text;
+  // background-color: variables.$text;
+}
+
+
+.active {
+  background-color: variables.$bg-subtle;
+}
+
+
+// Font (sizes, weights)
+// Font weight
+.fw-light {
+  font-weight: variables.$font-weight-light;
+}
+
+.fw-regular {
+  font-weight: variables.$font-weight-regular;
+}
+
+.fw-bold {
+  font-weight: variables.$font-weight-bold;
+}
+
+// Font size
+.fs-xs {
+  font-size: variables.$font-size-xs;
+}
+
+.fs-sm {
+  font-size: variables.$font-size-sm;
+}
+
+.fs-base {
+  font-size: variables.$font-size-lg;
+}
+
+.fs-lg {
+  font-size: variables.$font-size-lg;
+}
+
+.fs-xl {
+  font-size: variables.$font-size-xl;
+}
+
+// Color
+.t-primary {
+  color: variables.$text-emphasis;
+}
+
+.t-secondary {
+  color: variables.$text-muted;
+}
+
+.t-subtle {
+  color: variables.$text-subtle;
+}
+
+.t-muted {
+  color: variables.$text-muted;
+}
+
+.t-disabled {
+  color: variables.$text-disabled;
+}
+
+.t-emphasis {
+  color: variables.$text-emphasis;
+}
+
+.t-nowrap {
+  white-space: nowrap;
+}
+
+// Utils
+
+.no-bg {
+  background-color: transparent;
+}
+
+
+.wd-auto {
+  width: auto;
+}
+
+.mat-mdc-dialog-panel {
+  max-width: variables.$container-lg !important;
+  min-width: none !important;
+}

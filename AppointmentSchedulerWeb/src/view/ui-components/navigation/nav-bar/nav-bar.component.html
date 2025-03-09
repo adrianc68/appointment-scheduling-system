@@ -1,0 +1,29 @@
+<nav class="navbar">
+  <div class="navbar-toggle-button">
+    <button class="button icon" (click)="toggleSidebar()">
+      <mat-icon class="menu-icon">
+        menu
+      </mat-icon>
+
+    </button>
+  </div>
+  <div class="navbar-logo">
+    <span>
+      Scheduling.com
+    </span>
+  </div>
+  <div class="navbar-actions">
+    <a class="notification" (click)="showNotifications()">
+      <div class="notification-icon">
+        <mat-icon>
+          {{ notificationsPendingNumber > 0 ? 'notification_important' : 'notifications' }}
+        </mat-icon>
+        <span *ngIf="notificationsPendingNumber > 0" class="notification-badge">
+          {{ notificationsPendingNumber }}
+        </span>
+      </div>
+    </a>
+    <button class="button" (click)="changeLanguageToEnglish()">US</button>
+    <button class="button" (click)="changeLanguageToSpanish()">MX</button>
+  </div>
+</nav>

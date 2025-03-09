@@ -1,0 +1,53 @@
+<div class="register-container">
+
+  <form class="form card" (ngSubmit)="onSubmit()">
+
+    <div class="form-header">
+      <h1>{{translate(translationCodes.TC_MANAGEMENT_SERVICE_REGISTER_DIRECTORY)}}</h1>
+
+    </div>
+    <div class="form-body">
+      <div clas="form-input">
+        <label for="name">
+          {{ translate(translationCodes.TC_SERVICE_NAME_DATA_LABEL)}}
+        </label>
+        <input class="input" id="name" type="text" [(ngModel)]="name" name="name" required
+          placeholder={{translate(translationCodes.TC_SERVICE_NAME_PLACEHOLDER_LABEL)}} />
+        <app-error-validation-message-form [messages]="errorValidationMessage['name']" />
+      </div>
+      <div clas="form-input">
+        <label for="description">
+          {{ translate(translationCodes.TC_SERVICE_DESCRIPTION_DATA_LABEL)}}
+        </label>
+        <input class="input" id="description" type="text" [(ngModel)]="description" name="description" required
+          placeholder={{translate(translationCodes.TC_SERVICE_DESCRIPTION_PLACEHOLDER_LABEL)}} />
+        <app-error-validation-message-form [messages]="errorValidationMessage['description']" />
+
+      </div>
+      <div clas="form-input">
+        <label for="minutes">
+          {{ translate(translationCodes.TC_SERVICE_MINUTES_DATA_LABEL)}}
+        </label>
+        <input class="input" id="minutes" type="text" [(ngModel)]="minutes" name="minutes" required
+          placeholder={{translate(translationCodes.TC_SERVICE_MINUTES_PLACEHOLDER_LABEL)}} />
+        <app-error-validation-message-form [messages]="errorValidationMessage['minutes']" />
+      </div>
+      <div clas="form-input">
+        <label for="price">
+          {{ translate(translationCodes.TC_SERVICE_PRICE_DATA_LABEL)}}
+        </label>
+        <input class="input" id="price" type="text" [(ngModel)]="price" name="price" required
+          placeholder={{translate(translationCodes.TC_SERVICE_PRICE_PLACEHOLDER_LABEL)}} />
+        <app-error-validation-message-form [messages]="errorValidationMessage['price']" />
+      </div>
+    </div>
+    <div class="form-footer">
+      <app-button-task type="submit" [loadingState]="currentTaskState"
+        [text]="translate(translationCodes.TC_REGISTER_BUTTON_LABEL)" />
+      <span class="system-error">
+        {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
+      </span>
+
+    </div>
+  </form>
+</div>

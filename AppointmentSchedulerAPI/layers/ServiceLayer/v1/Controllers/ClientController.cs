@@ -78,12 +78,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [HttpDelete("delete")]
         [Authorize]
         [AllowedRoles(RoleType.ADMINISTRATOR)]
-        public async Task<IActionResult> DeleteClient([FromBody] DeleteClientDTO dto)
+        public async Task<IActionResult> DeleteClient([FromQuery] Guid uuid)
         {
             bool isStatusChanged = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.DeleteClientAsync(dto.Uuid);
+                OperationResult<bool, GenericError> result = await systemFacade.DeleteClientAsync(uuid);
                 if (result.IsSuccessful)
                 {
                     isStatusChanged = result.Result;
@@ -176,7 +176,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Name = dto.Name,
                     Email = dto.Email,
                     PhoneNumber = dto.PhoneNumber,
-                    Password = dto.Password,
                     Username = dto.Username
                 };
                 OperationResult<bool, GenericError> result = await systemFacade.UpdateClientAsync(client);

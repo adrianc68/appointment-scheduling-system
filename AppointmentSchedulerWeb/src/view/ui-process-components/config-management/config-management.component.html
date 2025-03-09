@@ -1,0 +1,105 @@
+<div class="config-management-container">
+  <div class="config-management">
+
+    <section class="item-management card">
+      <div class="item-header">
+        <h1 class="fs-xl">{{TranslationCodes.TC_CONFIGURATION_DIRECTORY_ASPECT | translate}}</h1>
+        <div class="item-description">
+          <span class="fw-bold t-emphasis fs-md">{{TranslationCodes.TC_THEME_ASPECT_PANEL_CONTROL | translate}}</span>
+          <p>{{TranslationCodes.TC_ASPECT_MANAGEMENT_TEXT | translate}}</p>
+        </div>
+      </div>
+      <div class="item-content">
+        <div class="color-theme-buttons">
+          <button class="item-theme bg-hover" (click)="setTheme('default')">
+            <img class="bg-hover" [ngClass]="{'selected': currentTheme === 'default'}" src="/images/theme-system.svg" />
+            <span class="t-muted">
+              {{TranslationCodes.TC_ASPECT_SYSTEM_MODE | translate}}
+            </span>
+          </button>
+          <button class="item-theme bg-hover" (click)="setTheme('dark')">
+            <img [ngClass]="{'selected': currentTheme === 'dark'}" src="/images/theme-dark.svg" />
+            <span class="t-muted">
+              {{TranslationCodes.TC_ASPECT_DARK_MODE | translate }}
+            </span>
+          </button>
+          <button class="item-theme bg-hover" (click)="setTheme('light')">
+            <img [ngClass]="{'selected': currentTheme === 'light'}" src="/images/theme-light.svg" />
+            <span class="t-muted">
+              {{TranslationCodes.TC_ASPECT_LIGHT_MODE | translate }}
+            </span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="item-management card">
+      <div class="item-header">
+        <h1 class="fs-xl">{{TranslationCodes.TC_CONFIGURATION_DIRECTORY_LANGUAGE | translate}}</h1>
+        <div class="item-description">
+          <span class="fw-bold t-emphasis fs-md">{{TranslationCodes.TC_LANGUAGE_PANEL_CONTROL | translate}}</span>
+          <p>{{TranslationCodes.TC_LANGUANGE_MANAGEMENT_TEXT | translate}}</p>
+        </div>
+      </div>
+      <div class="item-content">
+        <div class="language-buttons">
+          <button class="item-button" (click)="changeLanguage(LanguagesTypes.es_MX)">
+            <img src="/images/es_mx.svg" [ngClass]="{'selected': currentLanguage === LanguagesTypes.es_MX}">
+            <span class="t-muted">
+              {{TranslationCodes.TC_SPANISH_ES_MX_LANG | translate}}
+            </span>
+          </button>
+          <button class="item-button" (click)="changeLanguage(LanguagesTypes.en_US)">
+            <img src=" /images/en_us.svg" [ngClass]="{'selected': currentLanguage === LanguagesTypes.en_US}">
+            <span class="t-muted">
+              {{TranslationCodes.TC_ENGLISH_EN_US_LANG | translate}}
+            </span>
+          </button>
+          <button class="item-button">
+            <img class="disabled" src="/images/it_it.svg">
+            <span class="t-muted">
+              {{TranslationCodes.TC_ITALIAN_IT_IT_LANG | translate}}
+            </span>
+          </button>
+          <button class="item-button">
+            <img src="/images/fr_fr.svg">
+            <span class="t-muted">
+              {{TranslationCodes.TC_FRENCH_FR_FR_LANG | translate}}
+            </span>
+          </button>
+
+          <button class="item-button">
+            <img src="/images/zh_cn.svg">
+            <span class="t-muted">
+              {{TranslationCodes.TC_CHINESE_ZH_CN_LANG | translate}}
+            </span>
+          </button>
+
+          <button class="item-button">
+            <img src="/images/pt_br.svg">
+            <span class="t-muted">
+              {{TranslationCodes.TC_PORTUGUESE_PT_BR_LANG | translate}}
+            </span>
+          </button>
+
+          <button class="item-button" (click)="changeLanguage(LanguagesTypes.de_DE)">
+            <img src="/images/de_de.svg" [ngClass]="{'selected': currentLanguage === LanguagesTypes.de_DE}">
+            <span class=" t-muted">
+            {{TranslationCodes.TC_GERMAN_DE_DE_LANG | translate}}
+            </span>
+          </button>
+
+          <button class="item-button">
+            <img src="/images/ru_ru.svg">
+            <span class="t-muted">
+              {{TranslationCodes.TC_RUSSIAN_RU_RU_LANG | translate}}
+            </span>
+          </button>
+        </div>
+      </div>
+
+
+    </section>
+  </div>
+
+</div>

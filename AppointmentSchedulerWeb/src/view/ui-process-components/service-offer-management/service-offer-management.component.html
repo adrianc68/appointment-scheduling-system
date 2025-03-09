@@ -1,0 +1,39 @@
+<div class="client-management-container">
+  <div class="client-management-title">
+    <h1>{{TranslationCodes.TC_MANAGEMENT_SERVICE_OFFER_DIRECTORY | translate}}</h1>
+  </div>
+
+  <div class="client-summary">
+    <div class="client-summary-item card">
+      <!--<span class="t-muted">{{TranslationCodes.TC_CLIENTS_REGISTERED_LABEL | translate}}</span>-->
+      <!--<span class="fw-bold fs-xl">{{clients.length}}</span>-->
+    </div>
+    <div class="client-summary-item card">
+      <!--<span class="t-muted">{{TranslationCodes.TC_CLIENTS_AVAILABLE_LABEL | translate}}</span>-->
+      <!--<span class="fw-bold fs-xl">{{enabledClientsCount}}</span>-->
+    </div>
+    <div class="client-summary-item card">
+      <!--<span class="t-muted">{{TranslationCodes.TC_CLIENTS_NOT_AVAILABLE_LABEL | translate}}</span>-->
+      <!--<span class="fw-bold fs-xl">{{disabledClientsCount}}</span>-->
+    </div>
+  </div>
+
+  <div class="client-management-actions">
+    <div class="button-register">
+      <!--<button class="button" (click)="redirectToRegisterClient()">-->
+      <!--  {{translationCodes.TC_REGISTER_BUTTON_LABEL | translate}}-->
+      <!--</button>-->
+    </div>
+  </div>
+
+
+  <div class="client-table-content">
+
+    <!--<pre class="t-muted">{{serviceOffers | json}}</pre>-->
+    <app-grid-list [title]="TranslationCodes.TC_MANAGEMENT_SERVICE_OFFER_DIRECTORY" [items]="serviceOffers" [cardComponent]="component">
+
+    </app-grid-list>
+
+  </div>
+
+</div>

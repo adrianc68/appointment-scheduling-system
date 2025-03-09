@@ -1,0 +1,28 @@
+<div class="system-notification-container">
+  <div class="notification-icon">
+    <mat-icon class="icon" [ngClass]="{
+      'info': data.severity === SeverityCodeTypes.INFO,
+      'warning': data.severity === SeverityCodeTypes.WARNING,
+      'critical': data.severity === SeverityCodeTypes.CRITICAL
+      }">
+      warning
+    </mat-icon>
+  </div>
+
+  <div class="notification-content">
+    <div class="notification-title">
+      <span class="fw-bold t-primary">{{data.code | translate}}</span>
+    </div>
+    <div class="notification-data">
+      <div class="notification-message">
+        <p>{{data.message}}</p>
+      </div>
+      <div class="notification-date">
+        <span class="fw-light fs-sm t-secondary">{{data.createdAt.toString() | readableDate }}</span>
+      </div>
+    </div>
+  </div>
+  <div>
+  </div>
+
+</div>

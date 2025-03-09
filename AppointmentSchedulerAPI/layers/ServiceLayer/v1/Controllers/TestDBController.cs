@@ -85,10 +85,47 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             };
 
 
+            SystemNotification notificationSysWarning = new SystemNotification
+            {
+                Message = "Ha ocurrido un error dentro del servidor",
+                Code = SystemNotificationCodeType.SYSTEM_MAINTENANCE,
+                Options = new NotificationOptions
+                {
+                    Channels = new List<NotificationChannelType>
+                    {
+                        NotificationChannelType.WEB_APPLICATION
+                    }
+                },
+                Recipients = [],
+                Severity = SystemNotificationSeverityCodeType.WARNING
+            };
+
+
+            SystemNotification notificationSysCritical = new SystemNotification
+            {
+                Message = "Hemos sufrido un ataque",
+                Code = SystemNotificationCodeType.SYSTEM_MAINTENANCE,
+                Options = new NotificationOptions
+                {
+                    Channels = new List<NotificationChannelType>
+                    {
+                        NotificationChannelType.WEB_APPLICATION
+                    }
+                },
+                Recipients = [],
+                Severity = SystemNotificationSeverityCodeType.CRITICAL
+            };
+
+
+
+
+
             // await this.notificationMgr.CreateNotification(notification, NotificationUsersToSendType.SEND_TO_EVERYONE);
             await this.notificationMgr.CreateNotificationAsync(notificationApp);
             await this.notificationMgr.CreateNotificationAsync(notificationGen);
             await this.notificationMgr.CreateNotificationAsync(notificationSys);
+            await this.notificationMgr.CreateNotificationAsync(notificationSysWarning);
+            await this.notificationMgr.CreateNotificationAsync(notificationSysCritical);
 
 
             // await notificationMgr.NotifyAllAsync("Mensaje enviado para uno");

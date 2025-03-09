@@ -1,0 +1,87 @@
+@use '../../../../styles/variables.scss' as variables;
+@use '../../../../styles/mixins.scss' as mixins;
+@use '../../../../styles/breakpoints.scss' as breakpoints;
+@use "sass:math";
+
+
+.sidebar {
+  position: fixed;
+  width: 0px;
+  height: calc(100dvh - variables.$header-height);
+  transition: width variables.$transition-duration-medium variables.$ease-in-out;
+  padding-bottom: variables.$padding-md;
+  display: flex;
+  overflow: hidden;
+  overflow-y: auto;
+  flex-direction: column;
+  background-color: variables.$bg-muted;
+  z-index: variables.$z-index-top;
+
+  .sidebar-bs-operations {
+    flex-grow: 1;
+  }
+
+  li {
+
+    a,
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      text-decoration: none;
+      border:0;
+      border-radius:0px;
+      gap: variables.$spacing-small;
+      padding-top: variables.$padding-md;
+      padding-bottom: variables.$padding-md;
+      padding-left: calc(math.div((math.div(1, 4) * variables.$sidebar-width), 2) - math.div(variables.$icon-size-md, 2));
+      color: variables.$text;
+
+      .sidebar-icon {
+        min-width: variables.$icon-size-md;
+        max-width: variables.$icon-size-md;
+        width: variables.$icon-size-md;
+        height: variables.$icon-size-md;
+      }
+
+      span {
+        font-size: variables.$font-size-sm;
+        opacity: 0;
+        white-space: nowrap;
+      }
+    }
+
+    a:hover,
+    button:hover {
+      background-color: variables.$bg-subtle;
+    }
+
+    a:focus,
+    button:hover {
+      background-color: variables.$bg-emphasis;
+    }
+
+
+  }
+}
+
+.sidebar.open {
+  width: variables.$sidebar-width;
+
+  li a,
+  li button {
+    span {
+      width: auto;
+      opacity: 1;
+    }
+  }
+}
+
+@include mixins.respond-to(breakpoints.$breakpoint-md) {
+  .sidebar {
+    height: 100%;
+    position: relative;
+    left: 0;
+    width: math.div(1, 4) * variables.$sidebar-width;
+  }
+}

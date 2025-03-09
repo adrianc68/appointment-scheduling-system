@@ -1,0 +1,63 @@
+@use '../../../../styles/variables.scss' as variables;
+@use '../../../../styles/breakpoints.scss' as breakpoints;
+@use '../../../../styles/mixins.scss' as mixins;
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  background-color: yellow;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+
+  width: 200px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: variables.$z-index-medium;
+  display: flex;
+  flex-direction: column;
+  gap:variables.$spacing-small;
+
+  .dropdown-menu-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+
+    .search-box {
+      padding: variables.$padding-sm;
+    }
+
+    .select-all-box {
+      border: 0;
+      border-radius: 0px;
+    }
+  }
+
+  .dropdown-filters {
+    border-top: variables.$border-width solid variables.$border;
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: variables.$spacing-small;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+
+    .checkbox-item {
+
+      .input {
+        border-radius: 0px;
+        border: 0px;
+
+
+      }
+
+    }
+  }
+}
+
+

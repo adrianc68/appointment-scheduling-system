@@ -1,0 +1,209 @@
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
+import { TaskStateManagerService } from '../../model/task-state-manager.service';
+import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
+import { LoadingState } from '../../model/loading-state.type';
+import { Title } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
+import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
+import { AccountService } from '../../../model/communication-components/account.service';
+import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
+import { Observable, of, switchMap } from 'rxjs';
+import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
+import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
+import { Client } from '../../../view-model/business-entities/client';
+import { ClientService } from '../../../model/communication-components/client.service';
+
+@Component({
+  selector: 'app-edit-client',
+  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  providers: [TaskStateManagerService],
+  standalone: true,
+  templateUrl: './edit-client.component.html',
+  styleUrl: './edit-client.component.scss'
+})
+export class EditClientComponent {
+  translationCodes = TranslationCodes;
+  errorValidationMessage: { [field: string]: string[] } = {};
+  systemMessage?: string = '';
+  currentTaskState: LoadingState;
+
+  client: Client;
+
+  translate(key: string): string {
+    return this.i18nService.translate(key);
+  }
+
+  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private clientService: ClientService, private stateManagerService: TaskStateManagerService) {
+    this.client = this.router.getCurrentNavigation()?.extras.state?.["client"];
+    this.currentTaskState = this.stateManagerService.getState();
+    this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
+  }
+
+  onSubmit() {
+    console.log("called ")
+    if (this.currentTaskState === LoadingState.LOADING) {
+      return;
+    }
+
+    this.stateManagerService.setState(LoadingState.LOADING);
+    this.systemMessage = "";
+    this.errorValidationMessage = {};
+
+
+    this.clientService.editClient(this.client).pipe(
+      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
+        console.log("editclient called")
+        console.log(response);
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          return of(true);
+        } else {
+          this.handleErrorResponse(response);
+          return of(false);
+        }
+      }),
+    ).subscribe({
+      next: (result) => {
+        if (result) {
+          console.log("<<<<");
+          this.setSuccessfulTask();
+        } else {
+          console.log("<<<<");
+          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+        }
+      },
+      error: (err) => {
+        this.loggingService.error(err);
+        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+      }
+    });
+  }
+
+  disableClient(uuid: string) {
+    this.clientService.disableClient(uuid).pipe(
+      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          this.systemMessage = code;
+          return of(true);
+        } else {
+          this.handleErrorResponse(response);
+          return of(false);
+        }
+      }),
+    ).subscribe({
+      next: (result) => {
+        if (result) {
+          this.setSuccessfulTask();
+        } else {
+          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+        }
+      },
+      error: (err) => {
+        this.loggingService.error(err);
+        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+      }
+    });
+  }
+
+  enableClient(uuid: string) {
+    this.clientService.enableClient(uuid).pipe(
+      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          this.systemMessage = code;
+          return of(true);
+        } else {
+          this.handleErrorResponse(response);
+          return of(false);
+        }
+      }),
+    ).subscribe({
+      next: (result) => {
+        if (result) {
+          this.setSuccessfulTask();
+        } else {
+          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+        }
+      },
+      error: (err) => {
+        this.loggingService.error(err);
+        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+      }
+    });
+  }
+
+  deleteClient(uuid: string) {
+    this.clientService.deleteClient(uuid).pipe(
+      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          this.systemMessage = code;
+          return of(true);
+        } else {
+          this.handleErrorResponse(response);
+          return of(false);
+        }
+      }),
+    ).subscribe({
+      next: (result) => {
+        if (result) {
+          this.setSuccessfulTask();
+        } else {
+          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+        }
+      },
+      error: (err) => {
+        this.loggingService.error(err);
+        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+      }
+    });
+  }
+
+
+  private handleErrorResponse(response: OperationResult<boolean, ApiDataErrorResponse>): void {
+
+    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
+    if (isGenericErrorResponse(response.error)) {
+      let codeMesasge = getStringEnumKeyByValue(MessageCodeType, response.error.message);
+      if (response.error.additionalData?.["field"] !== undefined) {
+        this.setErrorValidationMessage(response.error.additionalData["field"], [codeMesasge!]);
+      }
+      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
+    } else if (isValidationErrorResponse(response.error)) {
+      response.error.forEach(errorItem => {
+        this.setErrorValidationMessage(errorItem.field, errorItem.messages);
+      });
+      code = this.translationCodes.TC_VALIDATION_ERROR;
+    } else if (isServerErrorResponse(response.error)) {
+      code = getStringEnumKeyByValue(MessageCodeType, response.code);
+    } else if (isEmptyErrorResponse(response.error)) {
+      code = getStringEnumKeyByValue(MessageCodeType, response.code);
+    }
+
+    this.systemMessage = code;
+  }
+
+
+  private setErrorValidationMessage(key: string, value: string[]) {
+    this.errorValidationMessage[key.toLowerCase()] = value;
+  }
+
+  private setUnsuccessfulTask(state: LoadingState): void {
+    this.stateManagerService.setState(state);
+    setTimeout(() => {
+      this.stateManagerService.setState(LoadingState.NO_ACTION_PERFORMED);
+    }, 1500);
+  }
+
+  private setSuccessfulTask(): void {
+    this.stateManagerService.setState(LoadingState.SUCCESSFUL_TASK);
+    setTimeout(() => {
+      //
+    }, 1500)
+  }
+}

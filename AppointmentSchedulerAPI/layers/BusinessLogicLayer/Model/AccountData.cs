@@ -9,7 +9,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Username { get; set; }
+        public string? Name { get; set; }
         public RoleType? Role { get; set; }
+        public AccountStatusType? Status { get; set;}
         public DateTime? CreatedAt { get; set; }
     }
 }

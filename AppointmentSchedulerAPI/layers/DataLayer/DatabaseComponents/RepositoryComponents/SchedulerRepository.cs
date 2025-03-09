@@ -186,6 +186,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     .Include(a => a.Assistant)
                         .ThenInclude(ass => ass!.UserAccount)
                         .ThenInclude(assc => assc!.UserInformation)
+                    .Include(una => una.UnavailableTimeSlots)
                 .ToListAsync();
 
             var availabilityTimeSlotsModel = availableServices
@@ -204,7 +205,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                         Id = slot.Assistant.IdUserAccount,
                         PhoneNumber = slot.Assistant!.UserAccount!.UserInformation!.Name,
                         Email = slot.Assistant!.UserAccount!.UserInformation!.Name,
-                    }
+                    },
+                    UnavailableTimeSlots = slot.UnavailableTimeSlots?.Select(unav => new BusinessLogicLayer.Model.UnavailableTimeSlot {
+                        StartTime = unav.StartTime!.Value,
+                        EndTime = unav.EndTime!.Value
+                    }).ToList() ?? [],
                 })
                 .ToList();
 

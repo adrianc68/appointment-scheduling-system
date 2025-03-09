@@ -1,32 +1,37 @@
 using System.ComponentModel.DataAnnotations;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Validation;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
 {
     public class CreateClientDTO
     {
-        [Required(ErrorMessage = "Email is required.")]
-        [EmailAddress(ErrorMessage = "Invalid email address format.")]
-        [StringLength(100, ErrorMessage = "Email cannot be longer than 100 characters.")]
+        [Required(ErrorMessage = ValidationCodeType.VALIDATION_EMAIL_FIELD_REQUIRED)]
+        [EmailAddress(ErrorMessage = ValidationCodeType.VALIDATION_EMAIL_INVALID_FORMAT)]
+        [StringLength(100, ErrorMessage = ValidationCodeType.VALIDATION_EMAIL_MAX_LIMIT_VIOLATION)]
+        [MinLength(3, ErrorMessage = ValidationCodeType.VALIDATION_EMAIL_MIN_LIMIT_VIOLATION)]
         public required string Email { get; set; }
 
-        [Required(ErrorMessage = "Password is required.")]
-        [StringLength(50, MinimumLength = 8, ErrorMessage = "Password must be between 8 and 50 characters.")]
+        [Required(ErrorMessage = ValidationCodeType.VALIDATION_PASSWORD_FIELD_REQUIRED)]
+        [StringLength(50, ErrorMessage = ValidationCodeType.VALIDATION_EMAIL_MAX_LIMIT_VIOLATION)]
+        [MinLength(8, ErrorMessage = ValidationCodeType.VALIDATION_PASSWORD_MIN_LIMIT_VIOLATION)]
         [StrongPassword]
         public required string Password { get; set; }
 
-        [Required(ErrorMessage = "Username is required.")]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Username must be between 3 and 50 characters.")]
-        [AllowSpecialCharacters(allowedCharacters: @"._")]
+        [Required(ErrorMessage = ValidationCodeType.VALIDATION_USERNAME_FIELD_REQUIRED)]
+        [StringLength(50, ErrorMessage = ValidationCodeType.VALIDATION_USERNAME_MAX_LIMIT_VIOLATION)]
+        [MinLength(3, ErrorMessage = ValidationCodeType.VALIDATION_USERNAME_MIN_LIMIT_VIOLATION)]
+        [AllowSpecialCharacters(allowedCharacters: @"._", ValidationCodeType.VALIDATION_USERNAME_CHARACTERS_NOT_ALLOWED_VIOLATION)]
         public required string Username { get; set; }
 
-        [Required(ErrorMessage = "Phone number is required.")]
+        [Required(ErrorMessage = ValidationCodeType.VALIDATION_PHONE_NUMBER_FIELD_REQUIRED)]
         [PhoneNumber]
         public required string PhoneNumber { get; set; }
 
-        [Required(ErrorMessage = "Name is required.")]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "Name cannot exceed 100 characters.")]
-        [AllowSpecialCharacters(allowedCharacters: " .")]
+        [Required(ErrorMessage = ValidationCodeType.VALIDATION_NAME_FIELD_REQUIRED)]
+        [StringLength(100, ErrorMessage = ValidationCodeType.VALIDATION_NAME_MAX_LIMIT_VIOLATION)]
+        [MinLength(3, ErrorMessage = ValidationCodeType.VALIDATION_NAME_MIN_LIMIT_VIOLATION)]
+        [AllowSpecialCharacters(allowedCharacters: " .", ValidationCodeType.VALIDATION_NAME_CHARACTERS_NOT_ALLOWED_VIOLATION)]
         public required string Name { get; set; }
     }
 }

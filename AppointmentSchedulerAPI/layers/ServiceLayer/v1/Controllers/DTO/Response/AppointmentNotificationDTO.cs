@@ -5,7 +5,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Respons
     public class AppointmentNotificationDTO : NotificationDTO
     {
         public required AppointmentNotificationCodeType Code { get; set;}
-        public required AppointmentUuidDTO Appointment { get; set;}
+
+        public required Guid AppointmentUuid { get; set;}
 
     }
 }

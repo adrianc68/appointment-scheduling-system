@@ -1,0 +1,133 @@
+@use '../../../styles/mixins.scss' as mixins;
+@use '../../../styles/breakpoints.scss' as breakpoints;
+@use '../../../styles/variables.scss' as variables;
+
+.config-management-container {
+  @include mixins.flex-center;
+  width: 100%;
+  padding-top: variables.$padding-xl;
+
+}
+
+.config-management {
+  @include mixins.flex-center;
+  flex-direction: column;
+  width: 90%;
+  max-width: variables.$container-md;
+  gap: variables.$spacing-large;
+}
+
+
+.item-management {
+  width: 100%;
+  @include mixins.flex-start;
+  flex-direction: column;
+
+  .item-header {
+    width: 100%;
+    padding: variables.$padding-lg;
+    display: flex;
+    flex-direction: column;
+    gap: variables.$spacing-medium;
+    border-bottom: 1px solid variables.$border;
+
+    .item-description {
+      display: flex;
+      flex-direction: column;
+      gap: variables.$spacing-small;
+    }
+  }
+
+  .item-content {
+    padding: variables.$padding-lg;
+    width: 100%;
+  }
+}
+
+.color-theme-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: variables.$spacing-medium;
+
+  button {
+    background-color: transparent;
+    border: 0;
+  }
+
+
+  .item-theme {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    gap: variables.$spacing-medium;
+
+    img {
+      width: 90%;
+      height: 90%;
+      border: variables.$border-width solid variables.$border;
+      border-radius: variables.$border-radius-sm;
+      cursor: pointer;
+    }
+
+    img.selected {
+      outline: solid variables.$selected-color 4px;
+    }
+  }
+}
+
+.language-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  width: 100%;
+  gap: variables.$spacing-medium;
+
+  button {
+    background-color: transparent;
+    border: 0;
+  }
+
+
+  .item-button {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    width: calc(variables.$container-md / 4 - variables.$padding-lg - variables.$spacing-medium);
+    gap: variables.$spacing-medium;
+
+    img {
+      width: 90%;
+      height: 90%;
+      object-fit: cover;
+      border: variables.$border-width solid variables.$border;
+      border-radius: variables.$border-radius-sm;
+      cursor: pointer;
+    }
+
+    img.selected {
+      outline: solid variables.$selected-color 4px;
+    }
+
+    img.disabled {
+      background-color: red;
+    }
+  }
+
+}
+
+
+@include mixins.respond-to(breakpoints.$breakpoint-sm) {
+  .config-management {
+    width: variables.$container-lg;
+  }
+
+  .color-theme-buttons {
+    flex-direction: row;
+  }
+
+}
