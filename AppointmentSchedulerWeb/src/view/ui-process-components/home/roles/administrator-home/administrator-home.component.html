@@ -23,11 +23,23 @@
         </a>
       </li>
 
+      <li>
+        <a [routerLink]="[webRoutes.service_offer_management]">
+          <div class="page-icon">
+            <mat-icon class="icon">assignment</mat-icon>
+          </div>
+          <span>
+            {{translate(translationCodes.TC_MANAGEMENT_SERVICE_OFFER_DIRECTORY) }}
+          </span>
+
+        </a>
+      </li>
+
 
       <li>
         <a [routerLink]="[webRoutes.assistant_management]">
           <div class="page-icon">
-            <mat-icon class="icon">supervisor_account</mat-icon>
+            <mat-icon class="icon">support_agent</mat-icon>
           </div>
           <span>
             {{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY) }}

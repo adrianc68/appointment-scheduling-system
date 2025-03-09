@@ -289,5 +289,48 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }
             return isUpdated;
         }
+
+        public async Task<IEnumerable<BusinessLogicLayer.Model.ServiceOffer>> GetAllAssistantsAndServicesOffer()
+        {
+            using var dbContext = context.CreateDbContext();
+            var dbServiceOffer = await dbContext.ServiceOffers
+                .Include(a => a.Service)
+                .Include(a => a.Assistant)
+                    .ThenInclude(asi => asi!.UserAccount)
+                    .ThenInclude(asc => asc!.UserInformation)
+                .ToListAsync();
+
+            if (dbServiceOffer == null)
+                return [];
+
+            return dbServiceOffer.Select(a => new BusinessLogicLayer.Model.ServiceOffer
+            {
+                Service = new BusinessLogicLayer.Model.Service
+                {
+                    Id = a.Service!.Id,
+                    Name = a.Service.Name,
+                    Description = a.Service.Description,
+                    Minutes = a.Service.Minutes,
+                    Price = a.Service.Price,
+                    Uuid = a.Service.Uuid,
+                    CreatedAt = a.Service.CreatedAt,
+                    Status = (BusinessLogicLayer.Model.Types.ServiceStatusType?)a.Service.Status
+                },
+                Id = a.Id,
+                Uuid = a.Uuid,
+                Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType?)a.Status,
+                Assistant = new BusinessLogicLayer.Model.Assistant
+                {
+                    Id = a!.Assistant!.IdUserAccount,
+                    Uuid = a.Assistant.UserAccount!.Uuid,
+                    Email = a.Assistant.UserAccount.Email!,
+                    Name = a.Assistant.UserAccount.UserInformation!.Name!,
+                    PhoneNumber = a.Assistant.UserAccount.UserInformation.PhoneNumber!,
+                    Username = a.Assistant.UserAccount.Username!,
+                    Status = (BusinessLogicLayer.Model.Types.AccountStatusType?)a.Assistant.UserAccount.Status,
+                    CreatedAt = a.Assistant.UserAccount.CreatedAt
+                }
+            }).ToList();
+        }
     }
 }

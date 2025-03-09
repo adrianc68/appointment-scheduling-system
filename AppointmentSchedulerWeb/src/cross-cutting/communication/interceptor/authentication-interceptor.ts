@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { map, Observable, switchMap, take, tap } from 'rxjs';
+import { Observable, switchMap, take } from 'rxjs';
 import { AuthenticationService } from '../../security/authentication/authentication.service';
 import { UserCredentialsJwt } from '../../../view-model/business-entities/user-credentials-jwt';
 import { ApiRoutes } from '../../operation-management/model/api-routes.constants';

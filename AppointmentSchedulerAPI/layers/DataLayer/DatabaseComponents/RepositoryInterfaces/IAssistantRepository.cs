@@ -16,5 +16,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<int?> GetAssistantIdByUuidAsync(Guid uuid);
         Task<bool> IsAssistantOfferingServiceByUuidAsync(int idService, int idAssistant);
 
+        Task<IEnumerable<ServiceOffer>> GetAllAssistantsAndServicesOffer();
     }
 }

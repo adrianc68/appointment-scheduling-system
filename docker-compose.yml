@@ -1,0 +1,54 @@
+services:
+  database:
+    image: postgres
+    container_name: appointment_scheduler_db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./AppointmentSchedulerAPI/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+    - scheduling-net
+
+  api:
+    build:
+      context: ./AppointmentSchedulerAPI
+      dockerfile: ./Dockerfile
+    container_name: appointment_scheduler_api
+    env_file:
+      - .env
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    environment:
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=${DEFAULT_DB_CONNECTION}
+    depends_on:
+      - database
+    networks:
+      - scheduling-net
+
+  frontend:
+    build:
+      context: ./AppointmentSchedulerWeb
+      dockerfile: ./Dockerfile
+      args:
+        API_BASE_URL: ${API_BASE_URL} 
+    container_name: appointment_scheduler_web
+    env_file:
+      - .env
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    networks:
+      - scheduling-net
+
+volumes:
+  postgres-data:
+
+networks:
+  scheduling-net:
+    driver: bridge

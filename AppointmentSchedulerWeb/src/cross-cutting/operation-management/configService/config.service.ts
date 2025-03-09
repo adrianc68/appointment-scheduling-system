@@ -7,9 +7,12 @@ import { environment } from '../../../environments/environment';
 export class ConfigService {
   private readonly apiBaseUrl = environment.apiBaseUrl;
 
-  constructor() { }
 
-  getApiBaseUrl() {
+  constructor() {
+  }
+
+
+  getApiBaseUrl(): string {
     return this.apiBaseUrl;
   }
 }

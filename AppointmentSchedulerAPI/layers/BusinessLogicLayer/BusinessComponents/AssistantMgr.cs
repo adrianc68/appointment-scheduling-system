@@ -74,6 +74,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<ServiceOffer>)await assistantRepository.GetServicesAssignedToAssistantByUuidAsync(uuid);
         }
 
+        public async Task<List<ServiceOffer>> GetAllAssistantsAndServicesOffer()
+        {
+            return (List<ServiceOffer>)await assistantRepository.GetAllAssistantsAndServicesOffer();
+        }
+
         public async Task<bool> UpdateAssistantAsync(Assistant assistant)
         {
             bool isUpdated = await assistantRepository.UpdateAssistantAsync(assistant);

@@ -43,19 +43,19 @@
       </div>
       <div class="item-content">
         <div class="language-buttons">
-          <button class="item-button" (click)="changeLanguageToSpanish()">
+          <button class="item-button" (click)="changeLanguage(LanguagesTypes.es_MX)">
             <img src="/images/es_mx.svg" [ngClass]="{'selected': currentLanguage === LanguagesTypes.es_MX}">
             <span class="t-muted">
               {{TranslationCodes.TC_SPANISH_ES_MX_LANG | translate}}
             </span>
           </button>
-          <button class="item-button" (click)="changeLanguageToEnglish()">
+          <button class="item-button" (click)="changeLanguage(LanguagesTypes.en_US)">
             <img src=" /images/en_us.svg" [ngClass]="{'selected': currentLanguage === LanguagesTypes.en_US}">
             <span class="t-muted">
               {{TranslationCodes.TC_ENGLISH_EN_US_LANG | translate}}
             </span>
           </button>
-          <button class="item-button" disabled>
+          <button class="item-button">
             <img class="disabled" src="/images/it_it.svg">
             <span class="t-muted">
               {{TranslationCodes.TC_ITALIAN_IT_IT_LANG | translate}}
@@ -82,10 +82,10 @@
             </span>
           </button>
 
-          <button class="item-button">
-            <img src="/images/de_de.svg">
-            <span class="t-muted">
-              {{TranslationCodes.TC_GERMAN_DE_DE_LANG | translate}}
+          <button class="item-button" (click)="changeLanguage(LanguagesTypes.de_DE)">
+            <img src="/images/de_de.svg" [ngClass]="{'selected': currentLanguage === LanguagesTypes.de_DE}">
+            <span class=" t-muted">
+            {{TranslationCodes.TC_GERMAN_DE_DE_LANG | translate}}
             </span>
           </button>
 

@@ -35,8 +35,17 @@
         </a>
       </li>
       <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
+        <a [routerLink]="[webRoutes.service_offer_management]" routerLinkActive="active">
+          <mat-icon class="sidebar-icon">assignment</mat-icon>
+          <span>
+            {{translate(translationCodes.TC_MANAGEMENT_SERVICE_OFFER_DIRECTORY) }}
+          </span>
+        </a>
+      </li>
+
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
         <a [routerLink]="[webRoutes.assistant_management]" routerLinkActive="active">
-          <mat-icon class="sidebar-icon">supervisor_account</mat-icon>
+          <mat-icon class="sidebar-icon">support_agent</mat-icon>
           <span>
             {{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY) }}
           </span>

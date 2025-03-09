@@ -6,5 +6,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
     public interface IGetAsssitantService
     {
         Task<OperationResult<List<ServiceOffer>, GenericError>> GetAllAssignedServicesAsync(Guid uuid);
+        Task<List<ServiceOffer>> GetAllAssistantsAndServicesOffer();
     }
 }

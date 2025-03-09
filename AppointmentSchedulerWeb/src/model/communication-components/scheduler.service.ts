@@ -158,7 +158,7 @@ export class SchedulerService {
   }
 
   private parseServiceOfferAvailable(dto: ServiceOfferDTO): ServiceOffer {
-    let data = new ServiceOffer(dto.name, dto.price, dto.minutes, dto.description, dto.uuid, dto.assistant);
+    let data = new ServiceOffer(dto.name, dto.price, dto.minutes, dto.description, dto.uuid, dto.status, dto.assistant);
     return data;
   }
 

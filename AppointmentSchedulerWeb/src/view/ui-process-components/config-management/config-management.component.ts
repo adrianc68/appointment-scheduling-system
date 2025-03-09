@@ -45,4 +45,8 @@ export class ConfigManagementComponent {
   changeLanguageToSpanish(): void {
     this.i18nService.setLanguage(LanguageTypes.es_MX);
   }
+
+  changeLanguage(lang: LanguageTypes) {
+    this.i18nService.setLanguage(lang);
+  }
 }

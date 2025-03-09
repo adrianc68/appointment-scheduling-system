@@ -1,5 +1,7 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://api.example.com'
+  //apiBaseUrl: 'API_BASE_URL_PLACEHOLDER'
+  apiBaseUrl: 'API_BASE_URL_PLACEHOLDER'
+
 };
 

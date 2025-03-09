@@ -48,8 +48,8 @@
 @include mixins.respond-to(breakpoints.$breakpoint-lg) {
   .client-summary {
 
-  .client-summary-item {
-    width: math.div(variables.$container-xs, 2);
+    .client-summary-item {
+      width: math.div(variables.$container-xs, 2);
+    }
   }
-}
 }

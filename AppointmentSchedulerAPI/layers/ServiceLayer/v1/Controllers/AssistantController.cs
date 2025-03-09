@@ -2,6 +2,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInterfa
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
@@ -249,6 +250,43 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         Status = a.Status!.Value,
                     }).ToList();
                 }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1); ;
+            }
+            return httpResponseService.OkResponse(servicesDtos, ApiVersionEnum.V1);
+        }
+
+
+        [HttpGet("service/all")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> GetAssistantWithTheirServicesOffer()
+        {
+            List<AssistantWithServicesOfferDTO> servicesDtos = [];
+            try
+            {
+                var result = await systemFacade.GetAllAssistantsAndServicesOffer();
+                servicesDtos = result
+                                .GroupBy(a => new { a.Assistant!.Uuid, a.Assistant.Name })
+                                .Select(g => new AssistantWithServicesOfferDTO
+                                {
+                                    Assistant = new AssistantServiceOfferDTO
+                                    {
+                                        Uuid = g.Key.Uuid,
+                                        Name = g.Key.Name
+                                    },
+                                    ServiceOffer = g.Select(a => new ServiceOfferDTO
+                                    {
+                                        Uuid = a.Uuid,
+                                        Name = a.Service!.Name,
+                                        Price = a.Service.Price,
+                                        Minutes = a.Service.Minutes,
+                                        Description = a.Service.Description,
+                                        Status = a.Status!.Value
+                                    }).ToList()
+                                }).ToList();
             }
             catch (System.Exception ex)
             {

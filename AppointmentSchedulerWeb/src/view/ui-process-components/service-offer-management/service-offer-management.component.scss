@@ -1,0 +1,55 @@
+@use '../../../styles/variables.scss' as variables;
+@use '../../../styles/mixins.scss' as mixins;
+@use '../../../styles/breakpoints.scss' as breakpoints;
+@use 'sass:math';
+
+.client-management-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: auto;
+  padding: variables.$padding-md;
+  gap: variables.$spacing-large;
+}
+
+.client-management-title {
+  width: 100%;
+}
+
+.client-summary {
+  width: 100%;
+  height: auto;
+  flex-wrap: wrap;
+  display: flex;
+  gap: variables.$spacing-medium;
+
+  .client-summary-item {
+    @include mixins.flex-start;
+    flex-direction: column;
+    // width: math.div(variables.$container-xs, 2);
+    width: 100%;
+    gap: variables.$spacing-small;
+    padding: variables.$padding-md;
+  }
+}
+
+.client-management-actions {
+  width: 100%;
+
+  @include mixins.flex-end;
+
+}
+
+.client-table-content {
+  width: 100%;
+}
+
+
+@include mixins.respond-to(breakpoints.$breakpoint-lg) {
+  .client-summary {
+
+    .client-summary-item {
+      width: math.div(variables.$container-xs, 2);
+    }
+  }
+}

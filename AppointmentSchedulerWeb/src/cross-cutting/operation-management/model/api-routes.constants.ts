@@ -23,6 +23,8 @@ export const ApiRoutes = {
   deleteService: `/service/delete`,
 
 
+  getAllAssistantServiceOffers: `/assistant/service/all`,
+
   registerAvailabilityTimeSlot: `/scheduling/availabilityTimeSlot`,
   editAvailabilityTimeSlot: `/scheduling/availabilityTimeSlot`,
   enableAvailabilityTimeSlot: `/scheduling/availabilityTimeSlot/enable`,

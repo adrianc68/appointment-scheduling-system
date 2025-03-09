@@ -1709,5 +1709,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             List<ServiceOffer> services = await assistantMgr.GetAssignedServicesOfAssistantByUuidAsync(uuid);
             return OperationResult<List<ServiceOffer>, GenericError>.Success(services);
         }
+
+        public async Task<List<ServiceOffer>> GetAllAssistantsAndServicesOffer()
+        {
+            List<ServiceOffer> services = await assistantMgr.GetAllAssistantsAndServicesOffer();
+            return services;
+        }
     }
 }
