@@ -255,14 +255,12 @@ public partial class AppointmentDbContext : DbContext
                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                .HasColumnType("timestamp without time zone")
                .HasColumnName("created_at");
-           entity.Property(e => e.Date)
-                .HasColumnName("date");
-           entity.Property(e => e.EndTime)
-                .HasColumnName("end_time");
+           entity.Property(e => e.StartDate)
+                .HasColumnName("start_date");
+           entity.Property(e => e.EndDate)
+                .HasColumnName("end_date");
            entity.Property(e => e.IdClient)
                 .HasColumnName("id_client");
-           entity.Property(e => e.StartTime)
-                .HasColumnName("start_time");
            entity.Property(e => e.TotalCost)
                 .HasColumnName("total_cost");
            entity.Property(e => e.Uuid)
@@ -346,9 +344,9 @@ public partial class AppointmentDbContext : DbContext
             entity.Property(e => e.IdServiceOffer)
                 .HasColumnName("id_serviceOffer");
             entity.Property(e => e.ServiceStartTime)
-                .HasColumnName("start_time");
+                .HasColumnName("start_date");
             entity.Property(e => e.ServiceEndTime)
-                .HasColumnName("end_time");
+                .HasColumnName("end_date");
             entity.Property(e => e.ServicePrice)
                 .HasColumnName("service_price");
             entity.Property(e => e.ServiceName)
@@ -379,17 +377,14 @@ public partial class AppointmentDbContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("created_at");
-            entity.Property(e => e.Date)
+            entity.Property(e => e.StartDate)
                 .HasMaxLength(50)
-                .HasColumnName("date");
-            entity.Property(e => e.EndTime)
+                .HasColumnName("start_date");
+            entity.Property(e => e.EndDate)
                 .HasMaxLength(50)
-                .HasColumnName("end_time");
+                .HasColumnName("end_date");
             entity.Property(e => e.IdAssistant)
                 .HasColumnName("id_assistant");
-            entity.Property(e => e.StartTime)
-                .HasMaxLength(50)
-                .HasColumnName("start_time");
             entity.Property(e => e.Status)
                 .HasColumnName("status");
 
@@ -407,14 +402,14 @@ public partial class AppointmentDbContext : DbContext
         modelBuilder.Entity<UnavailableTimeSlot>(entity =>
         {
             entity.ToTable("UnavailableTimeSlot");
-            entity.HasKey(e => new { e.StartTime, e.EndTime, e.IdAvailabilityTimeSlot });
+            entity.HasKey(e => new { e.StartDate, e.EndDate, e.IdAvailabilityTimeSlot });
 
             entity.Property(e => e.IdAvailabilityTimeSlot)
                 .HasColumnName("id_availability_time_slot");
-            entity.Property(e => e.StartTime)
-                .HasColumnName("start_time");
-            entity.Property(e => e.EndTime)
-            .HasColumnName("end_time");
+            entity.Property(e => e.StartDate)
+                .HasColumnName("start_date");
+            entity.Property(e => e.EndDate)
+            .HasColumnName("end_date");
         });
 
 
