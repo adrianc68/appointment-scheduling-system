@@ -87,7 +87,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             List<ScheduledService> services = dto.SelectedServices.Select(service => new ScheduledService
             {
                 Uuid = service.Uuid,
-                ServiceStartTime = service.StartTime
+                ServiceStartDate = service.StartTime
             }).ToList();
 
 
@@ -449,8 +449,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         Uuid = se.ServiceOffer!.Assistant.Uuid!.Value,
                         OccupiedTimeRange = new ServiceOfferRangeDTO
                         {
-                            StartTime = se.ServiceStartTime!.Value,
-                            EndTime = se.ServiceEndTime!.Value
+                            StartTime = se.ServiceStartDate!.Value,
+                            EndTime = se.ServiceEndDate!.Value
                         }
                     }).ToList()
                 }).ToList();
@@ -542,8 +542,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                             },
                             Service = new ScheduledServiceDTO
                             {
-                                StartTime = serviceSelected.ServiceStartTime!.Value,
-                                EndTime = serviceSelected.ServiceEndTime!.Value,
+                                StartTime = serviceSelected.ServiceStartDate!.Value,
+                                EndTime = serviceSelected.ServiceEndDate!.Value,
                                 Price = serviceSelected.ServicePrice,
                                 Minutes = serviceSelected.ServicesMinutes,
                                 Name = serviceSelected.ServiceName,
@@ -588,7 +588,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     var selectedService = new ScheduledService
                     {
                         Uuid = serviceOfferUuid.Uuid,
-                        ServiceStartTime = serviceOfferUuid.StartTime
+                        ServiceStartDate = serviceOfferUuid.StartTime
                     };
                     appointment.ScheduledServices!.Add(selectedService);
                 }
@@ -635,7 +635,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     var selectedService = new ScheduledService
                     {
                         Uuid = serviceOfferUuid.Uuid,
-                        ServiceStartTime = serviceOfferUuid.StartTime
+                        ServiceStartDate = serviceOfferUuid.StartTime
                     };
                     appointment.ScheduledServices!.Add(selectedService);
                 }
@@ -684,8 +684,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     },
                     TimeRange = new ConflictingAppointmentTimeRangeDTO
                     {
-                        StartTime = a.ServiceStartTime!.Value,
-                        EndTime = a.ServiceEndTime!.Value
+                        StartTime = a.ServiceStartDate!.Value,
+                        EndTime = a.ServiceEndDate!.Value
                     }
 
                 }).ToList();

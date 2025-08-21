@@ -169,12 +169,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.SERVICE_OFFER_UNAVAILABLE);
                 }
                 services[i].ServicesMinutes = serviceOfferData.Service.Minutes;
-                services[i].ServiceEndTime = services[i].ServiceStartTime!.Value.AddMinutes(services[i].ServicesMinutes!.Value);
+                services[i].ServiceEndDate = services[i].ServiceStartDate!.Value.AddMinutes(services[i].ServicesMinutes!.Value);
                 services[i].ServicePrice = serviceOfferData.Service.Price;
                 services[i].ServiceOffer = serviceOfferData;
             }
 
-            services = services.OrderBy(so => so.ServiceStartTime).ToList();
+            services = services.OrderBy(so => so.ServiceStartDate).ToList();
 
             List<GenericError> errorMessages = [];
             for (int i = 1; i < services.Count; i++)
@@ -182,10 +182,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 var prevService = services[i - 1];
                 var currentService = services[i];
 
-                if (currentService.ServiceStartTime != prevService.ServiceEndTime)
+                if (currentService.ServiceStartDate != prevService.ServiceEndDate)
                 {
                     GenericError genericError = new GenericError($"Service with UUID <{currentService!.Uuid!.Value}> is not contiguous with the previous service. <{prevService!.Uuid!.Value}>. Suggestions <ServiceOfferUuid>:<StartTime>:", []);
-                    genericError.AddData($"{currentService.Uuid.Value}", prevService.ServiceEndTime!.Value);
+                    genericError.AddData($"{currentService.Uuid.Value}", prevService.ServiceEndDate!.Value);
                     errorMessages.Add(genericError);
                 }
             }
@@ -196,19 +196,19 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 return result;
             }
 
-            range.StartTime = services.Min(asd => asd.ServiceStartTime!.Value);
+            range.StartTime = services.Min(asd => asd.ServiceStartDate!.Value);
             range.EndTime = range.StartTime.AddMinutes(services.Sum(service => service.ServicesMinutes!.Value));
 
 
 
             foreach (var scheduledService in services)
             {
-                TimeOnly proposedStartTime = TimeOnly.Parse(scheduledService.ServiceStartTime!.Value.ToString());
+                TimeOnly proposedStartTime = TimeOnly.Parse(scheduledService.ServiceStartDate!.Value.ToString());
                 TimeOnly proposedEndTime = proposedStartTime.AddMinutes(scheduledService.ServicesMinutes!.Value);
 
                 DateTimeRange serviceRange = new()
                 {
-                    StartTime = scheduledService.ServiceStartTime.Value,
+                    StartTime = scheduledService.ServiceStartDate.Value,
                     EndTime = proposedEndTime,
                     Date = range.Date,
                 };
@@ -242,8 +242,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
             List<ServiceTimeSlot> selectedServices = services.Select(service => new ServiceTimeSlot
             {
-                StartTime = service.ServiceStartTime!.Value,
-                EndTime = service.ServiceEndTime!.Value,
+                StartTime = service.ServiceStartDate!.Value,
+                EndTime = service.ServiceEndDate!.Value,
                 ServiceUuid = service.Uuid!.Value,
                 AssistantUuid = service.ServiceOffer!.Assistant!.Uuid!.Value
             }).ToList();
@@ -1229,7 +1229,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             for (int i = 0; i < appointment.ScheduledServices!.Count; i++)
             {
                 var serviceOffer = appointment.ScheduledServices[i];
-                var proposedStartTime = serviceOffer.ServiceStartTime;
+                var proposedStartTime = serviceOffer.ServiceStartDate;
                 ServiceOffer? serviceOfferData = await assistantMgr.GetServiceOfferByUuidAsync(serviceOffer.Uuid!.Value);
                 if (serviceOfferData == null)
                 {
@@ -1257,14 +1257,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 }
 
                 appointment.ScheduledServices[i].ServiceOffer = serviceOfferData;
-                appointment.ScheduledServices[i].ServiceStartTime = proposedStartTime;
-                appointment.ScheduledServices[i].ServiceEndTime = proposedStartTime!.Value.AddMinutes(serviceOfferData.Service!.Minutes!.Value);
+                appointment.ScheduledServices[i].ServiceStartDate = proposedStartTime;
+                appointment.ScheduledServices[i].ServiceEndDate = proposedStartTime!.Value.AddMinutes(serviceOfferData.Service!.Minutes!.Value);
                 appointment.ScheduledServices[i].ServiceName = serviceOfferData.Service.Name;
                 appointment.ScheduledServices[i].ServicesMinutes = serviceOfferData.Service.Minutes;
                 appointment.ScheduledServices[i].ServicePrice = serviceOfferData.Service.Price;
             }
 
-            appointment.ScheduledServices = appointment.ScheduledServices.OrderBy(so => so.ServiceStartTime).ToList();
+            appointment.ScheduledServices = appointment.ScheduledServices.OrderBy(so => so.ServiceStartDate).ToList();
 
             // Validate if the services are scheduled consecutively without gaps
             List<GenericError> errorMessages = [];
@@ -1273,10 +1273,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 var prevService = appointment.ScheduledServices[i - 1];
                 var currentService = appointment.ScheduledServices[i];
 
-                if (currentService.ServiceStartTime != prevService.ServiceEndTime)
+                if (currentService.ServiceStartDate != prevService.ServiceEndDate)
                 {
                     GenericError genericError = new GenericError($"Service with UUID <{currentService!.Uuid!.Value}> is not contiguous with the previous service. <{prevService!.Uuid!.Value}>. Suggestions <ServiceOfferUuid>:<StartTime>:", []);
-                    genericError.AddData($"{currentService.Uuid.Value}", prevService.ServiceEndTime!.Value);
+                    genericError.AddData($"{currentService.Uuid.Value}", prevService.ServiceEndDate!.Value);
                     errorMessages.Add(genericError);
                 }
             }
@@ -1332,12 +1332,12 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             // 1. Check for each service if it's Assistant is available in time range
             foreach (var scheduledService in appointment.ScheduledServices)
             {
-                TimeOnly proposedStartTime = TimeOnly.Parse(scheduledService.ServiceStartTime!.Value.ToString());
+                TimeOnly proposedStartTime = TimeOnly.Parse(scheduledService.ServiceStartDate!.Value.ToString());
                 TimeOnly proposedEndTime = proposedStartTime.AddMinutes(scheduledService.ServicesMinutes!.Value);
 
                 DateTimeRange serviceRange = new()
                 {
-                    StartTime = scheduledService.ServiceStartTime.Value,
+                    StartTime = scheduledService.ServiceStartDate.Value,
                     EndTime = proposedEndTime,
                     Date = appointment.Date!.Value,
                 };

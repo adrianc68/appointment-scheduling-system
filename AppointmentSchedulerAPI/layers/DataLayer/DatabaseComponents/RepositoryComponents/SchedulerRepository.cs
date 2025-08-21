@@ -39,8 +39,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     {
                         IdAppointment = appointmentDB.Id,
                         IdServiceOffer = scheduledService.ServiceOffer!.Id,
-                        ServiceStartTime = scheduledService.ServiceStartTime!.Value,
-                        ServiceEndTime = scheduledService.ServiceEndTime!.Value,
+                        ServiceStartTime = scheduledService.ServiceStartDate!.Value,
+                        ServiceEndTime = scheduledService.ServiceEndDate!.Value,
                         ServicePrice = scheduledService.ServicePrice!.Value,
                         ServicesMinutes = scheduledService.ServicesMinutes!.Value,
                         ServiceName = scheduledService.ServiceName,
@@ -152,8 +152,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 },
                 ScheduledServices = app.ScheduledServices!.Select(aso => new BusinessLogicLayer.Model.ScheduledService
                 {
-                    ServiceStartTime = aso.ServiceStartTime,
-                    ServiceEndTime = aso.ServiceEndTime,
+                    ServiceStartDate = aso.ServiceStartTime,
+                    ServiceEndDate = aso.ServiceEndTime,
                     ServicePrice = aso.ServicePrice,
                     ServiceName = aso.ServiceName,
                     ServicesMinutes = aso.ServicesMinutes,
@@ -351,8 +351,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             {
                 Id = aso.ServiceOffer!.Id,
                 Uuid = aso.ServiceOffer.Uuid,
-                ServiceStartTime = aso.ServiceStartTime,
-                ServiceEndTime = aso.ServiceEndTime,
+                ServiceStartDate = aso.ServiceStartTime,
+                ServiceEndDate = aso.ServiceEndTime,
                 ServicePrice = aso.ServicePrice,
                 ServiceName = aso.ServiceName,
                 ServicesMinutes = aso.ServicesMinutes,
@@ -456,8 +456,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 },
                 ScheduledServices = appointmentDB.ScheduledServices!.Select(aso => new BusinessLogicLayer.Model.ScheduledService
                 {
-                    ServiceStartTime = aso.ServiceStartTime,
-                    ServiceEndTime = aso.ServiceEndTime,
+                    ServiceStartDate = aso.ServiceStartTime,
+                    ServiceEndDate = aso.ServiceEndTime,
                     ServicePrice = aso.ServicePrice,
                     ServiceName = aso.ServiceName,
                     ServicesMinutes = aso.ServicesMinutes,
@@ -860,8 +860,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Id = ss.Id,
                     Uuid = ss.Uuid,
-                    ServiceStartTime = ss.ServiceStartTime,
-                    ServiceEndTime = ss.ServiceEndTime,
+                    ServiceStartDate = ss.ServiceStartTime,
+                    ServiceEndDate = ss.ServiceEndTime,
                     ServicePrice = ss.ServicePrice,
                     ServicesMinutes = ss.ServicesMinutes,
                     ServiceName = ss.ServiceName,
@@ -919,8 +919,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Id = ss.Id,
                     Uuid = ss.Uuid,
-                    ServiceStartTime = ss.ServiceStartTime,
-                    ServiceEndTime = ss.ServiceEndTime,
+                    ServiceStartDate = ss.ServiceStartTime,
+                    ServiceEndDate = ss.ServiceEndTime,
                     ServicePrice = ss.ServicePrice,
                     ServicesMinutes = ss.ServicesMinutes,
                     ServiceName = ss.ServiceName,
@@ -974,8 +974,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                         {
                             IdAppointment = dbAppointment.Id,
                             IdServiceOffer = scheduledService.ServiceOffer!.Id,
-                            ServiceStartTime = scheduledService.ServiceStartTime!.Value,
-                            ServiceEndTime = scheduledService.ServiceEndTime!.Value,
+                            ServiceStartTime = scheduledService.ServiceStartDate!.Value,
+                            ServiceEndTime = scheduledService.ServiceEndDate!.Value,
                             ServicePrice = scheduledService.ServicePrice!.Value,
                             ServicesMinutes = scheduledService.ServicesMinutes!.Value,
                             ServiceName = scheduledService.ServiceName,
@@ -1112,8 +1112,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 {
                     Id = ss.Id,
                     Uuid = ss.Uuid,
-                    ServiceStartTime = ss.ServiceStartTime,
-                    ServiceEndTime = ss.ServiceEndTime,
+                    ServiceStartDate = ss.ServiceStartTime,
+                    ServiceEndDate = ss.ServiceEndTime,
                     ServicePrice = ss.ServicePrice,
                     ServicesMinutes = ss.ServicesMinutes,
                     ServiceName = ss.ServiceName,
