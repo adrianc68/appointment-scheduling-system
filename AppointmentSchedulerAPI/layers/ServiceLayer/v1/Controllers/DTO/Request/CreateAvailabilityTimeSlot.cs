@@ -8,12 +8,11 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
         [Required(ErrorMessage = "Date is required.")]
         public required DateOnly Date { get; set; }
         [Required(ErrorMessage = "StartTime is required.")]
-        public required TimeOnly StartTime { get; set; }
+        public required DateTime StartDate { get; set; }
         [Required(ErrorMessage = "EndTime is required.")]
-        public required TimeOnly EndTime { get; set; }
+        public required DateTime EndDate { get; set; }
         [Required(ErrorMessage = "AssistantUuid is required.")]
         public required Guid AssistantUuid { get; set; }
-
         [ValidTimeSlot]
         public List<UnavailableTimeSlotDTO>? UnavailableTimeSlots { get; set;}
     }

@@ -57,8 +57,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Service = new ServiceBlockedTimeSlotDTO
                     {
                         Uuid = blockedService.ServiceUuid,
-                        StartTime = blockedService.StartTime,
-                        EndTime = blockedService.EndTime
+                        StartDate = blockedService.StartDate,
+                        EndDate = blockedService.EndDate
                     }
                 }).ToList(),
                 LockExpirationTime = slot.LockExpirationTime
@@ -75,23 +75,30 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             var claims = ClaimsPOCO.GetUserClaims(User);
             if (claims.Role == RoleType.CLIENT && claims.Uuid != dto.ClientUuid)
             {
-                return httpResponseService.Conflict(new GenericError("Clients can only block their own uuids"), ApiVersionEnum.V1, MessageCodeType.AUTHENTICATION_UUID_VIOLATION.ToString());
+                return httpResponseService.Conflict(
+                    new GenericError("Clients can only block their own uuids"),
+                    ApiVersionEnum.V1,
+                    MessageCodeType.AUTHENTICATION_UUID_VIOLATION.ToString()
+                );
             }
+
+            var earliestTime = dto.SelectedServices.Min(s => s.StartTime);
+            var latestTime = dto.SelectedServices.Max(s => s.StartTime);
 
             DateTimeRange range = new DateTimeRange
             {
-                Date = dto.Date,
-                StartTime = dto.SelectedServices.Min(a => a.StartTime)
+                StartDate = dto.Date.ToDateTime(earliestTime),
+                EndDate = dto.Date.ToDateTime(latestTime)
             };
 
             List<ScheduledService> services = dto.SelectedServices.Select(service => new ScheduledService
             {
                 Uuid = service.Uuid,
-                ServiceStartDate = service.StartTime
+                ServiceStartDate = dto.Date.ToDateTime(service.StartTime)
             }).ToList();
 
-
             OperationResult<DateTime, GenericError> result = await systemFacade.BlockTimeRangeAsync(services, range, dto.ClientUuid);
+
             if (!result.IsSuccessful)
             {
                 if (result.Errors != null && result.Errors.Any())
@@ -99,10 +106,11 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     return httpResponseService.Conflict(result.Errors, ApiVersionEnum.V1, result.Code.ToString());
                 }
                 return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
-
             }
+
             return httpResponseService.OkResponse(result.Result, ApiVersionEnum.V1);
         }
+
 
         [HttpDelete("appointment/range/unblock")]
         [Authorize]
@@ -131,13 +139,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 AvailabilityTimeSlot availabilityTimeSlot = new()
                 {
                     Uuid = dto.Uuid,
-                    Date = dto.Date,
-                    EndTime = dto.EndTime,
-                    StartTime = dto.StartTime,
+                    StartDate = dto.StartDate,
+                    EndDate = dto.EndDate,
                     UnavailableTimeSlots = dto.UnavailableTimeSlots?.Select(una => new UnavailableTimeSlot
                     {
-                        StartTime = una.StartTime,
-                        EndTime = una.EndTime,
+                        StartDate = una.StartDate,
+                        EndDate = una.EndDate,
                     }).ToList()
                 };
 
@@ -245,17 +252,16 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 AvailabilityTimeSlot availabilityTimeSlot = new()
                 {
-                    Date = availabilityDTO.Date,
-                    EndTime = availabilityDTO.EndTime,
-                    StartTime = availabilityDTO.StartTime,
+                    EndDate = availabilityDTO.EndDate,
+                    StartDate = availabilityDTO.StartDate,
                     Assistant = new Assistant
                     {
                         Uuid = availabilityDTO.AssistantUuid
                     },
                     UnavailableTimeSlots = availabilityDTO.UnavailableTimeSlots?.Select(e => new UnavailableTimeSlot
                     {
-                        StartTime = e.StartTime,
-                        EndTime = e.EndTime
+                        StartDate = e.StartDate,
+                        EndDate = e.EndDate
                     }).ToList()
                 };
                 OperationResult<Guid, GenericError> result = await systemFacade.RegisterAvailabilityTimeSlotAsync(availabilityTimeSlot);
@@ -328,12 +334,11 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     },
                     UnavailableTimeSlots = a.UnavailableTimeSlots!.Select(una => new DTO.Response.UnavailableTimeSlotDTO
                     {
-                        StartTime = una.StartTime,
-                        EndTime = una.EndTime
+                        StartDate = una.StartDate,
+                        EndDate = una.EndDate
                     }).ToList(),
-                    Date = a.Date!.Value,
-                    EndTime = a.EndTime!.Value,
-                    StartTime = a.StartTime!.Value,
+                    StartDate = a.StartDate,
+                    EndDate = a.EndDate,
                     Uuid = a.Uuid!.Value,
                     Status = a.Status
                 }).ToList();
@@ -438,9 +443,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 appointments = result.Select(app => new AppointmentDetailsDTO
                 {
                     Uuid = app.Uuid!.Value,
-                    StartTime = app.StartTime!.Value,
-                    EndTime = app.EndTime!.Value,
-                    Date = app.Date!.Value,
+                    StartDate = app.StartDate,
+                    EndDate = app.EndDate,
                     Status = app.Status,
                     CreatedAt = app.CreatedAt!.Value,
                     Assistants = app.ScheduledServices!.Select(se => new AsisstantOfferDTO
@@ -449,8 +453,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         Uuid = se.ServiceOffer!.Assistant.Uuid!.Value,
                         OccupiedTimeRange = new ServiceOfferRangeDTO
                         {
-                            StartTime = se.ServiceStartDate!.Value,
-                            EndTime = se.ServiceEndDate!.Value
+                            StartDate = se.ServiceStartDate!.Value.Date,
+                            EndDate = se.ServiceEndDate!.Value.Date
                         }
                     }).ToList()
                 }).ToList();
@@ -475,9 +479,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 appointments = result.Select(app => new AppointmentDetailsDTO
                 {
                     Uuid = app.Uuid!.Value,
-                    StartTime = app.StartTime!.Value,
-                    EndTime = app.EndTime!.Value,
-                    Date = app.Date!.Value,
+                    StartDate = app.StartDate,
+                    EndDate = app.EndDate,
                     TotalCost = app.TotalCost,
                     Status = app.Status,
                     CreatedAt = app.CreatedAt!.Value,
@@ -523,9 +526,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         Appointment = new AppointmentDTO
                         {
                             Uuid = app.Uuid,
-                            StartTime = app.StartTime,
-                            EndTime = app.EndTime,
-                            Date = app.Date,
+                            StartDate = app.StartDate,
+                            EndDate = app.EndDate,
                             TotalCost = app.TotalCost,
                             Status = app.Status.ToString(),
                             CreatedAt = app.CreatedAt!.Value,
@@ -542,8 +544,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                             },
                             Service = new ScheduledServiceDTO
                             {
-                                StartTime = serviceSelected.ServiceStartDate!.Value,
-                                EndTime = serviceSelected.ServiceEndDate!.Value,
+                                StartDate = serviceSelected.ServiceStartDate!.Value.Date,
+                                EndDate = serviceSelected.ServiceEndDate!.Value.Date,
                                 Price = serviceSelected.ServicePrice,
                                 Minutes = serviceSelected.ServicesMinutes,
                                 Name = serviceSelected.ServiceName,
@@ -577,18 +579,18 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 var claims = ClaimsPOCO.GetUserClaims(User);
                 Appointment appointment = new Appointment
                 {
-                    Date = dto.Date,
+                    // Date = dto.Date,
                     Client = new Client { Uuid = claims.Uuid },
                     ScheduledServices = [],
                     Uuid = Guid.CreateVersion7(),
-                    StartTime = dto.SelectedServices.Min(service => service.StartTime)
+                    StartDate = dto.SelectedServices.Min(service => dto.Date.ToDateTime(service.StartTime))
                 };
                 foreach (var serviceOfferUuid in dto.SelectedServices)
                 {
                     var selectedService = new ScheduledService
                     {
                         Uuid = serviceOfferUuid.Uuid,
-                        ServiceStartDate = serviceOfferUuid.StartTime
+                        ServiceStartDate = dto.Date.ToDateTime(serviceOfferUuid.StartTime)
                     };
                     appointment.ScheduledServices!.Add(selectedService);
                 }
@@ -624,18 +626,18 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 Appointment appointment = new Appointment
                 {
-                    Date = dto.Date,
+                    StartDate = dto.SelectedServices.Min(service => dto.Date.ToDateTime(service.StartTime)),
                     Client = new Client { Uuid = dto.ClientUuid },
                     ScheduledServices = [],
                     Uuid = Guid.CreateVersion7()
                 };
-                appointment.StartTime = dto.SelectedServices.Min(service => service.StartTime);
+                appointment.StartDate = dto.SelectedServices.Min(service => dto.Date.ToDateTime(service.StartTime));
                 foreach (var serviceOfferUuid in dto.SelectedServices)
                 {
                     var selectedService = new ScheduledService
                     {
                         Uuid = serviceOfferUuid.Uuid,
-                        ServiceStartDate = serviceOfferUuid.StartTime
+                        ServiceStartDate = dto.Date.ToDateTime(serviceOfferUuid.StartTime)
                     };
                     appointment.ScheduledServices!.Add(selectedService);
                 }
@@ -669,7 +671,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             List<ConflictingServiceOfferDTO> conflictingServiceOfferDTOs = [];
             try
             {
-                DateTimeRange range = new DateTimeRange(rangeDTO.Date, rangeDTO.StartTime, rangeDTO.EndTime);
+                DateTimeRange range = new DateTimeRange(rangeDTO.StartDate, rangeDTO.EndDate);
                 var conflictingServiceOffers = await systemFacade.GetConflictingServicesByDateTimeRangeAsync(range);
                 conflictingServiceOfferDTOs = conflictingServiceOffers.Select(a => new ConflictingServiceOfferDTO
                 {
@@ -684,8 +686,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     },
                     TimeRange = new ConflictingAppointmentTimeRangeDTO
                     {
-                        StartTime = a.ServiceStartDate!.Value,
-                        EndTime = a.ServiceEndDate!.Value
+                        StartDate = a.ServiceStartDate!.Value,
+                        EndDate = a.ServiceEndDate!.Value
                     }
 
                 }).ToList();

@@ -329,9 +329,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             {
                 DateTimeRange range = new DateTimeRange
                 {
-                    StartTime = slotData.StartTime!.Value,
-                    EndTime = slotData.EndTime!.Value,
-                    Date = slotData.Date!.Value
+                    StartDate = slotData.StartDate,
+                    EndDate = slotData.EndDate,
                 };
                 List<Appointment> appointments = await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAndRangeAsync(slotData.Assistant!.Id!.Value, range);
                 appointments = appointments.DistinctBy(a => a.Id).ToList();
@@ -354,8 +353,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                         {
                             scheduledServices.Remove(service);
                         }
-                        appointment.StartTime = scheduledServices.Min(ss => ss.ServiceStartDate);
-                        appointment.EndTime = scheduledServices.Max(ss => ss.ServiceEndDate);
+                        appointment.StartDate = scheduledServices.Min(ss => ss.ServiceStartDate!.Value.Date);
+                        appointment.StartDate = scheduledServices.Max(ss => ss.ServiceEndDate!.Value.Date);
                         appointment.TotalCost = scheduledServices.Sum(ss => ss.ServicePrice!.Value);
 
                         appointmentsToReschedule.Add(appointment);
@@ -385,9 +384,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 {
                     DateTimeRange range = new DateTimeRange
                     {
-                        StartTime = unavailableSlot.StartTime,
-                        EndTime = unavailableSlot.EndTime,
-                        Date = slotData.Date!.Value
+                        EndDate = unavailableSlot.EndDate,
+                        StartDate = slotData.StartDate
                     };
                     appointments.AddRange(await schedulerRepository.GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAndRangeAsync(slotData.Assistant!.Id!.Value, range));
                 }
@@ -401,8 +399,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 {
                     var overlappingServices = appointment.ScheduledServices!
                         .Where(ss => slotData.UnavailableTimeSlots.Any(uts =>
-                            ((ss.ServiceStartDate < uts.EndTime && ss.ServiceEndDate > uts.StartTime) || // Partially overlap
-                            (ss.ServiceStartDate >= uts.StartTime && ss.ServiceEndDate <= uts.EndTime)) && // Fully overlap 
+                            ((ss.ServiceStartDate < uts.EndDate && ss.ServiceEndDate > uts.StartDate) || // Partially overlap
+                            (ss.ServiceStartDate >= uts.StartDate && ss.ServiceEndDate <= uts.EndDate)) && // Fully overlap 
                             ss.ServiceOffer!.Assistant!.Id!.Value == slotData.Assistant!.Id!.Value))
                         .ToList();
 
@@ -417,8 +415,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                             appointment.ScheduledServices!.Remove(service);
                         }
 
-                        appointment.StartTime = appointment.ScheduledServices!.Min(ss => ss.ServiceStartDate);
-                        appointment.EndTime = appointment.ScheduledServices!.Max(ss => ss.ServiceEndDate);
+                        appointment.StartDate = appointment.ScheduledServices!.Min(ss => ss.ServiceStartDate!.Value.Date);
+                        appointment.EndDate = appointment.ScheduledServices!.Max(ss => ss.ServiceEndDate!.Value.Date);
                         appointment.TotalCost = appointment.ScheduledServices!.Sum(ss => ss.ServicePrice!.Value);
 
                         appointmentsToReschedule.Add(appointment);
@@ -452,8 +450,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     {
                         scheduledServices.Remove(service);
                     }
-                    appointment.StartTime = scheduledServices.Min(ss => ss.ServiceStartDate);
-                    appointment.EndTime = scheduledServices.Max(ss => ss.ServiceEndDate);
+                    appointment.StartDate = scheduledServices.Min(ss => ss.ServiceStartDate!.Value.Date);
+                    appointment.EndDate = scheduledServices.Max(ss => ss.ServiceEndDate!.Value.Date);
                     appointment.TotalCost = scheduledServices.Sum(ss => ss.ServicePrice!.Value);
 
                     appointmentsToReschedule.Add(appointment);

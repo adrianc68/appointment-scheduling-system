@@ -3,9 +3,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Respons
     public class AppointmentDTO
     {
         public Guid? Uuid { get; set; }
-        public TimeOnly? StartTime { get; set; }
-        public TimeOnly? EndTime { get; set; }
-        public DateOnly? Date { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public string? Status { get; set; }
         public Double? TotalCost { get; set; }
         public DateTime CreatedAt { get; set; }

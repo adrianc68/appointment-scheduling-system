@@ -1,5 +1,6 @@
 ﻿using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 
@@ -36,6 +37,7 @@ public partial class AppointmentDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
         modelBuilder
             .HasPostgresEnum<AppointmentStatusType>("AppointmentStatusType")
             .HasPostgresEnum<ClientStatusType>("ClientStatusType")
@@ -52,6 +54,26 @@ public partial class AppointmentDbContext : DbContext
             .HasPostgresEnum<SystemNotificationCodeType>("SystemNotificationCodeType")
             .HasPostgresEnum<SystemNotificationSeverityCodeType>("SystemNotificationSeverityCodeType");
 
+
+        var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+            v => v.ToUniversalTime(),          // Al guardar: UTC
+            v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Al leer: UTC
+        );
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var properties = entityType.ClrType.GetProperties()
+                .Where(p => p.PropertyType == typeof(DateTime));
+
+            foreach (var property in properties)
+            {
+                modelBuilder.Entity(entityType.Name)
+                            .Property(property.Name)
+                            .HasConversion(dateTimeConverter);
+            }
+        };
+
+        // base.OnModelCreating(modelBuilder);
 
 
         modelBuilder.Entity<UserAccount>(entity =>
@@ -343,9 +365,9 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnName("id_appointment");
             entity.Property(e => e.IdServiceOffer)
                 .HasColumnName("id_serviceOffer");
-            entity.Property(e => e.ServiceStartTime)
+            entity.Property(e => e.ServiceStartDate)
                 .HasColumnName("start_date");
-            entity.Property(e => e.ServiceEndTime)
+            entity.Property(e => e.ServiceEndDate)
                 .HasColumnName("end_date");
             entity.Property(e => e.ServicePrice)
                 .HasColumnName("service_price");
