@@ -4,9 +4,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
 {
     public class DateTimeRangeDTO
     {
-        [Required(ErrorMessage = "StartTime is required.")]
-        public required DateTime StartDate { get; set; }
-        [Required(ErrorMessage = "EndTime is required.")]
-        public required DateTime EndDate { get; set; }
+        [Required(ErrorMessage = "StartDate is required.")]
+        public DateTime? StartDate { get; set; }
+        [Required(ErrorMessage = "EndDate is required.")]
+        public DateTime? EndDate { get; set; }
     }
 }

@@ -6,7 +6,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
     {
         public required NotificationRecipientData RecipientData { get; set; }
         public NotificationStatusType? Status { get; set; } = NotificationStatusType.UNREAD;
-        public DateTime ChangedAt { get; set; } = DateTime.UtcNow;
+        // public DateTime ChangedAt { get; set; } = DateTime.UtcNow;
+        private DateTime? _changedAt;
+        public DateTime? ChangedAt
+        {
+            get => _changedAt;
+            set => _changedAt = value.HasValue
+                ? DateTime.SpecifyKind(value.Value, DateTimeKind.Utc)
+                : null;
+        }
 
         public override bool Equals(object? obj)
         {

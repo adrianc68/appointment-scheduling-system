@@ -82,7 +82,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                       .AddDays(MAX_WEEKS_FOR_SCHEDULE * 7)
                       .AddDays(MAX_DAYS_FROM_NOW);
 
-            System.Console.WriteLine(range.EndDate);
             DateTime startDateTime = range.StartDate;
 
             // Check for past scheduling
@@ -204,7 +203,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             range.StartDate = services.Min(s => s.ServiceStartDate!.Value);
             range.EndDate = range.StartDate.AddMinutes(services.Sum(s => s.ServicesMinutes!.Value));
 
-            Console.WriteLine("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 
             foreach (var scheduledService in services)
             {
@@ -219,7 +217,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 };
 
                 bool isAssistantAvailableInAvailabilityTimeSlots = await schedulerMgr.IsAssistantAvailableInAvailabilityTimeSlotsAsync(serviceRange, scheduledService.ServiceOffer!.Assistant!.Id!.Value);
-                Console.WriteLine("Is Assistant Available? :" + isAssistantAvailableInAvailabilityTimeSlots);
                 if (!isAssistantAvailableInAvailabilityTimeSlots)
                 {
                     GenericError error = new GenericError($"Assistant: <{scheduledService.ServiceOffer.Assistant!.Uuid!.Value}> is not available during the requested time range", []);
@@ -231,15 +228,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return OperationResult<DateTime, GenericError>.Failure(error, MessageCodeType.ASSISTANT_NOT_AVAILABLE_IN_TIME_RANGE);
                 }
 
-
-                Console.WriteLine("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
-                Console.WriteLine("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
-                Console.WriteLine("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
-                Console.WriteLine("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
-                Console.WriteLine("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
-                Console.WriteLine("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
-
-                Console.WriteLine(serviceRange);
 
                 bool hasAssistantConflictingAppoinments = await schedulerMgr.HasAssistantConflictingAppoinmentsAsync(serviceRange, scheduledService.ServiceOffer.Assistant!.Id!.Value);
                 if (hasAssistantConflictingAppoinments)
@@ -1184,10 +1172,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
         private async Task<OperationResult<Guid, GenericError>> ScheduleAppointmentAsync(Appointment appointment)
         {
-            PropToString.PrintData(appointment);
-            PropToString.PrintListData(appointment.ScheduledServices);
-
-
             DateTime currentDateTime = DateTime.Now;
             int MAX_DAYS_FROM_NOW = int.Parse(envService.Get("MAX_DAYS_FOR_SCHEDULE"));
             int MAX_WEEKS_FOR_SCHEDULE = int.Parse(envService.Get("MAX_WEEKS_FOR_SCHEDULE"));
@@ -1297,9 +1281,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 appointment.ScheduledServices[i].ServicesMinutes = serviceOfferData.Service.Minutes;
                 appointment.ScheduledServices[i].ServicePrice = serviceOfferData.Service.Price;
                 
-             Console.WriteLine("zzzzzzzzzzzzzzz");
-                Console.WriteLine(proposedStartTime);
-                Console.WriteLine(appointment.ScheduledServices[i].ServiceEndDate);
             }
 
             appointment.ScheduledServices = appointment.ScheduledServices.OrderBy(so => so.ServiceStartDate).ToList();
@@ -1328,9 +1309,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             // Calculate cost and endtime
             appointment.TotalCost = appointment.ScheduledServices.Sum(service => service.ServicePrice!.Value);
             appointment.EndDate = appointment.StartDate.AddMinutes(appointment.ScheduledServices.Sum(service => service.ServicesMinutes!.Value));
-
-            Console.WriteLine("<xasdxapodaspodaksdopaskdoap");
-            PropToString.PrintData(appointment);
 
 
             DateTimeRange appointmentRange = new()
@@ -1373,15 +1351,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             // 1. Check for each service if its Assistant is available in the time range
             foreach (var scheduledService in appointment.ScheduledServices)
             {
-                // El servicio comienza aquía\
-                Console.WriteLine("<<<<<<< AQUI ESTA EL PROBLEMA");
-                Console.WriteLine(scheduledService.ServiceStartDate);
                 var serviceStart = scheduledService.ServiceStartDate!.Value;
 
-                // Y termina después de la duración en minutos
                 var serviceEnd = serviceStart.AddMinutes(scheduledService.ServicesMinutes!.Value);
 
-                Console.WriteLine("serviceEnd >>>" + serviceEnd);
 
                 DateTimeRange serviceRange = new()
                 {
@@ -1389,7 +1362,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     EndDate = serviceEnd
                 };
 
-                // Verificar disponibilidad en AvailabilityTimeSlots
                 bool isAssistantAvailableInAvailabilityTimeSlots =
                     await schedulerMgr.IsAssistantAvailableInAvailabilityTimeSlotsAsync(
                         serviceRange,
@@ -1413,14 +1385,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     );
                 }
 
-                Console.WriteLine("*********************");
-                Console.WriteLine("*********************");
-                Console.WriteLine("*********************");
-                Console.WriteLine("*********************");
-                Console.WriteLine("*********************");
-                Console.WriteLine("*********************");
-                Console.WriteLine(serviceRange);
-
                 bool hasAssistantConflictingAppointments = await schedulerMgr.HasAssistantConflictingAppoinmentsAsync(serviceRange, scheduledService.ServiceOffer.Assistant!.Id!.Value);
 
                 if (hasAssistantConflictingAppointments)
@@ -1437,9 +1401,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                     return OperationResult<Guid, GenericError>.Failure(error, MessageCodeType.APPOINTMENT_SELECTED_SERVICE_CONFLICT_WITH_TIME_SLOT);
                 }
             }
-
-            Console.WriteLine("<<<<FINAL APPOINTMENT DATA");
-            PropToString.PrintData(appointment);
 
             Guid? UuidRegistered = await schedulerMgr.ScheduleAppointmentAsync(appointment);
             timeRangeLockMgr.UnblockTimeSlot(clientData.Uuid!.Value);

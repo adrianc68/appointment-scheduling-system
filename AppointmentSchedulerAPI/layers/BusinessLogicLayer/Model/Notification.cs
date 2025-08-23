@@ -4,7 +4,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
 {
     public abstract class Notification
     {
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        // public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        private DateTime? _createdAt;
+        public DateTime? CreatedAt
+        {
+            get => _createdAt;
+            set => _createdAt = value.HasValue
+                ? DateTime.SpecifyKind(value.Value, DateTimeKind.Utc)
+                : null;
+        }
+
         public int? Id { get; set; }
         public Guid? Uuid { get; set; }
         public NotificationType Type { get; set; }

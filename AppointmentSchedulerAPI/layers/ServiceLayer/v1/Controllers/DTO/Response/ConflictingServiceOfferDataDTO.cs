@@ -3,5 +3,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Respons
     public class ConflictingServiceOfferDataDTO
     {
         public Guid Uuid { get; set; }
+        public String? Name { get; set; }
     }
 }

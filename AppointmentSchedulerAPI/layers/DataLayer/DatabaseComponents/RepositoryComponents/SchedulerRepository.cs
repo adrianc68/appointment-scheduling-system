@@ -16,8 +16,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<bool> AddAppointmentAsync(BusinessLogicLayer.Model.Appointment appointment)
         {
-            Console.WriteLine("INITIAL DATA In RESPOSITORY");
-            PropToString.PrintData(appointment);
             bool isRegistered = false;
             using var dbContext = context.CreateDbContext();
             using var transaction = await dbContext.Database.BeginTransactionAsync();
@@ -146,6 +144,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 EndDate = app.EndDate,
                 TotalCost = app.TotalCost,
                 Uuid = app.Uuid,
+                Status = (BusinessLogicLayer.Model.Types.AppointmentStatusType)app.Status!.Value,
                 Id = app.Id,
                 CreatedAt = app.CreatedAt,
                 Client = new BusinessLogicLayer.Model.Client
@@ -322,33 +321,13 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return !isAvailable;
         }
 
-        //         public async Task<bool> IsAssistantAvailableInAvailabilityTimeSlotsAsync(BusinessLogicLayer.Model.Types.DateTimeRange range, int idAssistant)
-        //         {
-        //             using var dbContext = context.CreateDbContext();
-        //             var availableSlots = await dbContext.AvailabilityTimeSlots
-        //                 .Where(ats => ats.IdAssistant == idAssistant && ats.StartDate == range.StartDate)
-        //                 .ToListAsync();
-        //             bool isCoveredByAnySlot = await dbContext.AvailabilityTimeSlots.AnyAsync(slot =>
-        //     slot.IdAssistant == idAssistant &&
-        //     slot.Status == Model.Types.AvailabilityTimeSlotStatusType.ENABLED &&
-        //     slot.StartDate <= range.StartDate &&
-        //     slot.EndDate >= range.EndDate
-        // );
-
-        //             Console.WriteLine("IsCoveredByAnySlot" + isCoveredByAnySlot);
-        //             PropToString.PrintListData(availableSlots);
-        //             return isCoveredByAnySlot;
-        //         }
-
-
         public async Task<bool> IsAssistantAvailableInAvailabilityTimeSlotsAsync(
             BusinessLogicLayer.Model.Types.DateTimeRange range, int idAssistant)
         {
             using var dbContext = context.CreateDbContext();
 
-            // Buscar todos los slots habilitados que cubran el rango
             var coveringSlots = await dbContext.AvailabilityTimeSlots
-                .Include(slot => slot.UnavailableTimeSlots) // Incluimos los tiempos no disponibles
+                .Include(slot => slot.UnavailableTimeSlots) 
                 .Where(slot => slot.IdAssistant == idAssistant
                                && slot.Status == Model.Types.AvailabilityTimeSlotStatusType.ENABLED
                                && slot.StartDate <= range.StartDate
@@ -357,20 +336,13 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
             foreach (var slot in coveringSlots)
             {
-                // Si existe algún UnavailableTimeSlot que choque, no está disponible
-                if (slot.UnavailableTimeSlots.Any(uts =>
+                if (slot.UnavailableTimeSlots!.Any(uts =>
                     uts.StartDate < range.EndDate && uts.EndDate > range.StartDate))
                 {
                     return false;
                 }
-                PropToString.PrintData(slot);
             }
 
-            Console.WriteLine("***********************");
-            PropToString.PrintListData(coveringSlots);
-            Console.WriteLine("***********************");
-
-            // Si al menos un slot cubre el rango y no hay conflictos, está disponible
             return coveringSlots.Any();
         }
 
@@ -384,7 +356,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
     .ToListAsync();
 
 
-            // PropToString.PrintListData(scheduledServices);
 
             var conflictingServices = scheduledServices
                 .Where(ss => range.StartDate < ss.ServiceEndDate
@@ -392,8 +363,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .ToList();
 
 
-
-            // PropToString.PrintListData(conflictingServices);
 
             return conflictingServices.Any();
         }
@@ -440,8 +409,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     }
                 }
             }).ToList();
-
-            PropToString.PrintListData(conflicts);
 
             return conflicts;
         }

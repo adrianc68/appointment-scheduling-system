@@ -4,6 +4,7 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
@@ -670,13 +671,14 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             List<ConflictingServiceOfferDTO> conflictingServiceOfferDTOs = [];
             try
             {
-                DateTimeRange range = new DateTimeRange(dto.StartDate, dto.EndDate);
+                DateTimeRange range = new DateTimeRange(dto.StartDate!.Value, dto.EndDate!.Value);
                 var conflictingServiceOffers = await systemFacade.GetConflictingServicesByDateTimeRangeAsync(range);
                 conflictingServiceOfferDTOs = conflictingServiceOffers.Select(a => new ConflictingServiceOfferDTO
                 {
                     ScheduledService = new ConflictingServiceOfferDataDTO
                     {
-                        Uuid = a.Uuid!.Value
+                        Uuid = a.Uuid!.Value,
+                        Name = a.ServiceName
                     },
                     Assistant = new AssistantConflictingAppointmentDTO
                     {

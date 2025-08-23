@@ -7,8 +7,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types
 
         public DateTimeRange(DateTime startDate, DateTime endDate)
         {
-            StartDate = startDate;
-            EndDate = endDate;
+            // StartDate = startDate;
+            // EndDate = endDate;
+            StartDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc).ToUniversalTime();
+            EndDate = DateTime.SpecifyKind(endDate, DateTimeKind.Utc).ToUniversalTime();
         }
 
         public DateTimeRange()
