@@ -453,8 +453,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         Uuid = se.ServiceOffer!.Assistant.Uuid!.Value,
                         OccupiedTimeRange = new ServiceOfferRangeDTO
                         {
-                            StartDate = se.ServiceStartDate!.Value.Date,
-                            EndDate = se.ServiceEndDate!.Value.Date
+                            StartDate = se.ServiceStartDate!.Value,
+                            EndDate = se.ServiceEndDate!.Value
                         }
                     }).ToList()
                 }).ToList();
@@ -626,18 +626,17 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 Appointment appointment = new Appointment
                 {
-                    StartDate = dto.SelectedServices.Min(service => dto.Date.ToDateTime(service.StartTime)),
+                    StartDate = dto.SelectedServices.Min(service => dto.Date.ToDateTime(service.StartTime, DateTimeKind.Utc)),
                     Client = new Client { Uuid = dto.ClientUuid },
                     ScheduledServices = [],
                     Uuid = Guid.CreateVersion7()
                 };
-                appointment.StartDate = dto.SelectedServices.Min(service => dto.Date.ToDateTime(service.StartTime));
                 foreach (var serviceOfferUuid in dto.SelectedServices)
                 {
                     var selectedService = new ScheduledService
                     {
                         Uuid = serviceOfferUuid.Uuid,
-                        ServiceStartDate = dto.Date.ToDateTime(serviceOfferUuid.StartTime)
+                        ServiceStartDate = dto.Date.ToDateTime(serviceOfferUuid.StartTime, DateTimeKind.Utc)
                     };
                     appointment.ScheduledServices!.Add(selectedService);
                 }
@@ -666,12 +665,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [HttpGet("appointment/conflict")]
         [Authorize]
         [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
-        public async Task<IActionResult> GetConflictingServiceAppointmentFromRange([FromQuery] DateTimeRangeDTO rangeDTO)
+        public async Task<IActionResult> GetConflictingServiceAppointmentFromRange([FromQuery] DateTimeRangeDTO dto)
         {
             List<ConflictingServiceOfferDTO> conflictingServiceOfferDTOs = [];
             try
             {
-                DateTimeRange range = new DateTimeRange(rangeDTO.StartDate, rangeDTO.EndDate);
+                DateTimeRange range = new DateTimeRange(dto.StartDate, dto.EndDate);
                 var conflictingServiceOffers = await systemFacade.GetConflictingServicesByDateTimeRangeAsync(range);
                 conflictingServiceOfferDTOs = conflictingServiceOffers.Select(a => new ConflictingServiceOfferDTO
                 {

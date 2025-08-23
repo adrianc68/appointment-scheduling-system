@@ -55,9 +55,48 @@ public partial class AppointmentDbContext : DbContext
             .HasPostgresEnum<SystemNotificationSeverityCodeType>("SystemNotificationSeverityCodeType");
 
 
+        //     var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+        //     v => v.ToUniversalTime(),
+        //     v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+        // );
+
+        //     foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        //     {
+        //         var properties = entityType.ClrType.GetProperties()
+        //             .Where(p => p.PropertyType == typeof(DateTime));
+
+        //         foreach (var property in properties)
+        //         {
+        //             modelBuilder.Entity(entityType.Name)
+        //                         .Property(property.Name)
+        //                         .HasConversion(dateTimeConverter);
+        //         }
+        //     }
+
+
+        // var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+        //     v => v.ToUniversalTime(),          // Al guardar: UTC
+        //     v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Al leer: UTC
+        // );
+
+        // foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        // {
+        //     var properties = entityType.ClrType.GetProperties()
+        //         .Where(p => p.PropertyType == typeof(DateTime));
+
+        //     foreach (var property in properties)
+        //     {
+        //         modelBuilder.Entity(entityType.Name)
+        //                     .Property(property.Name)
+        //                     .HasConversion(dateTimeConverter);
+        //     }
+        // };
+
+        // base.OnModelCreating(modelBuilder);
+
         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
-            v => v.ToUniversalTime(),          // Al guardar: UTC
-            v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Al leer: UTC
+            v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),          
+            v => DateTime.SpecifyKind(v, DateTimeKind.Utc)                     
         );
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
@@ -68,12 +107,11 @@ public partial class AppointmentDbContext : DbContext
             foreach (var property in properties)
             {
                 modelBuilder.Entity(entityType.Name)
-                            .Property(property.Name)
-                            .HasConversion(dateTimeConverter);
+                    .Property(property.Name)
+                    .HasConversion(dateTimeConverter)
+                    .HasColumnType("timestamp with time zone"); 
             }
-        };
-
-        // base.OnModelCreating(modelBuilder);
+        }
 
 
         modelBuilder.Entity<UserAccount>(entity =>
@@ -85,7 +123,7 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
@@ -275,12 +313,16 @@ public partial class AppointmentDbContext : DbContext
                .HasColumnName("id");
            entity.Property(e => e.CreatedAt)
                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-               .HasColumnType("timestamp without time zone")
-               .HasColumnName("created_at");
+               .HasColumnName("created_at")
+               .HasColumnType("timestamp with time zone");
            entity.Property(e => e.StartDate)
-                .HasColumnName("start_date");
+                .HasColumnName("start_date")
+                .HasColumnType("timestamp with time zone");
+
            entity.Property(e => e.EndDate)
-                .HasColumnName("end_date");
+                .HasColumnName("end_date")
+                    .HasColumnType("timestamp with time zone");
+
            entity.Property(e => e.IdClient)
                 .HasColumnName("id_client");
            entity.Property(e => e.TotalCost)
@@ -308,7 +350,7 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.Description)
                 .HasColumnName("description");
@@ -366,9 +408,13 @@ public partial class AppointmentDbContext : DbContext
             entity.Property(e => e.IdServiceOffer)
                 .HasColumnName("id_serviceOffer");
             entity.Property(e => e.ServiceStartDate)
-                .HasColumnName("start_date");
+                .HasColumnName("start_date")
+                    .HasColumnType("timestamp with time zone");
+
             entity.Property(e => e.ServiceEndDate)
-                .HasColumnName("end_date");
+                .HasColumnName("end_date")
+                    .HasColumnType("timestamp with time zone");
+
             entity.Property(e => e.ServicePrice)
                 .HasColumnName("service_price");
             entity.Property(e => e.ServiceName)
@@ -397,19 +443,20 @@ public partial class AppointmentDbContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.StartDate)
                 .HasMaxLength(50)
-                .HasColumnName("start_date");
+                .HasColumnName("start_date")
+                .HasColumnType("timestamp with time zone");
             entity.Property(e => e.EndDate)
                 .HasMaxLength(50)
-                .HasColumnName("end_date");
+                .HasColumnName("end_date")
+                .HasColumnType("timestamp with time zone");
             entity.Property(e => e.IdAssistant)
                 .HasColumnName("id_assistant");
             entity.Property(e => e.Status)
                 .HasColumnName("status");
-
             entity.Property(e => e.Uuid).HasColumnName("uuid");
 
             entity.HasOne(d => d.Assistant)
@@ -429,9 +476,12 @@ public partial class AppointmentDbContext : DbContext
             entity.Property(e => e.IdAvailabilityTimeSlot)
                 .HasColumnName("id_availability_time_slot");
             entity.Property(e => e.StartDate)
-                .HasColumnName("start_date");
+                .HasColumnName("start_date")
+                .HasColumnType("timestamp with time zone");
+
             entity.Property(e => e.EndDate)
-            .HasColumnName("end_date");
+            .HasColumnName("end_date")
+                .HasColumnType("timestamp with time zone");
         });
 
 
