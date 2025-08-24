@@ -16,7 +16,7 @@ import { MessageCodeType } from '../../../cross-cutting/communication/model/mess
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { UnavailableTimeSlot } from '../../../view-model/business-entities/unavailable-time-slot';
 import { SchedulerService } from '../../../model/communication-components/scheduler.service';
-
+import { fromLocalToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
 @Component({
   selector: 'app-register-availability-time-slot',
   imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS],
@@ -29,9 +29,8 @@ export class RegisterAvailabilityTimeSlotComponent {
 
   translationCodes = TranslationCodes;
 
-  date: string = '';
-  startTime: string = '';
-  endTime: string = '';
+  startDate: Date = new Date();
+  endDate: Date = new Date();
   assistantUuid: string = '';
   unavailableTimeSlots: UnavailableTimeSlot[] = [];
 
@@ -48,6 +47,7 @@ export class RegisterAvailabilityTimeSlotComponent {
     this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
   }
 
+
   onSubmit() {
     if (this.currentTaskState === LoadingState.LOADING) {
       return;
@@ -58,26 +58,25 @@ export class RegisterAvailabilityTimeSlotComponent {
     this.errorValidationMessage = {};
 
     const availabilitySlot = {
-      date: this.date,
-      startTime: this.startTime,
-      endTime: this.endTime,
-      assistantUuid: this.assistantUuid,
-      unavailableTimeSlots: this.unavailableTimeSlots
+      StartDate: fromLocalToUTC(this.startDate),
+      EndDate: fromLocalToUTC(this.endDate),
+      AssistantUuid: this.assistantUuid,
+      UnavailableTimeSlots: this.unavailableTimeSlots.map(slot => ({
+        StartDate: fromLocalToUTC(slot.startDate),
+        EndDate: fromLocalToUTC(slot.endDate)
+      }))
     };
 
-    this.stateManagerService.setState(LoadingState.WORK_DONE);
+    //console.log("Payload enviado:", availabilitySlot);
 
-
-    console.log(availabilitySlot);
-
-    this.schedulerService.registerAvailabilityTimeSlot(this.date, this.startTime, this.endTime, this.assistantUuid, this.unavailableTimeSlots).pipe(
+    this.schedulerService.registerAvailabilityTimeSlot(availabilitySlot).pipe(
       switchMap((response: OperationResult<string, ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
           return of(true);
         } else {
           this.handleErrorResponse(response);
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          this.systemMessage = code;
           return of(false);
         }
       }),
@@ -139,7 +138,7 @@ export class RegisterAvailabilityTimeSlotComponent {
   }
 
   addUnavailableTimeSlot() {
-    this.unavailableTimeSlots.push({ startTime: '', endTime: '' });
+    this.unavailableTimeSlots.push({ startDate: new Date(), endDate: new Date() });
   }
 
   removeUnavailableTimeSlot(index: number) {

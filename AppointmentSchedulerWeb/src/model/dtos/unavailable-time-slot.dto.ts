@@ -1,9 +1,9 @@
 export class UnavailableTimeSlotDTO {
-  startTime: string;
-  endTime: string;
-  constructor(startTime: string, endTime: string) {
-    this.startTime = startTime;
-    this.endTime = endTime;
+  startDate: Date;
+  endDate: Date;
+  constructor(startDate: Date, endDate: Date) {
+    this.startDate = startDate;
+    this.endDate = endDate;
   }
 
 }

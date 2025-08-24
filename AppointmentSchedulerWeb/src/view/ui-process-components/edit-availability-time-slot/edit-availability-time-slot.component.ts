@@ -59,28 +59,28 @@ export class EditAvailabilityTimeSlotComponent {
 
 
 
-    this.schedulerService.editAvailabilityTimeSlot(this.availabilitySlot).pipe(
-      switchMap((response: OperationResult<string, ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          this.setSuccessfulTask();
-        } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-      }
-    });
+    //this.schedulerService.editAvailabilityTimeSlot(this.availabilitySlot).pipe(
+    //  switchMap((response: OperationResult<string, ApiDataErrorResponse>): Observable<boolean> => {
+    //    if (response.isSuccessful && response.code === MessageCodeType.OK) {
+    //      return of(true);
+    //    } else {
+    //      this.handleErrorResponse(response);
+    //      return of(false);
+    //    }
+    //  }),
+    //).subscribe({
+    //  next: (result) => {
+    //    if (result) {
+    //      this.setSuccessfulTask();
+    //    } else {
+    //      this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+    //    }
+    //  },
+    //  error: (err) => {
+    //    this.loggingService.error(err);
+    //    this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+    //  }
+    //});
   }
 
   private handleErrorResponse(response: OperationResult<string, ApiDataErrorResponse>): void {
@@ -126,7 +126,7 @@ export class EditAvailabilityTimeSlotComponent {
   }
 
   addUnavailableTimeSlot() {
-    this.availabilitySlot.unavailableTimeSlots.push({ startTime: '', endTime: '' });
+    //this.availabilitySlot.unavailableTimeSlots.push({ startTime: '', endTime: '' });
   }
 
   removeUnavailableTimeSlot(index: number) {

@@ -11,7 +11,6 @@
     <tr>
 
       <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_UUID_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_DATE_LABEL)}}</th>
       <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_START_TIME_LABEL)}}</th>
       <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_END_TIME_LABEL)}}</th>
       <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_ASSISTANT_LABEL)}}</th>
@@ -23,15 +22,15 @@
   <tbody>
     <tr *ngFor="let slot of slots">
       <td>{{ slot.uuid }}</td>
-      <td>{{ slot.date }}</td>
-      <td>{{ slot.startTime }}</td>
-      <td>{{ slot.endTime }}</td>
+      <td>{{ slot.startDate | readableDate }}</td>
+
+      <td>{{ slot.endDate | readableDate }}</td>
       <td>{{ slot.assistant.name }}</td>
       <td>{{ slot.status }}</td>
       <td>
         <ul>
           <li *ngFor="let slot of slot.unavailableTimeSlots">
-            {{ slot.startTime }} - {{ slot.endTime }}
+            {{ slot.startDate }} - {{ slot.endDate }}
           </li>
         </ul>
       </td>

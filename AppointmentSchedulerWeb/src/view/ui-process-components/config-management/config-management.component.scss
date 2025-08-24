@@ -121,6 +121,7 @@
 }
 
 
+
 @include mixins.respond-to(breakpoints.$breakpoint-sm) {
   .config-management {
     width: variables.$container-lg;

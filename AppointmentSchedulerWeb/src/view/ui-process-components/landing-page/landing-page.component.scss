@@ -11,6 +11,9 @@
   .container-body {
     width: 90%;
     padding-top: math.div(variables.$header-height, 2);
+    display: flex;
+    flex-direction: column;
+    gap: variables.$spacing-large;
 
     @include mixins.respond-to(breakpoints.$breakpoint-lg) {
       max-width: variables.$container-xl;

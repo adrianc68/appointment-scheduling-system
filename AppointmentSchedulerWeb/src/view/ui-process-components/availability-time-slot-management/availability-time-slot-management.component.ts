@@ -13,10 +13,12 @@ import { MessageCodeType } from '../../../cross-cutting/communication/model/mess
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { Router } from '@angular/router';
+import { formatReadableDate, fromUTCtoLocal } from '../../../cross-cutting/helper/date-utils/date.utils';
+import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
 
 @Component({
   selector: 'app-availability-time-slot-management',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, ReadableDatePipe],
   standalone: true,
   templateUrl: './availability-time-slot-management.component.html',
   styleUrl: './availability-time-slot-management.component.scss'
@@ -25,6 +27,8 @@ export class AvailabilityTimeSlotManagementComponent {
   systemMessage?: string = '';
   translationCodes = TranslationCodes;
   slots: AvailabilityTimeSlot[] = [];
+
+  //constructor(private i18nService: I18nService, private router: Router) {}
 
 
   constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
@@ -73,7 +77,7 @@ export class AvailabilityTimeSlotManagementComponent {
 
     this.systemMessage = code;
   }
-
+  //
   redirectToRegisterSlot() {
     this.router.navigate([WebRoutes.availability_time_slot_management_register_slot])
   }
@@ -81,10 +85,16 @@ export class AvailabilityTimeSlotManagementComponent {
   redirectToEditSlot(slot: AvailabilityTimeSlot) {
     this.router.navigate([WebRoutes.availability_time_slot_management_edit_slot], { state: { slot } });
   }
-
+  //
   translate(key: string): string {
     return this.i18nService.translate(key);
   }
+
+
+    fromUTCtoLocal = fromUTCtoLocal; // Exponerla al template
+    formatReadable = formatReadableDate;
+
+
 
 
 

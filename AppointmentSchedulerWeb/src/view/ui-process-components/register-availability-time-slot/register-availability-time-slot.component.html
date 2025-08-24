@@ -6,64 +6,43 @@
         {{translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_REGISTER_DIRECTORY)}}
       </h1>
     </div>
+
     <div class="form-body">
       <div class="form-input">
-        <label for="date">
-          date
-          {{translate(translationCodes.TC_DATE_LABEL)}}
-        </label>
-        <input class="input" id="date" type="date" [(ngModel)]="date" name="date" required
-          placeholder={{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DATE_PLACEHOLDER_LABEL)}} />
-        <app-error-validation-message-form [messages]="errorValidationMessage['date']" />
+        <label for="startDate">{{translate(translationCodes.TC_START_TIME_LABEL)}}</label>
+        <input class="input" id="startDate" type="datetime-local" step="1" [(ngModel)]="startDate" name="startDate"
+          required
+          placeholder="{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_START_TIME_PLACEHOLDER_LABEL)}}" />
+        <app-error-validation-message-form [messages]="errorValidationMessage['startDate']" />
       </div>
 
       <div class="form-input">
-        <label for="startTime">
-          {{translate(translationCodes.TC_START_TIME_LABEL)}}
-        </label>
-        <input class="input" id="startTime" type="time" step="1" [(ngModel)]="startTime" name="startTime" required
-          placeholder={{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_START_TIME_PLACEHOLDER_LABEL)}} />
-        <app-error-validation-message-form [messages]="errorValidationMessage['startTime']" />
+        <label for="endDate">{{translate(translationCodes.TC_END_TIME_LABEL)}}</label>
+        <input class="input" id="endDate" type="datetime-local" step="1" [(ngModel)]="endDate" name="endDate" required
+          placeholder="{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_END_TIME_PLACEHOLDER_LABEL)}}" />
+        <app-error-validation-message-form [messages]="errorValidationMessage['endDate']" />
       </div>
 
       <div class="form-input">
-        <label for="endTime">
-          {{translate(translationCodes.TC_END_TIME_LABEL)}}
-        </label>
-        <input class="input" id="endTime" type="time" step="1" [(ngModel)]="endTime" name="endTime" required
-          placeholder={{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_END_TIME_PLACEHOLDER_LABEL)}} />
-        <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
-      </div>
-
-      <div class="form-input">
-        <label for="assistantUuid">
-          {{ translate(translationCodes.TC_ASSISTANT_IDENTIFIER_LABEL)}}
-        </label>
+        <label for="assistantUuid">{{ translate(translationCodes.TC_ASSISTANT_IDENTIFIER_LABEL)}}</label>
         <input class="input" id="assistantUuid" type="text" [(ngModel)]="assistantUuid" name="assistantUuid" required
           placeholder={{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_ASSISTANT_PLACEHOLDER_LABEL)}} />
         <app-error-validation-message-form [messages]="errorValidationMessage['assistantUuid']" />
       </div>
-
 
       <div class="form-input">
         <h2>{{translate(translationCodes.TC_UNAVAILABLE_SLOT_LABEL)}}</h2>
 
         <div *ngFor="let slot of unavailableTimeSlots; let i = index">
           <div class="form-input">
-            <label>
-              {{translate(translationCodes.TC_START_TIME_LABEL)}}
-            </label>
-            <input class="input" type="time" step="1" [(ngModel)]="slot.startTime" name="startTime{{i}}" required />
+            <label>{{translate(translationCodes.TC_START_TIME_LABEL)}}</label>
+            <input class="input" type="datetime-local" step="1" [(ngModel)]="slot.startDate" name="startTime{{i}}" required />
           </div>
-
 
           <div class="form-input">
-            <label>
-              {{translate(translationCodes.TC_END_TIME_LABEL)}}
-            </label>
-            <input class="input" type="time" step="1" [(ngModel)]="slot.endTime" name="endTime{{i}}" required />
+            <label>{{translate(translationCodes.TC_END_TIME_LABEL)}}</label>
+            <input class="input" type="datetime-local" step="1" [(ngModel)]="slot.endDate" name="endTime{{i}}" required />
           </div>
-
 
           <button class="button" type="button" (click)="removeUnavailableTimeSlot(i)">
             {{translate(translationCodes.TC_DELETE_BUTTON_LABEL)}}
@@ -73,16 +52,9 @@
         <button class="button" type="button" (click)="addUnavailableTimeSlot()">
           {{translate(translationCodes.TC_ADD_BUTTON_LABEL)}}
         </button>
-
       </div>
 
-
-
     </div>
-
-
-
-
 
     <div class="form-footer">
       <app-button-task type="submit" [loadingState]="currentTaskState"
@@ -91,10 +63,5 @@
         {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
       </span>
     </div>
-
-
-
-
-
   </form>
 </div>

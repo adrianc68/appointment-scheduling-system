@@ -12,76 +12,76 @@
 
     </div>
 
-    <div class="form-input">
-      <label for="date">
-        {{translate(translationCodes.TC_DATE_LABEL)}}
-      </label>
-      <input class="input" id="date" type="date" [(ngModel)]="this.availabilitySlot.date" name="date" required
-        placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
-      <app-error-validation-message-form [messages]="errorValidationMessage['date']" />
-    </div>
-
-
-    <div class="form-input">
-      <label for="startTime">
-        {{translate(translationCodes.TC_START_TIME_LABEL)}}
-      </label>
-      <input class="input" id="startTime" type="time" step="1" [(ngModel)]="this.availabilitySlot.startTime"
-        name="startTime" required placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
-      <app-error-validation-message-form [messages]="errorValidationMessage['startTime']" />
-    </div>
-
-
-    <div class="form-input">
-      <label for="endTime">
-        {{translate(translationCodes.TC_END_TIME_LABEL)}}
-      </label>
-      <input class="input" id="endTime" type="time" step="1" [(ngModel)]="this.availabilitySlot.endTime" name="endTime"
-        required placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
-      <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
-    </div>
-
-
-    <div class="form-input">
-      <label for="assistantUuid">
-        {{ translate(translationCodes.TC_ASSISTANT_IDENTIFIER_LABEL)}}
-      </label>
-      <input class="input" id="assistantUuid" type="text" [(ngModel)]="this.availabilitySlot.assistant.uuid"
-        name="assistantUuid" required placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
-      <app-error-validation-message-form [messages]="errorValidationMessage['assistantUuid']" />
-    </div>
-
-
-    <div class="form-input">
-      <h2>
-        {{translate(translationCodes.TC_UNAVAILABLE_SLOT_LABEL)}}
-      </h2>
-      <div *ngFor="let slot of this.availabilitySlot.unavailableTimeSlots; let i = index">
-        <div class="form-input">
-          <label>
-            {{translate(translationCodes.TC_START_TIME_LABEL)}}
-          </label>
-          <input class="input" type="time" step="1" [(ngModel)]="slot.startTime" name="startTime{{i}}" required />
-        </div>
-
-        <div class="form-input">
-          <label>
-            {{translate(translationCodes.TC_END_TIME_LABEL)}}
-          </label>
-          <input class="input" type="time" step="1" [(ngModel)]="slot.endTime" name="endTime{{i}}" required />
-        </div>
-
-        <button class="button" type="button" (click)="removeUnavailableTimeSlot(i)">
-          {{translate(translationCodes.TC_DELETE_BUTTON_LABEL)}}
-        </button>
-      </div>
-
-      <button class="button" type="button" (click)="addUnavailableTimeSlot()">
-        {{translate(translationCodes.TC_ADD_BUTTON_LABEL)}}
-      </button>
-
-      <br><br>
-    </div>
+    <!--<div class="form-input">-->
+    <!--  <label for="date">-->
+    <!--    {{translate(translationCodes.TC_DATE_LABEL)}}-->
+    <!--  </label>-->
+    <!--  <input class="input" id="date" type="date" [(ngModel)]="this.availabilitySlot.date" name="date" required-->
+    <!--    placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />-->
+    <!--  <app-error-validation-message-form [messages]="errorValidationMessage['date']" />-->
+    <!--</div>-->
+    <!---->
+    <!---->
+    <!--<div class="form-input">-->
+    <!--  <label for="startTime">-->
+    <!--    {{translate(translationCodes.TC_START_TIME_LABEL)}}-->
+    <!--  </label>-->
+    <!--  <input class="input" id="startTime" type="time" step="1" [(ngModel)]="this.availabilitySlot.startTime"-->
+    <!--    name="startTime" required placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />-->
+    <!--  <app-error-validation-message-form [messages]="errorValidationMessage['startTime']" />-->
+    <!--</div>-->
+    <!---->
+    <!---->
+    <!--<div class="form-input">-->
+    <!--  <label for="endTime">-->
+    <!--    {{translate(translationCodes.TC_END_TIME_LABEL)}}-->
+    <!--  </label>-->
+    <!--  <input class="input" id="endTime" type="time" step="1" [(ngModel)]="this.availabilitySlot.endTime" name="endTime"-->
+    <!--    required placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />-->
+    <!--  <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />-->
+    <!--</div>-->
+    <!---->
+    <!---->
+    <!--<div class="form-input">-->
+    <!--  <label for="assistantUuid">-->
+    <!--    {{ translate(translationCodes.TC_ASSISTANT_IDENTIFIER_LABEL)}}-->
+    <!--  </label>-->
+    <!--  <input class="input" id="assistantUuid" type="text" [(ngModel)]="this.availabilitySlot.assistant.uuid"-->
+    <!--    name="assistantUuid" required placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />-->
+    <!--  <app-error-validation-message-form [messages]="errorValidationMessage['assistantUuid']" />-->
+    <!--</div>-->
+    <!---->
+    <!---->
+    <!--<div class="form-input">-->
+    <!--  <h2>-->
+    <!--    {{translate(translationCodes.TC_UNAVAILABLE_SLOT_LABEL)}}-->
+    <!--  </h2>-->
+    <!--  <div *ngFor="let slot of this.availabilitySlot.unavailableTimeSlots; let i = index">-->
+    <!--    <div class="form-input">-->
+    <!--      <label>-->
+    <!--        {{translate(translationCodes.TC_START_TIME_LABEL)}}-->
+    <!--      </label>-->
+    <!--      <input class="input" type="time" step="1" [(ngModel)]="slot.startTime" name="startTime{{i}}" required />-->
+    <!--    </div>-->
+    <!---->
+    <!--    <div class="form-input">-->
+    <!--      <label>-->
+    <!--        {{translate(translationCodes.TC_END_TIME_LABEL)}}-->
+    <!--      </label>-->
+    <!--      <input class="input" type="time" step="1" [(ngModel)]="slot.endTime" name="endTime{{i}}" required />-->
+    <!--    </div>-->
+    <!---->
+    <!--    <button class="button" type="button" (click)="removeUnavailableTimeSlot(i)">-->
+    <!--      {{translate(translationCodes.TC_DELETE_BUTTON_LABEL)}}-->
+    <!--    </button>-->
+    <!--  </div>-->
+    <!---->
+    <!--  <button class="button" type="button" (click)="addUnavailableTimeSlot()">-->
+    <!--    {{translate(translationCodes.TC_ADD_BUTTON_LABEL)}}-->
+    <!--  </button>-->
+    <!---->
+    <!--  <br><br>-->
+    <!--</div>-->
 
 
 

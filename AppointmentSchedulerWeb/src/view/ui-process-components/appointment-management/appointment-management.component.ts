@@ -26,84 +26,84 @@ export class AppointmentManagementComponent {
   servicesAvailable: ServiceOffer[] = [];
   scheduledAppointments: Appointment[] = [];
 
-
-  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService) {
-    this.schedulerService.getAvailableServices("2025-01-14").pipe(
-      switchMap((response: OperationResult<ServiceOffer[], ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.servicesAvailable = [...response.result!];
-          this.servicesAvailable.map(d => console.log(d));
-          this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-        //if(result) {
-        //  thos.setSuccessfulTask();
-        //} else {
-        //  this.setUn
-        //}
-      },
-      error: (err) => {
-        this.logginService.error(err);
-
-      }
-    });
-
-    this.schedulerService.getScheduledOrConfirmedAppointments("2024-1-1", "2026-1-1").pipe(
-      switchMap((response: OperationResult<Appointment[], ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.scheduledAppointments = [...response.result!];
-          this.scheduledAppointments.map(d => console.log(d));
-          this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-        //if(result) {
-        //  thos.setSuccessfulTask();
-        //} else {
-        //  this.setUn
-        //}
-      },
-      error: (err) => {
-        this.logginService.error(err);
-
-      }
-
-    })
-
-
-  }
-
-
-  private handleErrorResponse(response: OperationResult<any, ApiDataErrorResponse>): void {
-
-    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
-    if (isGenericErrorResponse(response.error)) {
-      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
-    } else if (isValidationErrorResponse(response.error)) {
-      code = this.translationCodes.TC_VALIDATION_ERROR;
-    } else if (isServerErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    } else if (isEmptyErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    }
-
-    this.systemMessage = code;
-  }
+  //
+  //constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService) {
+  //  this.schedulerService.getAvailableServices("2025-01-14").pipe(
+  //    switchMap((response: OperationResult<ServiceOffer[], ApiDataErrorResponse>): Observable<boolean> => {
+  //      if (response.isSuccessful && response.code === MessageCodeType.OK) {
+  //        let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+  //        this.servicesAvailable = [...response.result!];
+  //        this.servicesAvailable.map(d => console.log(d));
+  //        this.systemMessage = code;
+  //        return of(true);
+  //      } else {
+  //        this.handleErrorResponse(response);
+  //        return of(false);
+  //      }
+  //    })
+  //  ).subscribe({
+  //    next: (result) => {
+  //      console.log(result);
+  //      //if(result) {
+  //      //  thos.setSuccessfulTask();
+  //      //} else {
+  //      //  this.setUn
+  //      //}
+  //    },
+  //    error: (err) => {
+  //      this.logginService.error(err);
+  //
+  //    }
+  //  });
+  //
+  //  this.schedulerService.getScheduledOrConfirmedAppointments("2024-1-1", "2026-1-1").pipe(
+  //    switchMap((response: OperationResult<Appointment[], ApiDataErrorResponse>): Observable<boolean> => {
+  //      if (response.isSuccessful && response.code === MessageCodeType.OK) {
+  //        let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+  //        this.scheduledAppointments = [...response.result!];
+  //        this.scheduledAppointments.map(d => console.log(d));
+  //        this.systemMessage = code;
+  //        return of(true);
+  //      } else {
+  //        this.handleErrorResponse(response);
+  //        return of(false);
+  //      }
+  //    })
+  //  ).subscribe({
+  //    next: (result) => {
+  //      console.log(result);
+  //      //if(result) {
+  //      //  thos.setSuccessfulTask();
+  //      //} else {
+  //      //  this.setUn
+  //      //}
+  //    },
+  //    error: (err) => {
+  //      this.logginService.error(err);
+  //
+  //    }
+  //
+  //  })
+  //
+  //
+  //}
+  //
+  //
+  //private handleErrorResponse(response: OperationResult<any, ApiDataErrorResponse>): void {
+  //
+  //  let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
+  //  if (isGenericErrorResponse(response.error)) {
+  //    code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
+  //  } else if (isValidationErrorResponse(response.error)) {
+  //    code = this.translationCodes.TC_VALIDATION_ERROR;
+  //  } else if (isServerErrorResponse(response.error)) {
+  //    code = getStringEnumKeyByValue(MessageCodeType, response.code);
+  //  } else if (isEmptyErrorResponse(response.error)) {
+  //    code = getStringEnumKeyByValue(MessageCodeType, response.code);
+  //  }
+  //
+  //  this.systemMessage = code;
+  //}
 
 
 
