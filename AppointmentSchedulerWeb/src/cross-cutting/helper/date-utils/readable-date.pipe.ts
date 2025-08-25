@@ -22,7 +22,9 @@ export class ReadableDatePipe implements PipeTransform {
     });
   }
 
-  transform(isoString: string | Date, timeZone?: string): string {
+  transform(isoString: string | Date | undefined, timeZone?: string): string {
+    if (!isoString) return '';
+
     const date = new Date(isoString);
 
     const formattedDate = date.toLocaleDateString(this.getCurrentLanguage(), {
@@ -36,7 +38,7 @@ export class ReadableDatePipe implements PipeTransform {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true,
-      timeZone: timeZone || 'UTC',
+      timeZone: timeZone || this.currentTimeZone || 'UTC',
     });
 
     return `${formattedDate}, ${formattedTime}`;

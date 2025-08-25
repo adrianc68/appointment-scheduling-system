@@ -7,7 +7,6 @@ export class TimeZoneService {
   currentTimeZone$ = this.currentTimeZoneSubject.asObservable();
 
   constructor() {
-    // Inicialmente aplicar la zona horaria guardada
     this.applyTimeZone(this.currentTimeZoneSubject.value);
   }
 

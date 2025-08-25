@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
 import { TaskStateManagerService } from '../../model/task-state-manager.service';
 import { LoadingState } from '../../model/loading-state.type';

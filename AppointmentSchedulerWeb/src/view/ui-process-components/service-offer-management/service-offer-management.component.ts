@@ -13,6 +13,8 @@ import { Observable, of, switchMap } from 'rxjs';
 import { ServiceAssignedGridItemComponent } from '../../ui-components/display/grid-list/service-assigned-grid-item/service-assigned-grid-item.component';
 import { GridListComponent } from '../../ui-components/display/grid-list/grid-list.component';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
+import { Router } from '@angular/router';
+import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 
 @Component({
   selector: 'app-service-offer-management',
@@ -26,7 +28,7 @@ export class ServiceOfferManagementComponent {
   serviceOffers: ServiceAssignment[] = [];
   component = ServiceAssignedGridItemComponent;
 
-  constructor(private assistantService: AssistantService, private logginService: LoggingService) {
+  constructor(private assistantService: AssistantService, private logginService: LoggingService, private router: Router) {
     this.assistantService.getAssistantsAndServicesOffersList().pipe(
       switchMap((response: OperationResult<ServiceAssignment[], ApiDataErrorResponse>): Observable<boolean> => {
         console.log(response);
@@ -75,6 +77,10 @@ export class ServiceOfferManagementComponent {
     //this.systemMessage = code;
   }
 
+
+  redirectToRegisterServiceOffer(): void {
+    this.router.navigate([WebRoutes.service_offer_management_register_service_offer])
+  }
 
 
 

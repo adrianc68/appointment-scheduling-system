@@ -28,9 +28,6 @@ export class AvailabilityTimeSlotManagementComponent {
   translationCodes = TranslationCodes;
   slots: AvailabilityTimeSlot[] = [];
 
-  //constructor(private i18nService: I18nService, private router: Router) {}
-
-
   constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
     this.schedulerService.getAvailabilityTimeSlots("2024-1-11", "2026-1-11").pipe(
       switchMap((response: OperationResult<AvailabilityTimeSlot[], ApiDataErrorResponse>): Observable<boolean> => {
@@ -77,6 +74,8 @@ export class AvailabilityTimeSlotManagementComponent {
 
     this.systemMessage = code;
   }
+
+
   //
   redirectToRegisterSlot() {
     this.router.navigate([WebRoutes.availability_time_slot_management_register_slot])

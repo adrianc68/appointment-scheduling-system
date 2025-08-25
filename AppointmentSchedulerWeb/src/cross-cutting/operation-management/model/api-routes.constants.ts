@@ -1,5 +1,3 @@
-import { EditAvailabilityTimeSlotComponent } from "../../../view/ui-process-components/edit-availability-time-slot/edit-availability-time-slot.component";
-
 export const ApiRoutes = {
   login: `/Auth/login`,
   logout: `/Auth/logout`,
@@ -15,12 +13,18 @@ export const ApiRoutes = {
   disableAssistant: `/assistant/disable`,
   enableAssistant: `/assistant/enable`,
   deleteAssistant: `/assistant/delete`,
+  assignService: `/assistant/service`,
 
   registerService: `/service`,
   editService: `/service`,
   disableService: `/service/disable`,
   enableService: `/service/enable`,
   deleteService: `/service/delete`,
+
+
+  blockTimeRangeAppointment: `/scheduling/appointment/range/block`,
+  registerAppointmentAsClient: `/scheduling/appointment/asClient`,
+  registerAppointmentAsStaff: `/scheduling/appointment/asStaff`,
 
 
   getAllAssistantServiceOffers: `/assistant/service/all`,

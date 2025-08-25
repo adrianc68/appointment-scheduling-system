@@ -167,6 +167,29 @@ export class AssistantService {
   }
 
 
+  assignServiceToAssistant(dto: any): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.post<boolean>(`${this.apiUrl}${ApiRoutes.assignService}`, dto).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        console.log(response);
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          return OperationResultService.createSuccess(true, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+
   private parseAssistant(dto: AssistantDTO): Assistant {
     let data = new Assistant(dto.uuid, dto.email, dto.phoneNumber, dto.username, dto.name, RoleType.ASSISTANT, dto.status, dto.createdAt);
     return data;

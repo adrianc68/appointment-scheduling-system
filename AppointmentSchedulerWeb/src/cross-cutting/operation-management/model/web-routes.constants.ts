@@ -17,6 +17,8 @@ export const WebRoutes = {
 
 
   service_offer_management: "/management/service-offer",
+  service_offer_management_register_service_offer: "/management/service-offer/register",
+  service_offer_management_edit_service_offer: "/management/service-offer/edit",
 
   assistant_management: "/management/assistant",
   assistant_management_register_assistant: "/management/assistant/register",

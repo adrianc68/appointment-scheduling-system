@@ -1,14 +1,118 @@
-<p>appointment-management works!</p>
+<section class="app-management">
+
+  <h2>Services Available for date:</h2>
+  <input type="date" [ngModel]="selectedDate" (ngModelChange)="onDateChange($event)" />
+
+  <ng-container *ngFor="let serviceOffer of servicesAvailable">
+    <pre>{{ serviceOffer | json }}</pre>
+  </ng-container>
 
 
-<h2>Available Services</h2>
-<ng-container *ngFor="let serviceOffer of servicesAvailable">
-  <pre>{{serviceOffer | json}}</pre>
-</ng-container>
+  <hr>
+  <br><br><br>
+
+  <!--<h2>Scheduled Appointments </h2>-->
+  <!---->
+  <!--<ng-container *ngFor="let appointment of scheduledAppointments">-->
+  <!--  <pre>{{appointment | json }}</pre>-->
+  <!--</ng-container>-->
 
 
-<h2>Scheduled Appointments </h2>
 
-<ng-container *ngFor="let appointment of scheduledAppointments">
-  <pre>{{appointment | json }}</pre>
-</ng-container>
+
+  <div>
+    <label for="startDate">Start Date: </label>
+    <input id="startDate" type="date" [(ngModel)]="startDate">
+
+    <label for="endDate">End Date: </label>
+    <input id="endDate" type="date" [(ngModel)]="endDate">
+
+    <button (click)="loadAppointments()">Load Appointments</button>
+    <ng-container *ngFor="let appointment of scheduledAppointments">
+      <pre>{{ appointment | json }}</pre>
+    </ng-container>
+  </div>
+
+
+  <br><br><br>
+  <hr />
+
+
+  <div>
+    <h2>Block time range appointment</h2>
+
+    <button (click)="blockTimeRange()">Bloquear rango de tiempo</button>
+
+  </div>
+
+
+  <br><br><br>
+  <hr />
+
+
+  <h2>
+    {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
+    <br>
+  </h2>
+
+
+
+  <br><br><br>
+  <hr />
+
+
+  <div>
+    <h2>Registrar cita como cliente</h2>
+
+    <form (ngSubmit)="registerAppointmentAsStaff()" #appointmentForm="ngForm">
+
+      <!-- Fecha de la cita -->
+      <label for="date">Fecha:</label>
+      <input id="date" name="date" type="date" [(ngModel)]="appointmentFormData.date" required />
+      <br><br>
+
+      <!-- Cliente -->
+      <label for="clientUuid">Cliente UUID:</label>
+      <input id="clientUuid" name="clientUuid" type="text" [(ngModel)]="appointmentFormData.clientUuid" required />
+      <br><br>
+
+
+      <!-- Servicios dinámicos -->
+      <div *ngFor="let service of appointmentFormData.selectedServices; let i = index;">
+        <h3>Servicio {{ i + 1 }}</h3>
+
+        <label for="serviceUuid{{i}}">Servicio UUID:</label>
+        <input id="serviceUuid{{i}}" name="serviceUuid{{i}}" type="text" [(ngModel)]="service.uuid" required />
+        <br><br>
+
+        <label for="startTime{{i}}">Hora de inicio:</label>
+        <!--<input id="startTime{{i}}" name="startTime{{i}}" type="time" [(ngModel)]="service.startTime" required />-->
+        <input id="startTime{{i}}" name="startTime{{i}}" type="time" step="1" [(ngModel)]="service.startTime"
+          required />
+
+        <br><br>
+
+        <!-- Botón para eliminar servicio -->
+        <button type="button" (click)="removeService(i)">Eliminar servicio</button>
+        <!-- Botón para agregar nuevo servicio -->
+        <button type="button" (click)="addService()">Agregar otro servicio</button>
+        <br><br>
+        <br><br>
+        <br><br>
+
+
+
+      </div>
+
+
+
+      <button type="submit">Agendar cita</button>
+    </form>
+
+    <h2>
+      {{ translate(systemMessage ?? translationCodes.TC_EMPTY) }}
+      <br>
+    </h2>
+  </div>
+
+</section>

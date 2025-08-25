@@ -30,7 +30,7 @@
       <td>
         <ul>
           <li *ngFor="let slot of slot.unavailableTimeSlots">
-            {{ slot.startDate }} - {{ slot.endDate }}
+            {{ slot.startDate | readableDate }} / {{ slot.endDate | readableDate }}
           </li>
         </ul>
       </td>

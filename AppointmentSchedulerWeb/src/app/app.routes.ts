@@ -23,6 +23,7 @@ import { RegisterServiceComponent } from '../view/ui-process-components/register
 import { EditAvailabilityTimeSlotComponent } from '../view/ui-process-components/edit-availability-time-slot/edit-availability-time-slot.component';
 import { RegisterAvailabilityTimeSlotComponent } from '../view/ui-process-components/register-availability-time-slot/register-availability-time-slot.component';
 import { ServiceOfferManagementComponent } from '../view/ui-process-components/service-offer-management/service-offer-management.component';
+import { RegisterServiceOfferComponent } from '../view/ui-process-components/register-service-offer/register-service-offer.component';
 
 export const routes: Routes = [
   {
@@ -38,6 +39,7 @@ export const routes: Routes = [
       { path: "management/availability-time-slots/register", component: RegisterAvailabilityTimeSlotComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
 
       { path: "management/service-offer", component: ServiceOfferManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+      { path: "management/service-offer/register", component: RegisterServiceOfferComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
 
 
       { path: "management/assistant", component: AssistantManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },

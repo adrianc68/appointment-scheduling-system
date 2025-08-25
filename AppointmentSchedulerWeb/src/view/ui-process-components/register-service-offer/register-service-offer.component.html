@@ -1,0 +1,54 @@
+<div class="form-container">
+  <h2>Asignar Servicios a un Asistente</h2>
+
+  <form (ngSubmit)="onSubmit()" #assignForm="ngForm">
+    <!-- Assistant UUID -->
+    <div class="form-group">
+      <label for="assistantUuid">Assistant UUID</label>
+      <input
+        type="text"
+        id="assistantUuid"
+        name="assistantUuid"
+        [(ngModel)]="assistantUuid"
+        required
+        class="form-control"
+      />
+    </div>
+
+    <!-- Input para añadir un servicio -->
+    <div class="form-group d-flex">
+      <input
+        type="text"
+        [(ngModel)]="newServiceUuid"
+        name="newServiceUuid"
+        placeholder="UUID del servicio"
+        class="form-control"
+      />
+      <button type="button" (click)="addService()" class="btn btn-success ml-2">
+        Agregar
+      </button>
+    </div>
+
+    <!-- Lista de servicios seleccionados -->
+    <div class="form-group" *ngIf="selectedServices.length > 0">
+      <label>Servicios seleccionados:</label>
+      <ul class="list-group">
+        <li *ngFor="let service of selectedServices; let i = index" class="list-group-item d-flex justify-content-between align-items-center">
+          {{ service }}
+          <button type="button" (click)="removeService(i)" class="btn btn-danger btn-sm">
+            Eliminar
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Botón enviar -->
+    <button type="submit" class="btn btn-primary">Asignar</button>
+  </form>
+
+  <!-- Mensajes -->
+  <div *ngIf="systemMessage" class="message mt-3">
+    {{ systemMessage }}
+  </div>
+</div>
+
