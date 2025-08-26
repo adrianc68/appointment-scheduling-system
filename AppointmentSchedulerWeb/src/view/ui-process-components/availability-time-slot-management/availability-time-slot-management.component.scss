@@ -1,3 +1,48 @@
-table {
-  color: #8a8a8a;
+@use '../../../styles/variables.scss' as variables;
+@use '../../../styles/mixins.scss' as mixins;
+@use '../../../styles/breakpoints.scss' as breakpoints;
+
+.main-section {
+  background-color: red;
+  width: 100%;
+  padding: variables.$padding-md;
+}
+
+.availability-slots-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: variables.$text;
+
+  overflow-x: auto;
+
+  thead {
+    text-align: left;
+
+    th {
+      font-weight: bold;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid variables.$border;
+
+    }
+
+    td {
+      vertical-align: middle;
+
+      .actions {
+        display: flex;
+        // gap: 0.5rem;
+
+      }
+    }
+  }
+}
+
+.all-services-container {
+  background-color: brown;
+  border-radius: 6px;
+  padding: 1rem;
 }

@@ -1,54 +1,106 @@
-<div class="form-container">
-  <h2>Asignar Servicios a un Asistente</h2>
-
-  <form (ngSubmit)="onSubmit()" #assignForm="ngForm">
-    <!-- Assistant UUID -->
-    <div class="form-group">
-      <label for="assistantUuid">Assistant UUID</label>
-      <input
-        type="text"
-        id="assistantUuid"
-        name="assistantUuid"
-        [(ngModel)]="assistantUuid"
-        required
-        class="form-control"
-      />
-    </div>
-
-    <!-- Input para añadir un servicio -->
-    <div class="form-group d-flex">
-      <input
-        type="text"
-        [(ngModel)]="newServiceUuid"
-        name="newServiceUuid"
-        placeholder="UUID del servicio"
-        class="form-control"
-      />
-      <button type="button" (click)="addService()" class="btn btn-success ml-2">
-        Agregar
-      </button>
-    </div>
-
-    <!-- Lista de servicios seleccionados -->
-    <div class="form-group" *ngIf="selectedServices.length > 0">
-      <label>Servicios seleccionados:</label>
-      <ul class="list-group">
-        <li *ngFor="let service of selectedServices; let i = index" class="list-group-item d-flex justify-content-between align-items-center">
-          {{ service }}
-          <button type="button" (click)="removeService(i)" class="btn btn-danger btn-sm">
-            Eliminar
-          </button>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Botón enviar -->
-    <button type="submit" class="btn btn-primary">Asignar</button>
-  </form>
-
-  <!-- Mensajes -->
-  <div *ngIf="systemMessage" class="message mt-3">
-    {{ systemMessage }}
+<section class="main-section">
+  <h1>Selecciona un asistente</h1>
+  <p>Debes seleccionar un asistente que no tenga servicios asignados y seleccionar los servicios que quieres que el
+    asistente pueda ofrecer</p>
+  <div class="assistant-table-container">
+    <table class="assistant-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of assistants">
+          <td class="fw-bold">
+            {{data.name}}
+          </td>
+          <td>{{data.username}}</td>
+          <td>{{data.email}}</td>
+          <td>{{data.phoneNumber}}</td>
+          <td>{{data.status}}</td>
+          <td>
+            <button class="" (click)="getAssignedServicesOfAssistant(data.uuid)">
+              Seleccionar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-</div>
+</section>
+
+<section class="assigned-services-container p-all-md">
+  <h2>Servicios asignados del asistente</h2>
+  <p>Estos son los servicios asignados al asistente:</p>
+  <div class="service-table-container">
+    <table class="service-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th>Duración</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of servicesOfferAssigned">
+          <td class="t-emphasis">{{data.name}}</td>
+          <td class="t-muted">$ {{data.price}}</td>
+          <td class="t-muted">{{data.status}}</td>
+          <td class="t-muted">{{data.minutes}} minutos</td>
+          <td class="actions">
+            <button class="" (click)="enableAssignedService(data.uuid)">
+              Activar
+            </button>
+            <button class="" (click)="disableAssignedService(data.uuid)">
+              Desactivar
+            </button>
+            <button class="" (click)="deleteAssignedService(data.uuid)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="all-services-container p-all-md">
+  <h2>Servicios disponibles para asignar</h2>
+  <p>Estos son los servicios que puedes asignar al asistente seleccionado:</p>
+  <div class="service-table-container">
+    <table class="service-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Duración</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of serviceNotAssignedOfAssistant">
+          <td class="t-emphasis">{{data.name}}</td>
+          <td class="t-muted">$ {{data.price}}</td>
+          <td class="t-muted">{{data.minutes}} minutos</td>
+          <td class="t-muted">{{data.description}}</td>
+          <td class="t-muted">{{data.status}}</td>
+          <td class="actions">
+            <button class="btn btn-assign" (click)="assignService(data.uuid)">
+              Asignar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 

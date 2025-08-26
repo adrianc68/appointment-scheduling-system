@@ -6,7 +6,7 @@
 
 .register-container {
   @include mixins.flex-center;
-  padding-top: math.div(variables.$header-height, 2);
+  padding-top: math.div(variables.$navbar-height, 2);
   flex-direction: column;
   width: 100%;
 }

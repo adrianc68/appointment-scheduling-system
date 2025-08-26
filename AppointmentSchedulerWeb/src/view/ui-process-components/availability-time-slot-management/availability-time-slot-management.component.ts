@@ -15,10 +15,11 @@ import { WebRoutes } from '../../../cross-cutting/operation-management/model/web
 import { Router } from '@angular/router';
 import { formatReadableDate, fromUTCtoLocal } from '../../../cross-cutting/helper/date-utils/date.utils';
 import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-availability-time-slot-management',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, ReadableDatePipe],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, ReadableDatePipe, MatIconModule],
   standalone: true,
   templateUrl: './availability-time-slot-management.component.html',
   styleUrl: './availability-time-slot-management.component.scss'
@@ -90,8 +91,8 @@ export class AvailabilityTimeSlotManagementComponent {
   }
 
 
-    fromUTCtoLocal = fromUTCtoLocal; // Exponerla al template
-    formatReadable = formatReadableDate;
+  fromUTCtoLocal = fromUTCtoLocal;
+  formatReadable = formatReadableDate;
 
 
 

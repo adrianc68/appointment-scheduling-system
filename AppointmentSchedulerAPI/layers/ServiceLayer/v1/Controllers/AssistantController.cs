@@ -201,13 +201,13 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowedRoles(RoleType.ADMINISTRATOR)]
         public async Task<IActionResult> AssignServiceToAssistant([FromBody] AssignServiceToAssistantDTO assignServiceDTO)
         {
-            bool isAssigned = false;
+            List<Guid> assignedServices;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.AssignListServicesToAssistantAsync(assignServiceDTO.AssistantUuid, assignServiceDTO.SelectedServices);
+                OperationResult<List<Guid>, GenericError> result = await systemFacade.AssignListServicesToAssistantAsync(assignServiceDTO.AssistantUuid, assignServiceDTO.SelectedServices);
                 if (result.IsSuccessful)
                 {
-                    isAssigned = result.Result;
+                    assignedServices = result.Result!;
                 }
                 else
                 {
@@ -218,11 +218,33 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
             }
-            return httpResponseService.OkResponse(isAssigned, ApiVersionEnum.V1);
-
+            return httpResponseService.OkResponse(assignedServices, ApiVersionEnum.V1);
         }
 
-
+        [HttpPatch("service")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        public async Task<IActionResult> EditServiceAssignedToAssistant([FromBody] AssignServiceToAssistantDTO assignServiceDTO)
+        {
+            List<Guid> assignedServices;
+            try
+            {
+                OperationResult<List<Guid>, GenericError> result = await systemFacade.AssignListServicesToAssistantAsync(assignServiceDTO.AssistantUuid, assignServiceDTO.SelectedServices);
+                if (result.IsSuccessful)
+                {
+                    assignedServices = result.Result!;
+                }
+                else
+                {
+                    return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(assignedServices, ApiVersionEnum.V1);
+        }
 
         [HttpGet("service")]
         [Authorize]
@@ -248,6 +270,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         Minutes = a.Service.Minutes,
                         Description = a.Service.Description,
                         Status = a.Status!.Value,
+                        ServiceUuid = a.Service.Uuid,
+                        ServiceStatus = a.Service.Status,
                     }).ToList();
                 }
             }
@@ -283,6 +307,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                                         Name = a.Service!.Name,
                                         Price = a.Service.Price,
                                         Minutes = a.Service.Minutes,
+                                        ServiceUuid = a.Service.Uuid,
+                                        ServiceStatus = a.Service.Status,
                                         Description = a.Service.Description,
                                         Status = a.Status!.Value
                                     }).ToList()

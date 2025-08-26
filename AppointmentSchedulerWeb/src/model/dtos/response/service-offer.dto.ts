@@ -2,6 +2,7 @@ import { Expose, Transform } from "class-transformer";
 import { parseStringToEnum } from "../../../cross-cutting/helper/enum-utils/enum.utils";
 import { ServiceOfferStatusType } from "../../../view-model/business-entities/types/service-offer-status.types";
 import { InvalidValueEnumValueException } from "../exceptions/invalid-enum.exception";
+import { ServiceStatusType } from "../../../view-model/business-entities/types/service-status.types";
 
 export class ServiceOfferDTO {
   @Expose({ name: "name" })
@@ -19,6 +20,19 @@ export class ServiceOfferDTO {
   @Expose({ name: "uuid" })
   uuid: string;
 
+  @Expose({ name: "serviceUuid" })
+  serviceUuid?: string;
+
+  @Expose({ name: "serviceStatus" })
+  @Transform(({ value }) => {
+    let data = parseStringToEnum(ServiceStatusType, value);
+    if (data === null || data === undefined) {
+      throw new InvalidValueEnumValueException(`Invalid ServiceOfferStatusType value casting: ${value}`);
+    }
+    return data;
+  })
+  serviceStatus?: ServiceStatusType;
+
 
   @Expose({ name: "status" })
   @Transform(({ value }) => {
@@ -33,7 +47,7 @@ export class ServiceOfferDTO {
   @Expose({ name: "assistant" })
   assistant: { name: string, uuid: string }
 
-  constructor(name: string, price: number, minutes: number, description: string, uuid: string, status: ServiceOfferStatusType, assistant: { name: string, uuid: string }) {
+  constructor(name: string, price: number, minutes: number, description: string, uuid: string, status: ServiceOfferStatusType, assistant: { name: string, uuid: string }, serviceUuid?: string, serviceStatus?: ServiceStatusType) {
     this.name = name;
     this.price = price;
     this.minutes = minutes;
@@ -41,5 +55,7 @@ export class ServiceOfferDTO {
     this.uuid = uuid;
     this.status = status;
     this.assistant = assistant;
+    this.serviceUuid = serviceUuid;
+    this.serviceStatus = serviceStatus;
   }
 }

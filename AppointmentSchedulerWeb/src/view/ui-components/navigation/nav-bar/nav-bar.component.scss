@@ -3,15 +3,15 @@
 @use '../../../../styles/breakpoints.scss' as breakpoints;
 
 .navbar {
-  background-color: variables.$sidebar-background-color;
-  height: variables.$header-height;
+  background-color: variables.$bg-muted;
+  height: variables.$navbar-height;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: variables.$spacing-large;
+  gap: variables.$spacing-lg;
   padding-left: variables.$padding-md;
-  padding-right: variables.$spacing-large;
+  padding-right: variables.$spacing-lg;
   color: variables.$text;
   position: relative;
 }
@@ -32,13 +32,13 @@
   height: auto;
   width: auto;
   padding: 5px;
-  font-size: variables.$icon-size-lg;
+  font-size: 3rem;
 }
 
 .menu-icon {
   height: auto;
   width: auto;
-  font-size: variables.$icon-size-md;
+  font-size: 2rem;
   color: variables.$text;
 }
 
@@ -52,13 +52,13 @@
 
 .notification-icon {
   position: relative;
-  height: variables.$icon-size-md;
-  width: variables.$icon-size-md;
+  height: 2rem;
+  width: 2rem;
 }
 
 .notification-badge {
   background-color: variables.$danger-color;
-  color: variables.$white-color;
+  color: variables.$text-inverted;
   border-radius: variables.$border-radius-pill;
   font-size: variables.$font-size-sm;
   padding: 3px;

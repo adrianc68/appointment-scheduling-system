@@ -14,6 +14,11 @@ export const ApiRoutes = {
   enableAssistant: `/assistant/enable`,
   deleteAssistant: `/assistant/delete`,
   assignService: `/assistant/service`,
+  getAssignedServices: `/assistant/service`,
+
+  disableAssignedService: `/scheduling/appointment/serviceOffer/disable`,
+  deleteAssignedService: `/scheduling/appointment/serviceOffer/delete`,
+  enableAssignedService: `/scheduling/appointment/serviceOffer/enable`,
 
   registerService: `/service`,
   editService: `/service`,

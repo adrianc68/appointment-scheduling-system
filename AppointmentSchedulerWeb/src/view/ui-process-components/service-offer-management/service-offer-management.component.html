@@ -1,40 +1,41 @@
 <div class="client-management-container">
   <div class="client-management-title">
-    <h1>{{TranslationCodes.TC_MANAGEMENT_SERVICE_OFFER_DIRECTORY | translate}}</h1>
-  </div>
-  <h2>test</h2>
-
-  <div class="client-summary">
-    <div class="client-summary-item card">
-      <!--<span class="t-muted">{{TranslationCodes.TC_CLIENTS_REGISTERED_LABEL | translate}}</span>-->
-      <!--<span class="fw-bold fs-xl">{{clients.length}}</span>-->
-    </div>
-    <div class="client-summary-item card">
-      <!--<span class="t-muted">{{TranslationCodes.TC_CLIENTS_AVAILABLE_LABEL | translate}}</span>-->
-      <!--<span class="fw-bold fs-xl">{{enabledClientsCount}}</span>-->
-    </div>
-    <div class="client-summary-item card">
-      <!--<span class="t-muted">{{TranslationCodes.TC_CLIENTS_NOT_AVAILABLE_LABEL | translate}}</span>-->
-      <!--<span class="fw-bold fs-xl">{{disabledClientsCount}}</span>-->
-    </div>
+    <h1>Asignación de servicios</h1>
   </div>
 
   <div class="client-management-actions">
     <div class="button-register">
       <button class="button" (click)="redirectToRegisterServiceOffer()">
-        Registrar ofertas de servicio
+        Asignar servicios
       </button>
     </div>
   </div>
 
 
   <div class="client-table-content">
+    <div class="service-card-container" *ngFor="let data of serviceOffers">
+      <div class="service-data">
+        <div class="service-profile-data">
+          <mat-icon class="profile-icon">support_agent</mat-icon>
+          <span class="fw-bold t-emphasis">{{data.assistantName}}</span>
+        </div>
+        <div class="service-info">
+          <span class="fw-bold t-emphasis">Servicios asignados:</span>
+          <ul class="service-list-container">
+            <ng-container *ngFor="let service of data.serviceOffer">
+              <li>
+                <div class="service-item-container">
+                  <span class="t-emphasis">{{service.name}}</span>
+                  <!--<span class="fw-bold">{{service.uuid}}</span>-->
+                  <span class="t-muted">$ {{service.price}}</span>
+                  <span class="t-muted">{{service.minutes}} {{TranslationCodes.TC_MINUTES_LABEL | translate}}</span>
+                </div>
+              </li>
+            </ng-container>
+          </ul>
+        </div>
+      </div>
+    </div>
 
-    <!--<pre class="t-muted">{{serviceOffers | json}}</pre>-->
-    <app-grid-list [title]="TranslationCodes.TC_MANAGEMENT_SERVICE_OFFER_DIRECTORY" [items]="serviceOffers" [cardComponent]="component">
-
-    </app-grid-list>
 
   </div>
-
-</div>

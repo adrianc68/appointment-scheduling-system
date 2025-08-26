@@ -1,3 +1,4 @@
+using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model.Types;
 using AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.RepositoryInterfaces;
@@ -63,9 +64,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             return isRegistered;
         }
 
-        public async Task<bool> AddServicesToAssistantAsync(int idAssistant, List<int> idServices)
+        public async Task<List<Guid>> AddServicesToAssistantAsync(int idAssistant, List<int> idServices)
         {
-            bool isRegistered = false;
             using var dbContext = context.CreateDbContext();
             using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
@@ -81,14 +81,13 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 dbContext.ServiceOffers.AddRange(assistantServices);
                 await dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
-                isRegistered = true;
+                return assistantServices.Select(s => s.Uuid!.Value).ToList();
             }
             catch (System.Exception)
             {
                 await transaction.RollbackAsync();
                 throw;
             }
-            return isRegistered;
         }
 
         public async Task<int?> GetAssistantIdByUuidAsync(Guid uuid)
@@ -171,7 +170,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             var assistantDB = await dbContext.Assistants
                 .Include(a => a.ServiceOffers!)
                     .ThenInclude(ase => ase.Service)
+
                 .FirstOrDefaultAsync(a => a.UserAccount!.Uuid == uuid);
+
 
             if (assistantDB == null)
             {
@@ -179,7 +180,10 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }
 
             businessServicesOffers = assistantDB.ServiceOffers!
-                .Where(ase => ase.Service!.Status == ServiceStatusType.ENABLED)
+                // .Where(ase => ase.Service!.Status != ServiceStatusType.DELETED)
+                .Where(ase => ase.Status != ServiceOfferStatusType.DELETED
+           && ase.Service!.Status != ServiceStatusType.DELETED)
+
                 .Select(ase => new BusinessLogicLayer.Model.ServiceOffer
                 {
                     Id = ase.Service!.Id!.Value,
@@ -249,7 +253,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         {
             using var dbContext = context.CreateDbContext();
             var serviceOfferDB = await dbContext.ServiceOffers
-                .Where(a => a.IdService == idService && a.IdAssistant == idAssistant && a.Assistant!.UserAccount!.Status != AccountStatusType.DELETED && a.Service!.Status != ServiceStatusType.DELETED)
+       .Where(a => a.IdService == idService && a.IdAssistant == idAssistant
+        && a.Status != ServiceOfferStatusType.DELETED
+        && a.Assistant!.UserAccount!.Status != AccountStatusType.DELETED
+        && a.Service!.Status != ServiceStatusType.DELETED
+    )
                 .FirstOrDefaultAsync();
 
             return serviceOfferDB != null;
@@ -298,7 +306,11 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .Include(a => a.Assistant)
                     .ThenInclude(asi => asi!.UserAccount)
                     .ThenInclude(asc => asc!.UserInformation)
+                .Where(a => a.Status != ServiceOfferStatusType.DELETED)
                 .ToListAsync();
+
+            Console.WriteLine("********************");
+            PropToString.PrintListData(dbServiceOffer);
 
             if (dbServiceOffer == null)
                 return [];

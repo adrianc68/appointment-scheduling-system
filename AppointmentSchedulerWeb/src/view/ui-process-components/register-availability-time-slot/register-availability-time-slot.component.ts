@@ -17,9 +17,12 @@ import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-util
 import { UnavailableTimeSlot } from '../../../view-model/business-entities/unavailable-time-slot';
 import { SchedulerService } from '../../../model/communication-components/scheduler.service';
 import { fromLocalToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
+import { AssistantService } from '../../../model/communication-components/assistant.service';
+import { Assistant } from '../../../view-model/business-entities/assistant';
+import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-register-availability-time-slot',
-  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule],
   standalone: true,
   providers: [TaskStateManagerService],
   templateUrl: './register-availability-time-slot.component.html',
@@ -33,6 +36,8 @@ export class RegisterAvailabilityTimeSlotComponent {
   endDate: Date = new Date();
   assistantUuid: string = '';
   unavailableTimeSlots: UnavailableTimeSlot[] = [];
+  assistants: Assistant[] = [];
+  selectedAssistant?: Assistant;
 
   errorValidationMessage: { [field: string]: string[] } = {};
   systemMessage?: string = '';
@@ -42,13 +47,61 @@ export class RegisterAvailabilityTimeSlotComponent {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private schedulerService: SchedulerService, private stateManagerService: TaskStateManagerService) {
+  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private schedulerService: SchedulerService, private stateManagerService: TaskStateManagerService, private assistantService: AssistantService) {
     this.currentTaskState = this.stateManagerService.getState();
     this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
+
+    this.assistantService.getAssistantList().pipe(
+      switchMap((response: OperationResult<Assistant[], ApiDataErrorResponse>): Observable<boolean> => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          this.assistants = [...response.result!];
+          this.assistants.map(d => console.log(d));
+          this.systemMessage = code;
+          return of(true);
+        } else {
+          this.handleErrorResponseAssistant(response);
+          return of(false);
+        }
+      })
+    ).subscribe({
+      next: (result) => {
+        console.log(result);
+        //if(result) {
+        //  thos.setSuccessfulTask();
+        //} else {
+        //  this.setUn
+        //}
+      },
+      error: (err) => {
+        this.loggingService.error(err);
+
+      }
+    })
+  }
+
+  private handleErrorResponseAssistant(response: OperationResult<Assistant[], ApiDataErrorResponse>): void {
+
+    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
+    if (isGenericErrorResponse(response.error)) {
+      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
+    } else if (isValidationErrorResponse(response.error)) {
+      code = this.translationCodes.TC_VALIDATION_ERROR;
+    } else if (isServerErrorResponse(response.error)) {
+      code = getStringEnumKeyByValue(MessageCodeType, response.code);
+    } else if (isEmptyErrorResponse(response.error)) {
+      code = getStringEnumKeyByValue(MessageCodeType, response.code);
+    }
+
+    this.systemMessage = code;
   }
 
 
   onSubmit() {
+    if(!this.selectedAssistant) {
+      return;
+    }
+
     if (this.currentTaskState === LoadingState.LOADING) {
       return;
     }
@@ -60,7 +113,7 @@ export class RegisterAvailabilityTimeSlotComponent {
     const availabilitySlot = {
       StartDate: fromLocalToUTC(this.startDate),
       EndDate: fromLocalToUTC(this.endDate),
-      AssistantUuid: this.assistantUuid,
+      AssistantUuid: this.selectedAssistant.uuid,
       UnavailableTimeSlots: this.unavailableTimeSlots.map(slot => ({
         StartDate: fromLocalToUTC(slot.startDate),
         EndDate: fromLocalToUTC(slot.endDate)

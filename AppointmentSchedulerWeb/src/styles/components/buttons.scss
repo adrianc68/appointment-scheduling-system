@@ -12,7 +12,7 @@
   width: 100%;
   max-height: variables.$button-size-base;
   @include mixins.flex-center;
-  gap: variables.$spacing-small;
+  gap: variables.$spacing-sm;
   font-size: variables.$font-size-base;
 
   .button-icon {
@@ -20,31 +20,31 @@
   }
 }
 
-.button.primary {
+button.primary {
   background-color: variables.$bg-brand;
   color: variables.$text-inverted;
-  transition: background-color variables.$transition-duration-fast variables.$ease-in, color variables.$transition-duration-fast variables.$ease-in;
+  // transition: background-color variables.$transition-duration-fast variables.$ease-in, color variables.$transition-duration-fast variables.$ease-in;
 }
 
-.button.secondary {
+button.secondary {
   background-color: transparent;
   color: variables.$text-muted;
 
 }
 
 .button.success {
-  background-color: variables.$button-success-color;
-  color: variables.$button-success-text-color;
+  background-color: variables.$bg-success;
+  color: variables.$text-success;
 }
 
 .button.danger {
-  background-color: variables.$button-danger-color;
-  color: variables.$button-danger-text-color;
+  background-color: variables.$bg-error;
+  color: variables.$bg-error;
 }
 
 .button.error {
-  background-color: variables.$error-color;
-  color: variables.$button-error-text-color;
+  background-color: variables.$text-error;
+  color: variables.$text-error;
 }
 
 .button.icon {
@@ -54,11 +54,11 @@
 
 .button.bordered {
   background-color: transparent;
-  border: variables.$border-width solid variables.$border;
+  border: 1px solid variables.$border;
   color: variables.$text;
 
   &:hover {
-    border: variables.$border-width solid variables.$border-emphasis;
+    border: 1px solid variables.$border-emphasis;
     color: variables.$text-emphasis;
   }
 }

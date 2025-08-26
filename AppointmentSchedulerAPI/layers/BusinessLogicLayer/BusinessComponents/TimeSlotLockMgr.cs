@@ -46,7 +46,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 }
 
                 int maxSecondsLock = int.Parse(envService.Get("MAX_SECONDS_SCHEDULING_LOCK"));
-                DateTime lockEndTime = DateTime.Now.AddSeconds(maxSecondsLock);
+                // DateTime lockEndTime = DateTime.Now.AddSeconds(maxSecondsLock);
+                // lockEndTime = DateTime.SpecifyKind(lockEndTime, DateTimeKind.Utc);
+                DateTime lockEndTime = DateTime.UtcNow.AddSeconds(maxSecondsLock);
+
 
                 var timer = new Timer(_ =>
                 {

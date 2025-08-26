@@ -33,13 +33,15 @@ export class AppointmentManagementComponent {
   }
 
 
-  startDate: string = "2024-01-01";   // valores iniciales
-  endDate: string = "2026-01-01";
+  //startDate: string = "2024-01-01";
+  //endDate: string = "2026-01-01";
   scheduledAppointments: Appointment[] = [];
 
 
-  loadAppointments(): void {
-    this.schedulerService.getScheduledOrConfirmedAppointments(this.startDate, this.endDate).pipe(
+  loadAppointments(startDate: string, endDate: string): void {
+    this.scheduledAppointments = [];
+
+    this.schedulerService.getScheduledOrConfirmedAppointments(startDate, endDate).pipe(
       switchMap((response: OperationResult<Appointment[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
@@ -205,6 +207,10 @@ export class AppointmentManagementComponent {
   onDateChange(date: string) {
     this.selectedDate = date;
     this.getAvailableServices(date);
+    console.log("SELECTEDATE")
+    console.log(this.selectedDate);
+    this.loadAppointments(date, date);
+
   }
 
   getAvailableServices(date: string) {
@@ -212,8 +218,12 @@ export class AppointmentManagementComponent {
       switchMap((response: OperationResult<ServiceOffer[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.servicesAvailable = [...response.result!];
-          this.servicesAvailable.map(d => console.log(d));
+
+          this.servicesAvailable = [...response.result!].sort((a, b) =>
+            a.name.localeCompare(b.name)
+          );
+
+          //this.servicesAvailable.map(d => console.log(d));
           this.systemMessage = code;
           return of(true);
         } else {

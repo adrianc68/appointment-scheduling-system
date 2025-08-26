@@ -9,7 +9,7 @@
   align-items: center;
   width: auto;
   padding: variables.$padding-md;
-  gap: variables.$spacing-large;
+  gap: variables.$spacing-lg;
 }
 
 .client-management-title {
@@ -21,14 +21,15 @@
   height: auto;
   flex-wrap: wrap;
   display: flex;
-  gap: variables.$spacing-medium;
+  gap: variables.$spacing-md;
 
   .client-summary-item {
     @include mixins.flex-start;
     flex-direction: column;
     // width: math.div(variables.$container-xs, 2);
     width: 100%;
-    gap: variables.$spacing-small;
+    gap: variables.$spacing-sm;
+    ;
     padding: variables.$padding-md;
   }
 }
@@ -44,6 +45,95 @@
   width: 100%;
 }
 
+
+
+
+.service-card-container {
+  width: 100%;
+  // max-height: 200px;
+  padding: variables.$padding-md;
+  position: relative;
+}
+
+.service-data {
+  display: flex;
+  gap: variables.$spacing-sm;
+  ;
+  width: 100%;
+
+  .service-profile-data {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    width: 100px;
+    gap: variables.$spacing-sm;
+    ;
+
+    span {
+      text-align: center;
+      width: 100%;
+    }
+
+    .profile-icon {
+      @include mixins.flex-center;
+      font-size: 45px;
+      height: 45px;
+      color: variables.$text;
+      width: 45px;
+    }
+  }
+
+  .service-info {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+  }
+}
+
+
+.service-list-container {
+  padding: variables.$padding-sm;
+  // background-color: yellow;
+  display: flex;
+  flex-wrap: wrap;
+  gap: variables.$spacing-sm;
+  ;
+  list-style: none;
+
+  .service-item-container {
+    display: flex;
+    flex-direction: column;
+    gap: variables.$spacing-sm;
+    ;
+    padding: variables.$padding-sm;
+    width: auto;
+    border: 1px solid variables.$border;
+    border-radius: variables.$border-radius-sm;
+
+    span {
+      width: auto;
+      max-width: auto;
+    }
+  }
+
+
+
+}
+
+
+.service-buttons {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: variables.$padding-md;
+
+  .button {
+    height: auto;
+    padding: variables.$padding-sm;
+  }
+}
 
 @include mixins.respond-to(breakpoints.$breakpoint-lg) {
   .client-summary {

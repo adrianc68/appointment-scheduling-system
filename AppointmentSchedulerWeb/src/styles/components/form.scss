@@ -5,7 +5,7 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: variables.$spacing-large;
+  gap: variables.$spacing-lg;
   width: 90%;
   padding-top: variables.$padding-xl;
   padding-bottom: variables.$padding-xl;
@@ -21,26 +21,26 @@
 .form-header {
   display: flex;
   flex-direction: column;
-  gap: variables.$spacing-medium;
+  gap: variables.$spacing-md;
 }
 
 
 .form-body {
   display: flex;
   flex-direction: column;
-  gap: variables.$spacing-small;
+  gap: variables.$spacing-sm;
 }
 
 .form-input {
   display: flex;
   flex-direction: column;
-  gap: variables.$spacing-small;
+  gap: variables.$spacing-sm;
 }
 
 .form-footer {
   display: flex;
   flex-direction: column;
-  gap: variables.$spacing-medium;
+  gap: variables.$spacing-md;
 
   .system-error {
     text-align: center;

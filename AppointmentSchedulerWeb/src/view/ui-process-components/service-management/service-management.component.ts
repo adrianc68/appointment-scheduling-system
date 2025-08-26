@@ -58,7 +58,8 @@ export class ServiceManagementComponent {
         this.loggingService.error(err);
 
       }
-    })
+    });
+
   }
 
 

@@ -1,44 +1,46 @@
-<h1>
-  {{translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY)}}
-</h1>
+<section class="main-section">
+  <h1>
+    {{translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY)}}
+  </h1>
 
-<button class="button" (click)="redirectToRegisterSlot()">
-  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
-</button>
+  <button class="button" (click)="redirectToRegisterSlot()">
+    {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
+  </button>
 
-<table border="1">
-  <thead>
-    <tr>
+  <div class="availability-slots-table-container">
+    <table class="availability-slots-table">
+      <thead>
+        <tr>
+          <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_START_TIME_LABEL)}}</th>
+          <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_END_TIME_LABEL)}}</th>
+          <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_ASSISTANT_LABEL)}}</th>
+          <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
+          <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_UNAVAILABLE_SLOTS_LABEL)}}</th>
+          <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let slot of slots">
+          <td class="t-muted">{{ slot.startDate | readableDate }}</td>
+          <td class="t-muted">{{ slot.endDate | readableDate }}</td>
+          <td class="t-muted">{{ slot.assistant.name }}</td>
+          <td class="t-muted">{{ slot.status }}</td>
+          <td class="t-muted">
+            <ul>
+              <li *ngFor="let uSlot of slot.unavailableTimeSlots">
+                {{ uSlot.startDate | readableDate }} / {{ uSlot.endDate | readableDate }}
+              </li>
+            </ul>
+          </td>
+          <td class="actions">
+            <button class="edit button" (click)="redirectToEditSlot(slot)">
+              {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
+            </button>
 
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_UUID_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_START_TIME_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_END_TIME_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_ASSISTANT_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_UNAVAILABLE_SLOTS_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let slot of slots">
-      <td>{{ slot.uuid }}</td>
-      <td>{{ slot.startDate | readableDate }}</td>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-      <td>{{ slot.endDate | readableDate }}</td>
-      <td>{{ slot.assistant.name }}</td>
-      <td>{{ slot.status }}</td>
-      <td>
-        <ul>
-          <li *ngFor="let slot of slot.unavailableTimeSlots">
-            {{ slot.startDate | readableDate }} / {{ slot.endDate | readableDate }}
-          </li>
-        </ul>
-      </td>
-      <td>
-        <button class="button" (click)="redirectToEditSlot(slot)">
-          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+</section>

@@ -10,8 +10,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Respons
         public AppointmentStatusType? Status { get; set; }
         public Double? TotalCost { get; set; }
         public required DateTime CreatedAt { get; set; }
-        public ClientAppointmentDTO? Client {get;set;}
-        public required List<AsisstantOfferDTO> Assistants { get; set;} = [];
+        public ClientAppointmentDTO? Client { get; set; }
+        public required List<AsisstantOfferDTO> Assistants { get; set; } = [];
+        public List<ScheduledServiceDTO> SelectedServices { get; set; } = [];
 
     }
 }

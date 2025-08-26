@@ -1,0 +1,134 @@
+@use '../../../styles/variables.scss' as variables;
+@use '../../../styles/mixins.scss' as mixins;
+@use '../../../styles/breakpoints.scss' as breakpoints;
+
+.main-section {
+  background-color: red;
+  width: 100%;
+  padding: variables.$padding-md;
+}
+
+.assistant-container {
+  background-color: green;
+  display: flex;
+  flex-wrap: wrap;
+  gap: variables.$spacing-md;
+  // max-width:250px;
+
+  .assistant-data {
+    background-color: brown;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.assigned-services-container {
+  background-color: blue;
+  // flex-wrap: wrap;
+
+  .service-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: variables.$spacing-md;
+
+  }
+}
+
+.assistant-table-container {
+  background-color: green;
+  overflow-x: auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.assistant-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+
+  thead {
+    color: white;
+    text-align: left;
+
+    th {
+      // padding: variables.$padding-sm variables.$padding-md;
+      font-weight: bold;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid variables.$border;
+
+    }
+
+    td {
+      // padding: variables.$padding-sm variables.$padding-md;
+      vertical-align: middle;
+
+      .profile-icon {
+        font-size: 20px;
+        vertical-align: middle;
+        margin-right: variables.$spacing-xs;
+      }
+    }
+  }
+}
+
+.assigned-services-container {
+  margin-top: variables.$spacing-lg;
+
+  h2 {
+    margin-bottom: variables.$spacing-sm;
+  }
+
+  p {
+    margin-bottom: variables.$spacing-md;
+  }
+}
+
+.service-table-container {
+  overflow-x: auto;
+}
+
+.service-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+
+  thead {
+    color: white;
+    text-align: left;
+
+    th {
+      // padding: variables.$padding-sm variables.$padding-md;
+      font-weight: bold;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid variables.$border;
+
+      &:hover {}
+    }
+
+    td {
+      // padding: variables.$padding-sm variables.$padding-md;
+      vertical-align: middle;
+
+      &.t-emphasis {
+        font-weight: bold;
+      }
+
+      &.t-muted {}
+    }
+  }
+
+  .actions {
+    display:flex;
+  }
+}
+
+.all-services-container {
+  background-color: brown;
+}

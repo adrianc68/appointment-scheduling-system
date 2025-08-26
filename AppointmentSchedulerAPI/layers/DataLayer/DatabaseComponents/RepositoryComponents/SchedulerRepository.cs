@@ -297,6 +297,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<bool> IsAppointmentTimeSlotAvailableAsync(BusinessLogicLayer.Model.Types.DateTimeRange range)
         {
+            PropToString.PrintData(range);
+
             using var dbContext = context.CreateDbContext();
             bool isAvailable = await dbContext.Appointments
          .AnyAsync(a =>
@@ -327,7 +329,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var dbContext = context.CreateDbContext();
 
             var coveringSlots = await dbContext.AvailabilityTimeSlots
-                .Include(slot => slot.UnavailableTimeSlots) 
+                .Include(slot => slot.UnavailableTimeSlots)
                 .Where(slot => slot.IdAssistant == idAssistant
                                && slot.Status == Model.Types.AvailabilityTimeSlotStatusType.ENABLED
                                && slot.StartDate <= range.StartDate

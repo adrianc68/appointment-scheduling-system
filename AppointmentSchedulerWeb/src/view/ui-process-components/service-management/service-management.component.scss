@@ -9,7 +9,7 @@
   align-items: center;
   width: auto;
   padding: variables.$padding-md;
-  gap: variables.$spacing-large;
+  gap: variables.$spacing-lg;
 }
 
 .service-management-title {
@@ -21,14 +21,15 @@
   height: auto;
   flex-wrap: wrap;
   display: flex;
-  gap: variables.$spacing-medium;
+  gap: variables.$spacing-md;
 
   .service-summary-item {
     @include mixins.flex-start;
     flex-direction: column;
     // width: math.div(variables.$container-xs, 2);
     width: 100%;
-    gap: variables.$spacing-small;
+    gap: variables.$spacing-sm;
+    ;
     padding: variables.$padding-md;
   }
 }

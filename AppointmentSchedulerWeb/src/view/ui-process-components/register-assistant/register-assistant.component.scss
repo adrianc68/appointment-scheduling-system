@@ -2,8 +2,12 @@
 @use '../../../styles/mixins.scss' as mixins;
 
 
+
+
 .register-container {
-  @include mixins.flex-center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
   width: 100%;
   height: auto;

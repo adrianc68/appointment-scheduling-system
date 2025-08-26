@@ -3,7 +3,7 @@
 @use '../variables' as variables;
 
 .card {
-  border: variables.$border-width;
+  border: 1px;
   border-color: variables.$border;
   border-style: solid;
   border-radius: variables.$border-radius-md;

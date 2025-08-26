@@ -5,8 +5,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
 {
     public class CreateAvailabilityTimeSlotDTO
     {
-        [Required(ErrorMessage = "Date is required.")]
-        public required DateOnly Date { get; set; }
         [Required(ErrorMessage = "StartTime is required.")]
         public required DateTime StartDate { get; set; }
         [Required(ErrorMessage = "EndTime is required.")]

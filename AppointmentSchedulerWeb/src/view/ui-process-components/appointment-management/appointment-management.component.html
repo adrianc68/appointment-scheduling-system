@@ -3,9 +3,27 @@
   <h2>Services Available for date:</h2>
   <input type="date" [ngModel]="selectedDate" (ngModelChange)="onDateChange($event)" />
 
-  <ng-container *ngFor="let serviceOffer of servicesAvailable">
-    <pre>{{ serviceOffer | json }}</pre>
-  </ng-container>
+    <table class="service-table">
+      <thead>
+        <tr>
+          <th>Service Name</th>
+          <th>Price</th>
+          <th>Minutes</th>
+          <th>Description</th>
+          <th>Assistant</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let serviceOffer of servicesAvailable">
+          <td>{{ serviceOffer.name }}</td>
+          <td>{{ serviceOffer.price | currency }}</td>
+          <td>{{ serviceOffer.minutes }}</td>
+          <td>{{ serviceOffer.description }}</td>
+          <td>{{ serviceOffer.assistant?.name }}</td>
+        </tr>
+      </tbody>
+    </table>
+
 
 
   <hr>
@@ -21,13 +39,13 @@
 
 
   <div>
-    <label for="startDate">Start Date: </label>
-    <input id="startDate" type="date" [(ngModel)]="startDate">
-
-    <label for="endDate">End Date: </label>
-    <input id="endDate" type="date" [(ngModel)]="endDate">
-
-    <button (click)="loadAppointments()">Load Appointments</button>
+    <!--<label for="startDate">Start Date: </label>-->
+    <!--<input id="startDate" type="date" [(ngModel)]="startDate">-->
+    <!---->
+    <!--<label for="endDate">End Date: </label>-->
+    <!--<input id="endDate" type="date" [(ngModel)]="endDate">-->
+    <!---->
+    <!--<button (click)="loadAppointments()">Load Appointments</button>-->
     <ng-container *ngFor="let appointment of scheduledAppointments">
       <pre>{{ appointment | json }}</pre>
     </ng-container>
