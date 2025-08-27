@@ -304,6 +304,10 @@ strong {
   color: variables.$text;
 }
 
+.f-danger {
+  fill: variables.$text-error;
+}
+
 $spacing: (
   none: 0,
   base: variables.$spacing-base,

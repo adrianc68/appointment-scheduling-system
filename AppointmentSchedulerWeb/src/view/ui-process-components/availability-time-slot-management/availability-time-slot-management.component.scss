@@ -117,10 +117,14 @@
     visibility 0.3s ease,
     #{variables.$color-transition};
     will-change: height;
+    visibility: hidden;
+    opacity: 0;
 
 
     &.expanded {
       max-height: 1000px;
+      visibility: visible;
+      opacity: 1;
     }
 
     .slot-data-row {

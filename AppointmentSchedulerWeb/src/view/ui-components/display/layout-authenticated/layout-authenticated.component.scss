@@ -1,23 +1,57 @@
 @use '../../../../styles/variables.scss' as variables;
 @use '../../../../styles/mixins.scss' as mixins;
 @use '../../../../styles/breakpoints.scss' as breakpoints;
+@use "sass:math";
 
 .layout {
   display: flex;
-  flex-direction: column;
-  height: 100svh;
+  background-color: red;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: variables.$navbar-height;
+  z-index: variables.$z-index-top;
+  background-color: variables.$bg-muted;
+  // z-index:-1;
 }
 
 .main-container {
-  display: flex;
   flex: 1;
-  overflow: hidden;
+  display: flex;
+  margin-top: variables.$navbar-height;
+  background-color: variables.$bg;
+  z-index: 0;
+  position: relative;
+}
+
+.sidebar {
+  position: fixed;
+  top: variables.$navbar-height;
+  left: 0;
+  width: 0;
+  transition: width 0.3s ease-in-out,
+  opacity 0.3s ease,
+  visibility 0.3s ease,
+  #{variables.$color-transition};
+  will-change: width;
+  will-change: margin-left;
+  z-index: 200;
+  // height: calc(100dvh);
+  height: calc(100dvh - variables.$navbar-height);
+
+  &.open {
+    width: 250px;
+  }
 }
 
 .content {
-  flex-grow: 1;
-  background-color: variables.$bg;
+  flex: 1;
   overflow-y: auto;
+  background-color: variables.$bg;
 }
 
 @include mixins.respond-to(breakpoints.$breakpoint-md) {
@@ -27,6 +61,19 @@
 
   .content {
     flex: 1;
+    margin-left: calc(250px/4);
+    transition: margin-left 0.3s ease-in-out,
+    opacity 0.3s ease,
+    visibility 0.3s ease,
+    #{variables.$color-transition};
+
+    &.open {
+      margin-left: 250px;
+    }
+  }
+
+  .sidebar {
+    width: calc(250px / 4);
   }
 
 }

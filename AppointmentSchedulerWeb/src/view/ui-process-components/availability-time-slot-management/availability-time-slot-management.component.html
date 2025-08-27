@@ -37,7 +37,7 @@
     <div class="data-body">
       <ul class="slot-container">
         <li class="card-container card muted" *ngFor="let slot of filteredItems; let i = index">
-          <div class="card-header" [class.expanded]="openedSlots.has(i)">
+          <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
             <div class="card-title">
               <span class="fs-base t-emphasis">
                 {{ slot.startDate | slotDateRange: (slot.endDate) }}
@@ -45,7 +45,7 @@
               <span class="fs-base t-muted">{{ slot.assistant.name }} </span>
 
             </div>
-            <button [class.clicked]="openedSlots.has(i)" (click)="toggleSlot(i)">
+            <button [class.clicked]="openedSlots.has(i)">
               <mat-icon>
                 keyboard_arrow_right
               </mat-icon>
