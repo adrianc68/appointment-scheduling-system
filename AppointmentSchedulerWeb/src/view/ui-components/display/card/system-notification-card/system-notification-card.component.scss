@@ -18,7 +18,7 @@
 
   .notification-title {
     padding: variables.$padding-sm;
-    border-bottom: variables.$border-width solid variables.$border;
+    border-bottom: 1px solid variables.$border;
   }
 
   .notification-data {
@@ -38,21 +38,26 @@
   @include mixins.flex-center;
 
   .icon {
-    height: variables.$icon-size-md;
-    width: variables.$icon-size-md;
-    font-size: variables.$icon-size-md;
+    height: 2rem;
+    width: 2rem;
+    font-size: 2rem;
   }
 
   .icon.info {
-    color: variables.$info-color;
+
+    color: variables.$text;
   }
 
   .icon.warning {
-    color: variables.$warning-color;
+    color: variables.$text;
+    // color: variables.$warning-color;
   }
 
   .icon.critical {
-    color: variables.$error-color;
+
+    color: variables.$text;
+    // color: variables.$warning-color;
+    // color: variables.$error-color;
   }
 
 }

@@ -157,8 +157,8 @@
   --cal-bg-success: #28a745;
   --cal-bg-warning: #ffc107;
   --cal-border: #d1d5db;
-  --cal-border-subtle: #e5e7eb;
-  --cal-border-muted: #f1f2f4;
+  --cal-border-subtle: #d9dbe0;
+  --cal-border-muted: #c0c4cc;
   --cal-border-emphasis: #9ca3af;
   --cal-text-emphasis: #070a0d;
   --cal-text: #3c3e44;
@@ -167,7 +167,7 @@
   --cal-text-inverted: #fff;
   --cal-text-info: #243c84;
   --cal-text-warning: #000;
-  --cal-text-success: #285239;
+  --cal-text-success: #28a745;
   --cal-text-attention: #74331b;
   --cal-text-error: #dc3545;
   --cal-brand: #111827;
@@ -186,8 +186,8 @@
   --cal-bg-success: #28a745;
   --cal-bg-warning: #ffc107;
   --cal-border: #4d4d4d;
-  --cal-border-subtle: #262626;
-  --cal-border-muted: #171717;
+  --cal-border-subtle: #3d3d3d;
+  --cal-border-muted: #5a5a5a;
   --cal-border-emphasis: #737373;
   --cal-text-emphasis: #fafafa;
   --cal-text: #d4d4d4;
@@ -195,7 +195,7 @@
   --cal-text-muted: #a3a3a3;
   --cal-text-inverted: #000;
   --cal-text-info: #fff;
-  --cal-text-success: #fff;
+  --cal-text-success: #28a745;
   --cal-text-warning: #000;
   --cal-text-attention: #fcefd9;
   --cal-text-error: #dc3545;
@@ -346,4 +346,3 @@ $color-transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2
 // $header-height: 70px;
 // $footer-height: 120px;
 // $sidebar-width: 250px;
-

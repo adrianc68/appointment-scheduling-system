@@ -257,10 +257,6 @@ strong {
 
 
 // Text color
-.t-brand {
-  // color: variables.$text-brand;
-}
-
 .t-primary {
   color: variables.$text-emphasis;
   fill: variables.$text-emphasis;
@@ -293,6 +289,10 @@ strong {
 
 .t-success {
   color: variables.$text-success;
+}
+
+.t-danger {
+  color: variables.$text-error;
 }
 
 

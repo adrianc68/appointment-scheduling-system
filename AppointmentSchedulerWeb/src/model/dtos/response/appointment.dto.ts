@@ -2,6 +2,8 @@ import { Expose, Transform, Type } from "class-transformer";
 import { AppointmentStatusType } from "../../../view-model/business-entities/types/appointment-status.types";
 import { parseStringToEnum } from "../../../cross-cutting/helper/enum-utils/enum.utils";
 import { InvalidValueEnumValueException } from "../exceptions/invalid-enum.exception";
+import { ScheduledService } from "../../../view-model/business-entities/scheduled-service";
+import { ScheduledServiceDTO } from "./scheduled-service.dto";
 
 export class AppointmentDTO {
   @Expose({ name: "uuid" })
@@ -36,7 +38,13 @@ export class AppointmentDTO {
   @Expose({name: "assistants"})
   assistants: AssistantDTO[];
 
-  constructor(uuid: string, startTime: string, endTime: string, date: string, status: AppointmentStatusType, totalCost: number, createdAt: Date, assistants: AssistantDTO[]) {
+
+  @Type(() => ScheduledServiceDTO)
+  @Expose({name: "selectedServices"})
+  selectedServices?: ScheduledServiceDTO[]
+
+
+  constructor(uuid: string, startTime: string, endTime: string, date: string, status: AppointmentStatusType, totalCost: number, createdAt: Date, assistants: AssistantDTO[], selectedServices: ScheduledServiceDTO[]) {
     this.uuid = uuid;
     this.startTime = startTime;
     this.endTime = endTime;
@@ -45,6 +53,7 @@ export class AppointmentDTO {
     this.totalCost = totalCost;
     this.createdAt = createdAt;
     this.assistants = assistants;
+    this.selectedServices = selectedServices;
   }
 }
 

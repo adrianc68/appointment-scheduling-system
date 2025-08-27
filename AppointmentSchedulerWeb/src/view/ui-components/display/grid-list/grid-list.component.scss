@@ -101,13 +101,8 @@
 
 .custom-dropdown-panel {
   position: absolute;
-  /* Esto mantiene el dropdown bajo el botón */
   z-index: 1000;
-  /* Asegúrate de que esté encima de otros elementos */
   top: 100%;
-  /* Colócalo debajo del botón */
   left: 0;
-  /* Alineado con el borde izquierdo del botón */
   width: 100%;
-  /* Ancho opcional o ajustado a lo que necesites */
 }

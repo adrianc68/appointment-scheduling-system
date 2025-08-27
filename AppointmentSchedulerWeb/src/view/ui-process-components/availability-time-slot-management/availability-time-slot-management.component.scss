@@ -3,46 +3,168 @@
 @use '../../../styles/breakpoints.scss' as breakpoints;
 
 .main-section {
-  background-color: red;
-  width: 100%;
-  padding: variables.$padding-md;
+  // max-width: variables.$container-xl;
+  padding-right: variables.$padding-md;
+  padding-left: variables.$padding-md;
 }
 
-.availability-slots-table {
+.summary {
   width: 100%;
-  border-collapse: collapse;
-  color: variables.$text;
+  height: auto;
+  flex-wrap: wrap;
+  display: flex;
+  gap: variables.$spacing-md;
 
-  overflow-x: auto;
+  .summary-item {
+    @include mixins.flex-start;
+    flex-direction: column;
+    gap: variables.$spacing-sm;
+    padding: variables.$padding-md;
+  }
+}
 
-  thead {
-    text-align: left;
+.data-actions {
+  display: flex;
+  gap: variables.$spacing-md;
+  margin-bottom: variables.$spacing-md;
+}
 
-    th {
-      font-weight: bold;
+.data-container {
+  // background-color: red;
+
+  .data-header {
+    width: 100%;
+    padding: variables.$padding-md;
+    background-color: variables.$bg-muted;
+    border: 1px solid variables.$border;
+    border-bottom: 0;
+    border-top-left-radius: variables.$border-radius-md;
+    border-top-right-radius: variables.$border-radius-md;
+  }
+
+  .data-body {
+    border: 1px solid variables.$border;
+    padding: variables.$padding-md;
+  }
+}
+
+.slot-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: variables.$spacing-md;
+  justify-content: center;
+
+
+  .card-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+  }
+
+  .card-header {
+    display: flex;
+    // border-bottom: 1px solid variables.$border-subtle;
+    padding-bottom: variables.$padding-md;
+    justify-content: space-between;
+    align-items: center;
+    gap: variables.$spacing-base;
+    padding: variables.$padding-md;
+
+    border-bottom: 1px solid transparent;
+
+    &.expanded {
+      border-bottom: 1px solid variables.$border-subtle;
+    }
+
+    button {
+      background-color: transparent;
+      border: 0;
+      cursor: pointer;
+      height: auto;
+      width: auto;
+
+      mat-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: 1.5rem;
+        transition: transform 0.3s ease;
+      }
+
+      &.clicked>mat-icon {
+        transform: rotate(90deg);
+      }
+
+
+    }
+
+    .card-title {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: variables.$spacing-base;
     }
   }
 
-  tbody {
-    tr {
-      border-bottom: 1px solid variables.$border;
 
+  .card-body {
+    max-height: 0;
+    overflow: hidden;
+    // transition: max-height 0.3s ease, padding 0.3s ease;
+    transition: max-height 0.3s ease,
+    opacity 0.3s ease,
+    visibility 0.3s ease,
+    #{variables.$color-transition};
+    will-change: height;
+
+
+    &.expanded {
+      max-height: 1000px;
     }
 
-    td {
-      vertical-align: middle;
+    .slot-data-row {
+      display: flex;
+      justify-content: space-between;
+      gap: variables.$spacing-base;
+      border-bottom: 1px solid variables.$border-subtle;
+      padding-top: variables.$padding-md;
+      padding-bottom: variables.$padding-md;
+
+      .slot-data {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        width: 100%;
+
+
+        span {
+          font-size: variables.$font-size-sm;
+        }
+      }
+    }
+
+
+
+
+    .slot-actions {
+      display: flex;
+      flex-direction: column;
+      padding-top: variables.$padding-md;
+      padding-bottom: variables.$padding-md;
 
       .actions {
         display: flex;
-        // gap: 0.5rem;
+        flex-wrap: wrap;
+        gap: variables.$spacing-md;
+
+        button {
+          width: auto;
+          padding: variables.$spacing-sm;
+        }
 
       }
     }
   }
-}
-
-.all-services-container {
-  background-color: brown;
-  border-radius: 6px;
-  padding: 1rem;
 }

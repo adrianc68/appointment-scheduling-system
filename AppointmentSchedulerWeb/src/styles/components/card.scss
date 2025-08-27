@@ -9,4 +9,14 @@
   border-radius: variables.$border-radius-md;
   box-shadow: variables.$shadow-sm;
   background-color: variables.$bg;
+
+  &.subtle {
+
+    background-color: variables.$bg-subtle;
+  }
+
+  &.muted {
+
+    background-color: variables.$bg-muted;
+  }
 }

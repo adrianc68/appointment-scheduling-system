@@ -24,6 +24,7 @@ import { EditAvailabilityTimeSlotComponent } from '../view/ui-process-components
 import { RegisterAvailabilityTimeSlotComponent } from '../view/ui-process-components/register-availability-time-slot/register-availability-time-slot.component';
 import { ServiceOfferManagementComponent } from '../view/ui-process-components/service-offer-management/service-offer-management.component';
 import { RegisterServiceOfferComponent } from '../view/ui-process-components/register-service-offer/register-service-offer.component';
+import { RegisterAppointmentAsStaffComponent } from '../view/ui-process-components/register-appointment-as-staff/register-appointment-as-staff.component';
 
 export const routes: Routes = [
   {
@@ -55,6 +56,7 @@ export const routes: Routes = [
       { path: "management/service/register", component: RegisterServiceComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
 
       { path: "management/appointment", component: AppointmentManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+      { path: "management/appointment/staff", component: RegisterAppointmentAsStaffComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
 
     ]
   },

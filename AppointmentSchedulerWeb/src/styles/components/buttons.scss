@@ -21,7 +21,7 @@
 }
 
 button.primary {
-  background-color: variables.$bg-brand;
+  background-color: variables.$bg-inverted;
   color: variables.$text-inverted;
   // transition: background-color variables.$transition-duration-fast variables.$ease-in, color variables.$transition-duration-fast variables.$ease-in;
 }
@@ -52,6 +52,10 @@ button.secondary {
   border: 0;
 }
 
+.button.unbordered {
+  background-color: transparent;
+}
+
 .button.bordered {
   background-color: transparent;
   border: 1px solid variables.$border;
@@ -61,4 +65,6 @@ button.secondary {
     border: 1px solid variables.$border-emphasis;
     color: variables.$text-emphasis;
   }
+
+
 }

@@ -1,0 +1,171 @@
+<section class="app-management">
+
+  <h2>Services Available for date:</h2>
+  <input type="date" [ngModel]="selectedDate" (ngModelChange)="onDateChange($event)" />
+
+  <table class="service-table">
+    <thead>
+      <tr>
+        <th>Service Name</th>
+        <th>Price</th>
+        <th>Uuid</th>
+        <th>Minutes</th>
+        <th>Description</th>
+        <th>Assistant</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let serviceOffer of servicesAvailable">
+        <td>{{ serviceOffer.name }}</td>
+        <td>{{ serviceOffer.price | currency }}</td>
+        <td>{{ serviceOffer.uuid }}</td>
+        <td>{{ serviceOffer.minutes }}</td>
+        <td>{{ serviceOffer.description }}</td>
+        <td>{{ serviceOffer.assistant?.name }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+
+  <hr>
+  <br><br><br>
+
+  <!--<div>-->
+  <!--  <h2>Citas agendadas</h2>-->
+  <!--  <ng-container *ngFor="let appointment of scheduledAppointments">-->
+  <!--    <pre>{{ appointment | json }}</pre>-->
+  <!--  </ng-container>-->
+  <!--</div>-->
+
+
+  <div>
+    <h2>Citas agendadas</h2>
+
+    <ng-container *ngFor="let appointment of scheduledAppointments">
+      <table border="1" style="border-collapse: collapse; margin-bottom: 1rem; width: 100%;">
+        <thead>
+          <tr>
+            <th>UUID</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Total Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ appointment.uuid }}</td>
+            <td>{{ appointment.status }}</td>
+            <td>{{ appointment.createdAt | date:'short' }}</td>
+            <td>{{ appointment.totalCost ?? 'N/A' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Servicios -->
+      <h3>Servicios</h3>
+      <table border="1" style="border-collapse: collapse; margin-bottom: 1rem; width: 100%;">
+        <thead>
+          <tr>
+            <th>UUID</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Minutos</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let service of appointment.selectedServices">
+            <td>{{ service.uuid }}</td>
+            <td>{{ service.name }}</td>
+            <td>{{ service.price | currency }}</td>
+            <td>{{ service.minutes }}</td>
+            <td>{{ service.startDate | date:'short' }}</td>
+            <td>{{ service.endDate | date:'short' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Asistentes -->
+      <h3>Asistentes</h3>
+      <table border="1" style="border-collapse: collapse; margin-bottom: 2rem; width: 100%;">
+        <thead>
+          <tr>
+            <th>UUID</th>
+            <th>Nombre</th>
+            <th>Inicio Ocupado</th>
+            <th>Fin Ocupado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let assistant of appointment.assistants">
+            <td>{{ assistant.uuid }}</td>
+            <td>{{ assistant.name }}</td>
+            <!--<td>{{ assistant.occupiedTimeRange.startDate | date:'short' }}</td>-->
+            <!--<td>{{ assistant.occupiedTimeRange.endDate | date:'short' }}</td>-->
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+  </div>
+
+  <br>
+  <hr>
+
+  <div>
+    <h2>Registrar cita como cliente</h2>
+
+    <form (ngSubmit)="registerAppointmentAsStaff()" #appointmentForm="ngForm">
+
+      <!-- Fecha de la cita -->
+      <label for="date">Fecha:</label>
+      <input id="date" name="date" type="date" [(ngModel)]="appointmentFormData.date" required />
+      <br><br>
+
+      <!-- Cliente -->
+      <label for="clientUuid">Cliente UUID:</label>
+      <input id="clientUuid" name="clientUuid" type="text" [(ngModel)]="appointmentFormData.clientUuid" required />
+      <br><br>
+
+
+      <!-- Servicios dinámicos -->
+      <div *ngFor="let service of appointmentFormData.selectedServices; let i = index;">
+        <h3>Servicio {{ i + 1 }}</h3>
+
+        <label for="serviceUuid{{i}}">Servicio UUID:</label>
+        <input id="serviceUuid{{i}}" name="serviceUuid{{i}}" type="text" [(ngModel)]="service.uuid" required />
+        <br><br>
+
+        <label for="startTime{{i}}">Hora de inicio:</label>
+        <!--<input id="startTime{{i}}" name="startTime{{i}}" type="time" [(ngModel)]="service.startTime" required />-->
+        <input id="startTime{{i}}" name="startTime{{i}}" type="time" step="1" [(ngModel)]="service.startTime"
+          required />
+
+        <br><br>
+
+        <!-- Botón para eliminar servicio -->
+        <button type="button" (click)="removeService(i)">Eliminar servicio</button>
+        <!-- Botón para agregar nuevo servicio -->
+        <button type="button" (click)="addService()">Agregar otro servicio</button>
+        <br><br>
+      </div>
+
+
+      <div>
+        <h2>Block time range appointment</h2>
+        <button (click)="blockTimeRange()">Bloquear rango de tiempo</button>
+      </div>
+
+    </form>
+
+    <h2>
+      <br>
+      <button (click)="registerAppointmentAsStaff()">Agendar cita</button>
+      <br>
+      <hr>
+      {{ translate(systemMessage ?? translationCodes.TC_EMPTY) }}
+    </h2>
+  </div>
+
+</section>

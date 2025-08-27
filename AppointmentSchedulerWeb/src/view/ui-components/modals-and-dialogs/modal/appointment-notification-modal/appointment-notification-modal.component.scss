@@ -42,7 +42,7 @@
   height: auto;
   flex-direction: column;
   padding: variables.$padding-md;
-  border-bottom: variables.$border-width solid variables.$border;
+  border-bottom: 1px solid variables.$border;
 }
 
 .notification-content {
@@ -61,7 +61,7 @@
     min-height: 150px;
     padding-top: variables.$padding-sm;
     padding-bottom: variables.$padding-sm;
-    gap: variables.$spacing-small;
+    gap: variables.$spacing-sm;
   }
 
   .notification-buttons {
@@ -85,8 +85,8 @@
 
   .close-button-icon {
     @include mixins.flex-center;
-    width: variables.$icon-size-lg;
-    height: variables.$icon-size-lg;
+    width: 2rem;
+    height: 2rem;
   }
 }
 

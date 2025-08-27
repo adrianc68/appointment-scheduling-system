@@ -1,0 +1,40 @@
+@use '../../../styles/mixins.scss' as mixins;
+@use '../../../styles/variables.scss' as variables;
+
+
+.app-management {
+  color: #8a8a8a;
+}
+
+.service-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: variables.$text;
+
+  overflow-x: auto;
+
+  thead {
+    text-align: left;
+
+    th {
+      font-weight: bold;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid variables.$border;
+
+    }
+
+    td {
+      vertical-align: middle;
+
+      .actions {
+        display: flex;
+        // gap: 0.5rem;
+
+      }
+    }
+  }
+}

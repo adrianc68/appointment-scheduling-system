@@ -15,6 +15,8 @@ import { Appointment } from '../../../view-model/business-entities/appointment';
 import { FormsModule } from '@angular/forms';
 import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
 import { fromLocalToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
+import { Router } from '@angular/router';
+import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 
 @Component({
   selector: 'app-appointment-management',
@@ -27,16 +29,19 @@ export class AppointmentManagementComponent {
   systemMessage?: string = '';
   translationCodes = TranslationCodes
   servicesAvailable: ServiceOffer[] = [];
+  scheduledAppointments: Appointment[] = [];
 
 
-  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService) {
+  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
   }
 
 
   //startDate: string = "2024-01-01";
   //endDate: string = "2026-01-01";
-  scheduledAppointments: Appointment[] = [];
 
+  redirectToRegisterAppointment() {
+    this.router.navigate([WebRoutes.appointment_management_register_as_staff]);
+  }
 
   loadAppointments(startDate: string, endDate: string): void {
     this.scheduledAppointments = [];
@@ -64,179 +69,22 @@ export class AppointmentManagementComponent {
     });
   }
 
+  selectedDate: string = new Date().toISOString().split("T")[0];
+
+  startDate: string = this.selectedDate;
+  endDate: string = this.selectedDate;
 
 
-  blockTimeRange(): void {
 
-    const payload = {
-      date: this.appointmentFormData.date,
-      clientUuid: this.appointmentFormData.clientUuid,
-      selectedServices: this.appointmentFormData.selectedServices.map(s => ({
-        uuid: s.uuid,
-        startTime: s.startTime
-      }))
-    }; this.schedulerService.blockTimeRange(payload).pipe(
-      switchMap((response: OperationResult<Date, ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          console.log(response);
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = response.result ? new Date(response.result).toISOString() : code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-      },
-      error: (err) => {
-        this.logginService.error(err);
-      }
+
+  onDateRangeChange(value: string, type: 'start' | 'end') {
+    if (type === 'start') {
+      this.startDate = value;
+    } else {
+      this.endDate = value;
     }
-    )
+    this.loadAppointments(this.startDate, this.endDate);
   }
-
-  appointmentFormData = {
-    date: '',
-    clientUuid: '',
-    selectedServices: [
-      {
-        uuid: '',
-        startTime: ''
-      }
-    ]
-  };
-
-  addService(): void {
-    this.appointmentFormData.selectedServices.push({
-      uuid: '',
-      startTime: ''
-    });
-  }
-
-  removeService(index: number): void {
-    this.appointmentFormData.selectedServices.splice(index, 1);
-  }
-
-  registerAppointmentAsClient(): void {
-
-    const payload = {
-      date: this.appointmentFormData.date,
-      clientUuid: this.appointmentFormData.clientUuid,
-      selectedServices: this.appointmentFormData.selectedServices.map(s => ({
-        uuid: s.uuid,
-        startTime: s.startTime
-      }))
-    };
-
-    this.schedulerService.registerAppointmentAsClient(payload).pipe(
-      switchMap((response: OperationResult<Date, ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          console.log(response);
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = response.result ? new Date(response.result).toISOString() : code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-      },
-      error: (err) => {
-        this.logginService.error(err);
-      }
-    }
-    )
-  }
-
-
-  registerAppointmentAsStaff(): void {
-    console.log("called");
-
-    const payload = {
-      date: this.appointmentFormData.date,
-      clientUuid: this.appointmentFormData.clientUuid,
-      selectedServices: this.appointmentFormData.selectedServices.map(s => ({
-        uuid: s.uuid,
-        startTime: s.startTime
-      }))
-    };
-
-    this.schedulerService.registerAppointmentAsStaff(payload).pipe(
-      switchMap((response: OperationResult<Date, ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          console.log(response);
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-      },
-      error: (err) => {
-        this.logginService.error(err);
-      }
-    }
-    )
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-  selectedDate: string = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-
-  onDateChange(date: string) {
-    this.selectedDate = date;
-    this.getAvailableServices(date);
-    console.log("SELECTEDATE")
-    console.log(this.selectedDate);
-    this.loadAppointments(date, date);
-
-  }
-
-  getAvailableServices(date: string) {
-    this.schedulerService.getAvailableServices(date).pipe(
-      switchMap((response: OperationResult<ServiceOffer[], ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-
-          this.servicesAvailable = [...response.result!].sort((a, b) =>
-            a.name.localeCompare(b.name)
-          );
-
-          //this.servicesAvailable.map(d => console.log(d));
-          this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      })
-    ).subscribe({
-      next: (result) => console.log(result),
-      error: (err) => this.logginService.error(err)
-    });
-  }
-
 
   private handleErrorResponse(response: OperationResult<any, ApiDataErrorResponse>): void {
 

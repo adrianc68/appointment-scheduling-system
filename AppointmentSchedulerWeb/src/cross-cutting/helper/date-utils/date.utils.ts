@@ -80,3 +80,4 @@ export function fromLocalDateTimeToUTC(dateTimeLocal: string): Date {
   // Month is 0-indexed in JS Date
   return new Date(Date.UTC(year, month - 1, day, hours, minutes));
 }
+

@@ -216,6 +216,78 @@ export class SchedulerService {
   //    })
   //  );
   //}
+  //
+  //
+
+
+  disableAvailabilityTimeSlot(uuid: string) {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.disableAvailabilityTimeSlot}`, { uuid: uuid }).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          const guid = response.data;
+          return OperationResultService.createSuccess(guid, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  deleteAvailabilityTimeSlot(uuid: string) {
+    return this.httpServiceAdapter.delete<boolean>(`${this.apiUrl}${ApiRoutes.deleteAvailabilityTimeSlot}?uuid=${uuid}`).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          const guid = response.data;
+          return OperationResultService.createSuccess(guid, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+
+  }
+
+  enableAvailabilityTimeSlot(uuid: string) {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.enableAvailabilityTimeSlot}`, { uuid: uuid }).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          const guid = response.data;
+          return OperationResultService.createSuccess(guid, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+
 
 
   disableAssignedService(uuid: string) {
@@ -307,7 +379,7 @@ export class SchedulerService {
   }
 
   private parseAppointments(dto: AppointmentDTO): Appointment {
-    let data = new Appointment(dto.uuid, dto.startTime, dto.endTime, dto.date, dto.createdAt, dto.assistants, dto.status, dto.totalCost);
+    let data = new Appointment(dto.uuid, dto.startTime, dto.endTime, dto.date, dto.createdAt, dto.assistants, dto.status, dto.totalCost, dto.selectedServices);
     return data;
   }
 
