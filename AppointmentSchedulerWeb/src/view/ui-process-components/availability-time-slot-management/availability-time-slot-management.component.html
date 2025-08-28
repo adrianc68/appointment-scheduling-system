@@ -41,7 +41,6 @@
                 {{ slot.startDate | slotDateRange: (slot.endDate) }}
               </span>
               <span class="fs-base t-muted">{{ slot.assistant.name }} </span>
-
             </div>
             <button [class.clicked]="openedSlots.has(i)">
               <mat-icon>

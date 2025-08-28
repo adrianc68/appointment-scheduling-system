@@ -16,10 +16,11 @@ import { ServiceService } from '../../../model/communication-components/service.
 import { ServiceGridItemComponent } from '../../ui-components/display/grid-list/service-grid-item/service-grid-item.component';
 import { TranslatePipe } from '../../../cross-cutting/helper/i18n/translate.pipe';
 import { ServiceStatusType } from '../../../view-model/business-entities/types/service-status.types';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-service-management',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, TranslatePipe],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, TranslatePipe, MatIconModule],
   standalone: true,
   templateUrl: './service-management.component.html',
   styleUrl: './service-management.component.scss'
@@ -84,7 +85,7 @@ export class ServiceManagementComponent {
     return this.services.filter(item => item.status === ServiceStatusType.ENABLED).length;
   }
 
- get disabledServiceCount(): number {
+  get disabledServiceCount(): number {
     return this.services.filter(item => item.status === ServiceStatusType.DISABLED).length;
   }
 

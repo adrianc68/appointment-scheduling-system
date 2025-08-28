@@ -81,5 +81,20 @@ export class ServiceOfferManagementComponent {
   }
 
 
+  openedSlots = new Set<number>();
+
+  toggleSlot(index: number) {
+    if (this.openedSlots.has(index)) {
+      this.openedSlots.delete(index);
+    } else {
+      this.openedSlots.add(index);
+    }
+  }
+
+
+
+
+
 
 }
+

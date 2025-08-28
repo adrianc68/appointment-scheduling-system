@@ -3,27 +3,22 @@
 @use '../../../styles/breakpoints.scss' as breakpoints;
 @use 'sass:math';
 
-.client-management-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: auto;
-  padding: variables.$padding-md;
-  gap: variables.$spacing-lg;
-}
-
-.client-management-title {
+.main-section {
   width: 100%;
+  padding-right: variables.$padding-md;
+  padding-left: variables.$padding-md;
+  padding-top: variables.$padding-lg;
+  padding-bottom: variables.$padding-lg;
 }
 
-.client-summary {
+.summary {
   width: 100%;
   height: auto;
   flex-wrap: wrap;
   display: flex;
   gap: variables.$spacing-md;
 
-  .client-summary-item {
+  .summary-item {
     @include mixins.flex-start;
     flex-direction: column;
     // width: math.div(variables.$container-xs, 2);
@@ -34,79 +29,117 @@
   }
 }
 
-.client-management-actions {
-  width: 100%;
-
-  @include mixins.flex-end;
-
-}
-
-.client-table-content {
-  width: 100%;
-}
-
 
 
 
 .service-card-container {
   width: 100%;
-  // max-height: 200px;
   padding: variables.$padding-md;
-  position: relative;
+  display:flex;
+  flex-direction: column;
+  gap: variables.$spacing-md;
 }
 
 .service-data {
   display: flex;
-  gap: variables.$spacing-sm;
-  ;
+  // gap: variables.$spacing-md;
+  // padding: variables.$padding-md;
   width: 100%;
+  align-items: center;
+  flex-direction: column;
+  border-bottom: 1px solid variables.$border;
 
-  .service-profile-data {
+
+
+  .service-header {
     display: flex;
-    justify-content: flex-start;
+    width: 100%;
+    // background-color: red;
     align-items: center;
-    flex-direction: column;
-    width: 100px;
-    gap: variables.$spacing-sm;
-    ;
+    gap: variables.$spacing-md;
+    padding: variables.$padding-md;
 
-    span {
-      text-align: center;
+    &.expanded {
+      border-bottom: 1px solid variables.$border-subtle;
+    }
+
+    button {
+      background-color: transparent;
+      border: 0;
+      cursor: pointer;
+      height: auto;
+      width: auto;
+
+      mat-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: 1.5rem;
+        transition: transform 0.3s ease;
+      }
+
+      &.clicked>mat-icon {
+        transform: rotate(90deg);
+      }
+    }
+
+    .service-title {
       width: 100%;
+      display: flex;
+      align-items: center;
+      gap: variables.$spacing-base;
+      // background-color: green
     }
 
     .profile-icon {
-      @include mixins.flex-center;
-      font-size: 45px;
-      height: 45px;
-      color: variables.$text;
-      width: 45px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.5rem;
+      height: 2.5rem;
+      width: 2.5rem;
     }
   }
 
   .service-info {
+    max-height: 0;
+    overflow: hidden;
+    // transition: max-height 0.3s ease, padding 0.3s ease;
+    transition: max-height 0.3s ease,
+    opacity 0.3s ease,
+    visibility 0.3s ease,
+    #{variables.$color-transition};
+    will-change: height;
+    visibility: hidden;
+    opacity: 0;
     width: 100%;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
+
+    &.expanded {
+      max-height: 1000px;
+      visibility: visible;
+      opacity: 1;
+    }
+
+
   }
+}
+
+.service-body-wrapper {
+  // background-color: blue;
+  padding: variables.$padding-md;
 }
 
 
 .service-list-container {
   padding: variables.$padding-sm;
-  // background-color: yellow;
   display: flex;
   flex-wrap: wrap;
-  gap: variables.$spacing-sm;
-  ;
+  gap: variables.$spacing-base;
   list-style: none;
 
   .service-item-container {
     display: flex;
     flex-direction: column;
     gap: variables.$spacing-sm;
-    ;
     padding: variables.$padding-sm;
     width: auto;
     border: 1px solid variables.$border;
@@ -117,29 +150,5 @@
       max-width: auto;
     }
   }
-
-
-
 }
 
-
-.service-buttons {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  padding: variables.$padding-md;
-
-  .button {
-    height: auto;
-    padding: variables.$padding-sm;
-  }
-}
-
-@include mixins.respond-to(breakpoints.$breakpoint-lg) {
-  .client-summary {
-
-    .client-summary-item {
-      width: math.div(variables.$container-xs, 2);
-    }
-  }
-}

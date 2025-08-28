@@ -3,27 +3,22 @@
 @use '../../../styles/breakpoints.scss' as breakpoints;
 @use 'sass:math';
 
-.client-management-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: auto;
-  padding: variables.$padding-md;
-  gap: variables.$spacing-lg;
-}
-
-.client-management-title {
+.main-section {
   width: 100%;
+  padding-right: variables.$padding-md;
+  padding-left: variables.$padding-md;
+  padding-top: variables.$padding-lg;
+  padding-bottom: variables.$padding-lg;
 }
 
-.client-summary {
+.summary {
   width: 100%;
   height: auto;
   flex-wrap: wrap;
   display: flex;
   gap: variables.$spacing-md;
 
-  .client-summary-item {
+  .summary-item {
     @include mixins.flex-start;
     flex-direction: column;
     // width: math.div(variables.$container-xs, 2);
@@ -34,23 +29,38 @@
   }
 }
 
-.client-management-actions {
+
+.client-card-container {
   width: 100%;
+  position: relative;
 
-  @include mixins.flex-end;
+  .client-data {
+    display: flex;
+    gap: variables.$spacing-md;
+    padding: variables.$padding-md;
+    width: 100%;
+    align-items: center;
+    border-bottom: 1px solid variables.$border;
 
-}
+    &:last-child {
+      border-bottom: 1px solid transparent;
+    }
 
-.client-table-content {
-  width: 100%;
-}
+    .profile-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+    }
 
-
-@include mixins.respond-to(breakpoints.$breakpoint-lg) {
-  .client-summary {
-
-    .client-summary-item {
-      width: math.div(variables.$container-xs, 2);
+    .client-info {
+      flex: 1;
+      word-break: break-word;
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
     }
   }
 }

@@ -1,42 +1,62 @@
-<div class="service-management-container">
-  <div class="service-management-title">
-    <h1>{{ translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY | translate}}</h1>
-  </div>
+<div class="main-section">
+  <h1 class="m-bottom-md">Servicios</h1>
 
-  <div class="service-summary">
-    <div class="service-summary-item card">
+  <section class="summary m-bottom-xl">
+    <div class="summary-item card">
       <span class="t-muted">{{translationCodes.TC_SERVICES_REGISTERED_LABEL | translate}}</span>
       <span class="fw-bold fs-xl">{{services.length}}</span>
     </div>
-
-    <div class="service-summary-item card">
+    <div class="summary-item card">
       <span class="t-muted">{{translationCodes.TC_SERVICES_AVAILABLE_LABEL | translate}}</span>
       <span class="fw-bold fs-xl">{{enabledServiceCount}}</span>
     </div>
-
-    <div class="service-summary-item card">
+    <div class="summary-item card">
       <span class="t-muted">{{translationCodes.TC_SERVICES_NOT_AVAILABLE_LABEL | translate}}</span>
       <span class="fw-bold fs-xl">{{disabledServiceCount}}</span>
-
     </div>
+  </section>
 
-  </div>
-
-  <div class="service-management-actions">
-    <div class="button-register">
-      <button class="button" (click)="redirectToRegisterService()">
-        {{translationCodes.TC_REGISTER_BUTTON_LABEL | translate}}
+  <section class="data-container">
+    <section class="data-actions">
+      <div class="input container max-w-sm">
+        <label class="input-icon" for="search"><mat-icon>search</mat-icon></label>
+        <input id="search" class="input" type="text" placeholder="Buscar..." />
+      </div>
+      <button class="button primary w-auto" (click)="redirectToRegisterService()">
+        Registrar
       </button>
-    </div>
-  </div>
+    </section>
+    <section class="data-header">
+      <span>Servicios registrados</span>
+    </section>
+    <section class="data-body">
+      <div class="service-card-container">
+        <div class="service-data" *ngFor="let data of services">
+          <mat-icon class="profile-icon">business_center</mat-icon>
+          <div class="service-info">
+            <span class="fw-bold">{{data.name}} ({{data.name}})</span>
+            <span class="fs-sm t-secondary">{{data.price}}</span>
+            <span class="fs-sm t-secondary">{{data.minutes}}</span>
+            <span class="fs-sm t-secondary">{{data.description}}</span>
+            <span class="fs-sm t-secondary">{{data.status | translate}}</span>
+          </div>
+          <button class="button unbordered t-brand w-auto m-y-center" (click)="redirectToEditService(data)">
+            Editar
+          </button>
+        </div>
+      </div>
+    </section>
+  </section>
 
-  <div class="service-table-content">
-    <app-grid-list [title]="'test'" [items]="services" [cardComponent]="serviceCard">
-
-    </app-grid-list>
 
 
-  </div>
+  <!--<div class="service-table-content">-->
+  <!--  <app-grid-list [title]="'test'" [items]="services" [cardComponent]="serviceCard">-->
+  <!---->
+  <!--  </app-grid-list>-->
+  <!---->
+  <!---->
+  <!--</div>-->
 
 
 </div>

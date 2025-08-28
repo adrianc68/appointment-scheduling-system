@@ -3,6 +3,8 @@
 @use '../variables' as variables;
 
 .data-container {
+  width: 100%;
+
   .data-actions {
     display: flex;
     gap: variables.$spacing-md;
