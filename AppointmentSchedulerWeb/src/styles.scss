@@ -4,6 +4,8 @@
 @use 'styles/components/card.scss' as card;
 @use 'styles/components/input.scss' as input;
 @use 'styles/components/form.scss' as form;
+@use 'styles/components/data-container.scss' as dataContainer;
+
 // @use 'styles/components/modal.scss' as modal;
 // @use 'styles/components/accordion.scss' as accordion;
 
@@ -347,6 +349,11 @@ $padding: (
   margin-right: auto;
 }
 
+.m-y-center {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
 // Padding
 @each $key, $value in $padding {
   .p-top-#{$key} {
@@ -600,10 +607,20 @@ $width: (
 }
 
 .data-section {
-  padding-top: variables.$padding-lg;
-  padding-bottom: variables.$padding-lg;
+  // padding-top: variables.$padding-lg;
+  // padding-bottom: variables.$padding-lg;
+  padding: variables.$padding-lg;
   // min-height: min-content;
   height: auto;
+
+  &.sp-top {
+    margin-top: variables.$spacing-lg;
+  }
+
+  &.sp-bottom {
+
+    margin-bottom: variables.$spacing-lg;
+  }
 }
 
 #GSDevTools {

@@ -1,105 +1,138 @@
-<section class="select-assistant">
-  <div class="assistant-table-content p-all-md">
-    <h2>Seleccionar asistente</h2>
-
-    <table class="assistant-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Usuario</th>
-          <th>Email</th>
-          <th>Teléfono</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let data of assistants">
-          <td>{{ data.name }}</td>
-          <td>{{ data.username }}</td>
-          <td>{{ data.email }}</td>
-          <td>{{ data.phoneNumber }}</td>
-          <td>
-            <button class="" (click)="selectedAssistant = data">
-              Seleccionar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-
-<div class="register-container">
-  <form class="" (ngSubmit)="onSubmit()">
-    <div class="form-header">
-      <h2>
-        Seleccionar horarios
-      </h2>
-    </div>
-
-    <div class="form-body">
-      <div class="form-input">
-        <label for="startDate">{{translate(translationCodes.TC_START_TIME_LABEL)}}</label>
-        <input class="input" id="startDate" type="datetime-local" step="1" [(ngModel)]="startDate" name="startDate"
-          required
-          placeholder="{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_START_TIME_PLACEHOLDER_LABEL)}}" />
-        <app-error-validation-message-form [messages]="errorValidationMessage['startDate']" />
-      </div>
-
-      <div class="form-input">
-        <label for="endDate">{{translate(translationCodes.TC_END_TIME_LABEL)}}</label>
-        <input class="input" id="endDate" type="datetime-local" step="1" [(ngModel)]="endDate" name="endDate" required
-          placeholder="{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_END_TIME_PLACEHOLDER_LABEL)}}" />
-        <app-error-validation-message-form [messages]="errorValidationMessage['endDate']" />
-      </div>
-
-      <!--<div class="form-input">-->
-      <!--  <label for="assistantUuid">{{ translate(translationCodes.TC_ASSISTANT_IDENTIFIER_LABEL)}}</label>-->
-      <!--  <input class="input" id="assistantUuid" type="text" [(ngModel)]="assistantUuid" name="assistantUuid" required-->
-      <!--    placeholder={{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_ASSISTANT_PLACEHOLDER_LABEL)}} />-->
-      <!--  <app-error-validation-message-form [messages]="errorValidationMessage['assistantUuid']" />-->
-      <!--</div>-->
-      <span>
-        asistente seleccionado: {{ selectedAssistant?.name}}
-      </span>
-
-      <div class="form-input">
-        <h2>{{translate(translationCodes.TC_UNAVAILABLE_SLOT_LABEL)}}</h2>
-
-        <div *ngFor="let slot of unavailableTimeSlots; let i = index">
-          <div class="form-input">
-            <label>{{translate(translationCodes.TC_START_TIME_LABEL)}}</label>
-            <input class="input" type="datetime-local" step="1" [(ngModel)]="slot.startDate" name="startTime{{i}}"
-              required />
-          </div>
-
-          <div class="form-input">
-            <label>{{translate(translationCodes.TC_END_TIME_LABEL)}}</label>
-            <input class="input" type="datetime-local" step="1" [(ngModel)]="slot.endDate" name="endTime{{i}}"
-              required />
-          </div>
-
-          <button class="button" type="button" (click)="removeUnavailableTimeSlot(i)">
-            {{translate(translationCodes.TC_DELETE_BUTTON_LABEL)}}
-          </button>
+<section class="main-section">
+  <section class="assistant-select data-section sp-bottom card">
+    <h2 class="m-bottom-lg">1. Selecciona un asistente</h2>
+    <div class="data-container">
+      <div class="data-actions">
+        <div class="input container max-w-sm">
+          <label class="input-icon" for="search">
+            <mat-icon>search</mat-icon>
+          </label>
+          <input id="search" class="input" type="text" placeholder="Buscar..." />
         </div>
-
-        <button class="button" type="button" (click)="addUnavailableTimeSlot()">
-          {{translate(translationCodes.TC_ADD_BUTTON_LABEL)}}
-        </button>
       </div>
+      <div class="data-header">
+        <span>Asistentes disponibles</span>
+      </div>
+      <div class="data-body">
+        <div class="assistants-container scroll-visible">
+          <li class="assistant-card" *ngFor="let data of assistants">
+            <div class="card-icon">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="card-body">
+              <h3 class="fs-base">{{ data.name }}</h3>
+              <p class="fs-xs"> {{ data.username }}</p>
+              <p class="fs-xs">{{ data.phoneNumber }}</p>
+            </div>
+            <button (click)="selectedAssistant = data" class="button m-y-center unbordered w-auto p-all-sm">
+              <span class="fs-sm t-brand">Seleccionar</span>
+            </button>
+        </div>
+      </div>
+    </div>
+    <div class="data-selected m-top-md" *ngIf="selectedAssistant">
+      <h3 class="m-bottom-md">Asistente seleccionado: </h3>
+      <div class="assistant-summary">
+        <div>
+          <span class="fs-base t-muted m-bottom-base"> Nombre:</span>
+          <span class="fs-base t-emphasis">{{ selectedAssistant.name }}</span>
+        </div>
+        <div>
+          <span class="fs-base t-muted m-bottom-base"> Nombre de usuario:</span>
+          <span class="fs-base t-emphasis"> {{ selectedAssistant.username}}</span>
+        </div>
+        <div>
+          <span class="fs-base t-muted m-bottom-base"> Correo:</span>
+          <span class="fs-base t-emphasis"> {{ selectedAssistant.email}}</span>
+        </div>
+        <div>
+          <span class="fs-base t-muted m-bottom-base"> Telefono:</span>
+          <span class="fs-base t-emphasis"> {{ selectedAssistant.phoneNumber}}</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <section class="datetime-select data-section sp-bottom card">
+    <h2 class="m-bottom-lg">2. Selecciona el día y hora</h2>
+
+    <div class="date-type m-bottom-lg">
+      <label>
+        <input type="radio" name="dateType" [(ngModel)]="isSingleDay" [value]="true" />
+        Solo un día
+      </label>
+      <label>
+        <input type="radio" name="dateType" [(ngModel)]="isSingleDay" [value]="false" />
+        Rango de días
+      </label>
     </div>
 
-    <div class="form-footer">
-      <br>
-      <br>
+    <div *ngIf="!isSingleDay">
+      <label for="startDate">Inicio</label>
+      <input class="input m-top-base m-bottom-base" id="startDate" type="datetime-local" step="1"
+        [(ngModel)]="startDate" name="startDate" required />
+      <label for="endDate">Fin</label>
+      <input class="input m-top-base" id="endDate" type="datetime-local" step="1" [(ngModel)]="endDate" name="endDate"
+        required />
+    </div>
+
+    <div *ngIf="isSingleDay" class="m-top-lg">
+      <label for="selectedDate">Fecha</label>
+      <input class="input m-top-base m-bottom-lg" id="selectedDate" type="date" [(ngModel)]="selectedDate"
+        name="selectedDate" required />
+
+      <label for="startTime">Hora de inicio</label>
+      <input class="input m-top-base m-bottom-base" id="startTime" type="time" step="1" [(ngModel)]="startTime"
+        name="startTime" required />
+
+      <label for="endTime">Hora de fin</label>
+      <input class="input m-top-base" id="endTime" type="time" step="1" [(ngModel)]="endTime" name="endTime" required />
+    </div>
+  </section>
+
+
+  <section class="unavailability-slots data-section sp-bottom card">
+    <h2 class="m-bottom-lg">3. Seleccionar horas de descanso</h2>
+    <div *ngFor="let slot of unavailableTimeSlots; let i = index">
+      <div class="unavailability-slot m-bottom-lg">
+
+        <ng-container *ngIf="isSingleDay">
+          <div>
+            <label>Hora inicio</label>
+            <input class="input" type="time" step="1" [(ngModel)]="slotStartTimeMap[i]" name="slotStart{{i}}"
+              required />
+            <label>Hora fin</label>
+            <input class="input" type="time" step="1" [(ngModel)]="slotEndTimeMap[i]" name="slotEnd{{i}}" required />
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="!isSingleDay">
+          <div>
+            <label>Inicio</label>
+            <input class="input" type="datetime-local" [(ngModel)]="slot.startDate" name="slotStart{{i}}" required />
+            <label>Fin</label>
+            <input class="input" type="datetime-local" [(ngModel)]="slot.endDate" name="slotEnd{{i}}" required />
+          </div>
+        </ng-container>
+        <button class="button w-auto" type="button" (click)="removeUnavailableTimeSlot(i)">Eliminar</button>
+      </div>
+    </div>
+
+    <button class="button w-auto" type="button" (click)="addUnavailableTimeSlot()">Agregar</button>
+    <div>
+    </div>
+  </section>
+
+  <section class="register-container data-section card">
+    <form class="" (ngSubmit)="onSubmit()">
+      <div class="form-header">
+      </div>
       <app-button-task type="submit" [loadingState]="currentTaskState"
         [text]="translate(translationCodes.TC_REGISTER_BUTTON_LABEL)" />
       <span class="system-error">
         {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
       </span>
-    </div>
-  </form>
-</div>
+    </form>
+  </section>
+
+</section>

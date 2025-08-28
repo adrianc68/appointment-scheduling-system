@@ -20,6 +20,8 @@ import { fromLocalToUTC } from '../../../cross-cutting/helper/date-utils/date.ut
 import { AssistantService } from '../../../model/communication-components/assistant.service';
 import { Assistant } from '../../../view-model/business-entities/assistant';
 import { MatIconModule } from '@angular/material/icon';
+
+
 @Component({
   selector: 'app-register-availability-time-slot',
   imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule],
@@ -43,9 +45,45 @@ export class RegisterAvailabilityTimeSlotComponent {
   systemMessage?: string = '';
   currentTaskState: LoadingState;
 
+  isSingleDay: boolean = true; // por defecto asumimos un solo día
+
+
   translate(key: string): string {
     return this.i18nService.translate(key);
   }
+
+  startTime: string = '09:00';
+  endTime: string = '17:00';
+  selectedDate: string = new Date().toISOString().split('T')[0]; // "2025-08-27"
+
+
+  onDateChange() {
+    if (this.startDate && this.endDate) {
+      this.isSingleDay = this.startDate.toDateString() === this.endDate.toDateString();
+    } else {
+      this.isSingleDay = true;
+    }
+  }
+
+
+  getStartEndDate(): { start: Date, end: Date } {
+    if (this.isSingleDay) {
+      const [startHour, startMin] = this.startTime.split(':').map(Number);
+      const [endHour, endMin] = this.endTime.split(':').map(Number);
+
+      const start = new Date(this.selectedDate);
+      start.setHours(startHour, startMin, 0, 0);
+
+      const end = new Date(this.selectedDate);
+      end.setHours(endHour, endMin, 0, 0);
+
+      return { start, end };
+    } else {
+      return { start: this.startDate, end: this.endDate };
+    }
+  }
+
+
 
   constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private schedulerService: SchedulerService, private stateManagerService: TaskStateManagerService, private assistantService: AssistantService) {
     this.currentTaskState = this.stateManagerService.getState();
@@ -98,7 +136,7 @@ export class RegisterAvailabilityTimeSlotComponent {
 
 
   onSubmit() {
-    if(!this.selectedAssistant) {
+    if (!this.selectedAssistant) {
       return;
     }
 
@@ -110,14 +148,15 @@ export class RegisterAvailabilityTimeSlotComponent {
     this.systemMessage = "";
     this.errorValidationMessage = {};
 
+    const { start, end } = this.getStartEndDate();
+
+
     const availabilitySlot = {
-      StartDate: fromLocalToUTC(this.startDate),
-      EndDate: fromLocalToUTC(this.endDate),
+      StartDate: fromLocalToUTC(start),
+      EndDate: fromLocalToUTC(end),
       AssistantUuid: this.selectedAssistant.uuid,
-      UnavailableTimeSlots: this.unavailableTimeSlots.map(slot => ({
-        StartDate: fromLocalToUTC(slot.startDate),
-        EndDate: fromLocalToUTC(slot.endDate)
-      }))
+      UnavailableTimeSlots: this.getUnavailableSlotsUTC()
+
     };
 
     //console.log("Payload enviado:", availabilitySlot);
@@ -199,7 +238,29 @@ export class RegisterAvailabilityTimeSlotComponent {
   }
 
 
+  slotDateMap: { [key: number]: string } = {};
+  slotStartTimeMap: { [key: number]: string } = {};
+  slotEndTimeMap: { [key: number]: string } = {};
 
 
+  getUnavailableSlotsUTC() {
+    return this.unavailableTimeSlots.map((slot, i) => {
+      if (this.isSingleDay) {
+        const [year, month, day] = this.selectedDate.split('-').map(Number);
+        const [startHour, startMin] = this.slotStartTimeMap[i].split(':').map(Number);
+        const [endHour, endMin] = this.slotEndTimeMap[i].split(':').map(Number);
+
+        // Creamos un Date local combinando fecha + hora del slot
+        const startLocal = new Date(year, month - 1, day, startHour, startMin, 0, 0);
+        const endLocal = new Date(year, month - 1, day, endHour, endMin, 0, 0);
+
+        // Convertimos a UTC para el backend
+        return { StartDate: fromLocalToUTC(startLocal), EndDate: fromLocalToUTC(endLocal) };
+      } else {
+        // Rango de días: usamos datetime-local de cada slot
+        return { StartDate: fromLocalToUTC(slot.startDate), EndDate: fromLocalToUTC(slot.endDate) };
+      }
+    });
+  }
 
 }

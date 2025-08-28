@@ -6,6 +6,8 @@
   // max-width: variables.$container-xl;
   padding-right: variables.$padding-md;
   padding-left: variables.$padding-md;
+  padding-top: variables.$padding-lg;
+  padding-bottom: variables.$padding-lg;
 }
 
 .summary {
@@ -44,6 +46,8 @@
 
   .data-body {
     border: 1px solid variables.$border;
+    border-bottom-left-radius: variables.$border-radius-md;
+    border-bottom-right-radius: variables.$border-radius-md;
     padding: variables.$padding-md;
   }
 }

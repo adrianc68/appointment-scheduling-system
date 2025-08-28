@@ -1,6 +1,6 @@
 <section class="main-section">
   <h1 class="m-bottom-md">Horarios de disponibilidad</h1>
-  <div class="summary m-bottom-md">
+  <div class="summary m-bottom-xl">
     <div class="summary-item card">
       <span class="t-muted"> Horarios registrados </span>
       <span class="fw-bold fs-xl">{{slots.length}}</span>
@@ -15,7 +15,6 @@
     </div>
   </div>
 
-
   <section class="data-actions">
     <div class="grid-input-search input container">
       <label class="input-icon" for="search">
@@ -28,7 +27,6 @@
       Registrar
     </button>
   </section>
-
 
   <section class="data-container">
     <div class="data-header">
@@ -87,7 +85,11 @@
                   <span class="t-muted m-bottom-base">Rangos bloqueados:</span>
                   <ul>
                     <li *ngFor="let uSlot of slot.unavailableTimeSlots">
-                      {{ uSlot.startDate | readableDate }} / {{ uSlot.endDate | readableDate }}
+                      <span class="t-emphasis m-bottom-base">
+                        {{ uSlot.startDate | slotDateRange: (uSlot.endDate) }}
+                        <!--<br>-->
+                        <!--{{ uSlot.startDate | readableDate}} | {{ uSlot.endDate | readableDate}}-->
+                      </span>
                     </li>
                   </ul>
                 </div>
