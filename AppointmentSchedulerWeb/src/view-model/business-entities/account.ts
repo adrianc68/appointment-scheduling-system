@@ -8,11 +8,11 @@ export class AccountData {
   username: string;
   name: string;
   role: RoleType;
-  status: AccountStatusType;
-  createdAt: Date;
+  status?: AccountStatusType;
+  createdAt?: Date;
   password?: string
 
-  constructor(uuid: string, email: string, phoneNumber: string, username: string, name: string, role: RoleType, status: AccountStatusType, createdAt: Date, password?: string) {
+  constructor(uuid: string, email: string, phoneNumber: string, username: string, name: string, role: RoleType, status?: AccountStatusType, createdAt?: Date, password?: string) {
     this.uuid = uuid;
     this.email = email;
     this.phoneNumber = phoneNumber;

@@ -76,37 +76,37 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let service of appointment.selectedServices">
-            <td>{{ service.uuid }}</td>
-            <td>{{ service.name }}</td>
-            <td>{{ service.price | currency }}</td>
-            <td>{{ service.minutes }}</td>
-            <td>{{ service.startDate | date:'short' }}</td>
-            <td>{{ service.endDate | date:'short' }}</td>
+          <tr *ngFor="let appointment of appointment.scheduledServices">
+            <td>{{ appointment.service.uuid }}</td>
+            <td>{{ appointment.service.name }}</td>
+            <td>{{ appointment.service.price | currency }}</td>
+            <td>{{ appointment.service.minutes }}</td>
+            <td>{{ appointment.service.startDate | date:'short' }}</td>
+            <td>{{ appointment.service.endDate | date:'short' }}</td>
           </tr>
         </tbody>
       </table>
 
       <!-- Asistentes -->
-      <h3>Asistentes</h3>
-      <table border="1" style="border-collapse: collapse; margin-bottom: 2rem; width: 100%;">
-        <thead>
-          <tr>
-            <th>UUID</th>
-            <th>Nombre</th>
-            <th>Inicio Ocupado</th>
-            <th>Fin Ocupado</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let assistant of appointment.assistants">
-            <td>{{ assistant.uuid }}</td>
-            <td>{{ assistant.name }}</td>
-            <!--<td>{{ assistant.occupiedTimeRange.startDate | date:'short' }}</td>-->
-            <!--<td>{{ assistant.occupiedTimeRange.endDate | date:'short' }}</td>-->
-          </tr>
-        </tbody>
-      </table>
+      <!--<h3>Asistentes</h3>-->
+      <!--<table border="1" style="border-collapse: collapse; margin-bottom: 2rem; width: 100%;">-->
+      <!--  <thead>-->
+      <!--    <tr>-->
+      <!--      <th>UUID</th>-->
+      <!--      <th>Nombre</th>-->
+      <!--      <th>Inicio Ocupado</th>-->
+      <!--      <th>Fin Ocupado</th>-->
+      <!--    </tr>-->
+      <!--  </thead>-->
+      <!--  <tbody>-->
+      <!--    <tr *ngFor="let assistant of appointment">-->
+      <!--      <td>{{ assistant.uuid }}</td>-->
+      <!--      <td>{{ assistant.name }}</td>-->
+      <!--      <!--<td>{{ assistant.occupiedTimeRange.startDate | date:'short' }}</td>-->-->
+      <!--      <!--<td>{{ assistant.occupiedTimeRange.endDate | date:'short' }}</td>-->-->
+      <!--    </tr>-->
+      <!--  </tbody>-->
+      <!--</table>-->
     </ng-container>
   </div>
 

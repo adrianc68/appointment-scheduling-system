@@ -1,4 +1,6 @@
+import { AppointmentScheduledService } from "./appointment-scheduled-service";
 import { Client } from "./client";
+import { AppointmentNotification } from "./notification/appointment-notification";
 import { ScheduledService } from "./scheduled-service";
 import { AppointmentStatusType } from "./types/appointment-status.types";
 
@@ -9,19 +11,20 @@ export class Appointment {
   status?: AppointmentStatusType;
   totalCost?: number;
   createdAt: Date;
-  assistants: Assistant[];
-  selectedServices?: ScheduledService[]
+  //assistants: Assistant[];
+  //selectedServices?: ScheduledService[]
+  scheduledServices?: AppointmentScheduledService[]
   client?: Client;
 
-  constructor(uuid: string, startDate: Date, endDate: Date, createdAt: Date, assistants: Assistant[], status?: AppointmentStatusType, totalCost?: number, selectedServices?: ScheduledService[], client?: Client) {
+  constructor(uuid: string, startDate: Date, endDate: Date, createdAt: Date, status?: AppointmentStatusType, totalCost?: number, scheduledServices?: AppointmentScheduledService[], client?: Client) {
     this.uuid = uuid;
     this.startDate = startDate;
     this.endDate = endDate;
     this.status = status;
     this.totalCost = totalCost;
     this.createdAt = createdAt;
-    this.assistants = assistants;
-    this.selectedServices = selectedServices;
+    //this.assistants = assistants;
+    this.scheduledServices = scheduledServices;
     this.client = client;
   }
 }

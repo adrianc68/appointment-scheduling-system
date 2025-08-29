@@ -20,6 +20,10 @@ import { UnavailableTimeSlotDTO } from "../dtos/unavailable-time-slot.dto";
 import { ClientDTO } from "../dtos/client.dto";
 import { Client } from "../../view-model/business-entities/client";
 import { RoleType } from "../../view-model/business-entities/types/role.types";
+import { Assistant } from "../../view-model/business-entities/assistant";
+import { AppointmentScheduledService } from "../../view-model/business-entities/appointment-scheduled-service";
+import { ScheduledService } from "../../view-model/business-entities/scheduled-service";
+import { AccountStatusType } from "../../view-model/business-entities/types/account-status.types";
 
 @Injectable({
   providedIn: 'root'
@@ -404,10 +408,41 @@ export class SchedulerService {
   }
 
   private parseAppointments(dto: AppointmentDTO): Appointment {
-    let data = new Appointment(dto.uuid, new Date(dto.startDate), new Date(dto.endDate), dto.createdAt, dto.assistants, dto.status, dto.totalCost, dto.selectedServices,  this.mapClient(dto.client));
-    return data;
-  }
+    const scheduledServices = dto.scheduledServices?.map(ss =>
+      new AppointmentScheduledService(
+        new ScheduledService(
+          ss.service.name,
+          ss.service.price,
+          ss.service.minutes,
+          ss.service.uuid,
+          new Date(ss.service.startDate),
+          new Date(ss.service.endDate)
+        ),
+        new Assistant(
+          ss.assistant.uuid,
+          ss.assistant.email,
+          ss.assistant.phoneNumber,
+          ss.assistant.username,
+          ss.assistant.name,
+          RoleType.ASSISTANT,
+          ss.assistant.status
+        )
+      )
+    ) ?? [];
 
+    const client = dto.client ? this.mapClient(dto.client) : undefined;
+
+    return new Appointment(
+      dto.uuid,
+      new Date(dto.startDate),
+      new Date(dto.endDate),
+      new Date(dto.createdAt),
+      dto.status,
+      dto.totalCost,
+      scheduledServices,
+      client
+    );
+  }
   private mapClient(dto?: ClientDTO): Client | undefined {
     if (!dto) return undefined;
     return new Client(

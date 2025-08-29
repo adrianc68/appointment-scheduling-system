@@ -6,6 +6,23 @@
   padding: variables.$padding-md;
 }
 
+.summary {
+  width: 100%;
+  height: auto;
+  flex-wrap: wrap;
+  display: flex;
+  gap: variables.$spacing-md;
+
+  .summary-item {
+    @include mixins.flex-start;
+    flex-direction: column;
+    // width: math.div(variables.$container-xs, 2);
+    width: 100%;
+    gap: variables.$spacing-sm;
+    ;
+    padding: variables.$padding-md;
+  }
+}
 
 
 .slot-container {
@@ -13,6 +30,7 @@
   flex-wrap: wrap;
   gap: variables.$spacing-md;
   justify-content: center;
+  padding: variables.$padding-md;
 
 
   .card-container {
@@ -54,6 +72,22 @@
 
       &.clicked>mat-icon {
         transform: rotate(90deg);
+      }
+    }
+
+    .card-icon {
+      background-color: variables.$bg-subtle;
+      border-radius:50%;
+      height:auto;
+      width:auto;
+
+      mat-icon {
+        margin: variables.$padding-sm;
+        height:2rem;
+        width:2rem;
+        display:flex;
+        justify-content: center;
+        align-items: center;
       }
     }
 
@@ -99,6 +133,7 @@
         justify-content: flex-start;
         align-items: flex-start;
         width: 100%;
+        // background-color: gold;
 
 
         span {
@@ -127,49 +162,6 @@
         padding: variables.$spacing-sm;
       }
 
-    }
-  }
-}
-
-
-
-
-
-
-
-.app-management {
-  color: #8a8a8a;
-}
-
-.service-table {
-  width: 100%;
-  border-collapse: collapse;
-  color: variables.$text;
-
-  overflow-x: auto;
-
-  thead {
-    text-align: left;
-
-    th {
-      font-weight: bold;
-    }
-  }
-
-  tbody {
-    tr {
-      border-bottom: 1px solid variables.$border;
-
-    }
-
-    td {
-      vertical-align: middle;
-
-      .actions {
-        display: flex;
-        // gap: 0.5rem;
-
-      }
     }
   }
 }

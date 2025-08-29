@@ -16,6 +16,10 @@
     </div>
   </div>
 
+  <label>Desde: </label>
+  <input type="date" [ngModel]="startDate" (ngModelChange)="onDateRangeChange($event, 'start')" />
+  <label>Hasta: </label>
+  <input type="date" [ngModel]="endDate" (ngModelChange)="onDateRangeChange($event, 'end')" />
   <section class="data-container">
     <section class="data-actions">
       <div class="grid-input-search input container">
@@ -27,10 +31,7 @@
       <button class="button primary w-auto" (click)="redirectToRegisterAppointment()">
         Registrar
       </button>
-      <label>Desde: </label>
-      <input type="date" [ngModel]="startDate" (ngModelChange)="onDateRangeChange($event, 'start')" />
-      <label>Hasta: </label>
-      <input type="date" [ngModel]="endDate" (ngModelChange)="onDateRangeChange($event, 'end')" />
+
     </section>
 
     <div class="data-header">
@@ -40,36 +41,85 @@
       <ul class="slot-container">
         <li class="card-container card muted" *ngFor="let appointment of scheduledAppointments; let i = index">
           <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
-            <div class="card-title">
-              <span class="fs-base fw-bold t-emphasis">
-                {{ appointment.client!.name}}
-              </span>
-              <span class="fs-base t-muted">
-                {{ appointment.startDate | slotDateRange: (appointment.endDate)}}
-              </span>
-              <span class="fs-base t-muted">
-                $ {{ appointment.totalCost }}
-              </span>
-              <span>
+            <div class="card-icon">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="card-title d-flex">
+              <div class="d-flex-col">
+                <span class="fs-base fw-bold t-emphasis m-bottom-base">
+                  Cita con {{ appointment.client!.name}}
+                </span>
+                <span class="fs-sm t-muted">
+                  {{ appointment.startDate | slotDateRange: (appointment.endDate)}}
+                </span>
+              </div>
+              <span class="fs-xs fw-bold" [ngClass]="{
+        't-success': appointment.status === 'CONFIRMED',
+        't-brand': appointment.status === 'SCHEDULED',
+        't-danger': appointment.status === 'CANCELED',
+        't-inverted': appointment.status === 'RESCHEDULED',
+        't-muted': appointment.status === 'FINISHED',}">
+                {{ appointment.status }}
               </span>
             </div>
+
             <button [class.clicked]="openedSlots.has(i)">
               <mat-icon>
                 keyboard_arrow_right
               </mat-icon>
             </button>
+
           </div>
           <div class="card-body" [class.expanded]="openedSlots.has(i)">
             <div class="wrapper p-left-md p-right-md">
               <div class="slot-data-row">
                 <div class="slot-data">
-                  <span class="t-muted m-bottom-base">Servicios:</span>
-                  <ul>
-                    <li *ngFor="let selectedService of appointment.selectedServices">
-                      <span class="t-emphasis m-bottom-base">
-                        {{ selectedService.name }}
-                        {{ selectedService.startDate | readableDate }}
-                        {{ selectedService.endDate | readableDate }}
+                  <span class="fs-base t-muted">
+                    $ {{ appointment.totalCost }}
+                  </span>
+                  <ul class="w-100 bg-blue">
+                    <li class="" *ngFor="let selectedService of appointment.scheduledServices">
+                      <div class="d-flex gap-lg">
+                        <div class="d-flex m-bottom-base">
+                          <span class="t-muted">
+                            Servicio:
+                          </span>
+                          <span class="t-emphasis m-left-base">
+                            {{ selectedService.service.name }}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="d-flex m-bottom-base">
+                        <span class="m-botom-base t-muted">
+                          Asistente:
+                        </span>
+                        <span class="t-emphasis m-left-base">
+                          {{ selectedService.assistant.name}}
+                        </span>
+                      </div>
+                      <div class="d-flex-col m-bottom-base">
+                        <span class="m-bottom-base t-muted">
+                          Fecha de servicio:
+                        </span>
+                        <span class="t-emphasis">
+                          {{ selectedService.service.startDate | slotDateRange: (selectedService.service.endDate) }}
+                        </span>
+                      </div>
+
+                      <br>
+                      <br>
+                      <br>
+                      <span>
+                        {{ selectedService.service.startDate | slotDateRange: (selectedService.service.endDate) }}
+                      </span>
+                      <span>
+                        {{ selectedService.assistant.name }}
+                      </span>
+                      <span>
+                        {{ selectedService.assistant.username }}
+                      </span>
+                      <span>
+                        {{ selectedService.assistant.phoneNumber }}
                       </span>
                     </li>
                   </ul>
@@ -97,65 +147,11 @@
   </section>
 
 
-
-  <div>
-    <br><br>
-
-    <table border="1" style="border-collapse: collapse; margin-bottom: 1rem; width: 100%;">
-      <thead>
-        <tr>
-          <th>UUID Cita</th>
-          <th>Status</th>
-          <th>Created At</th>
-          <th>Servicios</th>
-          <th>Asistentes</th>
-          <th>Cliente</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let appointment of scheduledAppointments">
-          <td>{{ appointment.uuid }}</td>
-          <td>{{ appointment.status }}</td>
-          <td>{{ appointment.createdAt | date:'short' }}</td>
-
-          <!-- Servicios en la misma celda -->
-          <td>
-            <ul>
-              <li *ngFor="let service of appointment.selectedServices">
-                {{ service.name }} ({{ service.minutes }} min, {{ service.price | currency }})
-                <br>
-                {{ service.startDate | date:'shortTime' }} - {{ service.endDate | date:'shortTime' }}
-              </li>
-            </ul>
-          </td>
-
-          <!-- Asistentes en la misma celda -->
-          <td>
-            <ul>
-              <li *ngFor="let assistant of appointment.assistants">
-                {{ assistant.name }}
-              </li>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <li>
-                {{ appointment.client!.name }}
-              </li>
-            </ul>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-
-  </div>
-
-  <pre>
-    <span>
-      {{ scheduledAppointments | json}}
-
-    </span>
-  </pre>
+  <!--<pre>-->
+  <!--  <span>-->
+  <!--    {{ scheduledAppointments | json}}-->
+  <!---->
+  <!--  </span>-->
+  <!--</pre>-->
 
 </section>
