@@ -50,7 +50,8 @@ export const ApiRoutes = {
   getAllAssistants: `/assistant`,
   getAvailabilityTimeSlots: `/scheduling/availabilityTimeSlot`,
   getAvailableServices: `/scheduling/services/available`,
-  getScheduledAppointments: `/scheduling/appointment`
+  getScheduledAppointments: `/scheduling/appointment`,
+  getScheduledAppointmentsDetails: `/scheduling/appointment/details`
 
 };
 

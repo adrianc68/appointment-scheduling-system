@@ -34,6 +34,7 @@ export class RegisterServiceOfferComponent {
   selectedServices: string[] = [];
   systemMessage: string | undefined = '';
 
+  selectedAssistant?: Assistant;
   assistants: Assistant[] = [];
   assistantSelected: string | undefined;
 

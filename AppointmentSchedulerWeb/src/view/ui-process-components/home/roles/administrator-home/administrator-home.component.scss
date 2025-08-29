@@ -3,28 +3,33 @@
 @use "../../../../../styles/breakpoints.scss" as breakpoints;
 @use "sass:math";
 
-.admin-home-container {
+.main-section {
   width: 100%;
-  min-height: 100%;
+  min-height: calc(100svh - variables.$navbar-height);
+  height:100%;
   padding: variables.$padding-md;
-  @include mixins.flex-center;
+  display:flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.admin-sections {
-  text-decoration: none;
-  width: variables.$container-md;
 
-  ul {
-    @include mixins.flex-center;
-    list-style: none;
-    flex-wrap: wrap;
-    gap: variables.$spacing-md;
-  }
+ul {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  flex-wrap: wrap;
+  gap: variables.$spacing-md;
+  max-width: variables.$container-md;
+
+  // background-color: red;
 
   li {
     width: calc(math.div(variables.$container-md, 4) - variables.$spacing-md);
     height: calc(math.div(variables.$container-md, 4) - variables.$spacing-md);
   }
+
 
   a {
     @include mixins.flex-start;
@@ -43,6 +48,7 @@
   .page-icon {
     @include mixins.flex-center;
     font-size: 50px;
+    // background-color: red;
     height: 60%;
     width: 100%;
     text-align: center;
@@ -57,10 +63,9 @@
   }
 
   span {
+    flex:1;
+    // background-color: green;
     width: 100%;
-    margin-top: 10px;
     text-align: center;
   }
-
-
 }

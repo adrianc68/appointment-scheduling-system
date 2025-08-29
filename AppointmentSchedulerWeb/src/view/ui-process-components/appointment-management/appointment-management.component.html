@@ -1,21 +1,104 @@
-<section class="app-management p-all-md">
+<section class="main-section">
 
-  <button (click)="redirectToRegisterAppointment()">
-    Registrar cita
-  </button>
+  <h1 class="m-bottom-md">Citas agendadas</h1>
+  <div class="summary m-bottom-xl">
+    <div class="summary-item card">
+      <span class="t-muted"> Horarios registrados </span>
+      <span class="fw-bold fs-xl">1</span>
+    </div>
+    <div class="summary-item card">
+      <span class="t-muted">Horarios activos</span>
+      <span class="fw-bold fs-xl">2</span>
+    </div>
+    <div class="summary-item card">
+      <span class="t-muted">Horarios inactivos</span>
+      <span class="fw-bold fs-xl">3</span>
+    </div>
+  </div>
 
-  <hr>
-  <br><br><br>
+  <section class="data-container">
+    <section class="data-actions">
+      <div class="grid-input-search input container">
+        <label class="input-icon" for="search">
+          <mat-icon>search</mat-icon>
+        </label>
+        <input id="search" class="input" type="text" placeholder="Buscar..." />
+      </div>
+      <button class="button primary w-auto" (click)="redirectToRegisterAppointment()">
+        Registrar
+      </button>
+      <label>Desde: </label>
+      <input type="date" [ngModel]="startDate" (ngModelChange)="onDateRangeChange($event, 'start')" />
+      <label>Hasta: </label>
+      <input type="date" [ngModel]="endDate" (ngModelChange)="onDateRangeChange($event, 'end')" />
+    </section>
+
+    <div class="data-header">
+      <span class="fw-bold">Citas agendadas</span>
+    </div>
+    <div class="data-body">
+      <ul class="slot-container">
+        <li class="card-container card muted" *ngFor="let appointment of scheduledAppointments; let i = index">
+          <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
+            <div class="card-title">
+              <span class="fs-base fw-bold t-emphasis">
+                {{ appointment.client!.name}}
+              </span>
+              <span class="fs-base t-muted">
+                {{ appointment.startDate | slotDateRange: (appointment.endDate)}}
+              </span>
+              <span class="fs-base t-muted">
+                $ {{ appointment.totalCost }}
+              </span>
+              <span>
+              </span>
+            </div>
+            <button [class.clicked]="openedSlots.has(i)">
+              <mat-icon>
+                keyboard_arrow_right
+              </mat-icon>
+            </button>
+          </div>
+          <div class="card-body" [class.expanded]="openedSlots.has(i)">
+            <div class="wrapper p-left-md p-right-md">
+              <div class="slot-data-row">
+                <div class="slot-data">
+                  <span class="t-muted m-bottom-base">Servicios:</span>
+                  <ul>
+                    <li *ngFor="let selectedService of appointment.selectedServices">
+                      <span class="t-emphasis m-bottom-base">
+                        {{ selectedService.name }}
+                        {{ selectedService.startDate | readableDate }}
+                        {{ selectedService.endDate | readableDate }}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data">
+                </div>
+              </div>
+              <div class="slot-actions">
+                <span class="t-muted m-bottom-base">Acciones:</span>
+                <div class="actions">
+                  <!--<button (click)="redirectToEditSlot(slot)" class="button unbordered">-->
+                  <!--<span class="t-brand fs-sm">Editar</span>-->
+                  <!--</button>-->
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+
+    </div>
+
+  </section>
+
+
 
   <div>
-    <h2>Citas agendadas</h2>
-
-    <!-- Selector de rango de fechas -->
-    <label>Desde: </label>
-    <input type="date" [ngModel]="startDate" (ngModelChange)="onDateRangeChange($event, 'start')" />
-    <label>Hasta: </label>
-    <input type="date" [ngModel]="endDate" (ngModelChange)="onDateRangeChange($event, 'end')" />
-
     <br><br>
 
     <table border="1" style="border-collapse: collapse; margin-bottom: 1rem; width: 100%;">
@@ -26,6 +109,7 @@
           <th>Created At</th>
           <th>Servicios</th>
           <th>Asistentes</th>
+          <th>Cliente</th>
         </tr>
       </thead>
       <tbody>
@@ -50,14 +134,28 @@
             <ul>
               <li *ngFor="let assistant of appointment.assistants">
                 {{ assistant.name }}
-                <!--<br>{{ assistant.occupiedTimeRange.startDate | date:'shortTime' }} - {{ assistant.occupiedTimeRange.endDate | date:'shortTime' }}-->
+              </li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>
+                {{ appointment.client!.name }}
               </li>
             </ul>
           </td>
         </tr>
       </tbody>
     </table>
+
+
   </div>
 
-</section>
+  <pre>
+    <span>
+      {{ scheduledAppointments | json}}
 
+    </span>
+  </pre>
+
+</section>

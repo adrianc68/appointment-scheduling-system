@@ -28,7 +28,7 @@
       </button>
     </div>
     <div class="data-header">
-      <span>Servicios asignados</span>
+      <span class="fw-bold">Servicios asignados por asistente</span>
     </div>
     <div class="data-body">
       <div class="service-card-container">
@@ -51,7 +51,8 @@
                 <li *ngFor="let service of data.serviceOffer">
                   <div class="service-item-container">
                     <span class="t-emphasis">{{service.name}}</span>
-                    <span class="t-muted">Duración: {{service.minutes}} {{TranslationCodes.TC_MINUTES_LABEL | translate}}</span>
+                    <span class="t-muted">Duración: {{service.minutes}} {{TranslationCodes.TC_MINUTES_LABEL |
+                      translate}}</span>
                     <span class="t-muted">$ {{service.price}}</span>
                   </div>
                 </li>

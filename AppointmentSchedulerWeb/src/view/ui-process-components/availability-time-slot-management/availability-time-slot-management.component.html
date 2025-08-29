@@ -15,29 +15,30 @@
     </div>
   </div>
 
-  <section class="data-actions">
-    <div class="grid-input-search input container">
-      <label class="input-icon" for="search">
-        <mat-icon>search</mat-icon>
-      </label>
-      <input id="search" class="input" type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
-        placeholder="Buscar..." />
-    </div>
-    <button class="button primary w-auto" (click)="redirectToRegisterSlot()">
-      Registrar
-    </button>
-  </section>
-
   <section class="data-container">
+    <section class="data-actions">
+      <div class="grid-input-search input container">
+        <label class="input-icon" for="search">
+          <mat-icon>search</mat-icon>
+        </label>
+        <input id="search" class="input" type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
+          placeholder="Buscar..." />
+      </div>
+      <button class="button primary w-auto" (click)="redirectToRegisterSlot()">
+        Registrar
+      </button>
+    </section>
+
+
     <div class="data-header">
-      <span>Horarios registrados</span>
+      <span class="fw-bold">Horarios registrados</span>
     </div>
     <div class="data-body">
       <ul class="slot-container">
         <li class="card-container card muted" *ngFor="let slot of filteredItems; let i = index">
           <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
             <div class="card-title">
-              <span class="fs-base t-emphasis">
+              <span class="fs-base fw-bold t-emphasis">
                 {{ slot.startDate | slotDateRange: (slot.endDate) }}
               </span>
               <span class="fs-base t-muted">{{ slot.assistant.name }} </span>

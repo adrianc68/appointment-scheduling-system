@@ -17,6 +17,9 @@ import { AppointmentDTO } from "../dtos/response/appointment.dto";
 import { Appointment } from "../../view-model/business-entities/appointment";
 import { UnavailableTimeSlot } from "../../view-model/business-entities/unavailable-time-slot";
 import { UnavailableTimeSlotDTO } from "../dtos/unavailable-time-slot.dto";
+import { ClientDTO } from "../dtos/client.dto";
+import { Client } from "../../view-model/business-entities/client";
+import { RoleType } from "../../view-model/business-entities/types/role.types";
 
 @Injectable({
   providedIn: 'root'
@@ -151,6 +154,28 @@ export class SchedulerService {
 
   getScheduledOrConfirmedAppointments(startDate: string, endDate: string): Observable<OperationResult<Appointment[], ApiDataErrorResponse>> {
     return this.httpServiceAdapter.get<AppointmentDTO>(`${this.apiUrl}${ApiRoutes.getScheduledAppointments}?startDate=${startDate}&endDate=${endDate}`).pipe(
+      map((response: ApiResponse<AppointmentDTO[], ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<AppointmentDTO[]>(response)) {
+          const appointments: Appointment[] = response.data.map(dto => this.parseAppointments(dto));
+          return OperationResultService.createSuccess(appointments, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  getScheduledOrConfirmedAppointmentsAsStaff(startDate: string, endDate: string): Observable<OperationResult<Appointment[], ApiDataErrorResponse>> {
+    return this.httpServiceAdapter.get<AppointmentDTO>(`${this.apiUrl}${ApiRoutes.getScheduledAppointmentsDetails}?startDate=${startDate}&endDate=${endDate}`).pipe(
       map((response: ApiResponse<AppointmentDTO[], ApiDataErrorResponse>) => {
         if (this.httpServiceAdapter.isSuccessResponse<AppointmentDTO[]>(response)) {
           const appointments: Appointment[] = response.data.map(dto => this.parseAppointments(dto));
@@ -358,14 +383,14 @@ export class SchedulerService {
   private parseSlot(dto: AvailabilityTimeSlotDTO): AvailabilityTimeSlot {
     const unavailable = dto.unavailableTimeSlots.map(
       uts => new UnavailableTimeSlot(
-        new Date(uts.startDate), // convierto timestamp/ISO → Date en UTC
+        new Date(uts.startDate),
         new Date(uts.endDate)
       )
     );
 
     return new AvailabilityTimeSlot(
       dto.uuid,
-      new Date(dto.startDate),  // convierto timestamp → Date en UTC
+      new Date(dto.startDate),
       new Date(dto.endDate),
       dto.assistant,
       dto.status,
@@ -379,8 +404,22 @@ export class SchedulerService {
   }
 
   private parseAppointments(dto: AppointmentDTO): Appointment {
-    let data = new Appointment(dto.uuid, dto.startTime, dto.endTime, dto.date, dto.createdAt, dto.assistants, dto.status, dto.totalCost, dto.selectedServices);
+    let data = new Appointment(dto.uuid, new Date(dto.startDate), new Date(dto.endDate), dto.createdAt, dto.assistants, dto.status, dto.totalCost, dto.selectedServices,  this.mapClient(dto.client));
     return data;
+  }
+
+  private mapClient(dto?: ClientDTO): Client | undefined {
+    if (!dto) return undefined;
+    return new Client(
+      dto.uuid,
+      dto.email,
+      dto.phoneNumber,
+      dto.username,
+      dto.name,
+      RoleType.CLIENT,
+      dto.status,
+      dto.createdAt
+    );
   }
 
 

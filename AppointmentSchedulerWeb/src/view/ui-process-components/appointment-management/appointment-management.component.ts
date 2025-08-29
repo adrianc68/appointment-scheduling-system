@@ -17,10 +17,12 @@ import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/reada
 import { fromLocalToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
 import { Router } from '@angular/router';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
+import { MatIconModule } from '@angular/material/icon';
+import { SlotDateRangePipe } from '../../../cross-cutting/helper/date-utils/slot-date-range.pipe';
 
 @Component({
   selector: 'app-appointment-management',
-  imports: [CommonModule, FormsModule, ...SHARED_STANDALONE_COMPONENTS, ReadableDatePipe],
+  imports: [CommonModule, FormsModule, ...SHARED_STANDALONE_COMPONENTS, ReadableDatePipe, MatIconModule, SlotDateRangePipe, ReadableDatePipe],
   standalone: true,
   templateUrl: './appointment-management.component.html',
   styleUrl: './appointment-management.component.scss'
@@ -36,8 +38,16 @@ export class AppointmentManagementComponent {
   }
 
 
-  //startDate: string = "2024-01-01";
-  //endDate: string = "2026-01-01";
+  openedSlots = new Set<number>();
+
+  toggleSlot(index: number) {
+    if (this.openedSlots.has(index)) {
+      this.openedSlots.delete(index);
+    } else {
+      this.openedSlots.add(index);
+    }
+  }
+
 
   redirectToRegisterAppointment() {
     this.router.navigate([WebRoutes.appointment_management_register_as_staff]);
@@ -46,7 +56,8 @@ export class AppointmentManagementComponent {
   loadAppointments(startDate: string, endDate: string): void {
     this.scheduledAppointments = [];
 
-    this.schedulerService.getScheduledOrConfirmedAppointments(startDate, endDate).pipe(
+    this.schedulerService.getScheduledOrConfirmedAppointmentsAsStaff(startDate, endDate).pipe(
+
       switchMap((response: OperationResult<Appointment[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);

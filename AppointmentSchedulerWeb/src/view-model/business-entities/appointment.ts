@@ -1,27 +1,28 @@
+import { Client } from "./client";
 import { ScheduledService } from "./scheduled-service";
 import { AppointmentStatusType } from "./types/appointment-status.types";
 
 export class Appointment {
   uuid: string;
-  startTime: string;
-  endTime: string;
-  date: string;
+  startDate: Date;
+  endDate: Date;
   status?: AppointmentStatusType;
   totalCost?: number;
   createdAt: Date;
   assistants: Assistant[];
   selectedServices?: ScheduledService[]
+  client?: Client;
 
-  constructor(uuid: string, startTime: string, endTime: string, date: string, createdAt: Date, assistants: Assistant[], status?: AppointmentStatusType, totalCost?: number, selectedServices?: ScheduledService[]) {
+  constructor(uuid: string, startDate: Date, endDate: Date, createdAt: Date, assistants: Assistant[], status?: AppointmentStatusType, totalCost?: number, selectedServices?: ScheduledService[], client?: Client) {
     this.uuid = uuid;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.date = date;
+    this.startDate = startDate;
+    this.endDate = endDate;
     this.status = status;
     this.totalCost = totalCost;
     this.createdAt = createdAt;
     this.assistants = assistants;
     this.selectedServices = selectedServices;
+    this.client = client;
   }
 }
 

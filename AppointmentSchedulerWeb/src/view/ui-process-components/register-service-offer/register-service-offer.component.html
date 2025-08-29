@@ -1,106 +1,139 @@
 <section class="main-section">
-  <h1>Selecciona un asistente</h1>
-  <p>Debes seleccionar un asistente que no tenga servicios asignados y seleccionar los servicios que quieres que el
-    asistente pueda ofrecer</p>
-  <div class="assistant-table-container">
-    <table class="assistant-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Usuario</th>
-          <th>Email</th>
-          <th>Teléfono</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let data of assistants">
-          <td class="fw-bold">
-            {{data.name}}
-          </td>
-          <td>{{data.username}}</td>
-          <td>{{data.email}}</td>
-          <td>{{data.phoneNumber}}</td>
-          <td>{{data.status}}</td>
-          <td>
-            <button class="" (click)="getAssignedServicesOfAssistant(data.uuid)">
-              Seleccionar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
 
-<section class="assigned-services-container p-all-md">
-  <h2>Servicios asignados del asistente</h2>
-  <p>Estos son los servicios asignados al asistente:</p>
-  <div class="service-table-container">
-    <table class="service-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Precio</th>
-          <th>Estado</th>
-          <th>Duración</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let data of servicesOfferAssigned">
-          <td class="t-emphasis">{{data.name}}</td>
-          <td class="t-muted">$ {{data.price}}</td>
-          <td class="t-muted">{{data.status}}</td>
-          <td class="t-muted">{{data.minutes}} minutos</td>
-          <td class="actions">
-            <button class="" (click)="enableAssignedService(data.uuid)">
-              Activar
+  <section class="assistant-select data-section sp-bottom card">
+    <h2 class="m-bottom-lg">1. Selecciona un asistente</h2>
+    <div class="data-container">
+      <div class="data-actions">
+        <div class="input container max-w-sm">
+          <label class="input-icon" for="search">
+            <mat-icon>search</mat-icon>
+          </label>
+          <input id="search" class="input" type="text" placeholder="Buscar..." />
+        </div>
+      </div>
+      <div class="data-header">
+        <span>Asistentes disponibles</span>
+      </div>
+      <div class="data-body">
+        <div class="assistants-container scroll-visible">
+          <li class="assistant-card" *ngFor="let data of assistants">
+            <div class="card-icon">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="card-body">
+              <h3 class="fs-base">{{ data.name }}</h3>
+              <p class="fs-xs"> {{ data.username }}</p>
+              <p class="fs-xs">{{ data.phoneNumber }}</p>
+            </div>
+            <button (click)="selectedAssistant = data; getAssignedServicesOfAssistant(data.uuid)"
+              class="button m-y-center unbordered w-auto p-all-sm">
+              <span class="fs-sm t-brand">Seleccionar</span>
             </button>
-            <button class="" (click)="disableAssignedService(data.uuid)">
-              Desactivar
-            </button>
-            <button class="" (click)="deleteAssignedService(data.uuid)">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
+        </div>
+      </div>
+    </div>
+    <div class="data-selected m-top-md" *ngIf="selectedAssistant">
+      <h3 class="m-bottom-md">Asistente seleccionado: </h3>
+      <div class="assistant-summary">
+        <div>
+          <span class="fs-base t-muted m-bottom-base"> Nombre:</span>
+          <span class="fs-base t-emphasis">{{ selectedAssistant.name }}</span>
+        </div>
+        <div>
+          <span class="fs-base t-muted m-bottom-base"> Nombre de usuario:</span>
+          <span class="fs-base t-emphasis"> {{ selectedAssistant.username}}</span>
+        </div>
+        <div>
+          <span class="fs-base t-muted m-bottom-base"> Correo:</span>
+          <span class="fs-base t-emphasis"> {{ selectedAssistant.email}}</span>
+        </div>
+        <div>
+          <span class="fs-base t-muted m-bottom-base"> Telefono:</span>
+          <span class="fs-base t-emphasis"> {{ selectedAssistant.phoneNumber}}</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<section class="all-services-container p-all-md">
-  <h2>Servicios disponibles para asignar</h2>
-  <p>Estos son los servicios que puedes asignar al asistente seleccionado:</p>
-  <div class="service-table-container">
-    <table class="service-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Precio</th>
-          <th>Duración</th>
-          <th>Descripción</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let data of serviceNotAssignedOfAssistant">
-          <td class="t-emphasis">{{data.name}}</td>
-          <td class="t-muted">$ {{data.price}}</td>
-          <td class="t-muted">{{data.minutes}} minutos</td>
-          <td class="t-muted">{{data.description}}</td>
-          <td class="t-muted">{{data.status}}</td>
-          <td class="actions">
-            <button class="btn btn-assign" (click)="assignService(data.uuid)">
-              Asignar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
+  <section class="assigned-services data-section sp-bottom card">
+    <h2 class="m-bottom-lg">Servicios asignados</h2>
+    <div class="data-container">
+      <div class="data-actions">
+        <div class="input container max-w-sm">
+          <label class="input-icon" for="search">
+            <mat-icon>search</mat-icon>
+          </label>
+          <input id="search" class="input" type="text" placeholder="Buscar..." />
+        </div>
+      </div>
+      <div class="data-header">
+        <span>Servicios asignados</span>
+      </div>
+      <div class="data-body">
+        <div class="assigned-services-container scroll-visible">
+          <li class="assigned-service-card" *ngFor="let data of servicesOfferAssigned">
+            <div class="card-icon">
+              <mat-icon>business_center</mat-icon>
+            </div>
+            <div class="card-body">
+              <span class="t-emphasis fw-bold m-bottom-base">{{data.name}}</span>
+              <span class="t-muted fs-sm">$ {{data.price}}</span>
+              <span class="t-muted fs-sm">{{data.minutes}} minutos</span>
+              <span class="t-muted fs-sm">{{data.description}}</span>
+              <span class="t-muted fs-sm">{{data.status}}</span>
+            </div>
+            <td class="actions">
+              <button class="button  unbordered w-auto p-all-sm m-bottom-base"
+                (click)="enableAssignedService(data.uuid)">
+                <span class="fs-sm t-brand">Activar</span>
+              </button>
+              <button class=" button  unbordered w-auto p-all-sm m-bottom-base"
+                (click)="disableAssignedService(data.uuid)">
+                <span class="fs-sm t-brand">Desactivar</span>
+              </button>
+              <button class="button  unbordered w-auto p-all-sm" (click)="deleteAssignedService(data.uuid)">
+                <span class="fs-sm t-danger">Desvincular</span>
+              </button>
+            </td>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <section class="services-available data-section sp-bottom card">
+    <h2 class="m-bottom-lg">Servicios disponibles</h2>
+    <div class="data-container">
+      <div class="data-actions">
+        <div class="input container max-w-sm">
+          <label class="input-icon" for="search">
+            <mat-icon>search</mat-icon>
+          </label>
+          <input id="search" class="input" type="text" placeholder="Buscar..." />
+        </div>
+      </div>
+      <div class="data-header">
+        <span>Servicios disponibles para asignar</span>
+      </div>
+      <div class="data-body">
+        <ul class="services-available-container scroll-visible">
+          <li class="service-available-card" *ngFor="let data of serviceNotAssignedOfAssistant">
+            <div class="card-icon">
+              <mat-icon>business_center</mat-icon>
+            </div>
+            <div class="card-body">
+              <span class="t-emphasis fw-bold m-bottom-base">{{data.name}}</span>
+              <span class="t-muted fs-sm">Precio: ${{data.price}}</span>
+              <span class="t-muted fs-sm">Minutos: {{data.minutes}} minutos</span>
+              <span class="t-muted fs-sm">{{data.description}}</span>
+              <span class="t-muted fs-sm">{{data.status}}</span>
+            </div>
+            <div class="actions">
+              <button class="button m-y-center unbordered w-auto p-all-sm" (click)="assignService(data.uuid)">
+                <span class="fs-sm t-brand">Asignar</span>
+              </button>
+            </div>
+        </ul>
+      </div>
+    </div>
+  </section>
+</section>
