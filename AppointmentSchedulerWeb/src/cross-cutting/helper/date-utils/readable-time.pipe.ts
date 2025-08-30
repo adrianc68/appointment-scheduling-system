@@ -22,7 +22,7 @@ export class ReadableTimePipe implements PipeTransform {
     });
   }
 
-  transform(isoString: string | Date | undefined, timeZone?: string): string {
+  transform(isoString: string | Date | null | undefined, timeZone?: string): string {
     if (!isoString) return '';
 
     const date = new Date(isoString);

@@ -154,6 +154,7 @@
   --cal-bg-inverted: #070a0d;
   --cal-bg-brand: #2563eb;
   --cal-bg-info: #17a2b8;
+  --cal-bg-selected: #90CAF9;
   --cal-bg-success: #28a745;
   --cal-bg-warning: #ffc107;
   --cal-border: #d1d5db;
@@ -183,6 +184,7 @@
   --cal-bg-inverted: #fafafa;
   --cal-bg-brand: #2563eb;
   --cal-bg-info: #17a2b8;
+  --cal-bg-selected: #1E40AF;
   --cal-bg-success: #28a745;
   --cal-bg-warning: #ffc107;
   --cal-border: #4d4d4d;
@@ -238,6 +240,7 @@ $success-color: #28a745;
 $danger-color: #dc3545;
 $selected-color: #64b5f6;
 
+$bg-selected: var(--cal-bg-selected);
 
 // Fonts
 // $font-family-primary: 'Roboto', sans-serif;

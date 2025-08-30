@@ -13,10 +13,16 @@ import { OperationResult } from '../../../cross-cutting/communication/model/oper
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
+import { Client } from '../../../view-model/business-entities/client';
+import { ClientService } from '../../../model/communication-components/client.service';
+import { SlotDateRangePipe } from '../../../cross-cutting/helper/date-utils/slot-date-range.pipe';
+import { ReadableTimePipe } from '../../../cross-cutting/helper/date-utils/readable-time.pipe';
+import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
+import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
 
 @Component({
   selector: 'app-register-appointment-as-staff',
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, SlotDateRangePipe, ReadableTimePipe, ReadableDatePipe, DurationDatePipe],
   templateUrl: './register-appointment-as-staff.component.html',
   styleUrl: './register-appointment-as-staff.component.scss'
 })
@@ -26,12 +32,84 @@ export class RegisterAppointmentAsStaffComponent {
   translationCodes = TranslationCodes
   servicesAvailable: ServiceOffer[] = [];
   scheduledAppointments: Appointment[] = [];
+  clients: Client[] = [];
+  selectedDate: string = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+  selectedServicesOffer: ServiceOffer[] = [];
 
 
-  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService) {
+  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService, private clientService: ClientService) {
+
+    this.clientService.getClientList().pipe(
+      switchMap((response: OperationResult<Client[], ApiDataErrorResponse>): Observable<boolean> => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          this.clients = [...response.result!];
+          this.clients.map(d => console.log(d));
+          this.systemMessage = code;
+          return of(true);
+        } else {
+          this.handleErrorResponse(response);
+          return of(false);
+        }
+      })
+    ).subscribe({
+      next: (result) => {
+        console.log(result);
+        //if(result) {
+        //  thos.setSuccessfulTask();
+        //} else {
+        //  this.setUn
+        //}
+      },
+      error: (err) => {
+        this.logginService.error(err);
+
+      }
+    })
+
   }
 
 
+  openedSlots = new Set<number>();
+
+  toggleSlot(index: number) {
+    if (this.openedSlots.has(index)) {
+      this.openedSlots.delete(index);
+    } else {
+      this.openedSlots.add(index);
+    }
+  }
+
+  getTotalMinutes(): number {
+    if (!this.selectedServicesOffer) return 0;
+    return this.selectedServicesOffer.reduce((total, service) => total + service.minutes, 0);
+  }
+
+  getTotalPrice(): number {
+    if (!this.selectedServicesOffer) return 0;
+    return this.selectedServicesOffer.reduce((total, service) => total + service.price, 0);
+  }
+
+  selectServiceOffer(serviceOffer: ServiceOffer) {
+    const exists = this.selectedServicesOffer.some(s => s.uuid === serviceOffer.uuid);
+    if (!exists) {
+      this.selectedServicesOffer.push(serviceOffer);
+
+      const index = this.servicesAvailable.findIndex(service => service.uuid === serviceOffer.uuid);
+      if (index !== -1) {
+        this.servicesAvailable.splice(index, 1);
+      }
+    }
+  }
+
+  removeSelectedService(serviceOffer: ServiceOffer) {
+    const index = this.selectedServicesOffer.findIndex(service => service.uuid === serviceOffer.uuid);
+    if (index !== -1) {
+      this.selectedServicesOffer.splice(index, 1);
+
+      this.servicesAvailable.push(serviceOffer);
+    }
+  }
   //startDate: string = "2024-01-01";
   //endDate: string = "2026-01-01";
 
@@ -39,7 +117,7 @@ export class RegisterAppointmentAsStaffComponent {
   loadAppointments(startDate: string, endDate: string): void {
     this.scheduledAppointments = [];
 
-    this.schedulerService.getScheduledOrConfirmedAppointments(startDate, endDate).pipe(
+    this.schedulerService.getScheduledOrConfirmedAppointmentsAsStaff(startDate, endDate).pipe(
       switchMap((response: OperationResult<Appointment[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
@@ -67,11 +145,11 @@ export class RegisterAppointmentAsStaffComponent {
   blockTimeRange(): void {
 
     const payload = {
-      date: this.appointmentFormData.date,
-      clientUuid: this.appointmentFormData.clientUuid,
-      selectedServices: this.appointmentFormData.selectedServices.map(s => ({
+      date: this.selectedDate,
+      clientUuid: this.selectedClient?.uuid,
+      selectedServices: this.selectedServicesOffer.map(s => ({
         uuid: s.uuid,
-        startTime: s.startTime
+        startTime: this.startTimes[s.uuid]
       }))
     }; this.schedulerService.blockTimeRange(payload).pipe(
       switchMap((response: OperationResult<Date, ApiDataErrorResponse>): Observable<boolean> => {
@@ -96,36 +174,16 @@ export class RegisterAppointmentAsStaffComponent {
     )
   }
 
-  appointmentFormData = {
-    date: '',
-    clientUuid: '',
-    selectedServices: [
-      {
-        uuid: '',
-        startTime: ''
-      }
-    ]
-  };
 
-  addService(): void {
-    this.appointmentFormData.selectedServices.push({
-      uuid: '',
-      startTime: ''
-    });
-  }
-
-  removeService(index: number): void {
-    this.appointmentFormData.selectedServices.splice(index, 1);
-  }
 
   registerAppointmentAsClient(): void {
 
     const payload = {
-      date: this.appointmentFormData.date,
-      clientUuid: this.appointmentFormData.clientUuid.trim(),
-      selectedServices: this.appointmentFormData.selectedServices.map(s => ({
-        uuid: s.uuid.trim(),
-        startTime: s.startTime
+      date: this.selectedDate,
+      clientUuid: this.selectedClient?.uuid,
+      selectedServices: this.selectedServicesOffer.map(s => ({
+        uuid: s.uuid,
+        startTime: this.startTimes[s.uuid]
       }))
     };
 
@@ -153,15 +211,17 @@ export class RegisterAppointmentAsStaffComponent {
   }
 
 
+  selectedClient?: Client;
+
   registerAppointmentAsStaff(): void {
     console.log("called");
 
     const payload = {
-      date: this.appointmentFormData.date,
-      clientUuid: this.appointmentFormData.clientUuid.trim(),
-      selectedServices: this.appointmentFormData.selectedServices.map(s => ({
-        uuid: s.uuid.trim(),
-        startTime: s.startTime
+      date: this.selectedDate,
+      clientUuid: this.selectedClient?.uuid,
+      selectedServices: this.selectedServicesOffer.map(s => ({
+        uuid: s.uuid,
+        startTime: this.startTimes[s.uuid]
       }))
     };
 
@@ -189,18 +249,32 @@ export class RegisterAppointmentAsStaffComponent {
   }
 
 
+  startTimes: { [uuid: string]: string } = {};
+  getEarliestStartTime(): Date | null {
+    if (!this.selectedServicesOffer || this.selectedServicesOffer.length === 0) return null;
 
+    const times = this.selectedServicesOffer
+      .map(s => this.startTimes[s.uuid]) // tomamos del mapa
+      .filter(t => t)                     // eliminamos undefined/null
+      .map(t => new Date(`${this.selectedDate}T${t}`)); // combinamos con la fecha del appointment
 
+    if (times.length === 0) return null;
 
+    return new Date(Math.min(...times.map(d => d.getTime())));
+  }
 
+  // Devuelve la hora de fin estimada sumando la duración total
+  getEstimatedEndTime(): Date | null | undefined {
+    const start = this.getEarliestStartTime();
+    if (!start) return null;
 
+    const totalMinutes = this.getTotalMinutes();
+    const end = new Date(start.getTime());
+    end.setMinutes(end.getMinutes() + totalMinutes);
 
+    return end;
+  }
 
-
-
-
-
-  selectedDate: string = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 
   onDateChange(date: string) {
     this.selectedDate = date;

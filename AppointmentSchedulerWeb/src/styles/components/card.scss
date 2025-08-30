@@ -16,7 +16,11 @@
   }
 
   &.muted {
-
     background-color: variables.$bg-muted;
+  }
+
+  &.transparent {
+    box-shadow: none;
+    background-color: transparent;
   }
 }

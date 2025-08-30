@@ -50,30 +50,30 @@
             </button>
           </div>
           <div class="card-body" [class.expanded]="openedSlots.has(i)">
-            <div class="wrapper p-left-md p-right-md">
-              <div class="slot-data-row">
-                <div class="slot-data">
-                  <span class="m-bottom-base t-muted">Fecha</span>
+            <div class="wrapper p-all-md">
+              <div class="slot-data-row unbordered">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Fecha</span>
                   <span class="t-emphasis">{{ (slot.startDate | slotDateRange: (slot.endDate)).split('|')[0]}}</span>
                 </div>
-                <div class="slot-data">
-                  <span class="m-bottom-base t-muted">Horario inicio</span>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Horario inicio</span>
                   <span class="t-emphasis">{{ slot.startDate | readableTime }}</span>
                 </div>
               </div>
               <div class="slot-data-row">
-                <div class="slot-data">
-                  <span class="m-bottom-base t-muted">Horario fin</span>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Horario fin</span>
                   <span class="t-emphasis">{{ slot.endDate | readableTime }}</span>
                 </div>
-                <div class="slot-data">
-                  <span class="m-bottom-base t-muted">Nombre del asistente</span>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Nombre del asistente</span>
                   <span class="t-emphasis">{{ slot.assistant.name }}</span>
                 </div>
               </div>
               <div class="slot-data-row">
-                <div class="slot-data">
-                  <span class="m-bottom-base t-muted">Estado</span>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Estado</span>
                   <span class="slot-status"
                     [ngClass]="{'t-success': slot.status === 'ENABLED','t-danger': slot.status === 'DISABLED'}">
                     {{ slot.status }}
@@ -81,8 +81,8 @@
                 </div>
               </div>
               <div class="slot-data-row">
-                <div class="slot-data">
-                  <span class="t-muted m-bottom-base">Rangos bloqueados:</span>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Rangos bloqueados:</span>
                   <ul>
                     <li *ngFor="let uSlot of slot.unavailableTimeSlots">
                       <span class="t-emphasis m-bottom-base">

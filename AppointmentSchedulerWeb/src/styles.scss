@@ -168,11 +168,49 @@ li {
 span {
   font-size: variables.$font-size-base;
   color: variables.$text;
+  display: inline-block;
+
+  &.d-inline {
+    display: inline;
+  }
+
   // word-break: break-word;
   // overflow-wrap: break-word;
   // hyphens: auto;
   // -webkit-hyphens: auto;
   // -ms-hyphens: auto;
+}
+
+.word-no-break {
+  white-space: nowrap;
+}
+
+.word-break-normal {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.word-break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.word-break-break-word {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.word-break-break-all {
+  word-break: break-all;
+}
+
+.word-break-keep-all {
+  word-break: keep-all;
+}
+
+.word-break-hyphens {
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 strong {
@@ -476,6 +514,14 @@ $width: (
   color: variables.$text;
   width: auto;
   height: auto;
+
+  &.brand {
+    color: variables.$bg-brand;
+  }
+
+  &.danger {
+    color: variables.$text-error;
+  }
 }
 
 .mat-icon.inverted {
@@ -632,6 +678,18 @@ $width: (
 
 // FLEX
 
+.d-inline {
+  display: inline;
+}
+
+.d-inline-block {
+  display: inline-block;
+}
+
+.d-block {
+  display: block;
+}
+
 .d-flex {
   display: flex;
 }
@@ -687,4 +745,73 @@ $width: (
 
 .gap-lg {
   gap: variables.$spacing-lg;
+}
+
+.selected-item-bg {
+  background-color: variables.$bg-selected;
+  // background-color: var(--selected-color-bg);
+  // background-color: rgba(variables.$bg-selected, 0.9); // más suave
+
+
+}
+
+
+.slot-data-row {
+  display: flex;
+  // flex-wrap: wrap;
+  // background-color: green;
+  justify-content: space-between;
+  gap: variables.$spacing-base;
+  // border-bottom: 1px solid variables.$border-subtle;
+  padding-top: variables.$padding-sm;
+  padding-bottom: variables.$padding-sm;
+
+
+  &.type-inline {
+    display: inline-flex;
+    // background-color: green;
+  }
+
+  &.type-card {
+    // border: 1px;
+    border: 0;
+    // border-color: variables.$border-subtle;
+    // border-style: solid;
+    border-radius: variables.$border-radius-md;
+    background-color: variables.$bg-subtle;
+  }
+
+
+  .slot-data {
+    // background-color: blue;
+    display: flex;
+    // max-width:150px;
+    // flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    // background-color: gold;
+
+    &.d-inline {
+      display: inline;
+
+      span,
+      p {
+        display: inline;
+      }
+    }
+
+    span,
+    p {
+      font-size: variables.$font-size-sm;
+
+      &.fs-base {
+        font-size: variables.$font-size-base;
+      }
+
+      &.fs-xs {
+        font-size: variables.$font-size-xs;
+      }
+    }
+  }
 }

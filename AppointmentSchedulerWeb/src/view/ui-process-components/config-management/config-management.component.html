@@ -119,8 +119,26 @@
 
         <button class="button primary" (click)="changeTimeZone()">Aplicar</button>
       </div>
-
     </section>
+
+    <section class="item-management card">
+      <div class="item-header">
+        <h1>Moneda local</h1>
+        <div class="item-description">
+          <span class="fw-bold t-emphasis fs-md">Moneda local del sistema</span>
+          <p>Este cambia la moneda local dentro de su navegador.</p>
+        </div>
+      </div>
+
+      <div class="item-content">
+        <!--<select [(ngModel)]="selectedTimeZone" class="input">-->
+        <!--  <option *ngFor="let tz of availableTimeZones" [value]="tz">{{ tz }}</option>-->
+        <!--</select>-->
+
+        <button class="button primary">Aplicar</button>
+      </div>
+    </section>
+
   </div>
 
 </div>

@@ -14,15 +14,16 @@ import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-util
 import { Appointment } from '../../../view-model/business-entities/appointment';
 import { FormsModule } from '@angular/forms';
 import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
-import { fromLocalToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
 import { Router } from '@angular/router';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { MatIconModule } from '@angular/material/icon';
 import { SlotDateRangePipe } from '../../../cross-cutting/helper/date-utils/slot-date-range.pipe';
+import { ReadableTimePipe } from '../../../cross-cutting/helper/date-utils/readable-time.pipe';
+import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
 
 @Component({
   selector: 'app-appointment-management',
-  imports: [CommonModule, FormsModule, ...SHARED_STANDALONE_COMPONENTS, ReadableDatePipe, MatIconModule, SlotDateRangePipe, ReadableDatePipe],
+  imports: [CommonModule, FormsModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule, SlotDateRangePipe, ReadableDatePipe, ReadableTimePipe, DurationDatePipe],
   standalone: true,
   templateUrl: './appointment-management.component.html',
   styleUrl: './appointment-management.component.scss'
@@ -48,7 +49,6 @@ export class AppointmentManagementComponent {
     }
   }
 
-
   redirectToRegisterAppointment() {
     this.router.navigate([WebRoutes.appointment_management_register_as_staff]);
   }
@@ -62,7 +62,12 @@ export class AppointmentManagementComponent {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.scheduledAppointments = [...response.result!];
-          this.scheduledAppointments.map(d => console.log(d));
+          this.scheduledAppointments = [...response.result!].sort((a, b) => {
+            const dateA = new Date(a.startDate).getTime();
+            const dateB = new Date(b.startDate).getTime();
+            return dateA - dateB;
+          });
+
           this.systemMessage = code;
           return of(true);
         } else {

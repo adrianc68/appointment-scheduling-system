@@ -3,11 +3,11 @@
 @use '../../../styles/breakpoints.scss' as breakpoints;
 
 .main-section {
-  // max-width: variables.$container-xl;
   padding-right: variables.$padding-md;
   padding-left: variables.$padding-md;
   padding-top: variables.$padding-lg;
   padding-bottom: variables.$padding-lg;
+
 }
 
 .summary {
@@ -128,28 +128,6 @@
       max-height: 1000px;
       visibility: visible;
       opacity: 1;
-    }
-
-    .slot-data-row {
-      display: flex;
-      justify-content: space-between;
-      gap: variables.$spacing-base;
-      border-bottom: 1px solid variables.$border-subtle;
-      padding-top: variables.$padding-md;
-      padding-bottom: variables.$padding-md;
-
-      .slot-data {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: flex-start;
-        width: 100%;
-
-
-        span {
-          font-size: variables.$font-size-sm;
-        }
-      }
     }
 
 

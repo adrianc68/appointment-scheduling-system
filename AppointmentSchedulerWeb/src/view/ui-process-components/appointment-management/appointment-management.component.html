@@ -3,15 +3,15 @@
   <h1 class="m-bottom-md">Citas agendadas</h1>
   <div class="summary m-bottom-xl">
     <div class="summary-item card">
-      <span class="t-muted"> Horarios registrados </span>
+      <span class="t-muted"> Resumen </span>
       <span class="fw-bold fs-xl">1</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">Horarios activos</span>
+      <span class="t-muted">Resumen</span>
       <span class="fw-bold fs-xl">2</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">Horarios inactivos</span>
+      <span class="t-muted">Resumen 3</span>
       <span class="fw-bold fs-xl">3</span>
     </div>
   </div>
@@ -71,87 +71,195 @@
 
           </div>
           <div class="card-body" [class.expanded]="openedSlots.has(i)">
-            <div class="wrapper p-left-md p-right-md">
-              <div class="slot-data-row">
-                <div class="slot-data">
-                  <span class="fs-base t-muted">
-                    $ {{ appointment.totalCost }}
-                  </span>
-                  <ul class="w-100 bg-blue">
-                    <li class="" *ngFor="let selectedService of appointment.scheduledServices">
-                      <div class="d-flex gap-lg">
-                        <div class="d-flex m-bottom-base">
-                          <span class="t-muted">
-                            Servicio:
-                          </span>
-                          <span class="t-emphasis m-left-base">
-                            {{ selectedService.service.name }}
-                          </span>
-                        </div>
-                      </div>
-                      <div class="d-flex m-bottom-base">
-                        <span class="m-botom-base t-muted">
-                          Asistente:
-                        </span>
-                        <span class="t-emphasis m-left-base">
-                          {{ selectedService.assistant.name}}
-                        </span>
-                      </div>
-                      <div class="d-flex-col m-bottom-base">
-                        <span class="m-bottom-base t-muted">
-                          Fecha de servicio:
-                        </span>
-                        <span class="t-emphasis">
-                          {{ selectedService.service.startDate | slotDateRange: (selectedService.service.endDate) }}
-                        </span>
-                      </div>
+            <div class="wrapper p-all-md">
+              <div class="data-mgt">
+                <div class="slot-data-row unbordered">
+                  <div class="slot-data  d-flex-col">
+                    <span class="t-muted">
+                      Fecha de creación:
+                    </span>
+                    <span class="t-emphasis ">
+                      {{ appointment.createdAt | readableDate }}
+                    </span>
+                  </div>
+                  <div class="slot-data d-flex-col">
+                    <span class="t-muted">
+                      Fecha:
+                    </span>
+                    <span class="t-emphasis ">
+                      {{ (appointment.startDate | slotDateRange: (appointment.endDate)).split('|')[0]}}
+                    </span>
+                  </div>
+                </div>
+                <div class="slot-data-row">
+                  <div class="slot-data d-flex-col">
+                    <span class="t-muted">
+                      Hora de inicio:
+                    </span>
+                    <span class="t-emphasis ">
+                      {{ appointment.startDate | readableTime }}
+                    </span>
+                  </div>
+                  <div class="slot-data d-flex-col">
+                    <span class="t-muted">
+                      Hora de fin:
+                    </span>
+                    <span class="t-emphasis">
+                      {{ appointment.endDate | readableTime }}
+                    </span>
+                  </div>
+                </div>
+                <div class="slot-data-row">
+                  <div class="slot-data d-flex-col">
+                    <span class="t-muted">
+                      Estado:
+                    </span>
+                    <span class="t-emphasis">
+                      {{ appointment.status }}
+                    </span>
+                  </div>
+                  <div class="slot-data d-flex-col">
+                    <span class="t-muted">
+                      Costo:
+                    </span>
+                    <span class="t-emphasis">
+                      $ {{ appointment.totalCost}}
+                    </span>
+                  </div>
+                </div>
+                <div class="slot-data-row">
+                  <div class="slot-data d-flex-col">
+                    <span class="t-muted">
+                      Duración:
+                    </span>
+                    <span class="t-emphasis">
+                      {{ appointment.startDate | durationDate:appointment.endDate }}
+                    </span>
+                  </div>
+                </div>
 
-                      <br>
-                      <br>
-                      <br>
-                      <span>
-                        {{ selectedService.service.startDate | slotDateRange: (selectedService.service.endDate) }}
-                      </span>
-                      <span>
-                        {{ selectedService.assistant.name }}
-                      </span>
-                      <span>
-                        {{ selectedService.assistant.username }}
-                      </span>
-                      <span>
-                        {{ selectedService.assistant.phoneNumber }}
-                      </span>
-                    </li>
-                  </ul>
+                <div class="slot-data-row">
+                  <div class="slot-data d-flex-col">
+                    <span class="t-muted">
+                      Identificador:
+                    </span>
+                    <span class="t-emphasis fs-xs">
+                      {{ appointment.uuid }}
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div class="slot-data-row">
-                <div class="slot-data">
+
+              <div class="data-mgt m-bottom-md m-top-md">
+                <span class="t-muted">Cliente: </span>
+                <div class="slot-data-row unbordered">
+                  <div class="slot-data d-flex-col">
+                    <span class="t-muted">
+                      Nombre:
+                    </span>
+                    <span class="t-emphasis">
+                      {{ appointment.client!.name }}
+                    </span>
+                  </div>
+                  <div class="slot-data d-flex-col">
+                    <span class="t-muted">
+                      Teléfono:
+                    </span>
+                    <span class="t-emphasis">
+                      {{ appointment.client!.phoneNumber }}
+                    </span>
+                  </div>
+                </div>
+                <div class="slot-data-row">
+                  <div class="slot-data d-flex-col">
+                    <span class="t-muted">
+                      Usuario:
+                    </span>
+                    <span class="t-emphasis">
+                      {{ appointment.client?.username }}
+                    </span>
+                  </div>
+                </div>
+                <div class="slot-data-row">
+                  <div class="slot-data d-flex-col">
+                    <span class="t-muted">
+                      Correo:
+                    </span>
+                    <span class="t-emphasis">
+                      {{ appointment.client!.email }}
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div class="slot-actions">
-                <span class="t-muted m-bottom-base">Acciones:</span>
-                <div class="actions">
-                  <!--<button (click)="redirectToEditSlot(slot)" class="button unbordered">-->
-                  <!--<span class="t-brand fs-sm">Editar</span>-->
-                  <!--</button>-->
+              <span class="t-muted">Servicios: </span>
+              <div class="slot-data-row type-card d-flex-col transparent p-all-sm m-top-base"
+                *ngFor="let scheduleService of appointment.scheduledServices">
+                <div class="slot-data d-inline">
+                  <span class="t-muted">
+                    Servicio:
+                  </span>
+                  <span class="t-emphasis m-left-base">
+                    {{ scheduleService.service.name }}
+                  </span>
+                </div>
+                <div class="slot-data d-inline">
+                  <span class="t-muted">
+                    Precio:
+                  </span>
+                  <span class="t-emphasis m-left-base">
+                    $ {{ scheduleService.service.price }}
+                  </span>
+                </div>
+                <div class="slot-data d-inline">
+                  <span class="t-muted">
+                    Fecha:
+                  </span>
+                  <span class="t-emphasis m-left-base">
+                    {{ (scheduleService.service.startDate | slotDateRange: (scheduleService.service.endDate))}}
+                  </span>
+                </div>
+                <div class="slot-data d-inline">
+                  <span class="t-muted">
+                    Duración:
+                  </span>
+                  <span class="t-emphasis m-left-base">
+                    {{ scheduleService.service.startDate | durationDate:scheduleService.service.endDate}}
+                  </span>
+                </div>
+              </div>
+
+              <span class="t-muted m-top-md">Asistentes: </span>
+              <div class="slot-data-row type-card d-flex-col transparent p-all-sm m-top-base"
+                *ngFor="let scheduleService of appointment.scheduledServices">
+                <div class="slot-data d-inline">
+                  <span class="t-muted">
+                    Asistente:
+                  </span>
+                  <span class="t-emphasis m-left-base">
+                    {{ scheduleService.assistant.name }}
+                  </span>
+                </div>
+                <div class="slot-data d-inline">
+                  <span class="t-muted">
+                    Teléfono:
+                  </span>
+                  <span class="t-emphasis m-left-base">
+                    {{ scheduleService.assistant.phoneNumber }}
+                  </span>
+                </div>
+                <div class="slot-data d-inline">
+                  <span class="t-muted">
+                    Fecha de servicio:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ (scheduleService.service.startDate | slotDateRange: (scheduleService.service.endDate))}}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
         </li>
       </ul>
-
     </div>
-
   </section>
-
-
-  <!--<pre>-->
-  <!--  <span>-->
-  <!--    {{ scheduledAppointments | json}}-->
-  <!---->
-  <!--  </span>-->
-  <!--</pre>-->
-
 </section>
