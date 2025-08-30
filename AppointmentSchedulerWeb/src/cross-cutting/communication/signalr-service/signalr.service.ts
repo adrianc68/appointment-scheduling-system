@@ -19,15 +19,15 @@ export class SignalRService implements OnDestroy {
   private authSubscription!: Subscription;
 
   constructor(private authService: AuthenticationService, private logginService: LoggingService, private configService: ConfigService) {
-    this.authSubscription = this.authService.getCredentials().pipe(
-      map((credentials: UserCredentialsJwt | null) => credentials?.accessToken)
-    ).subscribe(token => {
-      if (token) {
-        this.initConnection(token);
-      } else {
-        this.stopConnection();
-      }
-    });
+    //this.authSubscription = this.authService.getCredentials().pipe(
+    //  map((credentials: UserCredentialsJwt | null) => credentials?.accessToken)
+    //).subscribe(token => {
+    //  if (token) {
+    //    this.initConnection(token);
+    //  } else {
+    //    this.stopConnection();
+    //  }
+    //});
   }
 
   public removeMessageListener(methodName: string) {
@@ -78,29 +78,29 @@ export class SignalRService implements OnDestroy {
   }
 
   private initConnection(accessToken: string) {
-    if (this.hubConnection) {
-      this.stopConnection();
-    }
-
-    this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${this.configService.getApiBaseUrl()}${WebRoutes.notification_hub}?${LocalStorageKeys.access_token}=${accessToken}`)
-      .configureLogging(signalR.LogLevel.Information)
-      .withAutomaticReconnect()
-      .build();
-
-    this.startConnection();
+    //if (this.hubConnection) {
+    //  this.stopConnection();
+    //}
+    //
+    //this.hubConnection = new signalR.HubConnectionBuilder()
+    //  .withUrl(`${this.configService.getApiBaseUrl()}${WebRoutes.notification_hub}?${LocalStorageKeys.access_token}=${accessToken}`)
+    //  .configureLogging(signalR.LogLevel.Information)
+    //  .withAutomaticReconnect()
+    //  .build();
+    //
+    //this.startConnection();
   }
 
   private async startConnection() {
-    try {
-      await this.hubConnection.start();
-      this.connectionEstablished.next(true);
-
-    } catch (err) {
-      this.logginService.error(err);
-      setTimeout(() => this.startConnection(), 5000);
-      this.connectionEstablished.next(false);
-    }
+    //try {
+    //  await this.hubConnection.start();
+    //  this.connectionEstablished.next(true);
+    //
+    //} catch (err) {
+    //  this.logginService.error(err);
+    //  setTimeout(() => this.startConnection(), 5000);
+    //  this.connectionEstablished.next(false);
+    //}
   }
 
 

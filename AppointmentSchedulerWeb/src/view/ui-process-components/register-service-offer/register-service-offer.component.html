@@ -16,7 +16,9 @@
       </div>
       <div class="data-body">
         <div class="assistants-container scroll-visible">
-          <li class="assistant-card" *ngFor="let data of assistants">
+          <li class="assistant-card" [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
+            (click)="selectedAssistant = data; getAssignedServicesOfAssistant(data.uuid)"
+            *ngFor="let data of assistants">
             <div class="card-icon">
               <mat-icon>person</mat-icon>
             </div>
@@ -25,10 +27,6 @@
               <p class="fs-xs"> {{ data.username }}</p>
               <p class="fs-xs">{{ data.phoneNumber }}</p>
             </div>
-            <button (click)="selectedAssistant = data; getAssignedServicesOfAssistant(data.uuid)"
-              class="button m-y-center unbordered w-auto p-all-sm">
-              <span class="fs-sm t-brand">Seleccionar</span>
-            </button>
         </div>
       </div>
     </div>

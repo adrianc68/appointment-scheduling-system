@@ -309,9 +309,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .Where(a => a.Status != ServiceOfferStatusType.DELETED)
                 .ToListAsync();
 
-            Console.WriteLine("********************");
-            PropToString.PrintListData(dbServiceOffer);
-
             if (dbServiceOffer == null)
                 return [];
 

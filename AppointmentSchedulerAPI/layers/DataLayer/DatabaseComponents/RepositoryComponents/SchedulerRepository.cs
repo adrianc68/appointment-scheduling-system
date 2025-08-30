@@ -140,10 +140,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .ToListAsync();
 
 
-
-            Console.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-            PropToString.PrintListData(appointmentDB);
-
             var appointmentsModel = appointmentDB.Select(app => new BusinessLogicLayer.Model.Appointment
             {
                 StartDate = app.StartDate,
@@ -191,10 +187,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             }).ToList();
 
 
-            Console.WriteLine("<<<<<<<<<<<<<<<<<<<<<< MODELBUSINESS");
-
-            PropToString.PrintListData(appointmentsModel);
-            
 
             return appointmentsModel;
         }
@@ -318,8 +310,6 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
         public async Task<bool> IsAppointmentTimeSlotAvailableAsync(BusinessLogicLayer.Model.Types.DateTimeRange range)
         {
-            PropToString.PrintData(range);
-
             using var dbContext = context.CreateDbContext();
             bool isAvailable = await dbContext.Appointments
          .AnyAsync(a =>
