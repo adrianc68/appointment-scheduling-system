@@ -136,7 +136,13 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     .ThenInclude(asinf => asinf!.UserInformation)
                 .Include(cli => cli.Client)
                     .ThenInclude(asacc => asacc!.UserAccount)
+                    .ThenInclude(asacc => asacc!.UserInformation)
                 .ToListAsync();
+
+
+
+            Console.WriteLine("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            PropToString.PrintListData(appointmentDB);
 
             var appointmentsModel = appointmentDB.Select(app => new BusinessLogicLayer.Model.Appointment
             {
@@ -150,7 +156,13 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 Client = new BusinessLogicLayer.Model.Client
                 {
                     Uuid = app.Client!.UserAccount!.Uuid,
-                    Id = app.Client.IdUserAccount
+                    Id = app.Client.IdUserAccount,
+                    Name = app.Client.UserAccount.UserInformation!.Name,
+                    PhoneNumber = app.Client.UserAccount.UserInformation!.PhoneNumber,
+                    Username =  app.Client.UserAccount.Username,
+                    Email = app.Client.UserAccount.Email,
+                    Status =  (BusinessLogicLayer.Model.Types.AccountStatusType?)app.Client.UserAccount.Status
+
                 },
                 ScheduledServices = app.ScheduledServices!.Select(aso => new BusinessLogicLayer.Model.ScheduledService
                 {
@@ -178,6 +190,12 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 }).ToList(),
             }).ToList();
 
+
+            Console.WriteLine("<<<<<<<<<<<<<<<<<<<<<< MODELBUSINESS");
+
+            PropToString.PrintListData(appointmentsModel);
+            
+
             return appointmentsModel;
         }
 
@@ -190,7 +208,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
 
 
             var availableServices = await dbContext.AvailabilityTimeSlots
-                .Where(slot => slot.StartDate >= startDateTime && slot.EndDate <= endDateTime && slot.Status == Model.Types.AvailabilityTimeSlotStatusType.ENABLED)
+                .Where(slot => slot.StartDate >= startDateTime && slot.EndDate <= endDateTime && slot.Status != Model.Types.AvailabilityTimeSlotStatusType.DELETED)
                     .Include(a => a.Assistant)
                         .ThenInclude(ass => ass!.UserAccount)
                         .ThenInclude(assc => assc!.UserInformation)
@@ -232,7 +250,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             using var dbContext = context.CreateDbContext();
 
             var availableServices = await dbContext.AvailabilityTimeSlots
-                .Where(slot => slot.StartDate >= startDateTime && slot.StartDate <= endDateTime)
+                .Where(slot => slot.StartDate >= startDateTime && slot.StartDate <= endDateTime && slot.Status == Model.Types.AvailabilityTimeSlotStatusType.ENABLED)
                 .Include(slot => slot.Assistant)
                     .ThenInclude(assistant => assistant!.UserAccount)
                     .ThenInclude(userAccount => userAccount!.UserInformation)
@@ -242,32 +260,35 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .ToListAsync();
 
             var serviceOffers = availableServices
-                .SelectMany(slot => slot.Assistant?.ServiceOffers!.Select(asService => new BusinessLogicLayer.Model.ServiceOffer
-                {
-                    Assistant = new BusinessLogicLayer.Model.Assistant
-                    {
-                        Id = slot.Assistant!.UserAccount!.Id,
-                        Uuid = slot.Assistant!.UserAccount!.Uuid,
-                        Name = slot.Assistant!.UserAccount!.UserInformation!.Name,
-                        PhoneNumber = slot.Assistant!.UserAccount!.UserInformation!.Name,
-                        Email = slot.Assistant!.UserAccount!.UserInformation!.Name,
-                    },
-                    Service = new BusinessLogicLayer.Model.Service
-                    {
-                        Name = asService.Service!.Name,
-                        Price = asService.Service!.Price,
-                        Minutes = asService.Service!.Minutes,
-                        Description = asService.Service?.Description,
-                        Uuid = asService.Service!.Uuid,
-                        Id = asService.Service!.Id
-                    },
-                    Id = asService.Id,
-                    Uuid = asService.Uuid,
-                    Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType)asService.Status
-                }) ?? [])
-                // 🔑 aquí eliminamos duplicados
-                .DistinctBy(so => so.Uuid)
-                .ToList();
+                   .SelectMany(slot =>
+                       slot.Assistant?.ServiceOffers!
+                           .Where(asService => asService.Status != Model.Types.ServiceOfferStatusType.DELETED) 
+                           .Select(asService => new BusinessLogicLayer.Model.ServiceOffer
+                           {
+                               Assistant = new BusinessLogicLayer.Model.Assistant
+                               {
+                                   Id = slot.Assistant!.UserAccount!.Id,
+                                   Uuid = slot.Assistant!.UserAccount!.Uuid,
+                                   Name = slot.Assistant!.UserAccount!.UserInformation!.Name,
+                                   PhoneNumber = slot.Assistant!.UserAccount!.UserInformation!.PhoneNumber,
+                                   Email = slot.Assistant!.UserAccount!.UserInformation!.UserAccount!.Email,
+                               },
+                               Service = new BusinessLogicLayer.Model.Service
+                               {
+                                   Name = asService.Service!.Name,
+                                   Price = asService.Service!.Price,
+                                   Minutes = asService.Service!.Minutes,
+                                   Description = asService.Service?.Description,
+                                   Uuid = asService.Service!.Uuid,
+                                   Id = asService.Service!.Id
+                               },
+                               Id = asService.Id,
+                               Uuid = asService.Uuid,
+                               Status = (BusinessLogicLayer.Model.Types.ServiceOfferStatusType)asService.Status
+                           }) ?? []
+                   )
+                   .DistinctBy(so => so.Uuid)
+                   .ToList();
 
             return serviceOffers;
         }

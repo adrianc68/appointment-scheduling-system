@@ -930,13 +930,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 EndDate = slotData!.EndDate,
             };
 
-            bool isAvailabilityTimeSlotAvailable = await schedulerMgr.IsAvailabilityTimeSlotAvailableAsync(range, slotData.Assistant!.Id!.Value);
-            if (!isAvailabilityTimeSlotAvailable)
-            {
-                GenericError genericError = new("Time range is not available. Another Time slot is disabled or enabled", new Dictionary<string, object>());
-                genericError.AdditionalData!.Add("Range", range);
-                return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_AVAILABLE);
-            }
+            // bool isAvailabilityTimeSlotAvailable = await schedulerMgr.IsAvailabilityTimeSlotAvailableAsync(range, slotData.Assistant!.Id!.Value);
+            // if (!isAvailabilityTimeSlotAvailable)
+            // {
+            //     GenericError genericError = new("Time range is not available. Another Time slot is disabled or enabled", new Dictionary<string, object>());
+            //     genericError.AdditionalData!.Add("Range", range);
+            //     return OperationResult<bool, GenericError>.Failure(genericError, MessageCodeType.AVAILABILITY_TIME_SLOT_NOT_AVAILABLE);
+            // }
 
             bool isStatusChanged = await schedulerMgr.ChangeAvailabilityStatusTypeAsync(slotData!.Id!.Value, AvailabilityTimeSlotStatusType.ENABLED);
             if (!isStatusChanged)

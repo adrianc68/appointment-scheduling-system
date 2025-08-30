@@ -122,7 +122,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [HttpDelete("availabilityTimeSlot/delete")]
         [Authorize]
         [AllowedRoles(RoleType.ADMINISTRATOR)]
-        public async Task<IActionResult> DeleteAvailabilityTimeSlot([FromBody] DeleteAvailabilityTimeSlotDTO dto)
+        public async Task<IActionResult> DeleteAvailabilityTimeSlot([FromQuery] DeleteAvailabilityTimeSlotDTO dto)
         {
             bool isStatusChanged = false;
             try
@@ -402,30 +402,87 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     EndDate = app.EndDate,
                     Status = app.Status,
                     CreatedAt = app.CreatedAt ?? DateTime.MinValue,
-                    SelectedServices = app.ScheduledServices?.Select(ss => new ScheduledServiceDTO
+                    ScheduledServices = app.ScheduledServices!.Select(serviceSelected => new AppointmentServiceDTO
                     {
-                        EndDate = ss.ServiceEndDate ?? DateTime.MinValue,
-                        StartDate = ss.ServiceStartDate ?? DateTime.MinValue,
-                        Minutes = ss.ServicesMinutes,
-                        Price = ss.ServicePrice,
-                        Name = ss.ServiceName,
-                        Uuid = ss.ServiceOffer!.Uuid ?? Guid.Empty,
-                    }).ToList() ?? new List<ScheduledServiceDTO>(),
-                    Assistants = app.ScheduledServices?.Select(se => new AsisstantOfferDTO
-                    {
-                        Name = se.ServiceOffer?.Assistant?.Name ?? "",
-                        Uuid = se.ServiceOffer?.Assistant?.Uuid ?? Guid.Empty,
-                        OccupiedTimeRange = new ServiceOfferRangeDTO
+                        Assistant = new AssistantScheduledServiceDTO
                         {
-                            StartDate = se.ServiceStartDate ?? DateTime.MinValue,
-                            EndDate = se.ServiceEndDate ?? DateTime.MinValue
+                            Name = serviceSelected.ServiceOffer!.Assistant!.Name,
+                            Uuid = serviceSelected.ServiceOffer!.Assistant.Uuid,
+                            PhoneNumber = serviceSelected.ServiceOffer!.Assistant.PhoneNumber,
+                            Email = serviceSelected.ServiceOffer.Assistant!.Email
+                        },
+                        Service = new ScheduledServiceDTO
+                        {
+                            StartDate = serviceSelected.ServiceStartDate!.Value.Date,
+                            EndDate = serviceSelected.ServiceEndDate!.Value.Date,
+                            Price = serviceSelected.ServicePrice,
+                            Minutes = serviceSelected.ServicesMinutes,
+                            Name = serviceSelected.ServiceName,
+                            Uuid = serviceSelected.ServiceOffer.Uuid!.Value
                         }
-                    }).ToList() ?? new List<AsisstantOfferDTO>()
+                    }).ToList(),
+                }).ToList();
+
+            }
+
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(appointments, ApiVersionEnum.V1);
+        }
+
+        [HttpGet("appointment/details")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT)]
+        public async Task<IActionResult> GetAppointmentsDetailsFromScheduler([FromQuery] GetAllAppointmentsDTO dto)
+        {
+            List<AppointmentDetailsDTO> appointments = [];
+            try
+            {
+                List<Appointment> result = await systemFacade.GetScheduledOrConfirmedAppoinmentsAsync(dto.StartDate, dto.EndDate);
+
+
+                
+                appointments = result.Select(app => new AppointmentDetailsDTO
+                {
+                    Uuid = app.Uuid ?? Guid.Empty,
+                    StartDate = app.StartDate,
+                    EndDate = app.EndDate,
+                    Status = app.Status,
+                    TotalCost = app.TotalCost,
+                    CreatedAt = app.CreatedAt ?? DateTime.MinValue,
+                    Client = new ClientAppointmentDTO
+                    {
+                        Uuid = app.Client?.Uuid,
+                        Name = app.Client?.Name,
+                        PhoneNumber = app.Client?.PhoneNumber,
+                        Email = app.Client?.Email,
+                        Username = app.Client?.Username
+                    },
+                    ScheduledServices = app.ScheduledServices!.Select(serviceSelected => new AppointmentServiceDTO
+                    {
+                        Assistant = new AssistantScheduledServiceDTO
+                        {
+                            Name = serviceSelected.ServiceOffer!.Assistant!.Name,
+                            Uuid = serviceSelected.ServiceOffer!.Assistant.Uuid,
+                            PhoneNumber = serviceSelected.ServiceOffer!.Assistant.PhoneNumber,
+                            Email = serviceSelected.ServiceOffer.Assistant!.Email
+                        },
+                        Service = new ScheduledServiceDTO
+                        {
+                            StartDate = serviceSelected.ServiceStartDate!.Value,
+                            EndDate = serviceSelected.ServiceEndDate!.Value,
+                            Price = serviceSelected.ServicePrice,
+                            Minutes = serviceSelected.ServicesMinutes,
+                            Name = serviceSelected.ServiceName,
+                            Uuid = serviceSelected.ServiceOffer.Uuid!.Value
+                        }
+                    }).ToList(),
                 }).ToList();
 
 
 
-                PropToString.PrintListData(appointments);
             }
 
             catch (System.Exception ex)
@@ -460,7 +517,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         PhoneNumber = app.Client.PhoneNumber,
                         Email = app.Client.Email,
                     },
-                    Assistants = [],
+
                 }).ToList();
             }
             catch (System.Exception ex)
@@ -590,16 +647,9 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT)]
         public async Task<IActionResult> ScheduleAppointmentAsStaff([FromBody] CreateAppointmentAsStaffDTO dto)
         {
-            Console.WriteLine("******************** BEFORE CHANGES ASSTAFF **********************");
-            PropToString.PrintData(dto);
-            Console.WriteLine("******************** BEFORE CHANGES ASSSTAF **********************");
-
-
-
             Guid? guid;
             try
             {
-                // Calcula el StartDate del appointment basado en la hora más temprana
                 DateTime startDateTime = dto.SelectedServices
                     .Min(s => DateTime.SpecifyKind(dto.Date.ToDateTime(s.StartTime), DateTimeKind.Local).ToUniversalTime());
 
@@ -611,7 +661,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     Uuid = Guid.CreateVersion7()
                 };
 
-                // Convierte cada servicio a UTC explícitamente
                 foreach (var serviceOffer in dto.SelectedServices)
                 {
                     appointment.ScheduledServices!.Add(new ScheduledService
@@ -651,9 +700,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         public async Task<IActionResult> BlockTimeRange([FromBody] BlockTimeRangeDTO dto)
         {
 
-            Console.WriteLine("******************** BEFORE CHANGES **********************");
-            PropToString.PrintData(dto);
-            Console.WriteLine("******************** BEFORE CHANGES **********************");
 
             var claims = ClaimsPOCO.GetUserClaims(User);
             if (claims.Role == RoleType.CLIENT && claims.Uuid != dto.ClientUuid)
@@ -668,26 +714,18 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             var earliestTime = dto.SelectedServices.Min(s => s.StartTime);
             var latestTime = dto.SelectedServices.Max(s => s.StartTime);
 
-            // var earliestTime = dto.SelectedServices.Min(s => s.StartTime);
-            // var latestTime = dto.SelectedServices.MaxBy(s => s.StartTime); // C# 9+
-
-
-            // Convierte correctamente la fecha + hora local a UTC
             DateTimeRange range = new DateTimeRange
             {
                 StartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(earliestTime), DateTimeKind.Local).ToUniversalTime(),
                 EndDate = DateTime.SpecifyKind(dto.Date.ToDateTime(latestTime), DateTimeKind.Local).ToUniversalTime()
             };
 
-            // Convierte cada servicio a UTC
             List<ScheduledService> services = dto.SelectedServices.Select(service => new ScheduledService
             {
                 Uuid = service.Uuid,
                 ServiceStartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(service.StartTime), DateTimeKind.Local).ToUniversalTime()
             }).ToList();
 
-            PropToString.PrintData(range);
-            PropToString.PrintListData(services);
 
             OperationResult<DateTime, GenericError> result = await systemFacade.BlockTimeRangeAsync(services, range, dto.ClientUuid);
 
