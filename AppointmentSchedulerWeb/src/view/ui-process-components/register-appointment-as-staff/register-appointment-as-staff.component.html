@@ -263,7 +263,7 @@
         <span class="fw-bold">Clientes registrados</span>
       </div>
       <div class="data-body">
-        <div class="client-card-container">
+        <div class="client-card-container scroll-visible">
           <div class="client-data" [class.selected-item-bg]="selectedClient?.uuid === data.uuid"
             (click)="selectedClient = data" *ngFor="let data of clients">
             <mat-icon class="profile-icon">person</mat-icon>
