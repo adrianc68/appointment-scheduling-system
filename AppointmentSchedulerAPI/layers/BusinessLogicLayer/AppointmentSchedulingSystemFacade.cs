@@ -69,14 +69,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
         public async Task<OperationResult<DateTime, GenericError>> BlockTimeRangeAsync(List<ScheduledService> services, DateTimeRange range, Guid clientUuid)
         {
-            Console.WriteLine("******************** BLOCK TIME RANGE CHANGES **********************");
-            PropToString.PrintData(range);
-            Console.WriteLine("******************** LOCK TIME RANGE CHANGES **********************");
-            Console.WriteLine("******************** LOCK TIME RANGE CHANGES **********************");
-            PropToString.PrintListData(services);
-            Console.WriteLine("******************** LOCK TIME RANGE CHANGES **********************");
-
-
             DateTime currentDateTime = DateTime.Now;
             int MAX_DAYS_FROM_NOW = int.Parse(envService.Get("MAX_DAYS_FOR_SCHEDULE"));
             int MAX_WEEKS_FOR_SCHEDULE = int.Parse(envService.Get("MAX_WEEKS_FOR_SCHEDULE"));

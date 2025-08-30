@@ -191,7 +191,8 @@ var app = builder.Build();
 
 app.UseStaticFiles();
 app.UseCors(policy => policy
-    .WithOrigins("http://localhost:4200", "http://localhost:8080", "http://192.168.50.63:4200", "https://appointment-scheduler-web-seven.vercel.app/")
+    // .WithOrigins("http://localhost:4200", "http://localhost:8080", "http://192.168.50.63:4200", "https://appointment-scheduler-web-seven.vercel.app/")
+    .WithOrigins("https://play.angeladrian.mx")
     // .AllowAnyOrigin()
     .AllowAnyHeader()
     .AllowAnyMethod()
@@ -247,7 +248,7 @@ app.UseMiddleware<HttpResponseAuthorizationMiddleware>();
 app.UseAuthorization();
 
 
-app.MapHub<NotificationHub>("/notificationHub");
+// app.MapHub<NotificationHub>("/notificationHub");
 app.MapControllers();
 
 app.Run($"http://0.0.0.0:{port}");
