@@ -18,7 +18,7 @@
   .notification-title {
     padding: variables.$padding-sm;
     @include mixins.flex-start;
-    border-bottom: variables.$border-width solid variables.$border;
+    border-bottom: 1px solid variables.$border;
   }
 
   .notification-data {
@@ -38,9 +38,9 @@
   @include mixins.flex-center;
 
   .icon {
-    height: variables.$icon-size-md;
-    width: variables.$icon-size-md;
-    font-size: variables.$icon-size-md;
+    height: 2rem;
+    width: 2rem;
+    font-size: 2rem;
   }
 }
 

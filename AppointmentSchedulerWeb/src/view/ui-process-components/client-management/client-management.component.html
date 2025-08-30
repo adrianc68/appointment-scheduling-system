@@ -1,46 +1,48 @@
-<div class="client-management-container">
-  <div class="client-management-title">
-    <h1>{{translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY | translate}}</h1>
-  </div>
-
-  <div class="client-summary">
-    <div class="client-summary-item card">
+<section class="main-section">
+  <h1 class="m-bottom-md">Clientes</h1>
+  <div class="summary m-bottom-xl">
+    <div class="summary-item card">
       <span class="t-muted">{{translationCodes.TC_CLIENTS_REGISTERED_LABEL | translate}}</span>
       <span class="fw-bold fs-xl">{{clients.length}}</span>
     </div>
-    <div class="client-summary-item card">
+    <div class="summary-item card">
       <span class="t-muted">{{translationCodes.TC_CLIENTS_AVAILABLE_LABEL | translate}}</span>
       <span class="fw-bold fs-xl">{{enabledClientsCount}}</span>
     </div>
-    <div class="client-summary-item card">
+    <div class="summary-item card">
       <span class="t-muted">{{translationCodes.TC_CLIENTS_NOT_AVAILABLE_LABEL | translate}}</span>
       <span class="fw-bold fs-xl">{{disabledClientsCount}}</span>
     </div>
   </div>
 
-  <div class="client-management-actions">
-    <div class="button-register">
-      <button class="button" (click)="redirectToRegisterClient()">
+  <section class="data-container">
+    <section class="data-actions">
+      <div class="input container max-w-sm">
+        <label class="input-icon" for="search"><mat-icon>search</mat-icon></label>
+        <input id="search" class="input" type="text" placeholder="Buscar..." />
+      </div>
+      <button class="button primary w-auto" (click)="redirectToRegisterClient()">
         {{translationCodes.TC_REGISTER_BUTTON_LABEL | translate}}
       </button>
+    </section>
+    <div class="data-header">
+      <span class="fw-bold">Clientes registrados</span>
     </div>
-  </div>
-
-
-  <div class="client-table-content">
-    <app-grid-list [title]="translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY" [items]="clients"
-      [cardComponent]="clientCard" [filters]="[
-      { key: 'status', label: 'Estado', type: 'enum', enumValues: [AccountStatusType.ENABLED, AccountStatusType.DISABLED] },
-      { key: 'createdAt', label: 'Fecha de Creación', type: 'date' },
-      { key: 'appointmentDateTime', label: 'Fecha y Hora de Cita', type: 'datetime' },
-      { key: 'status', label: 'Estados', type: 'multi'},
-      { key: 'status1', label: 'Estados', type: 'multi'},
-      { key: 'status3', label: 'Estados', type: 'multi'},
-      { key: 'status2', label: 'Estados', type: 'multi'}
-      ]">
-
-    </app-grid-list>
-
-  </div>
-
-</div>
+    <div class="data-body">
+      <div class="client-card-container">
+        <div class="client-data" *ngFor="let data of clients">
+          <mat-icon class="profile-icon">person</mat-icon>
+          <div class="client-info">
+            <span class="fw-bold">{{data.name}} ({{data.username}})</span>
+            <span class="fs-sm t-secondary">{{data.email}}</span>
+            <span class="fs-sm t-secondary">{{data.phoneNumber}}</span>
+            <span class="fs-sm t-secondary">{{data.status! | translate}}</span>
+          </div>
+          <button class="button unbordered t-brand w-auto m-y-center" (click)="redirectToEditClient(data)">
+            Editar
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>

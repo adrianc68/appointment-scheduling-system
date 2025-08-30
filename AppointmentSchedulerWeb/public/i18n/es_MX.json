@@ -122,6 +122,7 @@
   "TC_APPOINTMENT_CREATE_DIRECTORY": "Citas",
   "TC_CONFIGURATION_DIRECTORY_ASPECT": "Aspecto",
   "TC_CONFIGURATION_DIRECTORY_LANGUAGE": "Idioma",
+  "TC_CONFIGURATION_DIRECTORY_DATETIME": "Hora local",
   "TC_VALIDATION_ERROR": "Los datos enviados son inválidos",
   "TC_GENERIC_ERROR_CONFLICT": "Hay un conflicto con los datos",
   "TC_EMAIL_DATA_LABEL": "Correo electrónico:",

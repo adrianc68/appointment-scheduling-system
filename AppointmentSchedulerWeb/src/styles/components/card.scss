@@ -3,10 +3,24 @@
 @use '../variables' as variables;
 
 .card {
-  border: variables.$border-width;
+  border: 1px;
   border-color: variables.$border;
   border-style: solid;
   border-radius: variables.$border-radius-md;
   box-shadow: variables.$shadow-sm;
   background-color: variables.$bg;
+
+  &.subtle {
+
+    background-color: variables.$bg-subtle;
+  }
+
+  &.muted {
+    background-color: variables.$bg-muted;
+  }
+
+  &.transparent {
+    box-shadow: none;
+    background-color: transparent;
+  }
 }

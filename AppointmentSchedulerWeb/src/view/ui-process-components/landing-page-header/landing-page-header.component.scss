@@ -4,10 +4,10 @@
 
 .header {
   background-color: variables.$bg-subtle;
-  border-bottom: variables.$border-width;
+  border-bottom: 1px;
   border-color: variables.$border;
   box-shadow: variables.$shadow-sm;
-  height: variables.$header-landing-height;
+  height: variables.$navbar-height;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -37,7 +37,7 @@
   left: 0;
   width: 100%;
   display: none;
-  height: calc(100vh - variables.$header-landing-height);
+  height: calc(100vh - variables.$navbar-height);
   flex-direction: column;
   text-align: center;
 
@@ -52,7 +52,7 @@
     height: auto;
 
     &:not(:last-child) {
-      border-bottom: variables.$border-width solid variables.$border;
+      border-bottom: 1px solid variables.$border;
     }
   }
 

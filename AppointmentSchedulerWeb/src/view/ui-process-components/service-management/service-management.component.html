@@ -1,82 +1,51 @@
-<div class="service-management-container">
-  <div class="service-management-title">
-    <h1>{{ translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY | translate}}</h1>
-  </div>
+<section class="main-section">
+  <h1 class="m-bottom-md">Servicios</h1>
 
-  <div class="service-summary">
-    <div class="service-summary-item card">
+  <section class="summary m-bottom-xl">
+    <div class="summary-item card">
       <span class="t-muted">{{translationCodes.TC_SERVICES_REGISTERED_LABEL | translate}}</span>
       <span class="fw-bold fs-xl">{{services.length}}</span>
     </div>
-
-    <div class="service-summary-item card">
+    <div class="summary-item card">
       <span class="t-muted">{{translationCodes.TC_SERVICES_AVAILABLE_LABEL | translate}}</span>
       <span class="fw-bold fs-xl">{{enabledServiceCount}}</span>
     </div>
-
-    <div class="service-summary-item card">
+    <div class="summary-item card">
       <span class="t-muted">{{translationCodes.TC_SERVICES_NOT_AVAILABLE_LABEL | translate}}</span>
       <span class="fw-bold fs-xl">{{disabledServiceCount}}</span>
-
     </div>
+  </section>
 
-  </div>
-
-  <div class="service-management-actions">
-    <div class="button-register">
-      <button class="button" (click)="redirectToRegisterService()">
-        {{translationCodes.TC_REGISTER_BUTTON_LABEL | translate}}
+  <section class="data-container">
+    <section class="data-actions">
+      <div class="input container max-w-sm">
+        <label class="input-icon" for="search"><mat-icon>search</mat-icon></label>
+        <input id="search" class="input" type="text" placeholder="Buscar..." />
+      </div>
+      <button class="button primary w-auto" (click)="redirectToRegisterService()">
+        Registrar
       </button>
-    </div>
-  </div>
+    </section>
+    <section class="data-header">
+      <span class="fw-bold">Servicios registrados</span>
+    </section>
+    <section class="data-body">
+      <div class="service-card-container">
+        <div class="service-data" *ngFor="let data of services">
+          <mat-icon class="profile-icon">business_center</mat-icon>
+          <div class="service-info">
+            <span class="fw-bold">{{data.name}} ({{data.name}})</span>
+            <span class="fs-sm t-secondary">{{data.price}}</span>
+            <span class="fs-sm t-secondary">{{data.minutes}}</span>
+            <span class="fs-sm t-secondary">{{data.description}}</span>
+            <span class="fs-sm t-secondary">{{data.status | translate}}</span>
+          </div>
+          <button class="button unbordered t-brand w-auto m-y-center" (click)="redirectToEditService(data)">
+            Editar
+          </button>
+        </div>
+      </div>
+    </section>
+  </section>
 
-  <div class="service-table-content">
-    <app-grid-list [title]="'test'" [items]="services" [cardComponent]="serviceCard">
-
-    </app-grid-list>
-
-
-  </div>
-
-
-</div>
-
-
-<!---->
-<!---->
-<!--<h1>{{translate(translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY)}}</h1>-->
-<!---->
-<!--<button class="button" (click)="redirectToRegisterService()">-->
-<!--  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}-->
-<!--</button>-->
-<!---->
-<!--<table border="1">-->
-<!--  <thead>-->
-<!--    <tr>-->
-<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_NAME_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_DESCRIPTION_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_MINUTES_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_PRICE_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_STATUS_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_CREATED_AT_LABEL)}}</th>-->
-<!--      <th>{{translate(translationCodes.TC_SERVICE_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>-->
-<!---->
-<!--    </tr>-->
-<!--  </thead>-->
-<!--  <tbody>-->
-<!--    <tr *ngFor="let service of services">-->
-<!--      <td>{{service.name}}</td>-->
-<!--      <td>{{service.description}}</td>-->
-<!--      <td>{{service.minutes}}</td>-->
-<!--      <td>{{service.price}}</td>-->
-<!--      <td>{{service.status}}</td>-->
-<!--      <td>{{service.createdAt}}</td>-->
-<!--      <td>-->
-<!--        <button class="button" (click)="redirectToEditService(service)">-->
-<!--          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}-->
-<!--        </button>-->
-<!--      </td>-->
-<!--    </tr>-->
-<!---->
-<!--  </tbody>-->
-<!--</table>-->
+</section>

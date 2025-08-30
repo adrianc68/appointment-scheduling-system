@@ -5,10 +5,15 @@
 
 
 .sidebar {
-  position: fixed;
-  width: 0px;
-  height: calc(100dvh - variables.$header-height);
-  transition: width variables.$transition-duration-medium variables.$ease-in-out;
+  width: 100%;
+  height: 100%;
+  transition: width 0.3s ease-in-out,
+  opacity 0.3s ease,
+  visibility 0.3s ease,
+  #{variables.$color-transition};
+  will-change: width;
+  will-change: margin-left;
+  transition: visibility 0.3s 'ease-in-out';
   padding-bottom: variables.$padding-md;
   display: flex;
   overflow: hidden;
@@ -16,12 +21,14 @@
   flex-direction: column;
   background-color: variables.$bg-muted;
   z-index: variables.$z-index-top;
+  visibility: hidden;
 
   .sidebar-bs-operations {
     flex-grow: 1;
   }
 
   li {
+    flex: 1;
 
     a,
     button {
@@ -29,19 +36,21 @@
       align-items: center;
       justify-content: flex-start;
       text-decoration: none;
-      border:0;
-      border-radius:0px;
-      gap: variables.$spacing-small;
+      border: 0;
+      border-radius: 0px;
+      gap: variables.$spacing-sm;
       padding-top: variables.$padding-md;
       padding-bottom: variables.$padding-md;
-      padding-left: calc(math.div((math.div(1, 4) * variables.$sidebar-width), 2) - math.div(variables.$icon-size-md, 2));
-      color: variables.$text;
+      padding-left: calc(math.div((math.div(1, 4) * 250px), 2) - math.div(2rem, 2));
 
       .sidebar-icon {
-        min-width: variables.$icon-size-md;
-        max-width: variables.$icon-size-md;
-        width: variables.$icon-size-md;
-        height: variables.$icon-size-md;
+        min-width: 2rem;
+        max-width: 2rem;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       span {
@@ -66,12 +75,12 @@
 }
 
 .sidebar.open {
-  width: variables.$sidebar-width;
+
+  visibility: visible;
 
   li a,
   li button {
     span {
-      width: auto;
       opacity: 1;
     }
   }
@@ -79,9 +88,7 @@
 
 @include mixins.respond-to(breakpoints.$breakpoint-md) {
   .sidebar {
-    height: 100%;
-    position: relative;
-    left: 0;
-    width: math.div(1, 4) * variables.$sidebar-width;
+    visibility: visible;
   }
+
 }

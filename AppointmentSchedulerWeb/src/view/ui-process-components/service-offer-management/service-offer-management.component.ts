@@ -10,13 +10,14 @@ import { MessageCodeType } from '../../../cross-cutting/communication/model/mess
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { ServiceAssignment } from '../../../view-model/business-entities/service-assignment';
 import { Observable, of, switchMap } from 'rxjs';
-import { ServiceAssignedGridItemComponent } from '../../ui-components/display/grid-list/service-assigned-grid-item/service-assigned-grid-item.component';
-import { GridListComponent } from '../../ui-components/display/grid-list/grid-list.component';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
+import { Router } from '@angular/router';
+import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-service-offer-management',
-  imports: [CommonModule, TranslatePipe, ...SHARED_STANDALONE_COMPONENTS],
+  imports: [CommonModule, TranslatePipe, ...SHARED_STANDALONE_COMPONENTS, MatIconModule],
   standalone: true,
   templateUrl: './service-offer-management.component.html',
   styleUrl: './service-offer-management.component.scss'
@@ -24,9 +25,8 @@ import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-compone
 export class ServiceOfferManagementComponent {
   TranslationCodes = TranslationCodes;
   serviceOffers: ServiceAssignment[] = [];
-  component = ServiceAssignedGridItemComponent;
 
-  constructor(private assistantService: AssistantService, private logginService: LoggingService) {
+  constructor(private assistantService: AssistantService, private logginService: LoggingService, private router: Router) {
     this.assistantService.getAssistantsAndServicesOffersList().pipe(
       switchMap((response: OperationResult<ServiceAssignment[], ApiDataErrorResponse>): Observable<boolean> => {
         console.log(response);
@@ -76,6 +76,25 @@ export class ServiceOfferManagementComponent {
   }
 
 
+  redirectToRegisterServiceOffer(): void {
+    this.router.navigate([WebRoutes.service_offer_management_register_service_offer])
+  }
+
+
+  openedSlots = new Set<number>();
+
+  toggleSlot(index: number) {
+    if (this.openedSlots.has(index)) {
+      this.openedSlots.delete(index);
+    } else {
+      this.openedSlots.add(index);
+    }
+  }
+
+
+
+
 
 
 }
+

@@ -122,6 +122,7 @@
   "TC_APPOINTMENT_CREATE_DIRECTORY": "Appointments",
   "TC_CONFIGURATION_DIRECTORY_ASPECT": "Aspect",
   "TC_CONFIGURATION_DIRECTORY_LANGUAGE": "Language",
+  "TC_CONFIGURATION_DIRECTORY_DATETIME": "Datetime",
   "TC_VALIDATION_ERROR": "The data sent is invalid",
   "TC_GENERIC_ERROR_CONFLICT": "There is a conflict with the data",
   "TC_EMAIL_DATA_LABEL": "Email:",

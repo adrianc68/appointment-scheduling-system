@@ -1,14 +1,74 @@
 @use '../../../styles/mixins.scss' as mixins;
 @use '../../../styles/variables.scss' as variables;
 
-.register-container {
-  @include mixins.flex-center;
-  flex-direction: column;
+.main-section {
   width: 100%;
-  height: auto;
+  padding-right: variables.$padding-md;
+  padding-left: variables.$padding-md;
+  padding-top: variables.$padding-lg;
+  padding-bottom: variables.$padding-lg;
+}
+
+.assistant-select {
+  .assistants-container {
+    max-height: 250px;
+    overflow-y: auto;
+
+    .assistant-card {
+      display: flex;
+      width: 100%;
+      gap: variables.$spacing-md;
+      // background-color: green;
+      padding: variables.$padding-md;
+      border-bottom: 1px solid variables.$border;
+
+      &:last-child {
+        border-bottom: 0px solid transparent;
+      }
+
+      .card-icon {
+        // background-color: red;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        // padding: variables.$padding-sm;
+
+        &>mat-icon {
+          font-size: 1.8rem;
+          width: auto;
+          height: auto;
+          background-color: variables.$bg-subtle;
+          border-radius: 50%;
+          padding: variables.$padding-sm;
+        }
+      }
+
+      .card-body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+      }
+    }
+  }
+
+  .assistant-summary {
+    // background-color: red;
+    display: flex;
+    gap: variables.$spacing-md;
+    flex-direction: column;
+
+    div {
+      display: flex;
+      flex-direction: column;
+    }
+  }
 }
 
 
-.form {
-  max-width: variables.$container-lg;
+.datetime-select {
+  width: 100%;
+}
+
+.unavailability-slot {
+  display:flex;
 }

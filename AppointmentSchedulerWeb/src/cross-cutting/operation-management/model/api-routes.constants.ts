@@ -1,5 +1,3 @@
-import { EditAvailabilityTimeSlotComponent } from "../../../view/ui-process-components/edit-availability-time-slot/edit-availability-time-slot.component";
-
 export const ApiRoutes = {
   login: `/Auth/login`,
   logout: `/Auth/logout`,
@@ -15,12 +13,23 @@ export const ApiRoutes = {
   disableAssistant: `/assistant/disable`,
   enableAssistant: `/assistant/enable`,
   deleteAssistant: `/assistant/delete`,
+  assignService: `/assistant/service`,
+  getAssignedServices: `/assistant/service`,
+
+  disableAssignedService: `/scheduling/appointment/serviceOffer/disable`,
+  deleteAssignedService: `/scheduling/appointment/serviceOffer/delete`,
+  enableAssignedService: `/scheduling/appointment/serviceOffer/enable`,
 
   registerService: `/service`,
   editService: `/service`,
   disableService: `/service/disable`,
   enableService: `/service/enable`,
   deleteService: `/service/delete`,
+
+
+  blockTimeRangeAppointment: `/scheduling/appointment/range/block`,
+  registerAppointmentAsClient: `/scheduling/appointment/asClient`,
+  registerAppointmentAsStaff: `/scheduling/appointment/asStaff`,
 
 
   getAllAssistantServiceOffers: `/assistant/service/all`,
@@ -41,7 +50,8 @@ export const ApiRoutes = {
   getAllAssistants: `/assistant`,
   getAvailabilityTimeSlots: `/scheduling/availabilityTimeSlot`,
   getAvailableServices: `/scheduling/services/available`,
-  getScheduledAppointments: `/scheduling/appointment`
+  getScheduledAppointments: `/scheduling/appointment`,
+  getScheduledAppointmentsDetails: `/scheduling/appointment/details`
 
 };
 

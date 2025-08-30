@@ -2,19 +2,18 @@ import { Expose, Transform, Type } from "class-transformer";
 import { AppointmentStatusType } from "../../../view-model/business-entities/types/appointment-status.types";
 import { parseStringToEnum } from "../../../cross-cutting/helper/enum-utils/enum.utils";
 import { InvalidValueEnumValueException } from "../exceptions/invalid-enum.exception";
+import { ClientDTO } from "../client.dto";
+import { AppointmentScheduledServiceDTO } from "./appointment-scheduled-service.dto";
 
 export class AppointmentDTO {
   @Expose({ name: "uuid" })
   uuid: string;
 
-  @Expose({ name: "startTime" })
-  startTime: string;
+  @Expose({ name: "startDate" })
+  startDate: Date;
 
-  @Expose({ name: "endTime" })
-  endTime: string;
-
-  @Expose({ name: "date" })
-  date: string;
+  @Expose({ name: "endDate" })
+  endDate: Date;
 
   @Expose({ name: "status" })
   @Transform(({ value }) => {
@@ -33,27 +32,42 @@ export class AppointmentDTO {
   createdAt: Date;
 
   @Type(() => AssistantDTO)
-  @Expose({name: "assistants"})
+  @Expose({ name: "assistants" })
   assistants: AssistantDTO[];
 
-  constructor(uuid: string, startTime: string, endTime: string, date: string, status: AppointmentStatusType, totalCost: number, createdAt: Date, assistants: AssistantDTO[]) {
+  @Type(() => ClientDTO)
+  @Expose({ name: "client" })
+  client?: ClientDTO;
+
+
+  //@Type(() => ScheduledServiceDTO)
+  //@Expose({ name: "selectedServices" })
+  //selectedServices?: ScheduledServiceDTO[]
+  //
+  //
+  @Type(() => AppointmentScheduledServiceDTO)
+  scheduledServices?: AppointmentScheduledServiceDTO[];
+
+
+  constructor(uuid: string, startDate: Date, endDate: Date, status: AppointmentStatusType, totalCost: number, createdAt: Date, assistants: AssistantDTO[], scheduledServices: AppointmentScheduledServiceDTO[], client?: ClientDTO) {
     this.uuid = uuid;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.date = date;
+    this.startDate = startDate;
+    this.endDate = endDate;
     this.status = status;
     this.totalCost = totalCost;
     this.createdAt = createdAt;
     this.assistants = assistants;
+    this.scheduledServices = scheduledServices;
+    this.client = client;
   }
 }
 
 
 class OccupiedTimeRangeDTO {
-  @Expose({name: "startTime"})
+  @Expose({ name: "startTime" })
   startTime: string;
 
-  @Expose({name: "endTime"})
+  @Expose({ name: "endTime" })
   endTime: string;
 
   constructor(startTime: string, endTime: string) {
@@ -63,14 +77,14 @@ class OccupiedTimeRangeDTO {
 }
 
 class AssistantDTO {
-  @Expose({name: "name"})
+  @Expose({ name: "name" })
   name: string;
 
-  @Expose({name: "uuid"})
+  @Expose({ name: "uuid" })
   uuid: string;
 
   @Type(() => OccupiedTimeRangeDTO)
-  @Expose({name: "occupiedTimeRange"})
+  @Expose({ name: "occupiedTimeRange" })
   occupiedTimeRange: OccupiedTimeRangeDTO;
 
   constructor(name: string, uuid: string, occupiedTimeRange: OccupiedTimeRangeDTO) {

@@ -2,15 +2,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types
 {
     public class DateTimeRange
     {
-        public DateOnly Date { get; set; }
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
 
-        public DateTimeRange(DateOnly date, TimeOnly startTime, TimeOnly endTime)
+        public DateTimeRange(DateTime startDate, DateTime endDate)
         {
-            Date = date;
-            StartTime = startTime;
-            EndTime = endTime;
+            // StartDate = startDate;
+            // EndDate = endDate;
+            StartDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc).ToUniversalTime();
+            EndDate = DateTime.SpecifyKind(endDate, DateTimeKind.Utc).ToUniversalTime();
         }
 
         public DateTimeRange()
@@ -22,14 +22,15 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types
         {
             if (obj is DateTimeRange other)
             {
-                return this.StartTime == other.StartTime && this.EndTime == other.EndTime && this.Date == other.Date;
+                // Compara StartDate y EndDate
+                return this.StartDate == other.StartDate && this.EndDate == other.EndDate;
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(StartTime, EndTime, Date);
+            return HashCode.Combine(EndDate, StartDate);
         }
     }
 }

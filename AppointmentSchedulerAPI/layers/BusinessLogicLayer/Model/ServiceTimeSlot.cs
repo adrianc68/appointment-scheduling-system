@@ -4,7 +4,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
     {
         public Guid ServiceUuid { get; set; }
         public Guid AssistantUuid { get; set; }
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

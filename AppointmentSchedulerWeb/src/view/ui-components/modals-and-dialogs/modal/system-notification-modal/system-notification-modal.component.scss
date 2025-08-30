@@ -30,15 +30,15 @@
   }
 
   .icon.info {
-    color: variables.$info-color;
+    color: variables.$text;
   }
 
   .icon.warning {
-    color: variables.$warning-color;
+    // color: variables.$warning-color;
   }
 
   .icon.critical {
-    color: variables.$error-color;
+    // color: variables.$error-color;
   }
 
   img {
@@ -54,7 +54,7 @@
   height: auto;
   flex-direction: column;
   padding: variables.$padding-md;
-  border-bottom: variables.$border-width solid variables.$border-color;
+  border-bottom: 1px solid variables.$border;
 }
 
 .notification-content {
@@ -73,7 +73,7 @@
     flex-direction: column;
     padding-top: variables.$padding-md;
     padding-bottom: variables.$padding-lg * 2;
-    gap: variables.$spacing-small;
+    gap: variables.$spacing-sm;
   }
 
   .notification-buttons {
@@ -97,8 +97,8 @@
 
   .close-button-icon {
     @include mixins.flex-center;
-    width: variables.$icon-size-lg;
-    height: variables.$icon-size-lg;
+    width: 2rem;
+    height: 2rem;
   }
 }
 

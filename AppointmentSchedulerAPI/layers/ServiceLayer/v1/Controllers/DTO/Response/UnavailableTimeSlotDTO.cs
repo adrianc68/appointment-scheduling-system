@@ -2,7 +2,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Respons
 {
     public class UnavailableTimeSlotDTO
     {
-        public required TimeOnly StartTime { get; set; }
-        public required TimeOnly EndTime { get; set; }
+        public required DateTime StartDate { get; set; }
+        public required DateTime EndDate { get; set; }
     }
 }

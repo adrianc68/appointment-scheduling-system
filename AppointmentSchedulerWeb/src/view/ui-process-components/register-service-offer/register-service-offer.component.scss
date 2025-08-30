@@ -1,0 +1,153 @@
+@use '../../../styles/variables.scss' as variables;
+@use '../../../styles/mixins.scss' as mixins;
+@use '../../../styles/breakpoints.scss' as breakpoints;
+
+.main-section {
+  width: 100%;
+  padding: variables.$padding-md;
+}
+
+
+.assistant-select {
+  .assistants-container {
+    max-height: 250px;
+    overflow-y: auto;
+
+    .assistant-card {
+      display: flex;
+      width: 100%;
+      gap: variables.$spacing-md;
+      // background-color: green;
+      padding: variables.$padding-md;
+      border-bottom: 1px solid variables.$border;
+
+      &:last-child {
+        border-bottom: 0px solid transparent;
+      }
+
+      .card-icon {
+        // background-color: red;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        // padding: variables.$padding-sm;
+
+        &>mat-icon {
+          font-size: 1.8rem;
+          width: auto;
+          height: auto;
+          background-color: variables.$bg-subtle;
+          border-radius: 50%;
+          padding: variables.$padding-sm;
+        }
+      }
+
+      .card-body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+      }
+    }
+  }
+
+  .assistant-summary {
+    // background-color: red;
+    display: flex;
+    gap: variables.$spacing-md;
+    flex-direction: column;
+
+    div {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+.assigned-services {
+  .assigned-services-container {
+    max-height: 250px;
+    overflow-y: auto;
+
+    .assigned-service-card {
+      display: flex;
+      width: 100%;
+      gap: variables.$spacing-md;
+      // background-color: green;
+      padding: variables.$padding-md;
+      border-bottom: 1px solid variables.$border;
+
+      &:last-child {
+        border-bottom: 0px solid transparent;
+      }
+
+      .card-icon {
+        // background-color: red;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        // padding: variables.$padding-sm;
+
+        &>mat-icon {
+          font-size: 2.5rem;
+          width: auto;
+          height: auto;
+          // background-color: variables.$bg-subtle;
+          border-radius: 50%;
+          padding: variables.$padding-sm;
+        }
+      }
+
+      .card-body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+      }
+    }
+  }
+}
+
+.services-available {
+
+  .services-available-container {
+    max-height: 250px;
+    overflow-y: auto;
+
+    .service-available-card {
+      display: flex;
+      width: 100%;
+      gap: variables.$spacing-md;
+      padding: variables.$padding-md;
+      border-bottom: 1px solid variables.$border;
+
+      &:last-child {
+        border-bottom: 0px solid transparent;
+      }
+
+      .card-icon {
+        // background-color: red;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &>mat-icon {
+          font-size: 2.5rem;
+          width: auto;
+          height: auto;
+          border-radius: 50%;
+          padding: variables.$padding-sm;
+        }
+      }
+
+      .card-body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+
+  }
+}

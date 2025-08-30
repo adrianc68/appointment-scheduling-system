@@ -52,9 +52,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return assistantId != null;
         }
 
-        public async Task<bool> AssignListServicesToAssistantAsync(int idAssistant, List<int> idServices)
+        public async Task<List<Guid>> AssignListServicesToAssistantAsync(int idAssistant, List<int> idServices)
         {
-            bool areAllServicesRegistered = await assistantRepository.AddServicesToAssistantAsync(idAssistant, idServices);
+            List<Guid> areAllServicesRegistered = await assistantRepository.AddServicesToAssistantAsync(idAssistant, idServices);
             return areAllServicesRegistered;
         }
 

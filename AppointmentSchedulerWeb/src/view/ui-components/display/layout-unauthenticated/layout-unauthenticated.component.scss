@@ -8,7 +8,7 @@
 }
 
 .navbar {
-  height: variables.$header-landing-height;
+  height: variables.$navbar-height;
   width: 100%;
   position: fixed;
   top: 0;
@@ -17,7 +17,7 @@
 .main-container {
   display: flex;
   flex: 1;
-  margin-top: variables.$header-height;
+  margin-top: variables.$navbar-height;
 }
 
 .content {

@@ -12,10 +12,18 @@ import { Observable, of, switchMap } from 'rxjs';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { Appointment } from '../../../view-model/business-entities/appointment';
+import { FormsModule } from '@angular/forms';
+import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
+import { Router } from '@angular/router';
+import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
+import { MatIconModule } from '@angular/material/icon';
+import { SlotDateRangePipe } from '../../../cross-cutting/helper/date-utils/slot-date-range.pipe';
+import { ReadableTimePipe } from '../../../cross-cutting/helper/date-utils/readable-time.pipe';
+import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
 
 @Component({
   selector: 'app-appointment-management',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  imports: [CommonModule, FormsModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule, SlotDateRangePipe, ReadableDatePipe, ReadableTimePipe, DurationDatePipe],
   standalone: true,
   templateUrl: './appointment-management.component.html',
   styleUrl: './appointment-management.component.scss'
@@ -27,41 +35,39 @@ export class AppointmentManagementComponent {
   scheduledAppointments: Appointment[] = [];
 
 
-  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService) {
-    this.schedulerService.getAvailableServices("2025-01-14").pipe(
-      switchMap((response: OperationResult<ServiceOffer[], ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.servicesAvailable = [...response.result!];
-          this.servicesAvailable.map(d => console.log(d));
-          this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-        //if(result) {
-        //  thos.setSuccessfulTask();
-        //} else {
-        //  this.setUn
-        //}
-      },
-      error: (err) => {
-        this.logginService.error(err);
+  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
+  }
 
-      }
-    });
 
-    this.schedulerService.getScheduledOrConfirmedAppointments("2024-1-1", "2026-1-1").pipe(
+  openedSlots = new Set<number>();
+
+  toggleSlot(index: number) {
+    if (this.openedSlots.has(index)) {
+      this.openedSlots.delete(index);
+    } else {
+      this.openedSlots.add(index);
+    }
+  }
+
+  redirectToRegisterAppointment() {
+    this.router.navigate([WebRoutes.appointment_management_register_as_staff]);
+  }
+
+  loadAppointments(startDate: string, endDate: string): void {
+    this.scheduledAppointments = [];
+
+    this.schedulerService.getScheduledOrConfirmedAppointmentsAsStaff(startDate, endDate).pipe(
+
       switchMap((response: OperationResult<Appointment[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.scheduledAppointments = [...response.result!];
-          this.scheduledAppointments.map(d => console.log(d));
+          this.scheduledAppointments = [...response.result!].sort((a, b) => {
+            const dateA = new Date(a.startDate).getTime();
+            const dateB = new Date(b.startDate).getTime();
+            return dateA - dateB;
+          });
+
           this.systemMessage = code;
           return of(true);
         } else {
@@ -72,28 +78,40 @@ export class AppointmentManagementComponent {
     ).subscribe({
       next: (result) => {
         console.log(result);
-        //if(result) {
-        //  thos.setSuccessfulTask();
-        //} else {
-        //  this.setUn
-        //}
       },
       error: (err) => {
         this.logginService.error(err);
-
       }
-
-    })
-
-
+    });
   }
 
+  selectedDate: string = new Date().toISOString().split("T")[0];
+
+  startDate: string = this.selectedDate;
+  endDate: string = this.selectedDate;
+
+
+
+
+  onDateRangeChange(value: string, type: 'start' | 'end') {
+    if (type === 'start') {
+      this.startDate = value;
+    } else {
+      this.endDate = value;
+    }
+    this.loadAppointments(this.startDate, this.endDate);
+  }
 
   private handleErrorResponse(response: OperationResult<any, ApiDataErrorResponse>): void {
 
     let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
+    console.log("handleErrorResponse");
+    console.log(code);
+    console.log(response);
+    console.log(response.error);
     if (isGenericErrorResponse(response.error)) {
       code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
+      code = getStringEnumKeyByValue(MessageCodeType, response.error.message);
     } else if (isValidationErrorResponse(response.error)) {
       code = this.translationCodes.TC_VALIDATION_ERROR;
     } else if (isServerErrorResponse(response.error)) {
@@ -103,6 +121,10 @@ export class AppointmentManagementComponent {
     }
 
     this.systemMessage = code;
+  }
+
+  translate(key: string): string {
+    return this.i18nService.translate(key);
   }
 
 

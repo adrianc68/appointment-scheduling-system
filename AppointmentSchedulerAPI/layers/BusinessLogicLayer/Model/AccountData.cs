@@ -11,7 +11,14 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model
         public string? Username { get; set; }
         public string? Name { get; set; }
         public RoleType? Role { get; set; }
-        public AccountStatusType? Status { get; set;}
-        public DateTime? CreatedAt { get; set; }
+        public AccountStatusType? Status { get; set; }
+        private DateTime? _createdAt;
+        public DateTime? CreatedAt
+        {
+            get => _createdAt;
+            set => _createdAt = value.HasValue
+                ? DateTime.SpecifyKind(value.Value, DateTimeKind.Utc)
+                : null;
+        }
     }
 }

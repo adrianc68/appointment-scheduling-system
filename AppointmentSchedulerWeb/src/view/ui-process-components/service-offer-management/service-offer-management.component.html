@@ -1,39 +1,65 @@
-<div class="client-management-container">
-  <div class="client-management-title">
-    <h1>{{TranslationCodes.TC_MANAGEMENT_SERVICE_OFFER_DIRECTORY | translate}}</h1>
-  </div>
+<div class="main-section">
+  <h1 class="m-bottom-md">Asignación de servicios</h1>
 
-  <div class="client-summary">
-    <div class="client-summary-item card">
-      <!--<span class="t-muted">{{TranslationCodes.TC_CLIENTS_REGISTERED_LABEL | translate}}</span>-->
-      <!--<span class="fw-bold fs-xl">{{clients.length}}</span>-->
+  <section class="summary m-bottom-xl">
+    <div class="summary-item card">
+      <span class="t-muted">Resumen 1</span>
+      <span class="fw-bold fs-xl">1</span>
     </div>
-    <div class="client-summary-item card">
-      <!--<span class="t-muted">{{TranslationCodes.TC_CLIENTS_AVAILABLE_LABEL | translate}}</span>-->
-      <!--<span class="fw-bold fs-xl">{{enabledClientsCount}}</span>-->
+    <div class="summary-item card">
+      <span class="t-muted">Resumen 2</span>
+      <span class="fw-bold fs-xl">2</span>
     </div>
-    <div class="client-summary-item card">
-      <!--<span class="t-muted">{{TranslationCodes.TC_CLIENTS_NOT_AVAILABLE_LABEL | translate}}</span>-->
-      <!--<span class="fw-bold fs-xl">{{disabledClientsCount}}</span>-->
+    <div class="summary-item card">
+      <span class="t-muted">Resumen 3</span>
+      <span class="fw-bold fs-xl">3</span>
     </div>
-  </div>
+  </section>
 
-  <div class="client-management-actions">
-    <div class="button-register">
-      <!--<button class="button" (click)="redirectToRegisterClient()">-->
-      <!--  {{translationCodes.TC_REGISTER_BUTTON_LABEL | translate}}-->
-      <!--</button>-->
+
+  <section class="data-container">
+    <div class="data-actions">
+      <div class="input container max-w-sm">
+        <label class="input-icon" for="search"><mat-icon>search</mat-icon></label>
+        <input id="search" class="input" type="text" placeholder="Buscar..." />
+      </div>
+      <button class="button primary w-auto" (click)="redirectToRegisterServiceOffer()">
+        Asignar servicios
+      </button>
     </div>
-  </div>
-
-
-  <div class="client-table-content">
-
-    <!--<pre class="t-muted">{{serviceOffers | json}}</pre>-->
-    <app-grid-list [title]="TranslationCodes.TC_MANAGEMENT_SERVICE_OFFER_DIRECTORY" [items]="serviceOffers" [cardComponent]="component">
-
-    </app-grid-list>
-
-  </div>
-
-</div>
+    <div class="data-header">
+      <span class="fw-bold">Servicios asignados por asistente</span>
+    </div>
+    <div class="data-body">
+      <div class="service-card-container">
+        <div class="service-data card muted" *ngFor="let data of serviceOffers; let i = index">
+          <div class="service-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
+            <mat-icon class="profile-icon">support_agent</mat-icon>
+            <div class="service-title">
+              <span class="fw-bold t-emphasis t-center">{{data.assistantName}}</span>
+            </div>
+            <button [class.clicked]="openedSlots.has(i)">
+              <mat-icon>
+                keyboard_arrow_right
+              </mat-icon>
+            </button>
+          </div>
+          <div class="service-info" [class.expanded]="openedSlots.has(i)">
+            <div class="service-body-wrapper">
+              <span class="fw-bold t-muted m-bottom-md">Servicios asignados:</span>
+              <ul class="service-list-container">
+                <li *ngFor="let service of data.serviceOffer">
+                  <div class="service-item-container">
+                    <span class="t-emphasis">{{service.name}}</span>
+                    <span class="t-muted">Duración: {{service.minutes}} {{TranslationCodes.TC_MINUTES_LABEL |
+                      translate}}</span>
+                    <span class="t-muted">$ {{service.price}}</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>

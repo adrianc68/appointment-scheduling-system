@@ -1,45 +1,126 @@
-<h1>
-  {{translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY)}}
-</h1>
+<section class="main-section">
+  <h1 class="m-bottom-md">Horarios de disponibilidad</h1>
+  <div class="summary m-bottom-xl">
+    <div class="summary-item card">
+      <span class="t-muted"> Horarios registrados </span>
+      <span class="fw-bold fs-xl">{{slots.length}}</span>
+    </div>
+    <div class="summary-item card">
+      <span class="t-muted">Horarios activos</span>
+      <span class="fw-bold fs-xl">{{ slots.length}}</span>
+    </div>
+    <div class="summary-item card">
+      <span class="t-muted">Horarios inactivos</span>
+      <span class="fw-bold fs-xl">{{ slots.length}}</span>
+    </div>
+  </div>
 
-<button class="button" (click)="redirectToRegisterSlot()">
-  {{translate(translationCodes.TC_REGISTER_BUTTON_LABEL)}}
-</button>
+  <section class="data-container">
+    <section class="data-actions">
+      <div class="grid-input-search input container">
+        <label class="input-icon" for="search">
+          <mat-icon>search</mat-icon>
+        </label>
+        <input id="search" class="input" type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
+          placeholder="Buscar..." />
+      </div>
+      <button class="button primary w-auto" (click)="redirectToRegisterSlot()">
+        Registrar
+      </button>
+    </section>
 
-<table border="1">
-  <thead>
-    <tr>
 
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_UUID_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_DATE_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_START_TIME_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_END_TIME_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_ASSISTANT_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_STATUS_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_UNAVAILABLE_SLOTS_LABEL)}}</th>
-      <th>{{translate(translationCodes.TC_AVAILABILITY_TIME_SLOT_DIRECTORY_TABLE_ACTIONS_LABEL)}}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let slot of slots">
-      <td>{{ slot.uuid }}</td>
-      <td>{{ slot.date }}</td>
-      <td>{{ slot.startTime }}</td>
-      <td>{{ slot.endTime }}</td>
-      <td>{{ slot.assistant.name }}</td>
-      <td>{{ slot.status }}</td>
-      <td>
-        <ul>
-          <li *ngFor="let slot of slot.unavailableTimeSlots">
-            {{ slot.startTime }} - {{ slot.endTime }}
-          </li>
-        </ul>
-      </td>
-      <td>
-        <button class="button" (click)="redirectToEditSlot(slot)">
-          {{translate(translationCodes.TC_EDIT_BUTTON_LABEL)}}
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+    <div class="data-header">
+      <span class="fw-bold">Horarios registrados</span>
+    </div>
+    <div class="data-body">
+      <ul class="slot-container">
+        <li class="card-container card muted" *ngFor="let slot of filteredItems; let i = index">
+          <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
+            <div class="card-title">
+              <span class="fs-base fw-bold t-emphasis">
+                {{ slot.startDate | slotDateRange: (slot.endDate) }}
+              </span>
+              <span class="fs-base t-muted">{{ slot.assistant.name }} </span>
+            </div>
+            <button [class.clicked]="openedSlots.has(i)">
+              <mat-icon>
+                keyboard_arrow_right
+              </mat-icon>
+            </button>
+          </div>
+          <div class="card-body" [class.expanded]="openedSlots.has(i)">
+            <div class="wrapper p-all-md">
+              <div class="slot-data-row unbordered">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Fecha</span>
+                  <span class="t-emphasis">{{ (slot.startDate | slotDateRange: (slot.endDate)).split('|')[0]}}</span>
+                </div>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Horario inicio</span>
+                  <span class="t-emphasis">{{ slot.startDate | readableTime }}</span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Horario fin</span>
+                  <span class="t-emphasis">{{ slot.endDate | readableTime }}</span>
+                </div>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Nombre del asistente</span>
+                  <span class="t-emphasis">{{ slot.assistant.name }}</span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Estado</span>
+                  <span class="slot-status"
+                    [ngClass]="{'t-success': slot.status === 'ENABLED','t-danger': slot.status === 'DISABLED'}">
+                    {{ slot.status }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">Rangos bloqueados:</span>
+                  <ul>
+                    <li *ngFor="let uSlot of slot.unavailableTimeSlots">
+                      <span class="t-emphasis m-bottom-base">
+                        {{ uSlot.startDate | slotDateRange: (uSlot.endDate) }}
+                        <!--<br>-->
+                        <!--{{ uSlot.startDate | readableDate}} | {{ uSlot.endDate | readableDate}}-->
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="slot-actions">
+                <span class="t-muted m-bottom-base">Acciones:</span>
+                <div class="actions">
+                  <button (click)="redirectToEditSlot(slot)" class="button unbordered">
+                    <span class="t-brand fs-sm">Editar</span>
+                  </button>
+                  <button *ngIf="slot.status === 'DISABLED'" (click)="enableAvailabilityTimeSlot(slot.uuid)"
+                    class="button unbordered">
+                    <span class="t-brand fs-sm">Activar</span>
+                  </button>
+
+                  <button *ngIf="slot.status === 'ENABLED'" (click)="disableAvailabilityTimeSlot(slot.uuid)"
+                    class="button unbordered">
+                    <span class="t-brand fs-sm">Desactivar</span>
+                  </button>
+
+                  <button (click)="deleteAvailabilityTimeSlot(slot.uuid)" class="button unbordered">
+                    <span class="t-danger fs-sm">Eliminar</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </section>
+
+</section>

@@ -4,9 +4,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Model;
 
 public partial class Appointment
 {
-    public DateOnly? Date { get; set; }
-    public TimeOnly? EndTime { get; set; }
-    public TimeOnly? StartTime { get; set; }
+    public DateTime StartDate { get; set; } 
+    public DateTime EndDate { get; set; } 
     public double? TotalCost { get; set; }
     public Guid? Uuid { get; set; }
     public int? Id { get; set; }

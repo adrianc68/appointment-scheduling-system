@@ -28,11 +28,11 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 }
 
                 var conflictingServices = blockedTimeSlots
-                    .Where(b => b.TotalServicesTimeRange!.Date == range.Date)
+                    .Where(b => b.TotalServicesTimeRange!.StartDate == range.StartDate)
                     .SelectMany(b => b.SelectedServices)
                     .Where(service => selectedServices.Any(newService =>
-                        newService.StartTime < service.EndTime &&
-                        newService.EndTime > service.StartTime &&
+                        newService.StartDate < service.EndDate &&
+                        newService.EndDate > service.StartDate &&
                         (service.ServiceUuid == newService.ServiceUuid ||
                         service.AssistantUuid == newService.AssistantUuid)
                     ))
@@ -46,7 +46,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 }
 
                 int maxSecondsLock = int.Parse(envService.Get("MAX_SECONDS_SCHEDULING_LOCK"));
-                DateTime lockEndTime = DateTime.Now.AddSeconds(maxSecondsLock);
+                // DateTime lockEndTime = DateTime.Now.AddSeconds(maxSecondsLock);
+                // lockEndTime = DateTime.SpecifyKind(lockEndTime, DateTimeKind.Utc);
+                DateTime lockEndTime = DateTime.UtcNow.AddSeconds(maxSecondsLock);
+
 
                 var timer = new Timer(_ =>
                 {
@@ -61,8 +64,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                     LockExpirationTime = lockEndTime,
                     SelectedServices = selectedServices.Select(service => new ServiceTimeSlot
                     {
-                        StartTime = service.StartTime,
-                        EndTime = service.EndTime,
+                        StartDate = service.StartDate,
+                        EndDate = service.EndDate,
                         ServiceUuid = service.ServiceUuid,
                         AssistantUuid = service.AssistantUuid
                     }).ToList()
@@ -77,7 +80,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             lock (scheduleLock)
             {
-                if (newRange.StartTime >= newRange.EndTime)
+                if (newRange.EndDate >= newRange.EndDate)
                 {
                     var error = new GenericError($"Invalid range: {newRange}. StartTime must be earlier than EndTime.");
                     return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.INVALID_RANGE_TIME);
@@ -91,9 +94,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
                 }
 
                 if (blockedTimeSlots.Any(b => b.ClientUuid != clientUuid &&
-                                              b.TotalServicesTimeRange!.Date == newRange.Date &&
-                                              newRange.StartTime < b.TotalServicesTimeRange.EndTime &&
-                                              newRange.EndTime > b.TotalServicesTimeRange.StartTime))
+                                              b.TotalServicesTimeRange!.StartDate == newRange.StartDate &&
+                                              newRange.EndDate < b.TotalServicesTimeRange.EndDate &&
+                                              newRange.EndDate > b.TotalServicesTimeRange.EndDate))
                 {
                     var error = new GenericError($"Cannot extend range. Another range overlaps.");
                     return OperationResult<bool, GenericError>.Failure(error, MessageCodeType.APPOINTMENT_TIME_RANGE_LOCK_OCCUPPIED_BY_ANOTHER_USER);
@@ -139,7 +142,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         {
             lock (scheduleLock)
             {
-                var blocks = blockedTimeSlots.Where(b => b.TotalServicesTimeRange!.Date == date).ToList();
+                var blocks = blockedTimeSlots
+                    .Where(b => DateOnly.FromDateTime(b.TotalServicesTimeRange!.StartDate) == date)
+                    .ToList();
+
                 return OperationResult<List<BlockedTimeSlot>, GenericError>.Success(blocks);
             }
         }

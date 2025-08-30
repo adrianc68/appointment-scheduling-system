@@ -15,11 +15,11 @@ import { WebRoutes } from '../../../cross-cutting/operation-management/model/web
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../../../cross-cutting/helper/i18n/translate.pipe';
 import { AccountStatusType } from '../../../view-model/business-entities/types/account-status.types';
-import { AssistantGridItemComponent } from '../../ui-components/display/grid-list/assistant-grid-item/assistant-grid-item.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-assistant-management',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, TranslatePipe],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, TranslatePipe, MatIconModule],
   standalone: true,
   templateUrl: './assistant-management.component.html',
   styleUrl: './assistant-management.component.scss'
@@ -28,7 +28,6 @@ export class AssistantManagementComponent {
   systemMessage?: string = '';
   translationCodes = TranslationCodes;
   assistants: Assistant[] = [];
-  assistantCard = AssistantGridItemComponent;
 
   constructor(private router: Router, private assistantService: AssistantService, private i18nService: I18nService, private logginService: LoggingService) {
     this.assistantService.getAssistantList().pipe(

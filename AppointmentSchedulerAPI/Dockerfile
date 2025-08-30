@@ -2,15 +2,19 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
 WORKDIR /App
 
-COPY *.csproj ./
+COPY ./src/*.csproj ./
 RUN dotnet restore
 
-COPY . ./
+COPY ./src/ ./
 RUN dotnet publish -c Release -o out
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /App
+
+RUN useradd -m appuser
+USER appuser
+
 # COPY .env .env
 COPY --from=build /App/out .
 

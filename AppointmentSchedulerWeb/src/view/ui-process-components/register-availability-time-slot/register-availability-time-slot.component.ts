@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
 import { TaskStateManagerService } from '../../model/task-state-manager.service';
 import { LoadingState } from '../../model/loading-state.type';
@@ -16,10 +16,15 @@ import { MessageCodeType } from '../../../cross-cutting/communication/model/mess
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { UnavailableTimeSlot } from '../../../view-model/business-entities/unavailable-time-slot';
 import { SchedulerService } from '../../../model/communication-components/scheduler.service';
+import { fromLocalToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
+import { AssistantService } from '../../../model/communication-components/assistant.service';
+import { Assistant } from '../../../view-model/business-entities/assistant';
+import { MatIconModule } from '@angular/material/icon';
+
 
 @Component({
   selector: 'app-register-availability-time-slot',
-  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule],
   standalone: true,
   providers: [TaskStateManagerService],
   templateUrl: './register-availability-time-slot.component.html',
@@ -29,26 +34,112 @@ export class RegisterAvailabilityTimeSlotComponent {
 
   translationCodes = TranslationCodes;
 
-  date: string = '';
-  startTime: string = '';
-  endTime: string = '';
+  startDate: Date = new Date();
+  endDate: Date = new Date();
   assistantUuid: string = '';
   unavailableTimeSlots: UnavailableTimeSlot[] = [];
+  assistants: Assistant[] = [];
+  selectedAssistant?: Assistant;
 
   errorValidationMessage: { [field: string]: string[] } = {};
   systemMessage?: string = '';
   currentTaskState: LoadingState;
 
+  isSingleDay: boolean = true; // por defecto asumimos un solo día
+
+
   translate(key: string): string {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private schedulerService: SchedulerService, private stateManagerService: TaskStateManagerService) {
-    this.currentTaskState = this.stateManagerService.getState();
-    this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
+  startTime: string = '09:00';
+  endTime: string = '17:00';
+  selectedDate: string = new Date().toISOString().split('T')[0]; // "2025-08-27"
+
+
+  onDateChange() {
+    if (this.startDate && this.endDate) {
+      this.isSingleDay = this.startDate.toDateString() === this.endDate.toDateString();
+    } else {
+      this.isSingleDay = true;
+    }
   }
 
+
+  getStartEndDate(): { start: Date, end: Date } {
+    if (this.isSingleDay) {
+      const [startHour, startMin] = this.startTime.split(':').map(Number);
+      const [endHour, endMin] = this.endTime.split(':').map(Number);
+
+      const start = new Date(this.selectedDate);
+      start.setHours(startHour, startMin, 0, 0);
+
+      const end = new Date(this.selectedDate);
+      end.setHours(endHour, endMin, 0, 0);
+
+      return { start, end };
+    } else {
+      return { start: this.startDate, end: this.endDate };
+    }
+  }
+
+
+
+  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private schedulerService: SchedulerService, private stateManagerService: TaskStateManagerService, private assistantService: AssistantService) {
+    this.currentTaskState = this.stateManagerService.getState();
+    this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
+
+    this.assistantService.getAssistantList().pipe(
+      switchMap((response: OperationResult<Assistant[], ApiDataErrorResponse>): Observable<boolean> => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          this.assistants = [...response.result!];
+          this.assistants.map(d => console.log(d));
+          this.systemMessage = code;
+          return of(true);
+        } else {
+          this.handleErrorResponseAssistant(response);
+          return of(false);
+        }
+      })
+    ).subscribe({
+      next: (result) => {
+        console.log(result);
+        //if(result) {
+        //  thos.setSuccessfulTask();
+        //} else {
+        //  this.setUn
+        //}
+      },
+      error: (err) => {
+        this.loggingService.error(err);
+
+      }
+    })
+  }
+
+  private handleErrorResponseAssistant(response: OperationResult<Assistant[], ApiDataErrorResponse>): void {
+
+    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
+    if (isGenericErrorResponse(response.error)) {
+      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
+    } else if (isValidationErrorResponse(response.error)) {
+      code = this.translationCodes.TC_VALIDATION_ERROR;
+    } else if (isServerErrorResponse(response.error)) {
+      code = getStringEnumKeyByValue(MessageCodeType, response.code);
+    } else if (isEmptyErrorResponse(response.error)) {
+      code = getStringEnumKeyByValue(MessageCodeType, response.code);
+    }
+
+    this.systemMessage = code;
+  }
+
+
   onSubmit() {
+    if (!this.selectedAssistant) {
+      return;
+    }
+
     if (this.currentTaskState === LoadingState.LOADING) {
       return;
     }
@@ -57,27 +148,27 @@ export class RegisterAvailabilityTimeSlotComponent {
     this.systemMessage = "";
     this.errorValidationMessage = {};
 
+    const { start, end } = this.getStartEndDate();
+
+
     const availabilitySlot = {
-      date: this.date,
-      startTime: this.startTime,
-      endTime: this.endTime,
-      assistantUuid: this.assistantUuid,
-      unavailableTimeSlots: this.unavailableTimeSlots
+      StartDate: fromLocalToUTC(start),
+      EndDate: fromLocalToUTC(end),
+      AssistantUuid: this.selectedAssistant.uuid,
+      UnavailableTimeSlots: this.getUnavailableSlotsUTC()
+
     };
 
-    this.stateManagerService.setState(LoadingState.WORK_DONE);
+    //console.log("Payload enviado:", availabilitySlot);
 
-
-    console.log(availabilitySlot);
-
-    this.schedulerService.registerAvailabilityTimeSlot(this.date, this.startTime, this.endTime, this.assistantUuid, this.unavailableTimeSlots).pipe(
+    this.schedulerService.registerAvailabilityTimeSlot(availabilitySlot).pipe(
       switchMap((response: OperationResult<string, ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
           return of(true);
         } else {
           this.handleErrorResponse(response);
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          this.systemMessage = code;
           return of(false);
         }
       }),
@@ -139,7 +230,7 @@ export class RegisterAvailabilityTimeSlotComponent {
   }
 
   addUnavailableTimeSlot() {
-    this.unavailableTimeSlots.push({ startTime: '', endTime: '' });
+    this.unavailableTimeSlots.push({ startDate: new Date(), endDate: new Date() });
   }
 
   removeUnavailableTimeSlot(index: number) {
@@ -147,7 +238,29 @@ export class RegisterAvailabilityTimeSlotComponent {
   }
 
 
+  slotDateMap: { [key: number]: string } = {};
+  slotStartTimeMap: { [key: number]: string } = {};
+  slotEndTimeMap: { [key: number]: string } = {};
 
 
+  getUnavailableSlotsUTC() {
+    return this.unavailableTimeSlots.map((slot, i) => {
+      if (this.isSingleDay) {
+        const [year, month, day] = this.selectedDate.split('-').map(Number);
+        const [startHour, startMin] = this.slotStartTimeMap[i].split(':').map(Number);
+        const [endHour, endMin] = this.slotEndTimeMap[i].split(':').map(Number);
+
+        // Creamos un Date local combinando fecha + hora del slot
+        const startLocal = new Date(year, month - 1, day, startHour, startMin, 0, 0);
+        const endLocal = new Date(year, month - 1, day, endHour, endMin, 0, 0);
+
+        // Convertimos a UTC para el backend
+        return { StartDate: fromLocalToUTC(startLocal), EndDate: fromLocalToUTC(endLocal) };
+      } else {
+        // Rango de días: usamos datetime-local de cada slot
+        return { StartDate: fromLocalToUTC(slot.startDate), EndDate: fromLocalToUTC(slot.endDate) };
+      }
+    });
+  }
 
 }

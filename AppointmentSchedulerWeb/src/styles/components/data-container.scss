@@ -1,0 +1,31 @@
+@use '../mixins' as mixins;
+@use '../breakpoints' as breakpoints;
+@use '../variables' as variables;
+
+.data-container {
+  width: 100%;
+
+  .data-actions {
+    display: flex;
+    gap: variables.$spacing-md;
+    margin-bottom: variables.$spacing-md;
+  }
+
+  .data-header {
+    width: 100%;
+    padding: variables.$padding-md;
+    background-color: variables.$bg-muted;
+    border: 1px solid variables.$border;
+    border-bottom: 0;
+    border-top-left-radius: variables.$border-radius-md;
+    border-top-right-radius: variables.$border-radius-md;
+  }
+
+  .data-body {
+    border: 1px solid variables.$border;
+    border-bottom-left-radius: variables.$border-radius-md;
+    border-bottom-right-radius: variables.$border-radius-md;
+    // padding: variables.$padding-md;
+  }
+
+}

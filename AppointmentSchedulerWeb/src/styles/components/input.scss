@@ -9,7 +9,7 @@
   max-height: variables.$input-size-base;
   min-height: variables.$input-size-base;
   padding: variables.$padding-sm;
-  border: variables.$border-width solid variables.$border;
+  border: 1px solid variables.$border;
   background-color: variables.$bg-subtle;
   border-radius: variables.$border-radius-sm;
   outline-color: variables.$selected-color;
@@ -22,12 +22,12 @@
   }
 
   &:hover {
-    border: variables.$border-width solid variables.$bg-inverted;
+    border: 1px solid variables.$bg-inverted;
   }
 
   &:focus-within {
-    outline: variables.$border-width solid variables.$selected-color ;
-    border: variables.$border-width solid variables.$selected-color;
+    outline: 1px solid variables.$selected-color ;
+    border: 1px solid variables.$selected-color;
   }
 }
 
@@ -42,7 +42,7 @@
   justify-content: flex-start;
   position: relative;
   min-width: auto;
-  width:100%;
+  width: 100%;
 
   input {
     background-color: transparent;
@@ -119,5 +119,5 @@
 }
 
 .input.wd-auto {
-  width:auto;
+  width: auto;
 }

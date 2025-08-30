@@ -16,10 +16,11 @@ import { WebRoutes } from '../../../cross-cutting/operation-management/model/web
 import { ClientCardComponent } from '../../ui-components/display/card/client-card/client-card.component';
 import { TranslatePipe } from '../../../cross-cutting/helper/i18n/translate.pipe';
 import { AccountStatusType } from '../../../view-model/business-entities/types/account-status.types';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-client-management',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, TranslatePipe],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, TranslatePipe, MatIconModule],
   standalone: true,
   templateUrl: './client-management.component.html',
   styleUrl: './client-management.component.scss'

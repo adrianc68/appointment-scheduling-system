@@ -14,16 +14,16 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Validat
 
             foreach (var timeSlot in timeSlots)
             {
-                if (timeSlot.StartTime >= timeSlot.EndTime)
+                if (timeSlot.StartDate >= timeSlot.EndDate)
                 {
                     return new ValidationResult("Each UnavailableTimeSlot must have StartTime earlier than EndTime.");
                 }
             }
 
-            var sortedTimeSlots = timeSlots.OrderBy(ts => ts.StartTime).ToList();
+            var sortedTimeSlots = timeSlots.OrderBy(ts => ts.StartDate).ToList();
             for (int i = 0; i < sortedTimeSlots.Count - 1; i++)
             {
-                if (sortedTimeSlots[i].EndTime > sortedTimeSlots[i + 1].StartTime)
+                if (sortedTimeSlots[i].EndDate > sortedTimeSlots[i + 1].StartDate)
                 {
                     return new ValidationResult("UnavailableTimeSlots cannot have overlapping time ranges.");
                 }

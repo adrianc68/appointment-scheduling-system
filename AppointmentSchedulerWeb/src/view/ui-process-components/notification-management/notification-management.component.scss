@@ -21,7 +21,7 @@
   min-height: 150px;
   display: flex;
   flex-direction: column;
-  border-bottom: variables.$border-width solid variables.$border;
+  border-bottom: 1px solid variables.$border;
 }
 
 .notification-container.unread:hover,
@@ -30,7 +30,7 @@
 }
 
 .notification-container.unread {
-  background-color: variables.$notification-unread-color;
+  background-color: variables.$bg-subtle;
 }
 
 .notification-mgt-header {
@@ -44,7 +44,7 @@
 .update-notifications {
   height: auto;
   width: auto;
-  font-size: variables.$icon-size-lg;
+  font-size: 2rem;
 }
 
 .update-notifications:hover {
