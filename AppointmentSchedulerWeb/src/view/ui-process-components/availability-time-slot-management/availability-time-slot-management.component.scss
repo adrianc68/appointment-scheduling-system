@@ -20,7 +20,6 @@
   .summary-item {
     @include mixins.flex-start;
     flex-direction: column;
-    width: 100%;
     gap: variables.$spacing-sm;
     padding: variables.$padding-md;
   }

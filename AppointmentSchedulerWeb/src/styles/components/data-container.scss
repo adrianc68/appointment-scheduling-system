@@ -9,6 +9,7 @@
     display: flex;
     gap: variables.$spacing-md;
     margin-bottom: variables.$spacing-md;
+    justify-content: space-between;
   }
 
   .data-header {

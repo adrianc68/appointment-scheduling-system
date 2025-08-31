@@ -9,6 +9,8 @@
   padding-left: variables.$padding-md;
   padding-top: variables.$padding-lg;
   padding-bottom: variables.$padding-lg;
+  // max-width: variables.$container-md;
+  // margin: auto;
 }
 
 .summary {
@@ -22,7 +24,7 @@
     @include mixins.flex-start;
     flex-direction: column;
     // width: math.div(variables.$container-xs, 2);
-    width: 100%;
+    // width: 100%;
     gap: variables.$spacing-sm;
     ;
     padding: variables.$padding-md;

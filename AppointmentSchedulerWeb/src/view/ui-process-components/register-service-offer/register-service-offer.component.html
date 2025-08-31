@@ -16,7 +16,8 @@
       </div>
       <div class="data-body table-type">
         <div class="assistants-container scroll-visible">
-          <li class="assistant-card data-row-item accordion-type" [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
+          <li class="assistant-card data-row-item accordion-type"
+            [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
             (click)="selectedAssistant = data; getAssignedServicesOfAssistant(data.uuid)"
             *ngFor="let data of assistants">
             <div class="card-icon">
@@ -112,9 +113,9 @@
       <div class="data-header">
         <span>Servicios disponibles para asignar</span>
       </div>
-      <div class="data-body">
+      <div class="data-body table-type">
         <ul class="services-available-container scroll-visible">
-          <li class="service-available-card" *ngFor="let data of serviceNotAssignedOfAssistant">
+          <li class="service-available-card data-row-item" *ngFor="let data of serviceNotAssignedOfAssistant">
             <div class="card-icon">
               <mat-icon>business_center</mat-icon>
             </div>

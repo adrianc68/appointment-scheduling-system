@@ -57,25 +57,30 @@ export class RegisterAvailabilityTimeSlotComponent {
   selectedDate: string = new Date().toISOString().split('T')[0]; // "2025-08-27"
 
 
-  onDateChange() {
-    if (this.startDate && this.endDate) {
-      this.isSingleDay = this.startDate.toDateString() === this.endDate.toDateString();
-    } else {
-      this.isSingleDay = true;
-    }
-  }
+
 
 
   getStartEndDate(): { start: Date, end: Date } {
+
+
     if (this.isSingleDay) {
       const [startHour, startMin] = this.startTime.split(':').map(Number);
       const [endHour, endMin] = this.endTime.split(':').map(Number);
 
-      const start = new Date(this.selectedDate);
-      start.setHours(startHour, startMin, 0, 0);
+      const [year, month, day] = this.selectedDate.split('-').map(Number);
 
-      const end = new Date(this.selectedDate);
-      end.setHours(endHour, endMin, 0, 0);
+
+      const start = new Date(year, month - 1, day, startHour, startMin, 0, 0);
+      const end = new Date(year, month - 1, day, endHour, endMin, 0, 0);
+      //const start = new Date(this.selectedDate);
+      //start.setHours(startHour, startMin, 0, 0);
+
+      //const end = new Date(this.selectedDate);
+      //end.setHours(endHour, endMin, 0, 0);
+
+      console.log("DATE")
+      console.log(start);
+      console.log(end);
 
       return { start, end };
     } else {

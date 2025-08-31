@@ -17,7 +17,7 @@
 
   <section class="data-container">
     <section class="data-actions">
-      <div class="grid-input-search input container">
+      <div class="input container max-w-xs">
         <label class="input-icon" for="search">
           <mat-icon>search</mat-icon>
         </label>
@@ -34,86 +34,86 @@
       <span class="fw-bold">Horarios registrados</span>
     </div>
     <div class="data-body table-type">
-        <div class="card-data data-row-item accordion-type" *ngFor="let slot of filteredItems; let i = index">
-          <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
-            <div class="card-title">
-              <span class="fs-base t-emphasis">
-                {{ slot.startDate | slotDateRange: (slot.endDate) }}
-              </span>
-              <span class="fs-base t-muted">{{ slot.assistant.name }} </span>
-            </div>
-            <button [class.clicked]="openedSlots.has(i)">
-              <mat-icon>
-                keyboard_arrow_right
-              </mat-icon>
-            </button>
+      <div class="card-data data-row-item accordion-type" *ngFor="let slot of filteredItems; let i = index">
+        <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
+          <div class="card-title">
+            <span class="fs-base t-emphasis">
+              {{ slot.startDate | slotDateRange: (slot.endDate) }}
+            </span>
+            <span class="fs-base t-muted">{{ slot.assistant.name }} </span>
           </div>
-          <div class="card-body accordion-body" [class.expanded]="openedSlots.has(i)">
-            <div class="wrapper p-all-md">
-              <div class="slot-data-row unbordered">
-                <div class="slot-data d-flex-col">
-                  <span class="t-muted">Fecha</span>
-                  <span class="t-emphasis">{{ (slot.startDate | slotDateRange: (slot.endDate)).split('|')[0]}}</span>
-                </div>
-                <div class="slot-data d-flex-col">
-                  <span class="t-muted">Horario inicio</span>
-                  <span class="t-emphasis">{{ slot.startDate | readableTime }}</span>
-                </div>
+          <button [class.clicked]="openedSlots.has(i)">
+            <mat-icon>
+              keyboard_arrow_right
+            </mat-icon>
+          </button>
+        </div>
+        <div class="card-body accordion-body" [class.expanded]="openedSlots.has(i)">
+          <div class="wrapper p-all-md">
+            <div class="slot-data-row unbordered">
+              <div class="slot-data d-flex-col">
+                <span class="t-muted">Fecha</span>
+                <span class="t-emphasis">{{ (slot.startDate | slotDateRange: (slot.endDate)).split('|')[0]}}</span>
               </div>
-              <div class="slot-data-row">
-                <div class="slot-data d-flex-col">
-                  <span class="t-muted">Horario fin</span>
-                  <span class="t-emphasis">{{ slot.endDate | readableTime }}</span>
-                </div>
-                <div class="slot-data d-flex-col">
-                  <span class="t-muted">Nombre del asistente</span>
-                  <span class="t-emphasis">{{ slot.assistant.name }}</span>
-                </div>
+              <div class="slot-data d-flex-col">
+                <span class="t-muted">Horario inicio</span>
+                <span class="t-emphasis">{{ slot.startDate | readableTime }}</span>
               </div>
-              <div class="slot-data-row">
-                <div class="slot-data d-flex-col">
-                  <span class="t-muted">Estado</span>
-                  <span class="t-emphasis">{{ slot.status }}</span>
-                </div>
+            </div>
+            <div class="slot-data-row">
+              <div class="slot-data d-flex-col">
+                <span class="t-muted">Horario fin</span>
+                <span class="t-emphasis">{{ slot.endDate | readableTime }}</span>
               </div>
-              <div class="slot-data-row">
-                <div class="slot-data d-flex-col">
-                  <span class="t-muted">Rangos bloqueados:</span>
-                  <ul class="ul-bullet-style">
-                    <li *ngFor="let uSlot of slot.unavailableTimeSlots">
-                      <span class="t-emphasis m-bottom-base">
-                        {{ uSlot.startDate | slotDateRange: (uSlot.endDate) }}
-                        <!--<br>-->
-                        <!--{{ uSlot.startDate | readableDate}} | {{ uSlot.endDate | readableDate}}-->
-                      </span>
-                    </li>
-                  </ul>
-                </div>
+              <div class="slot-data d-flex-col">
+                <span class="t-muted">Nombre del asistente</span>
+                <span class="t-emphasis">{{ slot.assistant.name }}</span>
               </div>
-              <div class="slot-actions">
-                <span class="t-muted m-bottom-base">Acciones:</span>
-                <div class="actions">
-                  <button (click)="redirectToEditSlot(slot)" class="button unbordered">
-                    <span class="t-brand fs-sm">Editar</span>
-                  </button>
-                  <button *ngIf="slot.status === 'DISABLED'" (click)="enableAvailabilityTimeSlot(slot.uuid)"
-                    class="button unbordered">
-                    <span class="t-brand fs-sm">Activar</span>
-                  </button>
+            </div>
+            <div class="slot-data-row">
+              <div class="slot-data d-flex-col">
+                <span class="t-muted">Estado</span>
+                <span class="t-emphasis">{{ slot.status }}</span>
+              </div>
+            </div>
+            <div class="slot-data-row">
+              <div class="slot-data d-flex-col">
+                <span class="t-muted">Rangos bloqueados:</span>
+                <ul class="ul-bullet-style">
+                  <li *ngFor="let uSlot of slot.unavailableTimeSlots">
+                    <span class="t-emphasis m-bottom-base">
+                      {{ uSlot.startDate | slotDateRange: (uSlot.endDate) }}
+                      <!--<br>-->
+                      <!--{{ uSlot.startDate | readableDate}} | {{ uSlot.endDate | readableDate}}-->
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="slot-actions">
+              <span class="t-muted m-bottom-base">Acciones:</span>
+              <div class="actions">
+                <button (click)="redirectToEditSlot(slot)" class="button unbordered">
+                  <span class="t-brand fs-sm">Editar</span>
+                </button>
+                <button *ngIf="slot.status === 'DISABLED'" (click)="enableAvailabilityTimeSlot(slot.uuid)"
+                  class="button unbordered">
+                  <span class="t-brand fs-sm">Activar</span>
+                </button>
 
-                  <button *ngIf="slot.status === 'ENABLED'" (click)="disableAvailabilityTimeSlot(slot.uuid)"
-                    class="button unbordered">
-                    <span class="t-brand fs-sm">Desactivar</span>
-                  </button>
+                <button *ngIf="slot.status === 'ENABLED'" (click)="disableAvailabilityTimeSlot(slot.uuid)"
+                  class="button unbordered">
+                  <span class="t-brand fs-sm">Desactivar</span>
+                </button>
 
-                  <button (click)="deleteAvailabilityTimeSlot(slot.uuid)" class="button unbordered">
-                    <span class="t-danger fs-sm">Eliminar</span>
-                  </button>
-                </div>
+                <button (click)="deleteAvailabilityTimeSlot(slot.uuid)" class="button unbordered">
+                  <span class="t-danger fs-sm">Eliminar</span>
+                </button>
               </div>
             </div>
           </div>
         </div>
+      </div>
     </div>
 
   </section>

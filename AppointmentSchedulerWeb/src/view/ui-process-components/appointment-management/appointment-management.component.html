@@ -16,13 +16,16 @@
     </div>
   </div>
 
-  <label>Desde: </label>
-  <input type="date" [ngModel]="startDate" (ngModelChange)="onDateRangeChange($event, 'start')" />
-  <label>Hasta: </label>
-  <input type="date" [ngModel]="endDate" (ngModelChange)="onDateRangeChange($event, 'end')" />
+
+  <div class="max-w-xs m-bottom-md">
+    <label>Desde: </label>
+    <input class="input" type="date" [ngModel]="startDate" (ngModelChange)="onDateRangeChange($event, 'start')" />
+    <label>Hasta: </label>
+    <input class="input" type="date" [ngModel]="endDate" (ngModelChange)="onDateRangeChange($event, 'end')" />
+  </div>
   <section class="data-container">
     <section class="data-actions">
-      <div class="grid-input-search input container">
+      <div class="input container max-w-xs">
         <label class="input-icon" for="search">
           <mat-icon>search</mat-icon>
         </label>
@@ -38,7 +41,8 @@
       <span class="fw-bold">Citas agendadas</span>
     </div>
     <div class="data-body table-type">
-      <div class="card-container data-row-item accordion-type" *ngFor="let appointment of scheduledAppointments; let i = index">
+      <div class="card-container data-row-item accordion-type"
+        *ngFor="let appointment of scheduledAppointments; let i = index">
         <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
           <div class="card-icon">
             <mat-icon>person</mat-icon>
