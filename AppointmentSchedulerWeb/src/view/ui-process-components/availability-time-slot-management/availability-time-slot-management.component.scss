@@ -26,130 +26,103 @@
   }
 }
 
-.data-actions {
+
+.card-data {
+  width: 100%;
   display: flex;
-  gap: variables.$spacing-md;
-  margin-bottom: variables.$spacing-md;
-}
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: variables.$bg-subtle;
+  border-bottom: 1px solid variables.$border;
 
-.data-container {
-  // background-color: red;
-
-  .data-header {
-    width: 100%;
-    padding: variables.$padding-md;
-    background-color: variables.$bg-muted;
-    border: 1px solid variables.$border;
-    border-bottom: 0;
-    border-top-left-radius: variables.$border-radius-md;
-    border-top-right-radius: variables.$border-radius-md;
-  }
-
-  .data-body {
-    border: 1px solid variables.$border;
-    border-bottom-left-radius: variables.$border-radius-md;
-    border-bottom-right-radius: variables.$border-radius-md;
-    padding: variables.$padding-md;
-  }
-}
-
-.slot-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: variables.$spacing-md;
-  justify-content: center;
-
-
-  .card-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-  }
-
-  .card-header {
-    display: flex;
-    // border-bottom: 1px solid variables.$border-subtle;
-    padding-bottom: variables.$padding-md;
-    justify-content: space-between;
-    align-items: center;
-    gap: variables.$spacing-base;
-    padding: variables.$padding-md;
-
+  &:last-child {
     border-bottom: 1px solid transparent;
 
-    &.expanded {
-      border-bottom: 1px solid variables.$border-subtle;
+    border-bottom-left-radius: variables.$border-radius-sm;
+    border-bottom-right-radius: variables.$border-radius-sm;
+  }
+}
+
+.card-header {
+  display: flex;
+  // border-bottom: 1px solid variables.$border-subtle;
+  justify-content: space-between;
+  align-items: center;
+  // gap: variables.$spacing-base;
+  padding: variables.$padding-md;
+  border-bottom: 1px solid transparent;
+
+  &.expanded {
+    border-bottom: 1px solid variables.$border-subtle;
+  }
+
+  button {
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+    height: auto;
+    width: auto;
+
+    mat-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      font-size: 1.5rem;
+      transition: transform 0.3s ease;
     }
 
-    button {
-      background-color: transparent;
-      border: 0;
-      cursor: pointer;
-      height: auto;
-      width: auto;
-
-      mat-icon {
-        width: 1.5rem;
-        height: 1.5rem;
-        font-size: 1.5rem;
-        transition: transform 0.3s ease;
-      }
-
-      &.clicked>mat-icon {
-        transform: rotate(90deg);
-      }
-    }
-
-    .card-title {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      gap: variables.$spacing-base;
+    &.clicked>mat-icon {
+      transform: rotate(90deg);
     }
   }
 
-
-  .card-body {
-    max-height: 0;
-    overflow: hidden;
-    // transition: max-height 0.3s ease, padding 0.3s ease;
-    transition: max-height 0.3s ease,
-    opacity 0.3s ease,
-    visibility 0.3s ease,
-    #{variables.$color-transition};
-    will-change: height;
-    visibility: hidden;
-    opacity: 0;
+  .card-title {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: variables.$spacing-base;
+    // padding-bottom: variables.$padding-md;
+  }
+}
 
 
-    &.expanded {
-      max-height: 1000px;
-      visibility: visible;
-      opacity: 1;
-    }
+.card-body {
+  max-height: 0;
+  overflow: hidden;
+  // transition: max-height 0.3s ease, padding 0.3s ease;
+  transition: max-height 0.3s ease,
+  opacity 0.3s ease,
+  visibility 0.3s ease,
+  #{variables.$color-transition};
+  will-change: height;
+  visibility: hidden;
+  opacity: 0;
+
+
+  &.expanded {
+    max-height: 1000px;
+    visibility: visible;
+    opacity: 1;
+  }
 
 
 
 
-    .slot-actions {
+  .slot-actions {
+    display: flex;
+    flex-direction: column;
+    padding-top: variables.$padding-md;
+    padding-bottom: variables.$padding-md;
+
+    .actions {
       display: flex;
-      flex-direction: column;
-      padding-top: variables.$padding-md;
-      padding-bottom: variables.$padding-md;
+      flex-wrap: wrap;
+      gap: variables.$spacing-md;
 
-      .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: variables.$spacing-md;
-
-        button {
-          width: auto;
-          padding: variables.$spacing-sm;
-        }
-
+      button {
+        width: auto;
+        padding: variables.$spacing-sm;
       }
+
     }
   }
 }

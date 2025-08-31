@@ -13,9 +13,9 @@
       <div class="data-header">
         <span>Asistentes disponibles</span>
       </div>
-      <div class="data-body">
+      <div class="data-body table-type">
         <div class="assistants-container scroll-visible">
-          <li class="assistant-card" [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
+          <li class="assistant-card data-row-item" [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
             (click)="selectedAssistant = data" *ngFor="let data of assistants">
             <div class="card-icon">
               <mat-icon>person</mat-icon>
@@ -23,7 +23,7 @@
             <div class="card-body">
               <h3 class="fs-base">{{ data.name }}</h3>
               <p class="fs-xs"> {{ data.username }}</p>
-              <p class="fs-xs">{{ data.phoneNumber }}</p>
+              <!--<p class="fs-xs">{{ data.phoneNumber }}</p>-->
             </div>
         </div>
       </div>

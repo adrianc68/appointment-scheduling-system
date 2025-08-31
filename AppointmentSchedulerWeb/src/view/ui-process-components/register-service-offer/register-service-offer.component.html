@@ -14,9 +14,9 @@
       <div class="data-header">
         <span>Asistentes disponibles</span>
       </div>
-      <div class="data-body">
+      <div class="data-body table-type">
         <div class="assistants-container scroll-visible">
-          <li class="assistant-card" [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
+          <li class="assistant-card data-row-item accordion-type" [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
             (click)="selectedAssistant = data; getAssignedServicesOfAssistant(data.uuid)"
             *ngFor="let data of assistants">
             <div class="card-icon">
@@ -25,7 +25,7 @@
             <div class="card-body">
               <h3 class="fs-base">{{ data.name }}</h3>
               <p class="fs-xs"> {{ data.username }}</p>
-              <p class="fs-xs">{{ data.phoneNumber }}</p>
+              <!--<p class="fs-xs">{{ data.phoneNumber }}</p>-->
             </div>
         </div>
       </div>
@@ -67,9 +67,9 @@
       <div class="data-header">
         <span>Servicios asignados</span>
       </div>
-      <div class="data-body">
+      <div class="data-body table-type">
         <div class="assigned-services-container scroll-visible">
-          <li class="assigned-service-card" *ngFor="let data of servicesOfferAssigned">
+          <li class="assigned-service-card data-row-item " *ngFor="let data of servicesOfferAssigned">
             <div class="card-icon">
               <mat-icon>business_center</mat-icon>
             </div>
@@ -77,7 +77,7 @@
               <span class="t-emphasis fw-bold m-bottom-base">{{data.name}}</span>
               <span class="t-muted fs-sm">$ {{data.price}}</span>
               <span class="t-muted fs-sm">{{data.minutes}} minutos</span>
-              <span class="t-muted fs-sm">{{data.description}}</span>
+              <!--<span class="t-muted fs-sm">{{data.description}}</span>-->
               <span class="t-muted fs-sm">{{data.status}}</span>
             </div>
             <td class="actions">
@@ -120,9 +120,9 @@
             </div>
             <div class="card-body">
               <span class="t-emphasis fw-bold m-bottom-base">{{data.name}}</span>
-              <span class="t-muted fs-sm">Precio: ${{data.price}}</span>
-              <span class="t-muted fs-sm">Minutos: {{data.minutes}} minutos</span>
-              <span class="t-muted fs-sm">{{data.description}}</span>
+              <span class="t-muted fs-sm">${{data.price}}</span>
+              <span class="t-muted fs-sm">{{data.minutes}} minutos</span>
+              <!--<span class="t-muted fs-sm">{{data.description}}</span>-->
               <span class="t-muted fs-sm">{{data.status}}</span>
             </div>
             <div class="actions">
