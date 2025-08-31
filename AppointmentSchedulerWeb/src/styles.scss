@@ -815,3 +815,45 @@ $width: (
     }
   }
 }
+
+.summary-data-management {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: variables.$spacing-md;
+
+  .summary-item {
+    @include mixins.flex-start;
+    flex-direction: column;
+    gap: variables.$spacing-sm;
+    padding: variables.$padding-md;
+
+    flex: 1 1 calc(50% - variables.$spacing-md * 2);
+    max-width: calc(100%);
+
+    @media (min-width: 768px) {
+      flex: 0 0 calc((100% - variables.$spacing-md * 2)/3);
+      max-width: calc((100% - variables.$spacing-md)/3);
+    }
+  }
+}
+
+.filters-data-management {
+  width: 100%;
+  display: flex;
+  gap: variables.$spacing-md;
+  flex-wrap: wrap;
+
+  .filter-item {
+    flex: 1 1 280px; // permite que crezca y haga wrap
+    max-width: 100%; // en móvil ocupa todo el ancho disponible
+  }
+
+  @media (min-width: 768px) {
+    .filter-item {
+      flex: 0 0 280px; // en desktop se mantiene el ancho fijo
+      max-width: 280px;
+    }
+  }
+
+}

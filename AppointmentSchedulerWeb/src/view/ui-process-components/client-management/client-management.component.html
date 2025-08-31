@@ -1,23 +1,23 @@
 <section class="main-section">
   <h1 class="m-bottom-md">Clientes</h1>
-  <div class="summary m-bottom-xl">
+  <div class="summary-data-management m-bottom-xl">
     <div class="summary-item card">
-      <span class="t-muted">{{translationCodes.TC_CLIENTS_REGISTERED_LABEL | translate}}</span>
+      <span class="t-muted">Registrados</span>
       <span class="fw-bold fs-xl">{{clients.length}}</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">{{translationCodes.TC_CLIENTS_AVAILABLE_LABEL | translate}}</span>
+      <span class="t-muted">Disponibles</span>
       <span class="fw-bold fs-xl">{{enabledClientsCount}}</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">{{translationCodes.TC_CLIENTS_NOT_AVAILABLE_LABEL | translate}}</span>
+      <span class="t-muted">No disponibles</span>
       <span class="fw-bold fs-xl">{{disabledClientsCount}}</span>
     </div>
   </div>
 
   <section class="data-container">
     <section class="data-actions">
-      <div class="input container max-w-sm">
+      <div class="input container max-w-xs">
         <label class="input-icon" for="search"><mat-icon>search</mat-icon></label>
         <input id="search" class="input" type="text" placeholder="Buscar..." />
       </div>

@@ -21,6 +21,11 @@
         <span class="fw-bold">Citas agendadas</span>
       </div>
       <div class="data-body table-type">
+
+        <div class="data-body-no-data" *ngIf="scheduledAppointments?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han encontrado registros</span>
+        </div>
         <div class="card-container data-row-item accordion-type"
           *ngFor="let appointment of scheduledAppointments; let i = index">
           <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
@@ -262,6 +267,11 @@
         <span class="fw-bold">Clientes registrados</span>
       </div>
       <div class="data-body table-type">
+
+        <div class="data-body-no-data" *ngIf="clients?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han encontrado registros</span>
+        </div>
         <div class="client-card-container scroll-visible">
           <div class="client-data data-row-item" [class.selected-item-bg]="selectedClient?.uuid === data.uuid"
             (click)="selectedClient = data" *ngFor="let data of clients">
@@ -312,6 +322,10 @@
         <span>Servicios disponibles</span>
       </div>
       <div class="data-body table-type">
+        <div class="data-body-no-data" *ngIf="servicesAvailable?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han encontrado registros</span>
+        </div>
         <div class="service-card-container scroll-visible">
           <div class="service-data data-row-item" *ngFor="let serviceOffer of servicesAvailable">
             <div class="icon">
@@ -345,6 +359,10 @@
         <span>Servicios disponibles</span>
       </div>
       <div class="data-body table-type">
+        <div class="data-body-no-data" *ngIf="selectedServicesOffer?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han encontrado registros</span>
+        </div>
         <div class="service-data data-row-item" *ngFor="let serviceOffer of selectedServicesOffer; let i = index;">
           <div class="icon">
             <mat-icon>support_agent</mat-icon>

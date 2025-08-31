@@ -4,25 +4,13 @@
 .main-section {
   width: 100%;
   padding: variables.$padding-md;
+  // max-width:variables.$container-xl;
+  // margin: auto;
 }
 
-.summary {
-  width: 100%;
-  height: auto;
-  flex-wrap: wrap;
-  display: flex;
-  gap: variables.$spacing-md;
 
-  .summary-item {
-    @include mixins.flex-start;
-    flex-direction: column;
-    // width: math.div(variables.$container-xs, 2);
-    width: 100%;
-    gap: variables.$spacing-sm;
-    ;
-    padding: variables.$padding-md;
-  }
-}
+
+
 
 
 .card-container {

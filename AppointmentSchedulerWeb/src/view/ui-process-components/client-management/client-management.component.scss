@@ -22,9 +22,7 @@
     @include mixins.flex-start;
     flex-direction: column;
     // width: math.div(variables.$container-xs, 2);
-    width: 100%;
     gap: variables.$spacing-sm;
-    ;
     padding: variables.$padding-md;
   }
 }

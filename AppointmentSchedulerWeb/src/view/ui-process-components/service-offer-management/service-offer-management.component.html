@@ -1,7 +1,7 @@
 <div class="main-section">
   <h1 class="m-bottom-md">Asignación de servicios</h1>
 
-  <section class="summary m-bottom-xl">
+  <section class="summary-data-management m-bottom-xl">
     <div class="summary-item card">
       <span class="t-muted">Resumen 1</span>
       <span class="fw-bold fs-xl">1</span>
@@ -19,7 +19,7 @@
 
   <section class="data-container">
     <div class="data-actions">
-      <div class="input container max-w-sm">
+      <div class="input container max-w-xs">
         <label class="input-icon" for="search"><mat-icon>search</mat-icon></label>
         <input id="search" class="input" type="text" placeholder="Buscar..." />
       </div>
@@ -45,11 +45,11 @@
         </div>
         <div class="service-info" [class.expanded]="openedSlots.has(i)">
           <div class="service-body-wrapper accordion-body">
-            <span class="t-muted m-bottom-md">Servicios asignados:</span>
+            <span class="t-muted m-bottom-base">Servicios asignados:</span>
             <ul class="service-list-container">
               <li *ngFor="let service of data.serviceOffer">
                 <div class="service-item-container">
-                  <span class="t-emphasis">{{service.name}}</span>
+                  <span class="">{{service.name}}</span>
                   <span class="t-muted">Duración: {{service.minutes}} {{TranslationCodes.TC_MINUTES_LABEL |
                     translate}}</span>
                   <!--<span class="t-muted">$ {{service.price}}</span>-->

@@ -43,10 +43,12 @@
   position: relative;
   min-width: auto;
   width: 100%;
+  padding: variables.$padding-sm;
 
   input {
     background-color: transparent;
     color: variables.$text;
+    font-size: variables.$font-size-sm;
 
     &::placeholder {
       color: variables.$text-muted;
@@ -54,7 +56,7 @@
   }
 
   .input-icon {
-    padding: variables.$padding-xs;
+    // padding: variables.$padding-sm;
     @include mixins.flex-center;
     height: 100%;
     font-size: variables.$font-size-lg;
@@ -63,8 +65,8 @@
   }
 
   .input-placeholder {
-    padding-left: variables.$padding-sm;
-    padding-right: variables.$padding-sm;
+    // padding-left: variables.$padding-sm;
+    // padding-right: variables.$padding-sm;
     height: 100%;
     flex: 1;
     min-width: auto;
