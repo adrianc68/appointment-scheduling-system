@@ -1,46 +1,75 @@
 <section class="main-section">
 
-  <h1 class="m-bottom-md">Citas agendadas</h1>
-  <div class="summary m-bottom-xl">
+  <h1 class="m-bottom-base">Panel de administración de citas</h1>
+  <p class="m-bottom-lg">Una vista consolidada de todas las citas, categorizadas por estado, con resumen visual</p>
+
+  <button class="button primary w-auto m-bottom-md" (click)="redirectToRegisterAppointment()">
+    Registrar nueva cita
+  </button>
+
+  <div class="summary-data-management m-bottom-md">
     <div class="summary-item card">
-      <span class="t-muted"> Resumen </span>
+      <span class="t-muted"> Citas confirmadas</span>
       <span class="fw-bold fs-xl">1</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">Resumen</span>
+      <span class="t-muted">Citas pendientes</span>
       <span class="fw-bold fs-xl">2</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">Resumen 3</span>
+      <span class="t-muted">Citas canceladas</span>
       <span class="fw-bold fs-xl">3</span>
     </div>
   </div>
 
 
-  <div class="max-w-xs m-bottom-md">
-    <label>Desde: </label>
-    <input class="input" type="date" [ngModel]="startDate" (ngModelChange)="onDateRangeChange($event, 'start')" />
-    <label>Hasta: </label>
-    <input class="input" type="date" [ngModel]="endDate" (ngModelChange)="onDateRangeChange($event, 'end')" />
-  </div>
+
+
+  <section class="filters-data-management card p-all-md m-bottom-md">
+    <div class="input container filter-item">
+      <label class="input-icon" for="search">
+        <mat-icon>search</mat-icon>
+      </label>
+      <input id="search" class="input" type="text" placeholder="Buscar..." />
+    </div>
+
+    <div class="input container filter-item">
+      <label class="p-all-sm t-muted">De: </label>
+      <input class="" type="date" [ngModel]="startDate" (ngModelChange)="onDateRangeChange($event, 'start')"
+        placeholder="Hola" />
+    </div>
+
+    <div class="input container filter-item">
+      <label class="p-all-sm t-muted">Hasta: </label>
+      <input class="input " type="date" [ngModel]="endDate" (ngModelChange)="onDateRangeChange($event, 'end')" />
+    </div>
+
+    <div class="filter-item input">
+      Filtro n
+    </div>
+
+    <div class="filter-item input">
+      Filtro n
+    </div>
+
+    <div class="filter-item input">
+      Filtro n
+    </div>
+  </section>
+
+
+
   <section class="data-container">
-    <section class="data-actions">
-      <div class="input container max-w-xs">
-        <label class="input-icon" for="search">
-          <mat-icon>search</mat-icon>
-        </label>
-        <input id="search" class="input" type="text" placeholder="Buscar..." />
-      </div>
-      <button class="button primary w-auto" (click)="redirectToRegisterAppointment()">
-        Registrar
-      </button>
-
-    </section>
-
     <div class="data-header">
       <span class="fw-bold">Citas agendadas</span>
     </div>
     <div class="data-body table-type">
+
+      <div class="data-body-no-data" *ngIf="scheduledAppointments?.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <span>No se han encontrado registros</span>
+      </div>
+
       <div class="card-container data-row-item accordion-type"
         *ngFor="let appointment of scheduledAppointments; let i = index">
         <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
@@ -74,17 +103,9 @@
 
         </div>
         <div class="card-body accordion-body" [class.expanded]="openedSlots.has(i)">
-          <div class="wrapper p-all-md">
+          <div class="wrapper p-left-lg p-right-lg p-top-md p-bottom-lg">
             <div class="data-mgt">
               <div class="slot-data-row unbordered">
-                <div class="slot-data  d-flex-col">
-                  <span class="t-muted">
-                    Fecha de creación:
-                  </span>
-                  <span class="t-emphasis ">
-                    {{ appointment.createdAt | readableDate }}
-                  </span>
-                </div>
                 <div class="slot-data d-flex-col">
                   <span class="t-muted">
                     Fecha:
@@ -140,13 +161,28 @@
                   </span>
                 </div>
               </div>
+              <div class="slot-data-row">
+                <div class="slot-data  d-flex-col">
+                  <span class="t-muted">
+                    Fecha de creación:
+                  </span>
+                  <span class="t-emphasis fs-base">
+                    {{ appointment.createdAt | readableDate }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+
+              </div>
+
+
 
               <div class="slot-data-row">
                 <div class="slot-data d-flex-col">
                   <span class="t-muted">
                     Identificador:
                   </span>
-                  <span class="t-emphasis fs-xs">
+                  <span class="t-emphasis fs-base">
                     {{ appointment.uuid }}
                   </span>
                 </div>
