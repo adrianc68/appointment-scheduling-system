@@ -30,37 +30,34 @@
 }
 
 
-.client-card-container {
+
+
+.client-data {
+  display: flex;
+  gap: variables.$spacing-md;
+  padding: variables.$padding-md;
   width: 100%;
-  position: relative;
+  align-items: center;
+  border-bottom: 1px solid variables.$border;
 
-  .client-data {
+  &:last-child {
+    border-bottom: 1px solid transparent;
+  }
+
+  .profile-icon {
     display: flex;
-    gap: variables.$spacing-md;
-    padding: variables.$padding-md;
-    width: 100%;
+    justify-content: center;
     align-items: center;
-    border-bottom: 1px solid variables.$border;
+    font-size: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 
-    &:last-child {
-      border-bottom: 1px solid transparent;
-    }
-
-    .profile-icon {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2.5rem;
-      width: 2.5rem;
-      height: 2.5rem;
-    }
-
-    .client-info {
-      flex: 1;
-      word-break: break-word;
-      display: flex;
-      justify-content: space-between;
-      flex-direction: column;
-    }
+  .client-info {
+    flex: 1;
+    word-break: break-word;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
   }
 }

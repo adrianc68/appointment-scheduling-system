@@ -17,7 +17,7 @@
     .assistant-card {
       display: flex;
       width: 100%;
-      gap: variables.$spacing-md;
+      gap: variables.$spacing-base;
       // background-color: green;
       padding: variables.$padding-md;
       border-bottom: 1px solid variables.$border;
@@ -27,7 +27,8 @@
       }
 
       .card-icon {
-        // background-color: red;
+        background-color: variables.$bg-muted;
+        border-radius: 50%;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -35,17 +36,18 @@
 
         &>mat-icon {
           font-size: 1.8rem;
-          width: auto;
-          height: auto;
-          background-color: variables.$bg-subtle;
-          border-radius: 50%;
-          padding: variables.$padding-sm;
+          width: 1.8rem;
+          height: 1.8rem;
+          margin: variables.$spacing-base;
+          // padding: variables.$padding-sm;
         }
       }
 
       .card-body {
         display: flex;
         flex: 1;
+        // background-color: red;
+        justify-content: center;
         flex-direction: column;
       }
     }
@@ -70,5 +72,5 @@
 }
 
 .unavailability-slot {
-  display:flex;
+  display: flex;
 }

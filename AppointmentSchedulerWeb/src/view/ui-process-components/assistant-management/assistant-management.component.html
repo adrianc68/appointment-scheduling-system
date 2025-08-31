@@ -29,20 +29,18 @@
     <div class="data-header">
       <span class="fw-bold">Asistentes registrados</span>
     </div>
-    <div class="data-body">
-      <div class="assistant-card-container">
-        <div class="assistant-data" *ngFor="let data of assistants">
-          <mat-icon class="profile-icon">supervisor_account</mat-icon>
-          <div class="assistant-info">
-            <span class="fw-bold">{{data.name}} ({{data.username}})</span>
-            <span class="fs-sm t-secondary">{{data.email}}</span>
-            <span class="fs-sm t-secondary">{{data.phoneNumber}}</span>
-            <span class="fs-sm t-secondary">{{data.status! | translate}}</span>
-          </div>
-          <button class="button unbordered t-brand w-auto m-y-center" (click)="redirectToEditAssistant(data)">
-            Editar
-          </button>
+    <div class="data-body table-type">
+      <div class="assistant-data data-row-item" *ngFor="let data of assistants">
+        <mat-icon class="profile-icon">support_agent</mat-icon>
+        <div class="assistant-info">
+          <span class="fw-bold">{{data.name}} ({{data.username}})</span>
+          <span class="fs-sm t-secondary">{{data.email}}</span>
+          <span class="fs-sm t-secondary">{{data.phoneNumber}}</span>
+          <span class="fs-sm t-secondary">{{data.status! | translate}}</span>
         </div>
+        <button class="button unbordered t-brand w-auto m-y-center" (click)="redirectToEditAssistant(data)">
+          Editar
+        </button>
       </div>
     </div>
   </section>

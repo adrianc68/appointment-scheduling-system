@@ -33,12 +33,11 @@
     <div class="data-header">
       <span class="fw-bold">Horarios registrados</span>
     </div>
-    <div class="data-body">
-      <ul class="slot-container">
-        <li class="card-container card muted" *ngFor="let slot of filteredItems; let i = index">
+    <div class="data-body table-type">
+        <div class="card-data data-row-item accordion-type" *ngFor="let slot of filteredItems; let i = index">
           <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
             <div class="card-title">
-              <span class="fs-base fw-bold t-emphasis">
+              <span class="fs-base t-emphasis">
                 {{ slot.startDate | slotDateRange: (slot.endDate) }}
               </span>
               <span class="fs-base t-muted">{{ slot.assistant.name }} </span>
@@ -49,7 +48,7 @@
               </mat-icon>
             </button>
           </div>
-          <div class="card-body" [class.expanded]="openedSlots.has(i)">
+          <div class="card-body accordion-body" [class.expanded]="openedSlots.has(i)">
             <div class="wrapper p-all-md">
               <div class="slot-data-row unbordered">
                 <div class="slot-data d-flex-col">
@@ -74,16 +73,13 @@
               <div class="slot-data-row">
                 <div class="slot-data d-flex-col">
                   <span class="t-muted">Estado</span>
-                  <span class="slot-status"
-                    [ngClass]="{'t-success': slot.status === 'ENABLED','t-danger': slot.status === 'DISABLED'}">
-                    {{ slot.status }}
-                  </span>
+                  <span class="t-emphasis">{{ slot.status }}</span>
                 </div>
               </div>
               <div class="slot-data-row">
                 <div class="slot-data d-flex-col">
                   <span class="t-muted">Rangos bloqueados:</span>
-                  <ul>
+                  <ul class="ul-bullet-style">
                     <li *ngFor="let uSlot of slot.unavailableTimeSlots">
                       <span class="t-emphasis m-bottom-base">
                         {{ uSlot.startDate | slotDateRange: (uSlot.endDate) }}
@@ -117,8 +113,7 @@
               </div>
             </div>
           </div>
-        </li>
-      </ul>
+        </div>
     </div>
 
   </section>

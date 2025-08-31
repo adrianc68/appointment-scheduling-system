@@ -9,12 +9,12 @@ import { TranslationCodes } from '../../../../cross-cutting/helper/i18n/model/tr
 import { LanguageTypes } from '../../../../cross-cutting/helper/i18n/model/languages.types';
 import { NotificationService } from '../../../../cross-cutting/communication/notification-service/notification.service';
 import { WebRoutes } from '../../../../cross-cutting/operation-management/model/web-routes.constants';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-nav-bar',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule, RouterModule],
   standalone: true,
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.scss'

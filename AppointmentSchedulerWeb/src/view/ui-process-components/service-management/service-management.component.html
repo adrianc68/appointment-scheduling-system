@@ -29,21 +29,19 @@
     <section class="data-header">
       <span class="fw-bold">Servicios registrados</span>
     </section>
-    <section class="data-body">
-      <div class="service-card-container">
-        <div class="service-data" *ngFor="let data of services">
-          <mat-icon class="profile-icon">business_center</mat-icon>
-          <div class="service-info">
-            <span class="fw-bold">{{data.name}} ({{data.name}})</span>
-            <span class="fs-sm t-secondary">{{data.price}}</span>
-            <span class="fs-sm t-secondary">{{data.minutes}}</span>
-            <span class="fs-sm t-secondary">{{data.description}}</span>
-            <span class="fs-sm t-secondary">{{data.status | translate}}</span>
-          </div>
-          <button class="button unbordered t-brand w-auto m-y-center" (click)="redirectToEditService(data)">
-            Editar
-          </button>
+    <section class="data-body table-type">
+      <div class="service-data data-row-item" *ngFor="let data of services">
+        <mat-icon class="profile-icon">business_center</mat-icon>
+        <div class="service-info">
+          <span class="fw-bold">{{data.name}} ({{data.name}})</span>
+          <span class="fs-sm t-secondary">{{data.price}}</span>
+          <span class="fs-sm t-secondary">{{data.minutes}}</span>
+          <span class="fs-sm t-secondary">{{data.description}}</span>
+          <span class="fs-sm t-secondary">{{data.status | translate}}</span>
         </div>
+        <button class="button unbordered t-brand w-auto m-y-center" (click)="redirectToEditService(data)">
+          Editar
+        </button>
       </div>
     </section>
   </section>
