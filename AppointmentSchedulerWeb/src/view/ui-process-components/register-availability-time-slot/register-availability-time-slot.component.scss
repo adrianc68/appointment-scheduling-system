@@ -1,14 +1,6 @@
 @use '../../../styles/mixins.scss' as mixins;
 @use '../../../styles/variables.scss' as variables;
 
-.main-section {
-  width: 100%;
-  padding-right: variables.$padding-md;
-  padding-left: variables.$padding-md;
-  padding-top: variables.$padding-lg;
-  padding-bottom: variables.$padding-lg;
-}
-
 .assistant-select {
   .assistants-container {
     max-height: 250px;

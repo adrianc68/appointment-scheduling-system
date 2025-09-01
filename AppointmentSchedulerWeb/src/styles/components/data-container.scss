@@ -15,7 +15,7 @@
   .data-header {
     width: 100%;
     padding: variables.$padding-md;
-    background-color: variables.$bg-muted;
+    background-color: variables.$bg;
     border: 1px solid variables.$border;
     border-bottom: 0;
     border-top-left-radius: variables.$border-radius-md;
@@ -31,6 +31,7 @@
     // border-bottom: 0;
     border-bottom-left-radius: variables.$border-radius-md;
     border-bottom-right-radius: variables.$border-radius-md;
+    background-color: variables.$bg-subtle;
     // min-height: calc(variables.$container-xs/2);
     // padding: variables.$padding-md;
     // position: relative;
@@ -39,6 +40,7 @@
     &.table-type {
       // background-color: blue;
       // overflow: hidden;
+
 
       .data-row-item {
         background-color: variables.$bg-subtle;
@@ -50,7 +52,7 @@
 
         &.accordion-type {
           .accordion-body {
-            background-color: variables.$bg-muted;
+            background-color: variables.$bg;
             // background-color: red;
           }
         }

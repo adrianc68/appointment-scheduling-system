@@ -30,6 +30,10 @@
   li {
     flex: 1;
 
+    &.active {
+      background-color: variables.$bg-selected;
+    }
+
     a,
     button {
       display: flex;
@@ -60,16 +64,11 @@
       }
     }
 
-    a:hover,
-    button:hover {
+
+
+    &:not(.active):hover {
       background-color: variables.$bg-subtle;
     }
-
-    a:focus,
-    button:hover {
-      background-color: variables.$bg-emphasis;
-    }
-
 
   }
 }

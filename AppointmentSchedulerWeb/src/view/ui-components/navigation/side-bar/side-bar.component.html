@@ -1,7 +1,7 @@
 <nav class="sidebar" [class.open]="isOpen">
   <ul class="sidebar-bs-operations" *ngIf="accountData | async as accountData">
-    <li>
-      <a [routerLink]="[webRoutes.root]" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+    <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <a [routerLink]="[webRoutes.root]">
         <mat-icon class="sidebar-icon">home</mat-icon>
         <span>
           {{translate(translationCodes.TC_HOME_DIRECTORY)}}
@@ -10,32 +10,32 @@
     </li>
 
     <ng-container [ngSwitch]="accountData.role">
-      <li *ngSwitchCase="roleTypes.CLIENT">
-        <a [routerLink]="[webRoutes.root]" routerLinkActive="active">
+      <li *ngSwitchCase="roleTypes.CLIENT" routerLinkActive="active">
+        <a [routerLink]="[webRoutes.root]">
           <mat-icon class="sidebar-icon">calendar_month</mat-icon>
           <span>
             {{translate(translationCodes.TC_APPOINTMENT_CREATE_DIRECTORY)}}
           </span>
         </a>
       </li>
-      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
-        <a [routerLink]="[webRoutes.appointment_management]" routerLinkActive="active">
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR" routerLinkActive="active">
+        <a [routerLink]="[webRoutes.appointment_management]">
           <mat-icon class="sidebar-icon">calendar_month</mat-icon>
           <span>
             {{translate(translationCodes.TC_MANAGEMENT_APPOINTMENT_DIRECTORY) }}
           </span>
         </a>
       </li>
-      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
-        <a [routerLink]="[webRoutes.availability_time_slot_management]" routerLinkActive="active">
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR" routerLinkActive="active">
+        <a [routerLink]="[webRoutes.availability_time_slot_management]">
           <mat-icon class="sidebar-icon">access_time</mat-icon>
           <span>
             {{translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY) }}
           </span>
         </a>
       </li>
-      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
-        <a [routerLink]="[webRoutes.service_offer_management]" routerLinkActive="active">
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR" routerLinkActive="active">
+        <a [routerLink]="[webRoutes.service_offer_management]">
           <mat-icon class="sidebar-icon">assignment</mat-icon>
           <span>
             {{translate(translationCodes.TC_MANAGEMENT_SERVICE_OFFER_DIRECTORY) }}
@@ -43,24 +43,24 @@
         </a>
       </li>
 
-      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
-        <a [routerLink]="[webRoutes.assistant_management]" routerLinkActive="active">
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR" routerLinkActive="active">
+        <a [routerLink]="[webRoutes.assistant_management]">
           <mat-icon class="sidebar-icon">support_agent</mat-icon>
           <span>
             {{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY) }}
           </span>
         </a>
       </li>
-      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
-        <a [routerLink]="[webRoutes.service_management]" routerLinkActive="active">
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR" routerLinkActive="active">
+        <a [routerLink]="[webRoutes.service_management]">
           <mat-icon class="sidebar-icon">business_center</mat-icon>
           <span>
             {{translate(translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY) }}
           </span>
         </a>
       </li>
-      <li *ngSwitchCase="roleTypes.ADMINISTRATOR">
-        <a [routerLink]="[webRoutes.client_management]" routerLinkActive="active">
+      <li *ngSwitchCase="roleTypes.ADMINISTRATOR" routerLinkActive="active">
+        <a [routerLink]="[webRoutes.client_management]">
           <mat-icon class="sidebar-icon">groups_3</mat-icon>
           <span>
             {{ translate(translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY)}}
@@ -68,8 +68,8 @@
         </a>
       </li>
     </ng-container>
-    <li>
-      <a [routerLink]="[webRoutes.configuration]" routerLinkActive="active">
+    <li routerLinkActive="active">
+      <a [routerLink]="[webRoutes.configuration]">
         <mat-icon class="sidebar-icon">settings</mat-icon>
         <span>
           {{translate(translationCodes.TC_CONFIGURATION_DIRECTORY)}}

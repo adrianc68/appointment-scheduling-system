@@ -348,6 +348,10 @@ strong {
   fill: variables.$text-error;
 }
 
+.f-inverted {
+  fill: variables.$text-inverted;
+}
+
 $spacing: (
   none: 0,
   base: variables.$spacing-base,
@@ -856,4 +860,17 @@ $width: (
     }
   }
 
+}
+
+.main-section {
+  width: 100%;
+  padding: variables.$padding-lg;
+
+
+}
+
+@include mixins.respond-to(breakpoints.$breakpoint-md) {
+  .main-section {
+    padding: variables.$padding-xl;
+  }
 }

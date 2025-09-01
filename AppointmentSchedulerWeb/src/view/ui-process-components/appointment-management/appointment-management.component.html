@@ -1,11 +1,10 @@
 <section class="main-section">
 
-  <h1 class="m-bottom-base">Panel de administración de citas</h1>
-  <p class="m-bottom-lg">Una vista consolidada de todas las citas, categorizadas por estado, con resumen visual</p>
+  <h1 class="m-bottom-base">Administración de citas</h1>
+  <p class="m-bottom-lg">Visualiza todas tus citas en un solo lugar, organizadas por estado, con un resumen gráfico para un seguimiento rápido.</p>
 
-  <button class="button primary w-auto m-bottom-md" (click)="redirectToRegisterAppointment()">
-    Registrar nueva cita
-  </button>
+
+
 
   <div class="summary-data-management m-bottom-md">
     <div class="summary-item card">
@@ -57,14 +56,19 @@
     </div>
   </section>
 
-
+  <div class="d-flex w-100 j-content-end">
+    <button class="button primary w-auto m-bottom-md f-inverted" (click)="redirectToRegisterAppointment()">
+      <mat-icon class="button-icon">add</mat-icon>
+      Registrar nueva cita
+    </button>
+  </div>
 
   <section class="data-container">
     <div class="data-header">
       <span class="fw-bold">Citas agendadas</span>
     </div>
-    <div class="data-body table-type">
 
+    <div class="data-body table-type">
       <div class="data-body-no-data" *ngIf="scheduledAppointments?.length === 0">
         <mat-icon>search_off</mat-icon>
         <span>No se han encontrado registros</span>

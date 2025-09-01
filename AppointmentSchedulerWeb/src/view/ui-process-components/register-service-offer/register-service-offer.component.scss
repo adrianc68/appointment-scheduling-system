@@ -2,12 +2,6 @@
 @use '../../../styles/mixins.scss' as mixins;
 @use '../../../styles/breakpoints.scss' as breakpoints;
 
-.main-section {
-  width: 100%;
-  padding: variables.$padding-md;
-}
-
-
 .assistant-select {
   .assistants-container {
     max-height: 250px;
