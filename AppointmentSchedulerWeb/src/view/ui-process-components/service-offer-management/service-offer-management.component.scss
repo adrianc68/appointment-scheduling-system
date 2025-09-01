@@ -3,33 +3,6 @@
 @use '../../../styles/breakpoints.scss' as breakpoints;
 @use 'sass:math';
 
-.main-section {
-  width: 100%;
-  padding-right: variables.$padding-md;
-  padding-left: variables.$padding-md;
-  padding-top: variables.$padding-lg;
-  padding-bottom: variables.$padding-lg;
-  // max-width: variables.$container-md;
-  // margin: auto;
-}
-
-.summary {
-  width: 100%;
-  height: auto;
-  flex-wrap: wrap;
-  display: flex;
-  gap: variables.$spacing-md;
-
-  .summary-item {
-    @include mixins.flex-start;
-    flex-direction: column;
-    // width: math.div(variables.$container-xs, 2);
-    // width: 100%;
-    gap: variables.$spacing-sm;
-    ;
-    padding: variables.$padding-md;
-  }
-}
 
 
 .service-data {

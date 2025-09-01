@@ -2,15 +2,6 @@
 @use '../../../styles/variables.scss' as variables;
 
 
-.main-section {
-  width: 100%;
-  padding: variables.$padding-md;
-}
-
-.app-management {
-  color: #8a8a8a;
-}
-
 .select-service {
   .service-card-container {
     width: 100%;

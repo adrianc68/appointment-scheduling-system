@@ -16,7 +16,9 @@
   font-size: variables.$font-size-base;
 
   .button-icon {
-    font-size: variables.$font-size-xl;
+
+    color: variables.$text-inverted;
+    // font-size: variables.$font-size-xl;
   }
 }
 

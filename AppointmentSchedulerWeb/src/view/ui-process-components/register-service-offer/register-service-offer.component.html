@@ -69,6 +69,10 @@
         <span>Servicios asignados</span>
       </div>
       <div class="data-body table-type">
+        <div class="data-body-no-data" *ngIf="servicesOfferAssigned?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han encontrado registros</span>
+        </div>
         <div class="assigned-services-container scroll-visible">
           <li class="assigned-service-card data-row-item " *ngFor="let data of servicesOfferAssigned">
             <div class="card-icon">
@@ -114,6 +118,10 @@
         <span>Servicios disponibles para asignar</span>
       </div>
       <div class="data-body table-type">
+        <div class="data-body-no-data" *ngIf="serviceNotAssignedOfAssistant?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han encontrado registros</span>
+        </div>
         <ul class="services-available-container scroll-visible">
           <li class="service-available-card data-row-item" *ngFor="let data of serviceNotAssignedOfAssistant">
             <div class="card-icon">

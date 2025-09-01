@@ -44,10 +44,14 @@ export class SideBarComponent {
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
-    if (this.isOpen && this.isMobile() && !this.elementRef.nativeElement.contains(event.target)) {
+    //if (this.isOpen && this.isMobile() && !this.elementRef.nativeElement.contains(event.target)) {
+    //  this.isOpen = false;
+    //  this.isOpenChange.emit(this.isOpen);
+    //}
+    //
+    if (this.isOpen && this.isMobile()) {
       this.isOpen = false;
       this.isOpenChange.emit(this.isOpen);
-
     }
   }
 
