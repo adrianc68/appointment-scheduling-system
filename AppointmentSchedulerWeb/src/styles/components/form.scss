@@ -11,6 +11,7 @@
   padding-bottom: variables.$padding-xl;
   padding-left: variables.$padding-xl;
   padding-right: variables.$padding-xl;
+  // background-color: red;
 
   @include mixins.respond-to(breakpoints.$breakpoint-md) {
     width: 100%;
@@ -21,19 +22,21 @@
 .form-header {
   display: flex;
   flex-direction: column;
+  // background-color: blue;
 }
 
 
 .form-body {
   display: flex;
   flex-direction: column;
-  gap: variables.$spacing-sm;
+  // background-color: red;
+  gap: variables.$spacing-base;
 }
 
 .form-input {
   display: flex;
   flex-direction: column;
-  gap: variables.$spacing-sm;
+  gap: variables.$spacing-base;
 }
 
 .form-footer {
