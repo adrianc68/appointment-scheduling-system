@@ -17,10 +17,11 @@ import { MessageCodeType } from '../../../cross-cutting/communication/model/mess
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { Client } from '../../../view-model/business-entities/client';
 import { ClientService } from '../../../model/communication-components/client.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-edit-client',
-  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule],
   providers: [TaskStateManagerService],
   standalone: true,
   templateUrl: './edit-client.component.html',

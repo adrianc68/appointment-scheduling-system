@@ -352,6 +352,10 @@ strong {
   fill: variables.$text-inverted;
 }
 
+.f-text {
+  fill: variables.$text;
+}
+
 $spacing: (
   none: 0,
   base: variables.$spacing-base,
@@ -480,10 +484,10 @@ $width: (
   width: auto;
 }
 
-//
-// .w-100 {
-//   width: 100%;
-// }
+
+.w-100 {
+  width: 100%;
+}
 
 .h-100 {
   height: 100%;

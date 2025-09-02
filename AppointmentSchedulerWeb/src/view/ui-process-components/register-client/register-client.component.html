@@ -2,54 +2,56 @@
 
   <form class="form card" (ngSubmit)="onSubmit()">
     <div class="form-header">
-
-      <h1>
-        {{translate(translationCodes.TC_MANAGEMENT_CLIENT_REGISTER_DIRECTORY)}}
+      <h1 class="m-bottom-base">
+        Registrar cliente
       </h1>
+      <p>
+        Rellena el formulario para añadir un nuevo cliente.
+      </p>
     </div>
     <div class="form-body">
       <div class="form-input">
         <label for="username">
-          {{ translate(translationCodes.TC_USERNAME_DATA_LABEL)}}
+          Nombre de usuario
         </label>
         <input class="input" id="username" type="text" [(ngModel)]="username" name="username" required
-          placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
+          placeholder="Ingresa un nombre de usuario" />
         <app-error-validation-message-form [messages]="errorValidationMessage['username']" />
       </div>
 
       <div class="form-input">
         <label for="email">
-          {{ translate(translationCodes.TC_EMAIL_DATA_LABEL)}}
+          Correo electrónico
         </label>
         <input class="input" id="email" type="text" [(ngModel)]="email" name="email" required
-          placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
+          placeholder="Ingresa tu correo electrónico" />
         <app-error-validation-message-form [messages]="errorValidationMessage['email']" />
       </div>
 
       <div class="form-input">
         <label for="phoneNumber">
-          {{ translate(translationCodes.TC_PHONE_NUMBER_DATA_LABEL)}}
+          Número de teléfono
         </label>
         <input class="input" id="phoneNumber" type="text" [(ngModel)]="phoneNumber" name="phoneNumber" required
-          placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
+          placeholder="Ingrea el número de teléfono" />
         <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
       </div>
 
       <div class="form-input">
         <label for="name">
-          {{ translate(translationCodes.TC_NAME_DATA_LABEL)}}
+          Nombre completo:
         </label>
         <input class="input" id="name" type="text" [(ngModel)]="name" name="name" required
-          placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
+          placeholder="Ingresa el nombre completo" />
         <app-error-validation-message-form [messages]="errorValidationMessage['name']" />
       </div>
 
       <div class="form-input">
         <label for="password">
-          {{ translate(translationCodes.TC_PASSWORD_DATA_LABEL)}}
+          Contraseña
         </label>
         <input class="input" id="password" type="password" [(ngModel)]="password" name="password" required
-          placeholder={{translate(translationCodes.TC_PASSWORD_PLACEHOLDER_LABEL)}} />
+          placeholder="Ingresa una contraseña" />
         <app-error-validation-message-form [messages]="errorValidationMessage['password']" />
       </div>
 

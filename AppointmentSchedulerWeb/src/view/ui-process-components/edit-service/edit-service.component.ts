@@ -16,10 +16,11 @@ import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isS
 import { Observable, of, switchMap } from 'rxjs';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-edit-service',
-  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule],
   providers: [TaskStateManagerService],
   standalone: true,
   templateUrl: './edit-service.component.html',
