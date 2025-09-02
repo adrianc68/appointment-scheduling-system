@@ -12,3 +12,15 @@
 .form {
   max-width: variables.$container-sm;
 }
+
+
+.status-options {
+  border-top: 1px solid variables.$border;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing-base;
+  }
+}
+

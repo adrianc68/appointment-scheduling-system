@@ -17,10 +17,11 @@ import { OperationResult } from '../../../cross-cutting/communication/model/oper
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-edit-assistant',
-  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS],
+  imports: [FormsModule, CommonModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule],
   standalone: true,
   providers: [TaskStateManagerService],
   templateUrl: './edit-assistant.component.html',

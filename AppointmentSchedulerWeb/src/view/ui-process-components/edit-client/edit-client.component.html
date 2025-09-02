@@ -1,66 +1,85 @@
 <div class="edit-container">
-  <form class="form card" (ngSubmit)="onSubmit()">
-    <div clas="form-header">
-      <h1>
-        {{translate(translationCodes.TC_MANAGEMENT_CLIENT_EDIT_DIRECTORY)}}
-      </h1>
+  <ng-container *ngIf="client">
+    <form class="form card" (ngSubmit)="onSubmit()">
+      <div clas="form-header">
+        <h1 class="m-bottom-base">
+          Editar cliente
+        </h1>
+        <p>
+          Actualiza la información del cliente.
+        </p>
 
-      <button class="button" (click)="disableClient(client.uuid)" type="button">
-        {{translate(translationCodes.TC_DISABLE_BUTTON_LABEL)}}
-      </button>
-      <button class="button" (click)="enableClient(client.uuid)" type="button">
-        {{translate(translationCodes.TC_ENABLE_BUTTON_LABEL)}}
-      </button>
-      <button class="button" (click)="deleteClient(client.uuid)" type="button">
-        {{translate(translationCodes.TC_DELETE_BUTTON_LABEL)}}
-      </button>
-    </div>
-    <div clas="form-body">
-
-      <div class="form-input">
-        <label for="username">
-          {{ translate(translationCodes.TC_USERNAME_DATA_LABEL)}}
-        </label>
-        <input class="input" id="username" type="text" [(ngModel)]="this.client.username" name="username" required
-          placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
-        <app-error-validation-message-form [messages]="errorValidationMessage['username']" />
       </div>
+      <div clas="form-body">
 
-      <div class="form-input">
-        <label for="email">
-          {{ translate(translationCodes.TC_EMAIL_DATA_LABEL)}}
-        </label>
-        <input class="input" id="email" type="text" [(ngModel)]="this.client.email" name="email" required
-          placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
-        <app-error-validation-message-form [messages]="errorValidationMessage['email']" />
+        <div class="form-input">
+          <label for="username">
+            {{ translate(translationCodes.TC_USERNAME_DATA_LABEL)}}
+          </label>
+          <input class="input" id="username" type="text" [(ngModel)]="this.client.username" name="username" required
+            placeholder={{translate(translationCodes.TC_USERNAME_PLACEHOLDER_LABEL)}} />
+          <app-error-validation-message-form [messages]="errorValidationMessage['username']" />
+        </div>
+
+        <div class="form-input">
+          <label for="email">
+            {{ translate(translationCodes.TC_EMAIL_DATA_LABEL)}}
+          </label>
+          <input class="input" id="email" type="text" [(ngModel)]="this.client.email" name="email" required
+            placeholder={{translate(translationCodes.TC_EMAIL_PLACEHOLDER_LABEL)}} />
+          <app-error-validation-message-form [messages]="errorValidationMessage['email']" />
+        </div>
+
+        <div class="form-input">
+          <label for="phoneNumber">
+            {{ translate(translationCodes.TC_PHONE_NUMBER_DATA_LABEL)}}
+          </label>
+          <input class="input" id="phoneNumber" type="text" [(ngModel)]="this.client.phoneNumber" name="phoneNumber"
+            required placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
+          <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
+        </div>
+
+        <div class="form-input">
+          <label for="name">
+            {{ translate(translationCodes.TC_NAME_DATA_LABEL)}}
+          </label>
+          <input class="input" id="name" type="text" [(ngModel)]="this.client.name" name="name" required
+            placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
+          <app-error-validation-message-form [messages]="errorValidationMessage['name']" />
+        </div>
+
+        <div class="status-options m-top-lg">
+          <h2 class="m-bottom-base fw-regular fs-md m-top-lg">Gestionar cliente</h2>
+          <p class="m-bottom-md">Opciones para activar, desactivar o eliminar el cliente.</p>
+          <label class="m-bottom-md">
+            <input type="radio" name="clientStatus" [checked]="client.status === 'ENABLED'"
+              (change)="enableClient(client.uuid)">
+            <span class="t-muted">Activo</span>
+          </label>
+          <label class="m-bottom-lg">
+            <input type="radio" name="clientStatus" [checked]="client.status === 'DISABLED'"
+              (change)="disableClient(client.uuid)">
+            <span class="t-muted">Inactivo</span>
+          </label>
+          <button class="button danger w-auto" (click)="deleteClient(client.uuid)" type="button">
+            <mat-icon class="f-text">delete</mat-icon>
+            <span>
+              Eliminar
+            </span>
+          </button>
+          <p class="fs-xs">Esta acción es permanente y no se puede deshacer.</p>
+        </div>
+
       </div>
-
-      <div class="form-input">
-        <label for="phoneNumber">
-          {{ translate(translationCodes.TC_PHONE_NUMBER_DATA_LABEL)}}
-        </label>
-        <input class="input" id="phoneNumber" type="text" [(ngModel)]="this.client.phoneNumber" name="phoneNumber"
-          required placeholder={{translate(translationCodes.TC_PHONE_NUMBER_PLACEHOLDER_LABEL)}} />
-        <app-error-validation-message-form [messages]="errorValidationMessage['phonenumber']" />
+      <div class="form-footer">
+        <app-button-task type="submit" [loadingState]="currentTaskState"
+          [text]="translate(translationCodes.TC_EDIT_BUTTON_LABEL)">
+        </app-button-task>
+        <span class="system-error">
+          {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
+        </span>
       </div>
+    </form>
 
-      <div class="form-input">
-        <label for="name">
-          {{ translate(translationCodes.TC_NAME_DATA_LABEL)}}
-        </label>
-        <input class="input" id="name" type="text" [(ngModel)]="this.client.name" name="name" required
-          placeholder={{translate(translationCodes.TC_NAME_PLACEHOLDER_LABEL)}} />
-        <app-error-validation-message-form [messages]="errorValidationMessage['name']" />
-      </div>
-
-    </div>
-    <div class="form-footer">
-      <app-button-task type="submit" [loadingState]="currentTaskState"
-        [text]="translate(translationCodes.TC_EDIT_BUTTON_LABEL)">
-      </app-button-task>
-      <span class="system-error">
-        {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
-      </span>
-    </div>
-  </form>
+  </ng-container>
 </div>

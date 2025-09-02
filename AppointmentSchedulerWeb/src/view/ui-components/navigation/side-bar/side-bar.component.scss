@@ -73,6 +73,20 @@
   }
 }
 
+.logout-actions {
+
+
+  // background-color: red;
+  mat-icon {
+    color: variables.$text-error;
+    fill: variables.$text-error;
+
+  }
+
+  // background-color: red;
+
+}
+
 .sidebar.open {
 
   visibility: visible;

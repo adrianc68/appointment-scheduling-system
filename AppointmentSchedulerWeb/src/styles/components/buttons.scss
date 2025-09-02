@@ -6,6 +6,7 @@
   border-radius: variables.$border-radius-sm;
   background-color: variables.$bg-brand;
   color: variables.$text-inverted;
+  fill: variables.$text-inverted;
   padding: variables.$padding-md;
   cursor: pointer;
   border: none;
@@ -16,10 +17,16 @@
   font-size: variables.$font-size-base;
 
   .button-icon {
-
     color: variables.$text-inverted;
     // font-size: variables.$font-size-xl;
   }
+
+  * {
+    color: inherit;
+    fill: inherit;
+  }
+
+
 }
 
 button.primary {
@@ -35,13 +42,27 @@ button.secondary {
 }
 
 .button.success {
-  background-color: variables.$bg-success;
-  color: variables.$text-success;
+  background-color: variables.$bg-success-text;
+  color: variables.$bg-success-text;
+
+  * {
+    color: inherit;
+    fill: inherit;
+  }
+
+
 }
 
 .button.danger {
   background-color: variables.$bg-error;
-  color: variables.$bg-error;
+  color: variables.$bg-error-text;
+  fill: variables.$bg-error-text;
+
+  * {
+    color: inherit;
+    fill: inherit;
+  }
+
 }
 
 .button.error {

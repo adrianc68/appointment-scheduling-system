@@ -1,7 +1,7 @@
 :root {
   --cal-bg: #f9fafb;
   --cal-bg-subtle: #FFFFFF;
-  --cal-bg-muted: #F9FAFB;
+  --cal-bg-muted: #e5e7eb;
   --cal-bg-emphasis: #f9f9fa;
   --cal-bg-inverted: #111827;
   --cal-bg-inverted: #070a0d;
@@ -9,7 +9,9 @@
   --cal-bg-info: #17a2b8;
   --cal-bg-selected: #90CAF9;
   --cal-bg-success: #28a745;
+  --cal-bg-success-text: #fff;
   --cal-bg-warning: #ffc107;
+  --cal-bg-error: #dc3545;
   --cal-border: #d1d5db;
   --cal-border-subtle: #d9dbe0;
   --cal-border-muted: #c0c4cc;
@@ -27,6 +29,7 @@
   --cal-brand: #111827;
   --cal-brand-emphasis: #0f0f0f;
   --cal-brand-text: #4e71ff;
+  --cal-bg-error-text: #fff;
 }
 
 [data-theme="dark"] {
@@ -39,7 +42,10 @@
   --cal-bg-info: #17a2b8;
   --cal-bg-selected: #1E40AF;
   --cal-bg-success: #28a745;
+  --cal-bg-success-text: #fff;
   --cal-bg-warning: #ffc107;
+  --cal-bg-error: #dc3545;
+  --cal-bg-error-text: #fff;
   --cal-border: #4d4d4d;
   --cal-border-subtle: #3d3d3d;
   --cal-border-muted: #5a5a5a;
@@ -69,8 +75,10 @@ $bg-inverted: var(--cal-bg-inverted);
 $bg-brand: var(--cal-bg-brand);
 $bg-info: var(--cal-bg-info);
 $bg-success: var(--cal-bg-success);
+$bg-success-text: var(--cal-bg-success-text);
 $bg-warning: var(--cal-bg-warning);
 $bg-error: var(--cal-bg-error);
+$bg-error-text: var(--cal-bg-error-text);
 $border: var(--cal-border);
 $border-muted: var(--cal-border-muted);
 $border-subtle: var(--cal-border-subtle);
