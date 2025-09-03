@@ -107,13 +107,26 @@
           <span class="fw-bold t-emphasis fs-md">Zona horaria general del sistema</span>
           <p>Este cambia la zona horario que involucre fechas dentro
             de su navegador.</p>
-          <p>Zona horaria configurada: {{ selectedTimeZone }}</p>
+          <div class="d-flex-col">
+            <div class="slot-data-row type-inline">
+              <div class="slot-data d-flex">
+                <span class="t-muted">Zona horario configurada:</span>
+                <span class="t-emphasis m-left-base">{{ selectedTimeZone}}</span>
+              </div>
+            </div>
+
+            <div class="slot-data-row type-inline">
+              <div class="slot-data d-flex d-inline">
+                <span class="t-muted">Fecha actual:</span>
+                <span class="t-emphasis m-left-base">{{ now | readableDate}}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <p>Fecha actual: {{ now | readableDate }}</p>
       </div>
 
       <div class="item-content">
-        <select [(ngModel)]="selectedTimeZone" class="input">
+        <select [(ngModel)]="selectedTimeZone" class="input m-bottom-md">
           <option *ngFor="let tz of availableTimeZones" [value]="tz">{{ tz }}</option>
         </select>
 

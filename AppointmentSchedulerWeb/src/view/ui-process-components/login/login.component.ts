@@ -6,7 +6,7 @@ import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-util
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { AuthenticationService } from '../../../cross-cutting/security/authentication/authentication.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
-import { finalize, of, switchMap, take } from 'rxjs';
+import { of, switchMap, take } from 'rxjs';
 import { NavigationEnd, Router } from '@angular/router';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';

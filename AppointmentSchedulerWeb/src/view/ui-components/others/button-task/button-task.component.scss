@@ -1,5 +1,52 @@
 @use '../../../../styles/variables.scss' as variables;
 
+
+.error {
+  background-color: variables.$bg-error;
+  color: variables.$bg-error-text;
+  fill: variables.$bg-error-text;
+
+  * {
+    color: inherit;
+    fill: inherit;
+  }
+}
+
+.success {
+  background-color: variables.$bg-success;
+  color: variables.$bg-success-text;
+  fill: variables.$bg-success-text;
+
+  * {
+    color: inherit;
+    fill: inherit;
+  }
+}
+
+.loading {
+  background-color: variables.$bg-brand;
+  color: variables.$bg-brand-text;
+  fill: variables.$bg-brand-text;
+
+  * {
+    color: inherit;
+    fill: inherit;
+  }
+
+  // background-color: variables.$bg;
+}
+
+.work-done {
+  background-color: variables.$bg-success;
+  color: variables.$bg-success-text;
+  fill: variables.$bg-success-text;
+
+  * {
+    color: inherit;
+    fill: inherit;
+  }
+}
+
 @keyframes spin {
   0% {
     transform: rotate(360deg);

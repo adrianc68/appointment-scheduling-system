@@ -27,37 +27,95 @@ import { RegisterServiceOfferComponent } from '../view/ui-process-components/reg
 import { RegisterAppointmentAsStaffComponent } from '../view/ui-process-components/register-appointment-as-staff/register-appointment-as-staff.component';
 
 export const routes: Routes = [
+  //{
+  //  path: "",
+  //  component: RootComponent,
+  //  children: [
+  //    { path: "", component: HomeComponent },
+  //    { path: "configuration", component: ConfigManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR, RoleType.CLIENT, RoleType.ASSISTANT] } },
+  //    { path: "notifications", component: NotificationManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR, RoleType.CLIENT, RoleType.ASSISTANT] } },
+  //
+  //    { path: "management/availability-time-slots", component: AvailabilityTimeSlotManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //    { path: "management/availability-time-slots/edit", component: EditAvailabilityTimeSlotComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //    { path: "management/availability-time-slots/register", component: RegisterAvailabilityTimeSlotComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //
+  //    { path: "management/service-offer", component: ServiceOfferManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //    { path: "management/service-offer/register", component: RegisterServiceOfferComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //
+  //
+  //    { path: "management/assistant", component: AssistantManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //    { path: "management/assistant/edit", component: EditAssistantComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //    { path: "management/assistant/register", component: RegisterAssistantComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //
+  //    { path: "management/client", component: ClientManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //    { path: "management/client/register", component: RegisterClientComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //    { path: "management/client/edit", component: EditClientComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //
+  //    { path: "management/service", component: ServiceManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //    { path: "management/service/edit", component: EditServiceComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //    { path: "management/service/register", component: RegisterServiceComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //
+  //    { path: "management/appointment", component: AppointmentManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //    { path: "management/appointment/staff", component: RegisterAppointmentAsStaffComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+  //
+  //  ]
+  //},
+  //
+
   {
     path: "",
     component: RootComponent,
     children: [
       { path: "", component: HomeComponent },
-      { path: "configuration", component: ConfigManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR, RoleType.CLIENT, RoleType.ASSISTANT] } },
-      { path: "notifications", component: NotificationManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR, RoleType.CLIENT, RoleType.ASSISTANT] } },
 
-      { path: "management/availability-time-slots", component: AvailabilityTimeSlotManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-      { path: "management/availability-time-slots/edit", component: EditAvailabilityTimeSlotComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-      { path: "management/availability-time-slots/register", component: RegisterAvailabilityTimeSlotComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+      {
+        path: "configuration",
+        component: ConfigManagementComponent,
+        title: "Configuración",
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [RoleType.ADMINISTRATOR, RoleType.CLIENT, RoleType.ASSISTANT] }
+      },
+      {
+        path: "notifications",
+        component: NotificationManagementComponent,
+        title: "Notificaciones",
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [RoleType.ADMINISTRATOR, RoleType.CLIENT, RoleType.ASSISTANT] }
+      },
 
-      { path: "management/service-offer", component: ServiceOfferManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-      { path: "management/service-offer/register", component: RegisterServiceOfferComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+      // Grupo "management"
+      {
+        path: "management",
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [RoleType.ADMINISTRATOR] },
+        children: [
+          {
+            path: "availability-time-slots",
+            component: AvailabilityTimeSlotManagementComponent,
+            title: "Citas"
+          },
+          { path: "availability-time-slots/edit", component: EditAvailabilityTimeSlotComponent, title: "Citas" },
+          { path: "availability-time-slots/register", component: RegisterAvailabilityTimeSlotComponent, title: "Citas" },
 
+          { path: "service-offer", component: ServiceOfferManagementComponent, title: "Citas" },
+          { path: "service-offer/register", component: RegisterServiceOfferComponent, title: "Citas" },
 
-      { path: "management/assistant", component: AssistantManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-      { path: "management/assistant/edit", component: EditAssistantComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-      { path: "management/assistant/register", component: RegisterAssistantComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+          { path: "assistant", component: AssistantManagementComponent, title: "Citas" },
+          { path: "assistant/edit", component: EditAssistantComponent, title: "Citas" },
+          { path: "assistant/register", component: RegisterAssistantComponent, title: "Citas" },
 
-      { path: "management/client", component: ClientManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-      { path: "management/client/register", component: RegisterClientComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-      { path: "management/client/edit", component: EditClientComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+          { path: "client", component: ClientManagementComponent, title: "Citas" },
+          { path: "client/register", component: RegisterClientComponent, title: "Citas" },
+          { path: "client/edit", component: EditClientComponent, title: "Citas" },
 
-      { path: "management/service", component: ServiceManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-      { path: "management/service/edit", component: EditServiceComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-      { path: "management/service/register", component: RegisterServiceComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
+          { path: "service", component: ServiceManagementComponent, title: "Citas" },
+          { path: "service/edit", component: EditServiceComponent, title: "Citas" },
+          { path: "service/register", component: RegisterServiceComponent, title: "Citas" },
 
-      { path: "management/appointment", component: AppointmentManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-      { path: "management/appointment/staff", component: RegisterAppointmentAsStaffComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-
+          { path: "appointment", component: AppointmentManagementComponent, title: "Citas" },
+          { path: "appointment/staff", component: RegisterAppointmentAsStaffComponent, title: "Citas" }
+        ]
+      }
     ]
   },
   { path: "login", component: LoginComponent, canActivate: [RedirectIfAuthenticatedGuard] },
