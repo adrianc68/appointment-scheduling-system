@@ -11,7 +11,7 @@ import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { AccountService } from '../../../model/communication-components/account.service';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
-import { Observable, of, switchMap } from 'rxjs';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
@@ -31,7 +31,7 @@ export class EditClientComponent {
   translationCodes = TranslationCodes;
   errorValidationMessage: { [field: string]: string[] } = {};
   systemMessage?: string = '';
-  currentTaskState: LoadingState;
+  loadingState: LoadingState = LoadingState.NO_ACTION_PERFORMED;
 
   client: Client;
 
@@ -39,49 +39,55 @@ export class EditClientComponent {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private clientService: ClientService, private stateManagerService: TaskStateManagerService) {
+  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private clientService: ClientService) {
     this.client = this.router.getCurrentNavigation()?.extras.state?.["client"];
-    this.currentTaskState = this.stateManagerService.getState();
-    this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
   }
 
   onSubmit() {
-    console.log("called ")
-    if (this.currentTaskState === LoadingState.LOADING) {
+
+    if (this.loadingState == LoadingState.LOADING || this.loadingState == LoadingState.WORK_DONE) {
       return;
     }
 
-    this.stateManagerService.setState(LoadingState.LOADING);
+    if (this.loadingState === LoadingState.SUCCESSFUL_TASK) {
+      this.loadingState = LoadingState.WORK_DONE;
+      return;
+    }
+
+    this.editClient(this.client).subscribe(result => {
+
+      if (result) {
+        this.loadingState = LoadingState.SUCCESSFUL_TASK;
+      } else {
+        this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
+      }
+
+    })
+
+    this.loadingState = LoadingState.LOADING;
+
+
+
     this.systemMessage = "";
     this.errorValidationMessage = {};
 
+  }
 
-    this.clientService.editClient(this.client).pipe(
-      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
-        console.log("editclient called")
-        console.log(response);
+  editClient(client: Client): Observable<boolean> {
+    return this.clientService.editClient(client).pipe(
+      map((response: OperationResult<boolean, ApiDataErrorResponse>) => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          return of(true);
+          return true;
         } else {
           this.handleErrorResponse(response);
-          return of(false);
+          return false;
         }
       }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          console.log("<<<<");
-          this.setSuccessfulTask();
-        } else {
-          console.log("<<<<");
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-        }
-      },
-      error: (err) => {
+      catchError(err => {
         this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-      }
-    });
+        return of(false);
+      })
+    );
   }
 
   disableClient(uuid: string) {
@@ -195,16 +201,16 @@ export class EditClientComponent {
   }
 
   private setUnsuccessfulTask(state: LoadingState): void {
-    this.stateManagerService.setState(state);
-    setTimeout(() => {
-      this.stateManagerService.setState(LoadingState.NO_ACTION_PERFORMED);
-    }, 1500);
+    //this.stateManagerService.setState(state);
+    //setTimeout(() => {
+    //  this.stateManagerService.setState(LoadingState.NO_ACTION_PERFORMED);
+    //}, 1500);
   }
 
   private setSuccessfulTask(): void {
-    this.stateManagerService.setState(LoadingState.SUCCESSFUL_TASK);
-    setTimeout(() => {
-      //
-    }, 1500)
+    //this.stateManagerService.setState(LoadingState.SUCCESSFUL_TASK);
+    //setTimeout(() => {
+    //  //
+    //}, 1500)
   }
 }

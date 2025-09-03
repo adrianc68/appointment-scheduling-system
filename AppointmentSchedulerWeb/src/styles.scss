@@ -868,7 +868,7 @@ $width: (
 
 .main-section {
   width: 100%;
-  padding: variables.$padding-lg;
+  padding: variables.$padding-md;
 
 
 }
@@ -877,4 +877,8 @@ $width: (
   .main-section {
     padding: variables.$padding-xl;
   }
+}
+
+.user-select-none {
+  user-select: none;
 }

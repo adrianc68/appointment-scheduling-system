@@ -6,13 +6,13 @@
   @include mixins.flex-center;
   flex-direction: column;
   width: 100%;
-  height: auto;
+  min-height: auto;
   padding-top: variables.$padding-lg;
+  padding-bottom: variables.$padding-lg;
+  // background-color: red;
 }
 
-.form {
-  max-width: variables.$container-sm;
-}
+
 
 .status-options {
   border-top: 1px solid variables.$border;

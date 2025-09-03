@@ -4,7 +4,7 @@ import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { Client } from '../../../view-model/business-entities/client';
-import { Observable, of, switchMap } from 'rxjs';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
@@ -17,6 +17,7 @@ import { ClientCardComponent } from '../../ui-components/display/card/client-car
 import { TranslatePipe } from '../../../cross-cutting/helper/i18n/translate.pipe';
 import { AccountStatusType } from '../../../view-model/business-entities/types/account-status.types';
 import { MatIconModule } from '@angular/material/icon';
+import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 
 @Component({
   selector: 'app-client-management',
@@ -26,41 +27,38 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './client-management.component.scss'
 })
 export class ClientManagementComponent {
-  systemMessage?: string = '';
   translationCodes = TranslationCodes;
   clients: Client[] = [];
   clientCard = ClientCardComponent;
   AccountStatusType = AccountStatusType;
   accountStatusType = AccountStatusType;
 
-  constructor(private clientService: ClientService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
-    this.clientService.getClientList().pipe(
-      switchMap((response: OperationResult<Client[], ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.clients = [...response.result!];
-          this.clients.map(d => console.log(d));
-          this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-        //if(result) {
-        //  thos.setSuccessfulTask();
-        //} else {
-        //  this.setUn
-        //}
-      },
-      error: (err) => {
-        this.logginService.error(err);
+  constructor(private clientService: ClientService, private i18nService: I18nService, private logginService: LoggingService, private router: Router, private errorUIService: ErrorUIService) {
+    this.getClientList();
+  }
 
-      }
-    })
+  private getClientList(): void {
+    this.clientService.getClientList().pipe(
+      map((response: OperationResult<Client[], ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          this.clients = [...response.result!];
+          return true;
+        } else {
+          //this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
+
+          return false;
+        }
+      }),
+      catchError(err => {
+        this.logginService.error(err);
+        return of(false);
+      })
+    ).subscribe(result => {
+      console.log(result);
+      // if (result) this.setSuccessfulTask();
+      // else this.setUnsuccessfulTask();
+    });
   }
 
 
@@ -86,7 +84,7 @@ export class ClientManagementComponent {
       code = getStringEnumKeyByValue(MessageCodeType, response.code);
     }
 
-    this.systemMessage = code;
+    //this.systemMessage = code;
   }
 
 

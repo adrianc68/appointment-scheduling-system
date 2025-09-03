@@ -38,6 +38,10 @@ export class ButtonTaskComponent {
     return this.i18nService.translate(key);
   }
 
+  setState(state: LoadingState): void {
+    this.loadingState = state;
+  }
+
 
 
 }

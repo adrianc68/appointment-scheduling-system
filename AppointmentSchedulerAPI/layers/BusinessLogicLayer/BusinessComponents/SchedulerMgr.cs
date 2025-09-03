@@ -288,7 +288,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             {
                 // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
                 int idClient = clientEvent.ClientId!.Value;
-                await this.CancelScheduledOrConfirmedAppointmentsOfClientById(idClient);
+                // await this.CancelScheduledOrConfirmedAppointmentsOfClientById(idClient);
             }
         }
 

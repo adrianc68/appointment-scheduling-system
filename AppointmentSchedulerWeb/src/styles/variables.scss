@@ -6,6 +6,7 @@
   --cal-bg-inverted: #111827;
   --cal-bg-inverted: #070a0d;
   --cal-bg-brand: #2563eb;
+  --cal-bg-brand-text: #fff;
   --cal-bg-info: #17a2b8;
   --cal-bg-selected: #90CAF9;
   --cal-bg-success: #28a745;
@@ -39,6 +40,7 @@
   --cal-bg-emphasis: #383838;
   --cal-bg-inverted: #fafafa;
   --cal-bg-brand: #2563eb;
+  --cal-bg-brand-text: #fff;
   --cal-bg-info: #17a2b8;
   --cal-bg-selected: #1E40AF;
   --cal-bg-success: #28a745;
@@ -73,6 +75,7 @@ $bg-subtle: var(--cal-bg-subtle);
 $bg-muted: var(--cal-bg-muted);
 $bg-inverted: var(--cal-bg-inverted);
 $bg-brand: var(--cal-bg-brand);
+$bg-brand-text: var(--cal-bg-brand-text);
 $bg-info: var(--cal-bg-info);
 $bg-success: var(--cal-bg-success);
 $bg-success-text: var(--cal-bg-success-text);

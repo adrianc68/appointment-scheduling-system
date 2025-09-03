@@ -85,19 +85,21 @@
               <!--<span class="t-muted fs-sm">{{data.description}}</span>-->
               <span class="t-muted fs-sm">{{data.status}}</span>
             </div>
-            <td class="actions">
-              <button class="button  unbordered w-auto p-all-sm m-bottom-base"
+            <div class="actions">
+              <button *ngIf="data.status === 'DISABLED'" class="button unbordered w-auto p-all-sm m-bottom-base"
                 (click)="enableAssignedService(data.uuid)">
                 <span class="fs-sm t-brand">Activar</span>
               </button>
-              <button class=" button  unbordered w-auto p-all-sm m-bottom-base"
+
+              <button *ngIf="data.status === 'ENABLED'" class="button unbordered w-auto p-all-sm m-bottom-base"
                 (click)="disableAssignedService(data.uuid)">
                 <span class="fs-sm t-brand">Desactivar</span>
               </button>
-              <button class="button  unbordered w-auto p-all-sm" (click)="deleteAssignedService(data.uuid)">
+
+              <button class="button unbordered w-auto p-all-sm" (click)="deleteAssignedService(data.uuid)">
                 <span class="fs-sm t-danger">Desvincular</span>
               </button>
-            </td>
+            </div>
         </div>
       </div>
     </div>

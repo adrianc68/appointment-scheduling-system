@@ -6,8 +6,9 @@
   @include mixins.flex-center;
   flex-direction: column;
   width: 100%;
-  height: auto;
+  min-height: auto;
   padding-top: variables.$padding-lg;
+  padding-bottom: variables.$padding-lg;
 }
 
 .form {

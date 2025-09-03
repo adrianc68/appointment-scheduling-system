@@ -37,7 +37,7 @@
   left: 0;
   width: 100%;
   display: none;
-  height: calc(100vh - variables.$navbar-height);
+  height: calc(100svh - variables.$navbar-height);
   flex-direction: column;
   text-align: center;
 
@@ -81,7 +81,10 @@
     position: static;
     display: flex;
     height: auto;
+    // align-items: center;
+    // padding-right: variables.$padding-xl;
     background: none;
+    // background-color: red;
 
     ul {
       @include mixins.flex-center;

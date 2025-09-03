@@ -31,6 +31,10 @@
       <span class="fw-bold">Clientes registrados</span>
     </div>
     <div class="data-body table-type">
+      <div class="data-body-no-data" *ngIf="clients?.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <span>No se han encontrado registros</span>
+      </div>
       <div class="client-data data-row-item" *ngFor="let data of clients">
         <mat-icon class="profile-icon">person</mat-icon>
         <div class="client-info">
