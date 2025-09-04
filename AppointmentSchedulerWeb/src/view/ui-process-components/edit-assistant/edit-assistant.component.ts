@@ -12,12 +12,13 @@ import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { AccountService } from '../../../model/communication-components/account.service';
 import { AssistantService } from '../../../model/communication-components/assistant.service';
-import { Observable, of, switchMap } from 'rxjs';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { MatIconModule } from '@angular/material/icon';
+import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 
 @Component({
   selector: 'app-edit-assistant',
@@ -31,7 +32,7 @@ export class EditAssistantComponent {
   translationCodes = TranslationCodes;
   errorValidationMessage: { [field: string]: string[] } = {};
   systemMessage?: string = '';
-  currentTaskState: LoadingState;
+  loadingState: LoadingState = LoadingState.NO_ACTION_PERFORMED;
 
   assistant: Assistant;
 
@@ -39,49 +40,57 @@ export class EditAssistantComponent {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private assistantService: AssistantService, private stateManagerService: TaskStateManagerService) {
+  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private assistantService: AssistantService, private errorUIService: ErrorUIService) {
     this.assistant = this.router.getCurrentNavigation()?.extras.state?.["assistant"];
-    this.currentTaskState = this.stateManagerService.getState();
-    this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
   }
 
   onSubmit() {
-    console.log("called ")
-    if (this.currentTaskState === LoadingState.LOADING) {
+    if (this.loadingState == LoadingState.LOADING || this.loadingState == LoadingState.WORK_DONE) {
       return;
     }
 
-    this.stateManagerService.setState(LoadingState.LOADING);
+    if (this.loadingState === LoadingState.SUCCESSFUL_TASK) {
+      this.loadingState = LoadingState.WORK_DONE;
+      return;
+    }
+
     this.systemMessage = "";
     this.errorValidationMessage = {};
+    this.loadingState = LoadingState.LOADING;
 
-
-    this.assistantService.editAssistant(this.assistant).pipe(
-      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
-        console.log("editclient called")
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          console.log("<<<<");
-          this.setSuccessfulTask();
-        } else {
-          console.log("<<<<");
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+    this.editAssistant().subscribe(result => {
+      if (result) {
+        this.loadingState = LoadingState.SUCCESSFUL_TASK;
+      } else {
+        this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
       }
     });
   }
+
+
+  editAssistant(): Observable<boolean> {
+    return this.assistantService.editAssistant(this.assistant).pipe(
+      map((response: OperationResult<boolean, ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          return true;
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return false;
+        }
+      }),
+      catchError(err => {
+        this.loggingService.error(err);
+        return of(false);
+      })
+    );
+
+  }
+
+
 
   disableAssistant(uuid: string) {
     this.assistantService.disableAssistant(uuid).pipe(
@@ -91,21 +100,25 @@ export class EditAssistantComponent {
           this.systemMessage = code;
           return of(true);
         } else {
-          this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
           return of(false);
         }
       }),
     ).subscribe({
       next: (result) => {
         if (result) {
-          this.setSuccessfulTask();
+          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
         } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
         }
       },
       error: (err) => {
         this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
       }
     });
   }
@@ -118,21 +131,22 @@ export class EditAssistantComponent {
           this.systemMessage = code;
           return of(true);
         } else {
-          this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
+
           return of(false);
         }
       }),
     ).subscribe({
       next: (result) => {
         if (result) {
-          this.setSuccessfulTask();
+          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
         } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
         }
       },
       error: (err) => {
         this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
       }
     });
   }
@@ -145,66 +159,32 @@ export class EditAssistantComponent {
           this.systemMessage = code;
           return of(true);
         } else {
-          this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
           return of(false);
         }
       }),
     ).subscribe({
       next: (result) => {
         if (result) {
-          this.setSuccessfulTask();
+          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
         } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
         }
       },
       error: (err) => {
         this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
       }
     });
   }
 
 
-  private handleErrorResponse(response: OperationResult<boolean, ApiDataErrorResponse>): void {
-
-    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
-    if (isGenericErrorResponse(response.error)) {
-      let codeMesasge = getStringEnumKeyByValue(MessageCodeType, response.error.message);
-      if (response.error.additionalData?.["field"] !== undefined) {
-        this.setErrorValidationMessage(response.error.additionalData["field"], [codeMesasge!]);
-      }
-      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
-    } else if (isValidationErrorResponse(response.error)) {
-      response.error.forEach(errorItem => {
-        this.setErrorValidationMessage(errorItem.field, errorItem.messages);
-      });
-      code = this.translationCodes.TC_VALIDATION_ERROR;
-    } else if (isServerErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    } else if (isEmptyErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    }
-
-    this.systemMessage = code;
-  }
 
 
   private setErrorValidationMessage(key: string, value: string[]) {
     this.errorValidationMessage[key.toLowerCase()] = value;
   }
 
-  private setUnsuccessfulTask(state: LoadingState): void {
-    this.stateManagerService.setState(state);
-    setTimeout(() => {
-      this.stateManagerService.setState(LoadingState.NO_ACTION_PERFORMED);
-    }, 1500);
-  }
 
-  private setSuccessfulTask(): void {
-    this.stateManagerService.setState(LoadingState.SUCCESSFUL_TASK);
-    setTimeout(() => {
-      //
-    }, 1500)
-  }
 
 }

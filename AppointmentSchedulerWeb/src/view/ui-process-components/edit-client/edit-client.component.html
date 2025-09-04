@@ -67,9 +67,11 @@
         </button>
         <p class="fs-xs">Esta acción es permanente y no se puede deshacer.</p>
 
-        <span class="t-error m-top-base">
-          {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
-        </span>
+        <ng-container *ngIf="systemMessage && systemMessage.length > 0">
+          <span class="t-error m-top-base">
+            {{ systemMessage}}
+          </span>
+        </ng-container>
       </div>
 
     </div>
