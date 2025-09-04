@@ -12,12 +12,13 @@ import { LoggingService } from '../../../cross-cutting/operation-management/logg
 import { AccountService } from '../../../model/communication-components/account.service';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
-import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { ApiDataErrorResponse} from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { Client } from '../../../view-model/business-entities/client';
 import { ClientService } from '../../../model/communication-components/client.service';
 import { MatIconModule } from '@angular/material/icon';
+import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 
 @Component({
   selector: 'app-edit-client',
@@ -39,7 +40,7 @@ export class EditClientComponent {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private clientService: ClientService) {
+  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private clientService: ClientService, private errorUIService: ErrorUIService) {
     this.client = this.router.getCurrentNavigation()?.extras.state?.["client"];
   }
 
@@ -54,6 +55,10 @@ export class EditClientComponent {
       return;
     }
 
+    this.systemMessage = "";
+    this.errorValidationMessage = {};
+    this.loadingState = LoadingState.LOADING;
+
     this.editClient(this.client).subscribe(result => {
 
       if (result) {
@@ -63,14 +68,6 @@ export class EditClientComponent {
       }
 
     })
-
-    this.loadingState = LoadingState.LOADING;
-
-
-
-    this.systemMessage = "";
-    this.errorValidationMessage = {};
-
   }
 
   editClient(client: Client): Observable<boolean> {
@@ -79,7 +76,11 @@ export class EditClientComponent {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           return true;
         } else {
-          this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
           return false;
         }
       }),
@@ -98,21 +99,21 @@ export class EditClientComponent {
           this.systemMessage = code;
           return of(true);
         } else {
-          this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
           return of(false);
         }
       }),
     ).subscribe({
       next: (result) => {
         if (result) {
-          this.setSuccessfulTask();
+          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
         } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
         }
       },
       error: (err) => {
         this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
       }
     });
   }
@@ -125,21 +126,21 @@ export class EditClientComponent {
           this.systemMessage = code;
           return of(true);
         } else {
-          this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
           return of(false);
         }
       }),
     ).subscribe({
       next: (result) => {
         if (result) {
-          this.setSuccessfulTask();
+          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
         } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
         }
       },
       error: (err) => {
         this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
       }
     });
   }
@@ -152,47 +153,23 @@ export class EditClientComponent {
           this.systemMessage = code;
           return of(true);
         } else {
-          this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
           return of(false);
         }
       }),
     ).subscribe({
       next: (result) => {
         if (result) {
-          this.setSuccessfulTask();
+          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
         } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
         }
       },
       error: (err) => {
         this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
       }
     });
-  }
-
-
-  private handleErrorResponse(response: OperationResult<boolean, ApiDataErrorResponse>): void {
-
-    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
-    if (isGenericErrorResponse(response.error)) {
-      let codeMesasge = getStringEnumKeyByValue(MessageCodeType, response.error.message);
-      if (response.error.additionalData?.["field"] !== undefined) {
-        this.setErrorValidationMessage(response.error.additionalData["field"], [codeMesasge!]);
-      }
-      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
-    } else if (isValidationErrorResponse(response.error)) {
-      response.error.forEach(errorItem => {
-        this.setErrorValidationMessage(errorItem.field, errorItem.messages);
-      });
-      code = this.translationCodes.TC_VALIDATION_ERROR;
-    } else if (isServerErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    } else if (isEmptyErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    }
-
-    this.systemMessage = code;
   }
 
 
@@ -200,17 +177,5 @@ export class EditClientComponent {
     this.errorValidationMessage[key.toLowerCase()] = value;
   }
 
-  private setUnsuccessfulTask(state: LoadingState): void {
-    //this.stateManagerService.setState(state);
-    //setTimeout(() => {
-    //  this.stateManagerService.setState(LoadingState.NO_ACTION_PERFORMED);
-    //}, 1500);
-  }
 
-  private setSuccessfulTask(): void {
-    //this.stateManagerService.setState(LoadingState.SUCCESSFUL_TASK);
-    //setTimeout(() => {
-    //  //
-    //}, 1500)
-  }
 }

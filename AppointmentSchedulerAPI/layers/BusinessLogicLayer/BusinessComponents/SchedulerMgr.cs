@@ -295,24 +295,24 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
         public async void UpdateOnAssistantChanged(AssistantEvent assistantEvent)
         {
 
-            if (assistantEvent.EventType == AssistantEventType.DISABLED)
-            {
-                int idAssistant = assistantEvent.AssistantId!.Value;
-                await this.CancelOrRescheduledAppointmentsOfAssistantById(idAssistant);
-                await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.DISABLED);
-            }
-            else if (assistantEvent.EventType == AssistantEventType.ENABLED)
-            {
-                // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
-                int idAssistant = assistantEvent.AssistantId!.Value;
-                await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.ENABLED);
-            }
-            else if (assistantEvent.EventType == AssistantEventType.DELETED)
-            {
-                int idAssistant = assistantEvent.AssistantId!.Value;
-                await this.CancelOrRescheduledAppointmentsOfAssistantById(idAssistant);
-                await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.DISABLED);
-            }
+            // if (assistantEvent.EventType == AssistantEventType.DISABLED)
+            // {
+            //     int idAssistant = assistantEvent.AssistantId!.Value;
+            //     await this.CancelOrRescheduledAppointmentsOfAssistantById(idAssistant);
+            //     await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.DISABLED);
+            // }
+            // else if (assistantEvent.EventType == AssistantEventType.ENABLED)
+            // {
+            //     // $$$>> Create a Retry Mechanism to avoid inconsistencies <<<<<
+            //     int idAssistant = assistantEvent.AssistantId!.Value;
+            //     await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.ENABLED);
+            // }
+            // else if (assistantEvent.EventType == AssistantEventType.DELETED)
+            // {
+            //     int idAssistant = assistantEvent.AssistantId!.Value;
+            //     await this.CancelOrRescheduledAppointmentsOfAssistantById(idAssistant);
+            //     await this.ChangeAllServiceOfferStatusByAssistantIdAsync(idAssistant, ServiceOfferStatusType.DISABLED);
+            // }
         }
 
         private async Task<(bool allCanceled, List<int> failedAppointments)> CancelScheduledOrConfirmedAppointmentsOfClientById(int idClient)

@@ -42,7 +42,7 @@
       </div>
     </div>
     <div class="form-footer">
-      <app-button-task type="submit" [loadingState]="currentTaskState"
+      <app-button-task type="submit" [loadingState]="loadingState"
         [text]="translate(translationCodes.TC_REGISTER_BUTTON_LABEL)" />
       <span class="system-error">
         {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}

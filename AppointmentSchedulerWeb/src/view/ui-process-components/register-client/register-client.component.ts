@@ -10,11 +10,12 @@ import { AccountService } from '../../../model/communication-components/account.
 import { TaskStateManagerService } from '../../model/task-state-manager.service';
 import { LoadingState } from '../../model/loading-state.type';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
-import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
-import { Observable, of, switchMap } from 'rxjs';
+import { ApiDataErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { catchError, map, Observable, of } from 'rxjs';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { FormsModule } from '@angular/forms';
+import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 
 @Component({
   selector: 'app-register-client',
@@ -34,95 +35,71 @@ export class RegisterClientComponent {
   password: string = '';
 
   errorValidationMessage: { [field: string]: string[] } = {};
+
+  loadingState: LoadingState = LoadingState.NO_ACTION_PERFORMED;
   systemMessage?: string = '';
-  currentTaskState: LoadingState;
 
   translate(key: string): string {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private stateManagerService: TaskStateManagerService) {
-    this.currentTaskState = this.stateManagerService.getState();
-    this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
+  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private errorUIService: ErrorUIService) {
   }
 
   onSubmit() {
-    if (this.currentTaskState === LoadingState.LOADING) {
+    if (this.loadingState === LoadingState.LOADING || this.loadingState == LoadingState.WORK_DONE) {
       return;
     }
 
-    this.stateManagerService.setState(LoadingState.LOADING);
+    if (this.loadingState === LoadingState.SUCCESSFUL_TASK) {
+      this.loadingState = LoadingState.WORK_DONE;
+      return;
+    }
+
+
+    this.loadingState = LoadingState.LOADING;
     this.systemMessage = "";
     this.errorValidationMessage = {};
 
-    this.accountService.registerClient(this.username, this.email, this.phoneNumber, this.name, this.password).pipe(
-      switchMap((response: OperationResult<string, ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          this.setSuccessfulTask();
-        } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+
+    this.registerClient(this.username, this.email, this.phoneNumber, this.name, this.password).subscribe(result => {
+      if (result) {
+        this.loadingState = LoadingState.SUCCESSFUL_TASK;
+      } else {
+        this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
       }
     });
   }
 
-  private handleErrorResponse(response: OperationResult<string, ApiDataErrorResponse>): void {
 
-    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
-    if (isGenericErrorResponse(response.error)) {
-      let codeMesasge = getStringEnumKeyByValue(MessageCodeType, response.error.message);
-      if (response.error.additionalData?.["field"] !== undefined) {
-        this.setErrorValidationMessage(response.error.additionalData["field"], [codeMesasge!]);
-      }
-      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
-    } else if (isValidationErrorResponse(response.error)) {
-      response.error.forEach(errorItem => {
-        this.setErrorValidationMessage(errorItem.field, errorItem.messages);
-      });
-      code = this.translationCodes.TC_VALIDATION_ERROR;
-    } else if (isServerErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    } else if (isEmptyErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    }
 
-    this.systemMessage = code;
+  private registerClient(username: string, email: string, phoneNumber: string, name: string, password: string): Observable<boolean> {
+    return this.accountService.registerClient(username, email, phoneNumber, name, password).pipe(
+      map((response: OperationResult<string, ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          this.systemMessage = code;
+          return true;
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return false;
+        }
+      }),
+      catchError(err => {
+        this.loggingService.error(err);
+        return of(false);
+      })
+    );
   }
 
 
   private setErrorValidationMessage(key: string, value: string[]) {
     this.errorValidationMessage[key.toLowerCase()] = value;
   }
-
-  private setUnsuccessfulTask(state: LoadingState): void {
-    this.stateManagerService.setState(state);
-    setTimeout(() => {
-      this.stateManagerService.setState(LoadingState.NO_ACTION_PERFORMED);
-    }, 1500);
-  }
-
-  private setSuccessfulTask(): void {
-    this.stateManagerService.setState(LoadingState.SUCCESSFUL_TASK);
-    setTimeout(() => {
-      //this.router.navigate([WebRoutes.login])
-    }, 1500)
-  }
-
 
 
 

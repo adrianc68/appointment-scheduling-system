@@ -28,8 +28,18 @@ export class ErrorUIService {
     return code;
   }
 
+  public getValidationErrors(response: OperationResult<any, ApiDataErrorResponse>): { [field: string]: string[] } {
+    if (isValidationErrorResponse(response.error)) {
+      const errors: { [field: string]: string[] } = {};
+      response.error.forEach(errorItem => {
+        errors[errorItem.field] = errorItem.messages;
+      });
+      return errors;
+    }
+    return {};
+  }
+
   private showErrorUI(code: string | undefined, details: any): void {
-    // Aquí decides cómo mostrarlo:
     // - console.error (debug)
     // - modal
     // - snackbar
