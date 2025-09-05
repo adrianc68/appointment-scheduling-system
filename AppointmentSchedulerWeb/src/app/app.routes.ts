@@ -25,100 +25,94 @@ import { RegisterAvailabilityTimeSlotComponent } from '../view/ui-process-compon
 import { ServiceOfferManagementComponent } from '../view/ui-process-components/service-offer-management/service-offer-management.component';
 import { RegisterServiceOfferComponent } from '../view/ui-process-components/register-service-offer/register-service-offer.component';
 import { RegisterAppointmentAsStaffComponent } from '../view/ui-process-components/register-appointment-as-staff/register-appointment-as-staff.component';
+import { ManagementLayoutComponent } from '../view/ui-components/navigation/management-layout/management-layout.component';
 
 export const routes: Routes = [
-  //{
-  //  path: "",
-  //  component: RootComponent,
-  //  children: [
-  //    { path: "", component: HomeComponent },
-  //    { path: "configuration", component: ConfigManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR, RoleType.CLIENT, RoleType.ASSISTANT] } },
-  //    { path: "notifications", component: NotificationManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR, RoleType.CLIENT, RoleType.ASSISTANT] } },
-  //
-  //    { path: "management/availability-time-slots", component: AvailabilityTimeSlotManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //    { path: "management/availability-time-slots/edit", component: EditAvailabilityTimeSlotComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //    { path: "management/availability-time-slots/register", component: RegisterAvailabilityTimeSlotComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //
-  //    { path: "management/service-offer", component: ServiceOfferManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //    { path: "management/service-offer/register", component: RegisterServiceOfferComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //
-  //
-  //    { path: "management/assistant", component: AssistantManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //    { path: "management/assistant/edit", component: EditAssistantComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //    { path: "management/assistant/register", component: RegisterAssistantComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //
-  //    { path: "management/client", component: ClientManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //    { path: "management/client/register", component: RegisterClientComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //    { path: "management/client/edit", component: EditClientComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //
-  //    { path: "management/service", component: ServiceManagementComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //    { path: "management/service/edit", component: EditServiceComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //    { path: "management/service/register", component: RegisterServiceComponent, title: "Citas", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //
-  //    { path: "management/appointment", component: AppointmentManagementComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //    { path: "management/appointment/staff", component: RegisterAppointmentAsStaffComponent, title: "Cambiame", canActivate: [AuthGuard, RoleGuard], data: { roles: [RoleType.ADMINISTRATOR] } },
-  //
-  //  ]
-  //},
-  //
-
   {
     path: "",
     component: RootComponent,
     children: [
-      { path: "", component: HomeComponent },
-
       {
         path: "configuration",
         component: ConfigManagementComponent,
-        title: "Configuración",
         canActivate: [AuthGuard, RoleGuard],
         data: { roles: [RoleType.ADMINISTRATOR, RoleType.CLIENT, RoleType.ASSISTANT] }
       },
       {
         path: "notifications",
         component: NotificationManagementComponent,
-        title: "Notificaciones",
         canActivate: [AuthGuard, RoleGuard],
         data: { roles: [RoleType.ADMINISTRATOR, RoleType.CLIENT, RoleType.ASSISTANT] }
       },
-
-      // Grupo "management"
       {
-        path: "management",
-        canActivate: [AuthGuard, RoleGuard],
-        data: { roles: [RoleType.ADMINISTRATOR] },
+        path: "",
+        component: ManagementLayoutComponent,
+        data: { breadcrumb: "Inicio" },
         children: [
           {
-            path: "availability-time-slots",
-            component: AvailabilityTimeSlotManagementComponent,
-            title: "Citas"
+            path: "",
+            component: HomeComponent,
           },
-          { path: "availability-time-slots/edit", component: EditAvailabilityTimeSlotComponent, title: "Citas" },
-          { path: "availability-time-slots/register", component: RegisterAvailabilityTimeSlotComponent, title: "Citas" },
-
-          { path: "service-offer", component: ServiceOfferManagementComponent, title: "Citas" },
-          { path: "service-offer/register", component: RegisterServiceOfferComponent, title: "Citas" },
-
-          { path: "assistant", component: AssistantManagementComponent, title: "Citas" },
-          { path: "assistant/edit", component: EditAssistantComponent, title: "Citas" },
-          { path: "assistant/register", component: RegisterAssistantComponent, title: "Citas" },
-
-          { path: "client", component: ClientManagementComponent, title: "Citas" },
-          { path: "client/register", component: RegisterClientComponent, title: "Citas" },
-          { path: "client/edit", component: EditClientComponent, title: "Citas" },
-
-          { path: "service", component: ServiceManagementComponent, title: "Citas" },
-          { path: "service/edit", component: EditServiceComponent, title: "Citas" },
-          { path: "service/register", component: RegisterServiceComponent, title: "Citas" },
-
-          { path: "appointment", component: AppointmentManagementComponent, title: "Citas" },
-          { path: "appointment/staff", component: RegisterAppointmentAsStaffComponent, title: "Citas" }
+          {
+            path: "management",
+            canActivate: [AuthGuard, RoleGuard],
+            data: { roles: [RoleType.ADMINISTRATOR] },
+            children: [
+              {
+                path: "availability-time-slots", data: { breadcrumb: "Disponibilidad" },
+                children: [
+                  { path: "", component: AvailabilityTimeSlotManagementComponent, },
+                  { path: "edit", component: EditAvailabilityTimeSlotComponent, data: { breadcrumb: "Editar" } },
+                  { path: "register", component: RegisterAvailabilityTimeSlotComponent, data: { breadcrumb: "Registrar" } }
+                ]
+              },
+              {
+                path: "service-offer", data: { breadcrumb: "Asignaciones" },
+                children: [
+                  { path: "", component: ServiceOfferManagementComponent },
+                  { path: "register", component: RegisterServiceOfferComponent, data: { breadcrumb: "Registrar" } },
+                ]
+              },
+              {
+                path: "assistant", data: { breadcrumb: "Asistentes" },
+                children: [
+                  { path: "", component: AssistantManagementComponent },
+                  { path: "edit", component: EditAssistantComponent, data: { breadcrumb: "Editar" } },
+                  { path: "register", component: RegisterAssistantComponent, data: { breadcrumb: "Registrar" } },
+                ]
+              },
+              {
+                path: "client", data: { breadcrumb: "Clientes" },
+                children: [
+                  { path: "", component: ClientManagementComponent },
+                  { path: "register", component: RegisterClientComponent, data: { breadcrumb: "Registrar" } },
+                  { path: "edit", component: EditClientComponent, data: { breadcrumb: "Editar" } },
+                ]
+              },
+              {
+                path: "service", data: { breadcrumb: "Servicios" },
+                children: [
+                  { path: "", component: ServiceManagementComponent },
+                  { path: "edit", component: EditServiceComponent, data: { breadcrumb: "Editar" } },
+                  { path: "register", component: RegisterServiceComponent, data: { breadcrumb: "Registrar" } },
+                ]
+              },
+              {
+                path: "appointment", data: { breadcrumb: "Citas" },
+                children: [
+                  { path: "", component: AppointmentManagementComponent },
+                  { path: "staff", component: RegisterAppointmentAsStaffComponent, data: { breadcrumb: "Registrar" } },
+                ]
+              },
+            ]
+          }
         ]
-      }
+      },
+
     ]
   },
-  { path: "login", component: LoginComponent, canActivate: [RedirectIfAuthenticatedGuard] },
-  { path: "signup", component: RegisterComponent, canActivate: [RedirectIfAuthenticatedGuard] },
-  { path: '**', redirectTo: "" }
+  { path: "login", component: LoginComponent, canActivate: [RedirectIfAuthenticatedGuard], data: { breadcrumb: "Iniciar sesión" } },
+  { path: "signup", component: RegisterComponent, canActivate: [RedirectIfAuthenticatedGuard], data: { breadcrumb: "Registrarse" } },
+  { path: "**", redirectTo: "" }
 ];
+

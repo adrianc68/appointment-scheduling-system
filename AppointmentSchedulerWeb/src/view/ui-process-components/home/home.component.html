@@ -1,5 +1,8 @@
 <ng-container *ngIf="(accountData | async ) as accountData">
+
   <app-client-home *ngIf="accountData.role === roleTypes.CLIENT"></app-client-home>
   <app-assistant-home *ngIf="accountData.role === roleTypes.ASSISTANT"></app-assistant-home>
   <app-administrator-home *ngIf="accountData.role === roleTypes.ADMINISTRATOR"></app-administrator-home>
+
+  <router-outlet></router-outlet>
 </ng-container>

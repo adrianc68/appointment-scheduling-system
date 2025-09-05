@@ -1,1 +1,7 @@
-<p>breadcrumbs works!</p>
+<nav class="breadcrumb main-section" *ngIf="breadcrumbs.length > 0">
+  <ng-container *ngFor="let breadcrumb of breadcrumbs; let last = last">
+    <a class="fs-sm t-muted" *ngIf="!last" [routerLink]="breadcrumb.url">{{ breadcrumb.label }}</a>
+    <span class="fs-sm t-muted" *ngIf="last">{{ breadcrumb.label }}</span>
+    <span class="fs-sm t-muted"*ngIf="!last"> > </span>
+  </ng-container>
+</nav>

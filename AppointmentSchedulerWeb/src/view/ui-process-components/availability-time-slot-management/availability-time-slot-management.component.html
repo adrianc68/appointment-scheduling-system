@@ -1,6 +1,7 @@
 <section class="main-section">
   <h1 class="m-bottom-base">Administración de disponibilidad</h1>
-  <p class="m-bottom-lg">Gestiona los horarios disponibles de tus asistentes, definiendo franjas de tiempo en las que pueden recibir citas.
+  <p class="m-bottom-lg">Gestiona los horarios disponibles de tus asistentes, definiendo franjas de tiempo en las que
+    pueden recibir citas.
   </p>
   <div class="summary-data-management m-bottom-xl">
     <div class="summary-item card">
@@ -36,6 +37,11 @@
       <span class="fw-bold">Horarios registrados</span>
     </div>
     <div class="data-body table-type">
+      <div class="data-body-no-data" *ngIf="filteredItems?.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <span>No se han encontrado registros</span>
+      </div>
+
       <div class="card-data data-row-item accordion-type" *ngFor="let slot of filteredItems; let i = index">
         <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
           <div class="card-title">
