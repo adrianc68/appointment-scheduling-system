@@ -34,6 +34,10 @@
       <span class="">Servicios asignados por asistente</span>
     </div>
     <div class="data-body table-type">
+      <div class="data-body-no-data" *ngIf="serviceOffers?.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <span>No se han encontrado registros</span>
+      </div>
       <div class="service-data data-row-item accordion-type" *ngFor="let data of serviceOffers; let i = index">
         <div class="service-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
           <mat-icon class="icon">support_agent</mat-icon>

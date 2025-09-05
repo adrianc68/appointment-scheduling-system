@@ -1,11 +1,12 @@
 <div class="layout">
   <app-nav-bar class="navbar" (menuToggle)="toggleSidebar()" />
-  <div class="main-container">
+  <main class="main-container">
     <div class="sidebar" [class.open]="sidebarOpen">
       <app-side-bar [isOpen]="sidebarOpen" (isOpenChange)="onSidebarStateChange($event)" />
     </div>
     <div class="content" [class.open]="sidebarOpen">
+      <app-breadcrumbs></app-breadcrumbs>
       <router-outlet></router-outlet>
     </div>
-  </div>
+  </main>
 </div>

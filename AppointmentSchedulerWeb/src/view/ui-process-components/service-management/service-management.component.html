@@ -32,6 +32,11 @@
       <span class="fw-bold">Servicios registrados</span>
     </section>
     <section class="data-body table-type">
+      <div class="data-body-no-data" *ngIf="services?.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <span>No se han encontrado registros</span>
+      </div>
+
       <div class="service-data data-row-item" *ngFor="let data of services">
         <mat-icon class="profile-icon">business_center</mat-icon>
         <div class="service-info">

@@ -6,11 +6,12 @@
 .main-section {
   width: 100%;
   min-height: calc(100svh - variables.$navbar-height);
-  height: 100%;
+  height: auto;
   padding: variables.$padding-md;
   display: flex;
   justify-content: center;
   align-items: center;
+  // background-color: red;
 }
 
 

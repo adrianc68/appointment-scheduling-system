@@ -1,6 +1,7 @@
 <section class="main-section">
   <h1 class="m-bottom-base">Administración de asistentes</h1>
-  <p class="m-bottom-lg">Gestiona la información y permisos de los asistentes, manteniendo su perfil y disponibilidad actualizados.</p>
+  <p class="m-bottom-lg">Gestiona la información y permisos de los asistentes, manteniendo su perfil y disponibilidad
+    actualizados.</p>
 
   <section class="summary-data-management m-bottom-xl">
     <div class="summary-item card">
@@ -32,6 +33,11 @@
       <span class="fw-bold">Asistentes registrados</span>
     </div>
     <div class="data-body table-type">
+      <div class="data-body-no-data" *ngIf="assistants?.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <span>No se han encontrado registros</span>
+      </div>
+
       <div class="assistant-data data-row-item" *ngFor="let data of assistants">
         <mat-icon class="profile-icon">support_agent</mat-icon>
         <div class="assistant-info">

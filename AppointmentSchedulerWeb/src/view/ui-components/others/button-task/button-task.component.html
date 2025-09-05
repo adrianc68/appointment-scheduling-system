@@ -2,8 +2,7 @@
   [class.success]="loadingState === loadingStateType.SUCCESSFUL_TASK"
   [class.loading]="loadingState === loadingStateType.LOADING"
   [class.work-done]="loadingState === loadingStateType.WORK_DONE"
-  [disabled]="loadingState === loadingStateType.WORK_DONE"
-  [type]="type" [name]="name" [id]="id" (click)="onClick()">
+  [disabled]="loadingState === loadingStateType.WORK_DONE" [type]="type" [name]="name" [id]="id" (click)="onClick()">
   <ng-container [ngSwitch]="loadingState">
     <ng-container *ngSwitchCase="loadingStateType.NO_ACTION_PERFORMED">
       <span>
@@ -19,7 +18,7 @@
     </ng-container>
     <ng-container *ngSwitchCase="loadingStateType.SUCCESSFUL_TASK">
       <span>
-        Se ha completado la tarea con éxito...
+        Tarea completada exitosamente...
         <!--{{ translate(loadingState) }}-->
       </span>
       <mat-icon class="success-icon">check_circle</mat-icon>
