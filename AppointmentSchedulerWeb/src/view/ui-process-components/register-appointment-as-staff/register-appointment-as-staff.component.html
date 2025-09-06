@@ -1,8 +1,170 @@
 <section class="main-section">
 
+  <section class="calendar data-section sp-bottom card">
+
+    <app-calendar></app-calendar>
+  </section>
+
   <section class="select-date data-section sp-bottom card">
     <h2>1. Selecciona una fecha</h2>
     <input class="input m-top-base" type="date" [ngModel]="selectedDate" (ngModelChange)="onDateChange($event)" />
+  </section>
+
+
+
+  <section class="select-client data-section sp-bottom card">
+    <h2>1.1 Seleccionar cliente</h2>
+
+    <div class="data-container m-top-base">
+      <div class="data-actions">
+        <div class="input container max-w-sm">
+          <label class="input-icon" for="search"><mat-icon>search</mat-icon></label>
+          <input id="search" class="input" type="text" placeholder="Buscar..." />
+        </div>
+      </div>
+      <div class="data-header">
+        <span class="fw-bold">Clientes registrados</span>
+      </div>
+      <div class="data-body table-type">
+
+        <div class="data-body-no-data" *ngIf="clients?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han encontrado registros</span>
+        </div>
+        <div class="client-card-container scroll-visible">
+          <div class="client-data data-row-item" [class.selected-item-bg]="selectedClient?.uuid === data.uuid"
+            (click)="selectedClient = data" *ngFor="let data of clients">
+            <mat-icon class="profile-icon">person</mat-icon>
+            <div class="client-info">
+              <span class="fw-bold">{{data.name}}</span>
+              <span class="fs-sm t-secondary">{{data.username}}</span>
+              <!--<span class="fs-sm t-secondary">{{data.phoneNumber}}</span>-->
+              <!--<span class="fs-sm t-secondary">{{data.status!}}</span>-->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="data-selected">
+        <div class="data-selected m-top-md" *ngIf="selectedClient">
+          <h3 class="m-bottom-md">Asistente seleccionado: </h3>
+          <div class="assistant-summary">
+            <div>
+              <span class="fs-base t-muted m-bottom-base"> Nombre:</span>
+              <span class="fs-base t-emphasis m-left-base">{{ selectedClient.name }}</span>
+            </div>
+            <div>
+              <span class="fs-base t-muted m-bottom-base"> Nombre de usuario:</span>
+              <span class="fs-base t-emphasis m-left-base"> {{ selectedClient.username}}</span>
+            </div>
+            <div>
+              <span class="fs-base t-muted m-bottom-base"> Correo:</span>
+              <span class="fs-base t-emphasis m-left-base"> {{ selectedClient.email}}</span>
+            </div>
+            <div>
+              <span class="fs-base t-muted m-bottom-base"> Telefono:</span>
+              <span class="fs-base t-emphasis m-left-base"> {{ selectedClient.phoneNumber}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="select-service data-section sp-bottom card">
+    <h2>2. Selecciona los servicios</h2>
+
+    <div class="data-container">
+      <div class="data-actions">
+
+      </div>
+      <div class="data-header">
+        <span>Servicios disponibles</span>
+      </div>
+      <div class="data-body table-type">
+        <div class="data-body-no-data" *ngIf="servicesAvailable?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han encontrado registros</span>
+        </div>
+        <div class="service-card-container scroll-visible">
+          <div class="service-data data-row-item" *ngFor="let serviceOffer of servicesAvailable">
+            <div class="icon">
+              <mat-icon>support_agent</mat-icon>
+              <span class="fs-base m-top-base">{{ serviceOffer.assistant?.name }}</span>
+            </div>
+            <div class="service-info">
+              <span class="fs-base t-emphasis fw-bold">{{ serviceOffer.name}}</span>
+              <div class="m-top-base">
+                <span class="fs-sm t-muted">$ {{ serviceOffer.price}}</span>
+                <span class="fs-sm t-muted m-left-base">-</span>
+                <span class="fs-sm t-muted m-left-base">{{ serviceOffer.minutes}} min</span>
+              </div>
+            </div>
+            <button class="button bordered m-y-center w-auto p-all-sm" (click)="selectServiceOffer(serviceOffer)">
+              <mat-icon class="brand">add</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="selected-service data-section sp-bottom card">
+    <h2>3. Servicios seleccionados</h2>
+    <div class="data-container">
+      <div class="data-actions">
+      </div>
+      <div class="data-header">
+        <span>Servicios disponibles</span>
+      </div>
+      <div class="data-body table-type">
+        <div class="data-body-no-data" *ngIf="selectedServicesOffer?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han encontrado registros</span>
+        </div>
+        <div class="service-data data-row-item" *ngFor="let serviceOffer of selectedServicesOffer; let i = index;">
+          <div class="icon">
+            <mat-icon>support_agent</mat-icon>
+            <span class="fs-base m-top-base">{{ serviceOffer.assistant?.name }}</span>
+          </div>
+          <div class="service-info">
+            <span class="fs-base t-emphasis fw-bold">{{ serviceOffer.name}}</span>
+            <div class="m-top-base">
+              <span class="fs-sm t-muted">$ {{ serviceOffer.price}}</span>
+              <span class="fs-sm t-muted m-left-base">-</span>
+              <span class="fs-sm t-muted m-left-base">{{ serviceOffer.minutes}} min</span>
+            </div>
+            <div class="m-top-base">
+              <label class="w-auto" for="startTime{{i}}">Hora de inicio:</label>
+              <input id="startTime{{i}}" name="startTime{{i}}" type="time" step="1"
+                [(ngModel)]="startTimes[serviceOffer.uuid]" required />
+            </div>
+
+
+            <!--<div class="slot-data d-inline">-->
+            <!--  <span class="fs-base t-muted"> Descripción:</span>-->
+            <!--  <p class="fs-base t-emphasis"> {{ serviceOffer.description}}</p>-->
+            <!--</div>-->
+          </div>
+
+          <button class="button bordered m-y-center w-auto p-all-sm" (click)="removeSelectedService(serviceOffer)">
+            <mat-icon class="danger">delete</mat-icon>
+          </button>
+
+        </div>
+      </div>
+      <div class="slot-data-container">
+        <div class="slot-data d-flex-col">
+          <span class="fs-base t-muted m-top-md"> Duración de la cita:</span>
+          <span class="fs-base t-emphasis"> {{ getTotalMinutes() }} minutos</span>
+        </div>
+        <div class="slot-data d-flex-col">
+          <span class="fs-base t-muted  m-top-md"> Total:</span>
+          <span class="fs-base t-emphasis"> {{ getTotalPrice() | currency }}</span>
+        </div>
+      </div>
+    </div>
+
   </section>
 
 
@@ -252,161 +414,6 @@
 
   </section>
 
-
-  <section class="select-client data-section sp-bottom card">
-    <h2>1.1 Seleccionar cliente</h2>
-
-    <div class="data-container m-top-base">
-      <div class="data-actions">
-        <div class="input container max-w-sm">
-          <label class="input-icon" for="search"><mat-icon>search</mat-icon></label>
-          <input id="search" class="input" type="text" placeholder="Buscar..." />
-        </div>
-      </div>
-      <div class="data-header">
-        <span class="fw-bold">Clientes registrados</span>
-      </div>
-      <div class="data-body table-type">
-
-        <div class="data-body-no-data" *ngIf="clients?.length === 0">
-          <mat-icon>search_off</mat-icon>
-          <span>No se han encontrado registros</span>
-        </div>
-        <div class="client-card-container scroll-visible">
-          <div class="client-data data-row-item" [class.selected-item-bg]="selectedClient?.uuid === data.uuid"
-            (click)="selectedClient = data" *ngFor="let data of clients">
-            <mat-icon class="profile-icon">person</mat-icon>
-            <div class="client-info">
-              <span class="fw-bold">{{data.name}}</span>
-              <span class="fs-sm t-secondary">{{data.username}}</span>
-              <!--<span class="fs-sm t-secondary">{{data.phoneNumber}}</span>-->
-              <!--<span class="fs-sm t-secondary">{{data.status!}}</span>-->
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="data-selected">
-        <div class="data-selected m-top-md" *ngIf="selectedClient">
-          <h3 class="m-bottom-md">Asistente seleccionado: </h3>
-          <div class="assistant-summary">
-            <div>
-              <span class="fs-base t-muted m-bottom-base"> Nombre:</span>
-              <span class="fs-base t-emphasis m-left-base">{{ selectedClient.name }}</span>
-            </div>
-            <div>
-              <span class="fs-base t-muted m-bottom-base"> Nombre de usuario:</span>
-              <span class="fs-base t-emphasis m-left-base"> {{ selectedClient.username}}</span>
-            </div>
-            <div>
-              <span class="fs-base t-muted m-bottom-base"> Correo:</span>
-              <span class="fs-base t-emphasis m-left-base"> {{ selectedClient.email}}</span>
-            </div>
-            <div>
-              <span class="fs-base t-muted m-bottom-base"> Telefono:</span>
-              <span class="fs-base t-emphasis m-left-base"> {{ selectedClient.phoneNumber}}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="select-service data-section sp-bottom card">
-    <h2>2. Selecciona los servicios</h2>
-
-    <div class="data-container">
-      <div class="data-actions">
-
-      </div>
-      <div class="data-header">
-        <span>Servicios disponibles</span>
-      </div>
-      <div class="data-body table-type">
-        <div class="data-body-no-data" *ngIf="servicesAvailable?.length === 0">
-          <mat-icon>search_off</mat-icon>
-          <span>No se han encontrado registros</span>
-        </div>
-        <div class="service-card-container scroll-visible">
-          <div class="service-data data-row-item" *ngFor="let serviceOffer of servicesAvailable">
-            <div class="icon">
-              <mat-icon>support_agent</mat-icon>
-              <span class="fs-base m-top-base">{{ serviceOffer.assistant?.name }}</span>
-            </div>
-            <div class="service-info">
-              <span class="fs-base t-emphasis fw-bold">{{ serviceOffer.name}}</span>
-              <div class="m-top-base">
-                <span class="fs-sm t-muted">$ {{ serviceOffer.price}}</span>
-                <span class="fs-sm t-muted m-left-base">-</span>
-                <span class="fs-sm t-muted m-left-base">{{ serviceOffer.minutes}} min</span>
-              </div>
-            </div>
-            <button class="button bordered m-y-center w-auto p-all-sm" (click)="selectServiceOffer(serviceOffer)">
-              <mat-icon class="brand">add</mat-icon>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <section class="selected-service data-section sp-bottom card">
-    <h2>3. Servicios seleccionados</h2>
-    <div class="data-container">
-      <div class="data-actions">
-      </div>
-      <div class="data-header">
-        <span>Servicios disponibles</span>
-      </div>
-      <div class="data-body table-type">
-        <div class="data-body-no-data" *ngIf="selectedServicesOffer?.length === 0">
-          <mat-icon>search_off</mat-icon>
-          <span>No se han encontrado registros</span>
-        </div>
-        <div class="service-data data-row-item" *ngFor="let serviceOffer of selectedServicesOffer; let i = index;">
-          <div class="icon">
-            <mat-icon>support_agent</mat-icon>
-            <span class="fs-base m-top-base">{{ serviceOffer.assistant?.name }}</span>
-          </div>
-          <div class="service-info">
-            <span class="fs-base t-emphasis fw-bold">{{ serviceOffer.name}}</span>
-            <div class="m-top-base">
-              <span class="fs-sm t-muted">$ {{ serviceOffer.price}}</span>
-              <span class="fs-sm t-muted m-left-base">-</span>
-              <span class="fs-sm t-muted m-left-base">{{ serviceOffer.minutes}} min</span>
-            </div>
-            <div class="m-top-base">
-              <label class="w-auto" for="startTime{{i}}">Hora de inicio:</label>
-              <input id="startTime{{i}}" name="startTime{{i}}" type="time" step="1"
-                [(ngModel)]="startTimes[serviceOffer.uuid]" required />
-            </div>
-
-
-            <!--<div class="slot-data d-inline">-->
-            <!--  <span class="fs-base t-muted"> Descripción:</span>-->
-            <!--  <p class="fs-base t-emphasis"> {{ serviceOffer.description}}</p>-->
-            <!--</div>-->
-          </div>
-
-          <button class="button bordered m-y-center w-auto p-all-sm" (click)="removeSelectedService(serviceOffer)">
-            <mat-icon class="danger">delete</mat-icon>
-          </button>
-
-        </div>
-      </div>
-      <div class="slot-data-container">
-        <div class="slot-data d-flex-col">
-          <span class="fs-base t-muted m-top-md"> Duración de la cita:</span>
-          <span class="fs-base t-emphasis"> {{ getTotalMinutes() }} minutos</span>
-        </div>
-        <div class="slot-data d-flex-col">
-          <span class="fs-base t-muted  m-top-md"> Total:</span>
-          <span class="fs-base t-emphasis"> {{ getTotalPrice() | currency }}</span>
-        </div>
-      </div>
-    </div>
-
-  </section>
 
 
 

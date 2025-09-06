@@ -1,4 +1,4 @@
-<nav class="sidebar" [class.open]="isOpen">
+<nav class="sidebar scroll-visible" [class.open]="isOpen">
   <ul class="sidebar-bs-operations" *ngIf="accountData | async as accountData">
     <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
       <a [routerLink]="[webRoutes.root]">
