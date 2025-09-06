@@ -19,10 +19,11 @@ import { SlotDateRangePipe } from '../../../cross-cutting/helper/date-utils/slot
 import { ReadableTimePipe } from '../../../cross-cutting/helper/date-utils/readable-time.pipe';
 import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
 import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
+import { CalendarComponent } from '../../ui-components/display/calendar/calendar.component';
 
 @Component({
   selector: 'app-register-appointment-as-staff',
-  imports: [CommonModule, FormsModule, MatIconModule, SlotDateRangePipe, ReadableTimePipe, ReadableDatePipe, DurationDatePipe],
+  imports: [CommonModule, FormsModule, MatIconModule, SlotDateRangePipe, ReadableTimePipe, ReadableDatePipe, DurationDatePipe, CalendarComponent],
   templateUrl: './register-appointment-as-staff.component.html',
   styleUrl: './register-appointment-as-staff.component.scss'
 })

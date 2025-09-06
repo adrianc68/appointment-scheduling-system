@@ -1,0 +1,100 @@
+@use '../../../../styles/variables.scss' as variables;
+@use '../../../../styles/breakpoints.scss' as breakpoints;
+
+/* 🔹 Estilo general del calendario */
+:host ::ng-deep .fc {
+  border: none !important;
+  // background-color: red;
+  padding: 0 !important;
+  margin: 0 !important;
+
+  width: 100%;
+  height: 100%;
+  color: variables.$text;
+  // font-family: 'Inter', sans-serif;
+}
+
+:host ::ng-deep .fc-view-harness {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+:host ::ng-deep .fc-daygrid-day-frame {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+:host ::ng-deep .fc-scroller {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+
+:host ::ng-deep .fc-theme-standard .fc-scrollgrid,
+:host ::ng-deep .fc-theme-standard .fc-scrollgrid-section>td {
+  border: none !important;
+}
+
+:host ::ng-deep .fc {
+  height: auto !important;
+}
+
+
+:host ::ng-deep .fc-theme-standard td,
+:host ::ng-deep .fc-theme-standard th {
+  border: none !important;
+}
+
+:host ::ng-deep .fc-daygrid-day-frame {
+  border: 1px solid variables.$border;
+}
+
+:host ::ng-deep .fc-col-header-cell {
+  // border: 1px solid variables.$border !important;
+  border: 1px solid variables.$border !important;
+}
+
+
+:host ::ng-deep .fc-scroller {
+  height: auto !important;
+  max-height: none !important;
+}
+
+:host ::ng-deep .fc-header-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  :host ::ng-deep .fc-header-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  :host ::ng-deep .fc-toolbar-chunk {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  :host ::ng-deep .fc .fc-button-group,
+  :host ::ng-deep .fc .fc-button {
+    flex: 1 1 auto;
+  }
+}
+
+:host ::ng-deep .fc-day-today {
+  background-color: variables.$bg-brand !important;
+}
+
+:host ::ng-deep .fc-event {
+  border: none !important;
+  background: #3b82f6; // azul
+  border-radius: 8px;
+  padding: 2px 6px;
+}

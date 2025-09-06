@@ -33,7 +33,6 @@ export class BreadcrumbsComponent implements OnInit {
         startWith(null)
       )
       .subscribe(() => {
-        //
         let crumbs = this.buildBreadcrumb(this.route.root);
 
         if (crumbs.length === 1 && crumbs[0].url === '') {
