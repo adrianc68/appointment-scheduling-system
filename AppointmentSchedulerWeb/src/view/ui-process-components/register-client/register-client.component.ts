@@ -43,7 +43,7 @@ export class RegisterClientComponent {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private errorUIService: ErrorUIService) {
+  constructor(private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private errorUIService: ErrorUIService) {
   }
 
   onSubmit() {

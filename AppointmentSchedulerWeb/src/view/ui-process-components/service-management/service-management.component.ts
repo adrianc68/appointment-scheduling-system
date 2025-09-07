@@ -5,11 +5,10 @@ import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-compone
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { Service } from '../../../view-model/business-entities/service';
-import { Observable, of, switchMap } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
-import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { ApiDataErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
-import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { Router } from '@angular/router';
 import { ServiceService } from '../../../model/communication-components/service.service';
@@ -17,6 +16,7 @@ import { ServiceGridItemComponent } from '../../ui-components/display/grid-list/
 import { TranslatePipe } from '../../../cross-cutting/helper/i18n/translate.pipe';
 import { ServiceStatusType } from '../../../view-model/business-entities/types/service-status.types';
 import { MatIconModule } from '@angular/material/icon';
+import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 
 @Component({
   selector: 'app-service-management',
@@ -31,55 +31,29 @@ export class ServiceManagementComponent {
   services: Service[] = [];
   serviceCard = ServiceGridItemComponent;
 
-  constructor(private serviceService: ServiceService, private i18nService: I18nService, private loggingService: LoggingService, private router: Router) {
+  constructor(private serviceService: ServiceService, private i18nService: I18nService, private loggingService: LoggingService, private router: Router, private errorUIService: ErrorUIService) {
+    this.getServiceList();
+  }
+
+  private getServiceList(): void {
     this.serviceService.getServiceList().pipe(
-      switchMap((response: OperationResult<Service[], ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.services = [...response.result!];
-          this.services.map(s => console.log(s));
-          this.systemMessage = code;
-          return of(true);
+      map((response: OperationResult<Service[], ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK && response.result) {
+          return response.result;
+        } else {
+          this.errorUIService.handleError(response);
+          return [];
         }
-        this.handleErrorResponse(response);
-        return of(false);
-
-      })
-
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-        //if(result) {
-        //  thos.setSuccessfulTask();
-        //} else {
-        //  this.setUn
-        //}
-      },
-      error: (err) => {
+      }),
+      catchError(err => {
         this.loggingService.error(err);
-
-      }
+        this.errorUIService.handleError(err);
+        return of([]);
+      })
+    ).subscribe((services: Service[]) => {
+      this.services = services;
     });
-
   }
-
-
-  private handleErrorResponse(response: OperationResult<Service[], ApiDataErrorResponse>): void {
-
-    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
-    if (isGenericErrorResponse(response.error)) {
-      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
-    } else if (isValidationErrorResponse(response.error)) {
-      code = this.translationCodes.TC_VALIDATION_ERROR;
-    } else if (isServerErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    } else if (isEmptyErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    }
-
-    this.systemMessage = code;
-  }
-
 
   get enabledServiceCount(): number {
     return this.services.filter(item => item.status === ServiceStatusType.ENABLED).length;
@@ -88,7 +62,6 @@ export class ServiceManagementComponent {
   get disabledServiceCount(): number {
     return this.services.filter(item => item.status === ServiceStatusType.DISABLED).length;
   }
-
 
   redirectToEditService(service: Service) {
     this.router.navigate([WebRoutes.service_management_edit_service], { state: { service } });
@@ -101,12 +74,4 @@ export class ServiceManagementComponent {
   translate(key: string): string {
     return this.i18nService.translate(key);
   }
-
-
-
-
-
-
-
-
 }

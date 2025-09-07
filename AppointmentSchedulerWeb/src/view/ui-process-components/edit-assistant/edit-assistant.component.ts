@@ -6,15 +6,13 @@ import { TaskStateManagerService } from '../../model/task-state-manager.service'
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { LoadingState } from '../../model/loading-state.type';
 import { Assistant } from '../../../view-model/business-entities/assistant';
-import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
-import { AccountService } from '../../../model/communication-components/account.service';
 import { AssistantService } from '../../../model/communication-components/assistant.service';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
-import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { ApiDataErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { MatIconModule } from '@angular/material/icon';
@@ -40,7 +38,7 @@ export class EditAssistantComponent {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private assistantService: AssistantService, private errorUIService: ErrorUIService) {
+  constructor(private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private assistantService: AssistantService, private errorUIService: ErrorUIService) {
     this.assistant = this.router.getCurrentNavigation()?.extras.state?.["assistant"];
   }
 
@@ -87,10 +85,7 @@ export class EditAssistantComponent {
         return of(false);
       })
     );
-
   }
-
-
 
   disableAssistant(uuid: string) {
     this.assistantService.disableAssistant(uuid).pipe(
@@ -108,19 +103,7 @@ export class EditAssistantComponent {
           return of(false);
         }
       }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
-        } else {
-          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-      }
-    });
+    ).subscribe();
   }
 
   enableAssistant(uuid: string) {
@@ -136,19 +119,7 @@ export class EditAssistantComponent {
           return of(false);
         }
       }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
-        } else {
-          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-      }
-    });
+    ).subscribe();
   }
 
   deleteAssistant(uuid: string) {
@@ -163,28 +134,10 @@ export class EditAssistantComponent {
           return of(false);
         }
       }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
-        } else {
-          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-      }
-    });
+    ).subscribe();
   }
-
-
-
 
   private setErrorValidationMessage(key: string, value: string[]) {
     this.errorValidationMessage[key.toLowerCase()] = value;
   }
-
-
-
 }

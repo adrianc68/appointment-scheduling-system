@@ -2,12 +2,11 @@ import { Component } from '@angular/core';
 import { ClientService } from '../../../model/communication-components/client.service';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
-import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { ApiDataErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { Client } from '../../../view-model/business-entities/client';
-import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
-import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { CommonModule } from '@angular/common';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
@@ -40,24 +39,20 @@ export class ClientManagementComponent {
   private getClientList(): void {
     this.clientService.getClientList().pipe(
       map((response: OperationResult<Client[], ApiDataErrorResponse>) => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          this.clients = [...response.result!];
-          return true;
+        if (response.isSuccessful && response.code === MessageCodeType.OK && response.result) {
+          return response.result;
         } else {
-          //this.handleErrorResponse(response);
           this.errorUIService.handleError(response);
-
-          return false;
+          return [];
         }
       }),
       catchError(err => {
         this.logginService.error(err);
-        return of(false);
+        this.errorUIService.handleError(err);
+        return of([]);
       })
-    ).subscribe(result => {
-      console.log(result);
-      // if (result) this.setSuccessfulTask();
-      // else this.setUnsuccessfulTask();
+    ).subscribe((clients: Client[]) => {
+      this.clients = clients;
     });
   }
 
@@ -71,24 +66,6 @@ export class ClientManagementComponent {
   }
 
 
-  private handleErrorResponse(response: OperationResult<Client[], ApiDataErrorResponse>): void {
-
-    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
-    if (isGenericErrorResponse(response.error)) {
-      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
-    } else if (isValidationErrorResponse(response.error)) {
-      code = this.translationCodes.TC_VALIDATION_ERROR;
-    } else if (isServerErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    } else if (isEmptyErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    }
-
-    //this.systemMessage = code;
-  }
-
-
-
   redirectToRegisterClient() {
     this.router.navigate([WebRoutes.client_management_register_client])
   }
@@ -100,10 +77,5 @@ export class ClientManagementComponent {
   translate(key: string): string {
     return this.i18nService.translate(key);
   }
-
-
-
-
-
 
 }

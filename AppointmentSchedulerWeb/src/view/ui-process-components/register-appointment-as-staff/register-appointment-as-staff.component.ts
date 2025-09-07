@@ -20,6 +20,7 @@ import { ReadableTimePipe } from '../../../cross-cutting/helper/date-utils/reada
 import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
 import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
 import { CalendarComponent } from '../../ui-components/display/calendar/calendar.component';
+import { AvailabilityTimeSlot } from '../../../view-model/business-entities/availability-time-slot';
 
 @Component({
   selector: 'app-register-appointment-as-staff',
@@ -286,6 +287,69 @@ export class RegisterAppointmentAsStaffComponent {
 
   }
 
+  onDateSelected(date: string) {
+    console.log('El padre recibió la fecha:', date);
+    this.loadAppointments(date, date);
+    this.getAvailableServices(date);
+  }
+
+
+
+  onCurrentDateChange(date: Date) {
+    console.log('El padre recibió la fecha:', date);
+
+    // ejemplo: mostrar en español
+    const formatted = date.toLocaleString('es-MX', { month: 'long', year: 'numeric' });
+    console.log('Mes actual:', formatted);
+
+    // ejemplo: podrías calcular el rango del mes
+    const start = new Date(date.getFullYear(), date.getMonth(), 1);
+    const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    console.log('Rango del mes:', start, end);
+
+    this.getAvailabilityTimeSlots(start, end);
+
+  }
+
+
+  //slots: AvailabilityTimeSlot[] = [];
+  slots: { startDate: string, endDate: string }[] = [];
+
+  getAvailabilityTimeSlots(startDate: Date, endDate: Date) {
+    this.schedulerService.getAvailabilityTimeSlots("2024-1-11", "2026-1-11").pipe(
+      switchMap((response: OperationResult<AvailabilityTimeSlot[], ApiDataErrorResponse>): Observable<boolean> => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          //let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          //this.slots = [...response.result!].sort((a, b) => {
+          //  return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+          //});
+          //this.systemMessage = code;
+
+          this.slots = response.result!.map(slot => ({
+            startDate: new Date(slot.startDate).toISOString(), // convertir a string
+            endDate: new Date(slot.endDate).toISOString()
+          })); return of(true);
+        } else {
+          this.handleErrorResponse(response);
+          return of(false);
+        }
+      })
+    ).subscribe({
+      next: (result) => {
+        console.log(result);
+        //if(result) {
+        //  thos.setSuccessfulTask();
+        //} else {
+        //  this.setUn
+        //}
+      },
+      error: (err) => {
+        this.logginService.error(err);
+
+      }
+    })
+  }
+
   getAvailableServices(date: string) {
     this.schedulerService.getAvailableServices(date).pipe(
       switchMap((response: OperationResult<ServiceOffer[], ApiDataErrorResponse>): Observable<boolean> => {
@@ -309,6 +373,8 @@ export class RegisterAppointmentAsStaffComponent {
       error: (err) => this.logginService.error(err)
     });
   }
+
+
 
 
   private handleErrorResponse(response: OperationResult<any, ApiDataErrorResponse>): void {

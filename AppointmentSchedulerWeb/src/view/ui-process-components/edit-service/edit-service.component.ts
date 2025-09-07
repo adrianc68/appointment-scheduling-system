@@ -5,14 +5,13 @@ import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-compone
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { LoadingState } from '../../model/loading-state.type';
 import { Service } from '../../../view-model/business-entities/service';
-import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { ServiceService } from '../../../model/communication-components/service.service';
 import { TaskStateManagerService } from '../../model/task-state-manager.service';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
-import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { ApiDataErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
@@ -38,7 +37,7 @@ export class EditServiceComponent {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private serviceService: ServiceService, private errorUIService: ErrorUIService) {
+  constructor(private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private serviceService: ServiceService, private errorUIService: ErrorUIService) {
     this.service = this.router.getCurrentNavigation()?.extras.state?.["service"];
   }
 
@@ -86,31 +85,25 @@ export class EditServiceComponent {
     );
   }
 
-  disableService(uuid: string) {
+  disableService(uuid: string): void {
     this.serviceService.disableService(uuid).pipe(
-      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>): Observable<boolean> => {
+      map((response: OperationResult<boolean, ApiDataErrorResponse>) => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.systemMessage = code;
-          return of(true);
+          return true;
         } else {
-          this.errorUIService.handleError(response);
-          return of(false);
+          let code = this.errorUIService.handleError(response);
+          this.systemMessage = code;
+          return false;
         }
       }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
-        } else {
-          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-        }
-      },
-      error: (err) => {
+      catchError(err => {
         this.loggingService.error(err);
-        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-      }
-    });
+        this.errorUIService.handleError(err);
+        return of(false); // Devuelve false en caso de error
+      })
+    ).subscribe();
   }
 
   enableService(uuid: string) {
@@ -125,19 +118,7 @@ export class EditServiceComponent {
           return of(false);
         }
       }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
-        } else {
-          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-      }
-    });
+    ).subscribe();
   }
 
   deleteService(uuid: string) {
@@ -152,19 +133,7 @@ export class EditServiceComponent {
           return of(false);
         }
       }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
-        } else {
-          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-      }
-    });
+    ).subscribe();
   }
 
 

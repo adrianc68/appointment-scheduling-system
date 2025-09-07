@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions } from '@fullcalendar/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
+import { CalendarOptions, DatesSetArg } from '@fullcalendar/core';
 
 import dayGridPlugin from '@fullcalendar/daygrid';      // vista mes
 import timeGridPlugin from '@fullcalendar/timegrid';    // vista semana/día
@@ -16,6 +16,12 @@ import interactionPlugin from '@fullcalendar/interaction'; // interacciones (dra
   styleUrl: './calendar.component.scss'
 })
 export class CalendarComponent {
+  @ViewChild('calendar') calendar!: FullCalendarComponent;
+
+  @Output() dateSelected = new EventEmitter<string>();
+  @Output() currentDateChange = new EventEmitter<Date>();
+  @Input() slots: { startDate: string, endDate: string }[] = [];
+
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     headerToolbar: {
@@ -24,17 +30,33 @@ export class CalendarComponent {
       right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-    dateClick: this.handleDateClick.bind(this), // callback al hacer click en un día
-
-    //events: [
-    //  { title: 'Evento 1', date: '2025-09-10' },
-    //  { title: 'Evento 2', date: '2025-09-15' }
-    //]
+    datesSet: this.handleDatesSet.bind(this),
+    dateClick: this.handleDateClick.bind(this),
+    events: []
   };
 
-
   handleDateClick(arg: any) {
-    alert('Seleccionaste la fecha: ' + arg.dateStr);
-    // aquí podrías abrir un modal, crear un evento, etc.
+    this.dateSelected.emit(arg.dateStr);
+  }
+
+  handleDatesSet(arg: DatesSetArg) {
+    this.currentDateChange.emit(arg.view.currentStart);
+  }
+
+  ngOnChanges() {
+    if (this.slots && this.slots.length > 0 && this.calendar) {
+      const calendarApi = this.calendar.getApi();
+      calendarApi.removeAllEvents(); // limpia eventos antiguos
+      this.slots.forEach(slot => {
+        calendarApi.addEvent({
+          start: slot.startDate,
+          end: slot.endDate,
+          allDay: true,
+          display: 'background',
+          backgroundColor: '#4caf50',
+          //title: 'Disponible'
+        });
+      });
+    }
   }
 }

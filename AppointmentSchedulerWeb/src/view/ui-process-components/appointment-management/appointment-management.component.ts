@@ -75,14 +75,7 @@ export class AppointmentManagementComponent {
           return of(false);
         }
       })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-      },
-      error: (err) => {
-        this.logginService.error(err);
-      }
-    });
+    ).subscribe();
   }
 
   selectedDate: string = new Date().toISOString().split("T")[0];
