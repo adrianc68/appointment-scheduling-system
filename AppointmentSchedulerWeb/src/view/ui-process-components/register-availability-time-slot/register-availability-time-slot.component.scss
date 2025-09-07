@@ -3,7 +3,7 @@
 
 .assistant-select {
   .assistants-container {
-    max-height: 250px;
+    max-height: variables.$container-xs;
     overflow-y: auto;
 
     .assistant-card {
@@ -65,4 +65,49 @@
 
 .unavailability-slot {
   display: flex;
+  flex: 1 1 100%;
+
+  .una-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex: 1 1 100%;
+    gap: variables.$spacing-base;
+    border: 1px solid variables.$border;
+    border-radius: variables.$border-radius-md;
+    padding: variables.$padding-sm;
+     // background-color: red;
+
+
+    .una-input-group {
+      display: flex;
+      flex-wrap: wrap;
+      flex: 1 1 auto;
+      gap: variables.$spacing-base;
+
+      .una-input {
+        flex: 1 1 calc(50% - variables.$spacing-base);
+        display: flex;
+        flex-direction: column;
+        min-width: 200px;
+
+        label {
+          margin-bottom: variables.$spacing-base;
+        }
+
+        .input {
+          flex: 1 1 auto;
+          min-width: 0;
+        }
+      }
+    }
+
+    .delete-btn {
+      flex: 0 0 auto;
+      background-color: red;
+      align-self: center;
+    }
+  }
+
+
 }

@@ -1,7 +1,8 @@
 <section class="main-section">
 
   <h1 class="m-bottom-base">Administración de citas</h1>
-  <p class="m-bottom-lg">Visualiza todas tus citas en un solo lugar, organizadas por estado, con un resumen gráfico para un seguimiento rápido.</p>
+  <p class="m-bottom-lg">Visualiza todas tus citas en un solo lugar, organizadas por estado, con un resumen gráfico para
+    un seguimiento rápido.</p>
 
 
 
@@ -41,6 +42,11 @@
     <div class="input container filter-item">
       <label class="p-all-sm t-muted">Hasta: </label>
       <input class="input " type="date" [ngModel]="endDate" (ngModelChange)="onDateRangeChange($event, 'end')" />
+    </div>
+
+    <div class="input container filter-item">
+      <label class="p-all-sm t-muted">Hoy: </label>
+      <span class="fs-sm">{{( today | readableDate).split(",")[0]}}</span>
     </div>
 
     <div class="filter-item input">

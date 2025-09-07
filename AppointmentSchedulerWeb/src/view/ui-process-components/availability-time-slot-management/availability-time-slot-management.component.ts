@@ -18,10 +18,11 @@ import { SlotDateRangePipe } from '../../../cross-cutting/helper/date-utils/slot
 import { ReadableTimePipe } from '../../../cross-cutting/helper/date-utils/readable-time.pipe';
 import { FormsModule } from '@angular/forms';
 import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
+import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
 
 @Component({
   selector: 'app-availability-time-slot-management',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule, SlotDateRangePipe, ReadableTimePipe, FormsModule],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, MatIconModule, SlotDateRangePipe, ReadableTimePipe, FormsModule, ReadableDatePipe],
   standalone: true,
   templateUrl: './availability-time-slot-management.component.html',
   styleUrl: './availability-time-slot-management.component.scss'
@@ -36,8 +37,19 @@ export class AvailabilityTimeSlotManagementComponent {
   startDate: string = this.selectedDate;
   endDate: string = this.selectedDate;
   openedSlots = new Set<number>();
+  today: Date = new Date();
+
 
   constructor(private schedulerService: SchedulerService, private errorUIService: ErrorUIService, private i18nService: I18nService, private router: Router) {
+    const past = new Date(this.today);
+    past.setMonth(this.today.getMonth() - 1);
+
+    const future = new Date(this.today);
+    future.setMonth(this.today.getMonth() + 1);
+
+    this.startDate = past.toISOString().split("T")[0];
+    this.endDate = future.toISOString().split("T")[0];
+
     this.getAvailabilityTimeSlots(this.startDate, this.endDate);
   }
 

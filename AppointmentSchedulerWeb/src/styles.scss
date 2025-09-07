@@ -737,6 +737,10 @@ $width: (
   display: flex;
 }
 
+.d-flex-wrap {
+  flex-wrap: wrap;
+}
+
 .d-flex-col {
   display: flex;
   flex-direction: column;
@@ -886,15 +890,16 @@ $width: (
   display: flex;
   gap: variables.$spacing-md;
   flex-wrap: wrap;
+  // justify-content: center;
 
   .filter-item {
-    flex: 1 1 280px; // permite que crezca y haga wrap
-    max-width: 100%; // en móvil ocupa todo el ancho disponible
+    flex: 1 1 280px;
+    max-width: 100%;
   }
 
   @media (min-width: 768px) {
     .filter-item {
-      flex: 0 0 280px; // en desktop se mantiene el ancho fijo
+      flex: 0 0 280px;
       max-width: 280px;
     }
   }
