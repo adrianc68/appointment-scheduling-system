@@ -15,7 +15,7 @@ export class ErrorUIService {
     let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
 
     if (isGenericErrorResponse(response.error)) {
-      code = 'GENERIC_ERROR_CONFLICT'; // o this.translationCodes.TC_GENERIC_ERROR_CONFLICT
+      code = 'GENERIC_ERROR_CONFLICT';
     } else if (isValidationErrorResponse(response.error)) {
       code = 'VALIDATION_ERROR';
     } else if (isServerErrorResponse(response.error)) {

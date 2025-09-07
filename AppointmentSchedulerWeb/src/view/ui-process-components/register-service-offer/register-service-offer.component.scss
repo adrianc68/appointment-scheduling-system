@@ -4,7 +4,7 @@
 
 .assistant-select {
   .assistants-container {
-    max-height: 250px;
+    max-height: variables.$container-xs;
     overflow-y: auto;
 
     .assistant-card {
@@ -59,6 +59,8 @@
 
 .assigned-services {
   .assigned-services-container {
+    max-height: variables.$container-xs;
+    overflow-y: auto;
 
     .assigned-service-card {
       display: flex;
@@ -77,7 +79,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: variables.$padding-sm;
+        // padding: variables.$padding-sm;
 
         &>mat-icon {
           font-size: 1.5rem;
@@ -102,7 +104,7 @@
 .services-available {
 
   .services-available-container {
-    max-height: 250px;
+    max-height: variables.$container-sm;
     overflow-y: auto;
 
     .service-available-card {
@@ -127,7 +129,7 @@
           width: auto;
           height: auto;
           border-radius: 50%;
-          padding: variables.$padding-sm;
+          // padding: variables.$padding-sm;
         }
       }
 

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { I18nService } from '../cross-cutting/helper/i18n/i18n.service';
 import { AuthenticationService } from '../cross-cutting/security/authentication/authentication.service';
 import { CommonModule } from '@angular/common';
@@ -9,6 +9,8 @@ import { LanguageTypes } from '../cross-cutting/helper/i18n/model/languages.type
 import { NotificationService } from '../cross-cutting/communication/notification-service/notification.service';
 import { MatDialogModule } from '@angular/material/dialog';
 import { LayoutUnauthenticatedComponent } from '../view/ui-components/display/layout-unauthenticated/layout-unauthenticated.component';
+import { filter, takeUntil } from 'rxjs';
+import { Subject } from '@microsoft/signalr';
 
 
 @Component({
@@ -24,13 +26,13 @@ import { LayoutUnauthenticatedComponent } from '../view/ui-components/display/la
   styleUrl: './app.component.scss',
 })
 
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   translationCodes = TranslationCodes;
   isAuthenticated: boolean = false;
   notificationMessages: string[] = [];
 
 
-  constructor(private notificationService: NotificationService, private i18nService: I18nService, private loggingService: LoggingService, private authService: AuthenticationService) {
+  constructor(private notificationService: NotificationService, private i18nService: I18nService, private loggingService: LoggingService, private authService: AuthenticationService, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -48,6 +50,13 @@ export class AppComponent {
     });
 
     this.i18nService.setLanguage(this.i18nService.getLanguage());
+
+    this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => { window.scrollTo(0, 0); });
+
+  }
+
+  ngOnDestroy(): void {
+
   }
 
 

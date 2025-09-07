@@ -32,7 +32,6 @@ export class AssistantService {
   getAssistantList(): Observable<OperationResult<Assistant[], ApiDataErrorResponse>> {
     return this.httpServiceAdapter.get<AssistantDTO[]>(`${this.apiUrl}${ApiRoutes.getAllAssistants}`).pipe(
       map((response: ApiResponse<AssistantDTO[], ApiDataErrorResponse>) => {
-        console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<AssistantDTO[]>(response)) {
           const assistants: Assistant[] = response.data.map(dto => this.parseAssistant(dto));
           return OperationResultService.createSuccess(assistants, response.message);
@@ -146,7 +145,6 @@ export class AssistantService {
   getAssistantsAndServicesOffersList(): Observable<OperationResult<ServiceAssignment[], ApiDataErrorResponse>> {
     return this.httpServiceAdapter.get<AssistantWithServiceOfferDTO[]>(`${this.apiUrl}${ApiRoutes.getAllAssistantServiceOffers}`).pipe(
       map((response: ApiResponse<AssistantWithServiceOfferDTO[], ApiDataErrorResponse>) => {
-        console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<AssistantWithServiceOfferDTO[]>(response)) {
           const assistants: ServiceAssignment[] = response.data.map(dto => this.parseAssistantWithServiceOffer(dto));
           //const assistants: AssistantWithServiceOfferDTO[] = response.data.map(dto => this.parseAssistant(dto));
@@ -193,7 +191,6 @@ export class AssistantService {
   addServiceToAssistant(dto: any): Observable<OperationResult<string[], ApiDataErrorResponse>> {
     return this.httpServiceAdapter.patch<string[]>(`${this.apiUrl}${ApiRoutes.assignService}`, dto).pipe(
       map((response: ApiResponse<string[], ApiDataErrorResponse>) => {
-        console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<string[]>(response)) {
           return OperationResultService.createSuccess(response.data!, response.message);
         }
@@ -216,7 +213,6 @@ export class AssistantService {
   getAssignedServiceOfAssistant(uuid: string): Observable<OperationResult<ServiceOffer[], ApiDataErrorResponse>> {
     return this.httpServiceAdapter.get<ServiceOfferDTO[]>(`${this.apiUrl}${ApiRoutes.getAssignedServices}/?uuid=${uuid}`).pipe(
       map((response: ApiResponse<ServiceOfferDTO[], ApiDataErrorResponse>) => {
-        console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<ServiceOfferDTO[]>(response)) {
           return OperationResultService.createSuccess(this.parseServiceOffer(response.data), response.message);
         }
@@ -242,14 +238,9 @@ export class AssistantService {
   }
 
   private parseServiceOffer(dto: ServiceOfferDTO[]): ServiceOffer[] {
-    console.log("PARSING SERVICE OFFER");
-    console.log(dto);
     let serviceOffers = (dto ?? []).map(serv =>
       new ServiceOffer(serv.name, serv.price, serv.minutes, serv.description, serv.uuid, serv.status, undefined, serv.serviceUuid, serv.serviceStatus)
     );
-
-    console.log(serviceOffers);
-
     return serviceOffers;
   }
 

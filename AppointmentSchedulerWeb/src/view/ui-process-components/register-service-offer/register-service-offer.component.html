@@ -1,6 +1,8 @@
 <section class="main-section">
 
-  <section class="assistant-select data-section sp-bottom card">
+
+
+  <section class="assistant-select data-section sp-bottom card" *ngIf="currentStep === 1">
     <h2 class="m-bottom-lg">1. Selecciona un asistente</h2>
     <div class="data-container">
       <div class="data-actions">
@@ -15,6 +17,10 @@
         <span>Asistentes disponibles</span>
       </div>
       <div class="data-body table-type">
+        <div class="data-body-no-data" *ngIf="assistants?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han encontrado registros</span>
+        </div>
         <div class="assistants-container scroll-visible">
           <li class="assistant-card data-row-item accordion-type"
             [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
@@ -51,10 +57,11 @@
           <span class="fs-base t-emphasis"> {{ selectedAssistant.phoneNumber}}</span>
         </div>
       </div>
+      <button class="button primary m-top-lg" *ngIf="selectedAssistant" (click)="nextStep()">Siguiente</button>
     </div>
   </section>
 
-  <section class="assigned-services data-section sp-bottom card">
+  <section class="assigned-services data-section sp-bottom card" *ngIf="currentStep === 2">
     <h2 class="m-bottom-lg">Servicios asignados</h2>
     <div class="data-container">
       <div class="data-actions">
@@ -102,10 +109,12 @@
             </div>
         </div>
       </div>
+
+      <button class="button primary m-top-lg" (click)="prevStep()">Regresar</button>
     </div>
   </section>
 
-  <section class="services-available data-section sp-bottom card">
+  <section class="services-available data-section sp-bottom card" *ngIf="currentStep === 2">
     <h2 class="m-bottom-lg">Servicios disponibles</h2>
     <div class="data-container">
       <div class="data-actions">
@@ -145,4 +154,7 @@
       </div>
     </div>
   </section>
+
+  <div class="actions-footer m-top-md flex justify-between">
+  </div>
 </section>
