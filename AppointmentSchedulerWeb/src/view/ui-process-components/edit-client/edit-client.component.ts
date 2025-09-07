@@ -12,7 +12,7 @@ import { LoggingService } from '../../../cross-cutting/operation-management/logg
 import { AccountService } from '../../../model/communication-components/account.service';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
-import { ApiDataErrorResponse} from '../../../cross-cutting/communication/model/api-response.error';
+import { ApiDataErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { Client } from '../../../view-model/business-entities/client';
@@ -40,7 +40,7 @@ export class EditClientComponent {
     return this.i18nService.translate(key);
   }
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private accountService: AccountService, private clientService: ClientService, private errorUIService: ErrorUIService) {
+  constructor(private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private clientService: ClientService, private errorUIService: ErrorUIService) {
     this.client = this.router.getCurrentNavigation()?.extras.state?.["client"];
   }
 
@@ -103,19 +103,7 @@ export class EditClientComponent {
           return of(false);
         }
       }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
-        } else {
-          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-      }
-    });
+    ).subscribe();
   }
 
   enableClient(uuid: string) {
@@ -130,19 +118,7 @@ export class EditClientComponent {
           return of(false);
         }
       }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
-        } else {
-          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-      }
-    });
+    ).subscribe();
   }
 
   deleteClient(uuid: string) {
@@ -157,19 +133,7 @@ export class EditClientComponent {
           return of(false);
         }
       }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          //this.loadingState = LoadingState.SUCCESSFUL_TASK;
-        } else {
-          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-          //this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
-      }
-    });
+    ).subscribe();
   }
 
 

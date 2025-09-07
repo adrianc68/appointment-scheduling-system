@@ -2,7 +2,10 @@
 
   <section class="calendar data-section sp-bottom card">
 
-    <app-calendar></app-calendar>
+    <app-calendar (dateSelected)="onDateSelected($event)" [slots]="slots"
+      (currentDateChange)="onCurrentDateChange($event)"></app-calendar>
+
+
   </section>
 
   <section class="select-date data-section sp-bottom card">

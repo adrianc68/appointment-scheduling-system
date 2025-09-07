@@ -3,7 +3,7 @@
   <p class="m-bottom-lg">Gestiona los horarios disponibles de tus asistentes, definiendo franjas de tiempo en las que
     pueden recibir citas.
   </p>
-  <div class="summary-data-management m-bottom-xl">
+  <div class="summary-data-management m-bottom-md">
     <div class="summary-item card">
       <span class="t-muted"> Horarios registrados </span>
       <span class="fw-bold fs-xl">{{slots.length}}</span>
@@ -18,18 +18,36 @@
     </div>
   </div>
 
+  <section class="filters-data-management card p-all-md m-bottom-md">
+    <div class="input container filter-item">
+      <label class="input-icon" for="search">
+        <mat-icon>search</mat-icon>
+      </label>
+      <!--<input id="search" class="input" type="text" placeholder="Buscar..." />-->
+      <input id="search" class="input w-100" type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
+        placeholder="Buscar..." />
+    </div>
+
+    <div class="input container filter-item">
+      <label class="p-all-sm t-muted">De: </label>
+      <input class="" type="date" [ngModel]="startDate" (ngModelChange)="onDateRangeChange($event, 'start')"
+        placeholder="Hola" />
+    </div>
+
+    <div class="input container filter-item">
+      <label class="p-all-sm t-muted">Hasta: </label>
+      <input class="input " type="date" [ngModel]="endDate" (ngModelChange)="onDateRangeChange($event, 'end')" />
+    </div>
+
+  </section>
+
   <section class="data-container">
     <section class="data-actions">
-      <div class="input container max-w-xs">
-        <label class="input-icon" for="search">
-          <mat-icon>search</mat-icon>
-        </label>
-        <input id="search" class="input" type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
-          placeholder="Buscar..." />
+      <div class="d-flex w-100 j-content-end">
+        <button class="button primary w-auto" (click)="redirectToRegisterSlot()">
+          Registrar
+        </button>
       </div>
-      <button class="button primary w-auto" (click)="redirectToRegisterSlot()">
-        Registrar
-      </button>
     </section>
 
 
@@ -46,7 +64,7 @@
         <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
           <div class="card-title">
             <span class="fs-base t-emphasis">
-              {{ slot.startDate | slotDateRange: (slot.endDate) }}
+              Fecha: {{ slot.startDate | slotDateRange: (slot.endDate) }}
             </span>
             <span class="fs-base t-muted">{{ slot.assistant.name }} </span>
           </div>
