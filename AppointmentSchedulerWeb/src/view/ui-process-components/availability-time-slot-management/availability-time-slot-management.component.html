@@ -39,6 +39,11 @@
       <input class="input " type="date" [ngModel]="endDate" (ngModelChange)="onDateRangeChange($event, 'end')" />
     </div>
 
+    <div class="input container filter-item">
+      <label class="p-all-sm t-muted">Hoy: </label>
+      <span class="fs-sm">{{( today | readableDate).split(",")[0]}}</span>
+    </div>
+
   </section>
 
   <section class="data-container">
@@ -64,7 +69,7 @@
         <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
           <div class="card-title">
             <span class="fs-base t-emphasis">
-              Fecha: {{ slot.startDate | slotDateRange: (slot.endDate) }}
+              {{ slot.startDate | slotDateRange: (slot.endDate) }}
             </span>
             <span class="fs-base t-muted">{{ slot.assistant.name }} </span>
           </div>

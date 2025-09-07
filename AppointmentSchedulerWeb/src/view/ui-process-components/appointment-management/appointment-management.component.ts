@@ -33,13 +33,30 @@ export class AppointmentManagementComponent {
   translationCodes = TranslationCodes
   servicesAvailable: ServiceOffer[] = [];
   scheduledAppointments: Appointment[] = [];
+  selectedDate: string = new Date().toISOString().split("T")[0];
+
+  openedSlots = new Set<number>();
+  startDate: string = this.selectedDate;
+  endDate: string = this.selectedDate;
+
+  today: Date = new Date();
 
 
   constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
+
+    const past = new Date(this.today);
+    past.setMonth(this.today.getMonth() - 1);
+
+    const future = new Date(this.today);
+    future.setMonth(this.today.getMonth() + 1);
+
+    this.startDate = past.toISOString().split("T")[0];
+    this.endDate = future.toISOString().split("T")[0];
+    this.loadAppointments(this.startDate, this.endDate);
+
   }
 
 
-  openedSlots = new Set<number>();
 
   toggleSlot(index: number) {
     if (this.openedSlots.has(index)) {
@@ -78,10 +95,7 @@ export class AppointmentManagementComponent {
     ).subscribe();
   }
 
-  selectedDate: string = new Date().toISOString().split("T")[0];
 
-  startDate: string = this.selectedDate;
-  endDate: string = this.selectedDate;
 
 
 

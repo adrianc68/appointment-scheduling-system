@@ -42,6 +42,4 @@ export class ButtonTaskComponent {
     this.loadingState = state;
   }
 
-
-
 }

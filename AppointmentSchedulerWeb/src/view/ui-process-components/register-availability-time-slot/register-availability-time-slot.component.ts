@@ -5,21 +5,19 @@ import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-compone
 import { TaskStateManagerService } from '../../model/task-state-manager.service';
 import { LoadingState } from '../../model/loading-state.type';
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
-import { Title } from '@angular/platform-browser';
-import { Router } from '@angular/router';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
-import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
-import { Observable, of, switchMap } from 'rxjs';
+import { ApiDataErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { catchError, map, Observable, of } from 'rxjs';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
-import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { UnavailableTimeSlot } from '../../../view-model/business-entities/unavailable-time-slot';
 import { SchedulerService } from '../../../model/communication-components/scheduler.service';
 import { fromLocalToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
 import { AssistantService } from '../../../model/communication-components/assistant.service';
 import { Assistant } from '../../../view-model/business-entities/assistant';
 import { MatIconModule } from '@angular/material/icon';
+import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 
 
 @Component({
@@ -43,9 +41,21 @@ export class RegisterAvailabilityTimeSlotComponent {
 
   errorValidationMessage: { [field: string]: string[] } = {};
   systemMessage?: string = '';
-  currentTaskState: LoadingState;
+  loadingState: LoadingState = LoadingState.NO_ACTION_PERFORMED;
+  isSingleDay: boolean = true;
+  currentStep = 1;
+  previousStep = 1;
 
-  isSingleDay: boolean = true; // por defecto asumimos un solo día
+  slotDateMap: { [key: number]: string } = {};
+  slotStartTimeMap: { [key: number]: string } = {};
+  slotEndTimeMap: { [key: number]: string } = {};
+
+
+  constructor(private i18nService: I18nService, private loggingService: LoggingService, private schedulerService: SchedulerService, private assistantService: AssistantService, private errorUIService: ErrorUIService) {
+
+    this.getAssistantList();
+  }
+
 
 
   translate(key: string): string {
@@ -54,9 +64,26 @@ export class RegisterAvailabilityTimeSlotComponent {
 
   startTime: string = '09:00';
   endTime: string = '17:00';
-  selectedDate: string = new Date().toISOString().split('T')[0]; // "2025-08-27"
+  selectedDate: string = new Date().toISOString().split('T')[0];
 
 
+  nextStep() {
+    this.currentStep++;
+  }
+
+  prevStep() {
+    this.currentStep--;
+
+    this.loadingState = LoadingState.NO_ACTION_PERFORMED;
+  }
+
+
+  ngAfterViewChecked(): void {
+    if (this.previousStep !== this.currentStep) {
+      window.scrollTo(0, 0);
+      this.previousStep = this.currentStep;
+    }
+  }
 
 
 
@@ -66,21 +93,9 @@ export class RegisterAvailabilityTimeSlotComponent {
     if (this.isSingleDay) {
       const [startHour, startMin] = this.startTime.split(':').map(Number);
       const [endHour, endMin] = this.endTime.split(':').map(Number);
-
       const [year, month, day] = this.selectedDate.split('-').map(Number);
-
-
       const start = new Date(year, month - 1, day, startHour, startMin, 0, 0);
       const end = new Date(year, month - 1, day, endHour, endMin, 0, 0);
-      //const start = new Date(this.selectedDate);
-      //start.setHours(startHour, startMin, 0, 0);
-
-      //const end = new Date(this.selectedDate);
-      //end.setHours(endHour, endMin, 0, 0);
-
-      console.log("DATE")
-      console.log(start);
-      console.log(end);
 
       return { start, end };
     } else {
@@ -90,71 +105,49 @@ export class RegisterAvailabilityTimeSlotComponent {
 
 
 
-  constructor(private titleService: Title, private router: Router, private i18nService: I18nService, private loggingService: LoggingService, private schedulerService: SchedulerService, private stateManagerService: TaskStateManagerService, private assistantService: AssistantService) {
-    this.currentTaskState = this.stateManagerService.getState();
-    this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
 
+  private getAssistantList(): void {
     this.assistantService.getAssistantList().pipe(
-      switchMap((response: OperationResult<Assistant[], ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.assistants = [...response.result!];
-          this.assistants.map(d => console.log(d));
-          this.systemMessage = code;
-          return of(true);
+      map((response: OperationResult<Assistant[], ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK && response.result) {
+          return response.result;
         } else {
-          this.handleErrorResponseAssistant(response);
-          return of(false);
+          this.errorUIService.handleError(response);
+          return [];
         }
-      })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-        //if(result) {
-        //  thos.setSuccessfulTask();
-        //} else {
-        //  this.setUn
-        //}
-      },
-      error: (err) => {
+      }),
+      catchError(err => {
         this.loggingService.error(err);
-
-      }
+        this.errorUIService.handleError(err);
+        return of([]);
+      })
+    ).subscribe((assistants: Assistant[]) => {
+      this.assistants = assistants;
     })
   }
 
-  private handleErrorResponseAssistant(response: OperationResult<Assistant[], ApiDataErrorResponse>): void {
 
-    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
-    if (isGenericErrorResponse(response.error)) {
-      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
-    } else if (isValidationErrorResponse(response.error)) {
-      code = this.translationCodes.TC_VALIDATION_ERROR;
-    } else if (isServerErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    } else if (isEmptyErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    }
-
-    this.systemMessage = code;
-  }
 
 
   onSubmit() {
+    if (this.loadingState === LoadingState.LOADING || this.loadingState == LoadingState.WORK_DONE) {
+      return;
+    }
+
+    if (this.loadingState === LoadingState.SUCCESSFUL_TASK) {
+      this.loadingState = LoadingState.WORK_DONE;
+      return;
+    }
+
     if (!this.selectedAssistant) {
       return;
     }
 
-    if (this.currentTaskState === LoadingState.LOADING) {
-      return;
-    }
-
-    this.stateManagerService.setState(LoadingState.LOADING);
+    this.loadingState = LoadingState.LOADING;
     this.systemMessage = "";
     this.errorValidationMessage = {};
 
     const { start, end } = this.getStartEndDate();
-
 
     const availabilitySlot = {
       StartDate: fromLocalToUTC(start),
@@ -164,55 +157,36 @@ export class RegisterAvailabilityTimeSlotComponent {
 
     };
 
-    //console.log("Payload enviado:", availabilitySlot);
-
-    this.schedulerService.registerAvailabilityTimeSlot(availabilitySlot).pipe(
-      switchMap((response: OperationResult<string, ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
-          return of(false);
-        }
-      }),
-    ).subscribe({
-      next: (result) => {
-        if (result) {
-          this.setSuccessfulTask();
-        } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
-        }
-      },
-      error: (err) => {
-        this.loggingService.error(err);
-        this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+    this.registerAvailabilityTimeSlot(availabilitySlot).subscribe(result => {
+      if (result) {
+        this.loadingState = LoadingState.SUCCESSFUL_TASK;
+      } else {
+        this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
       }
-    });
+    })
   }
 
-  private handleErrorResponse(response: OperationResult<string, ApiDataErrorResponse>): void {
 
-    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
-    if (isGenericErrorResponse(response.error)) {
-      let codeMesasge = getStringEnumKeyByValue(MessageCodeType, response.error.message);
-      if (response.error.additionalData?.["field"] !== undefined) {
-        this.setErrorValidationMessage(response.error.additionalData["field"], [codeMesasge!]);
-      }
-      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
-    } else if (isValidationErrorResponse(response.error)) {
-      response.error.forEach(errorItem => {
-        this.setErrorValidationMessage(errorItem.field, errorItem.messages);
-      });
-      code = this.translationCodes.TC_VALIDATION_ERROR;
-    } else if (isServerErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    } else if (isEmptyErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    }
-
-    this.systemMessage = code;
+  private registerAvailabilityTimeSlot(payload: any): Observable<boolean> {
+    return this.schedulerService.registerAvailabilityTimeSlot(payload).pipe(
+      map((response: OperationResult<string, ApiDataErrorResponse>): boolean => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          return true;
+        } else {
+          let code = this.errorUIService.handleError(response);
+          this.systemMessage = code;
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return false;
+        }
+      }),
+      catchError(err => {
+        this.loggingService.error(err);
+        return of(false);
+      })
+    )
   }
 
 
@@ -220,19 +194,6 @@ export class RegisterAvailabilityTimeSlotComponent {
     this.errorValidationMessage[key.toLowerCase()] = value;
   }
 
-  private setUnsuccessfulTask(state: LoadingState): void {
-    this.stateManagerService.setState(state);
-    setTimeout(() => {
-      this.stateManagerService.setState(LoadingState.NO_ACTION_PERFORMED);
-    }, 1500);
-  }
-
-  private setSuccessfulTask(): void {
-    this.stateManagerService.setState(LoadingState.SUCCESSFUL_TASK);
-    setTimeout(() => {
-      //this.router.navigate([WebRoutes.login])
-    }, 1500)
-  }
 
   addUnavailableTimeSlot() {
     this.unavailableTimeSlots.push({ startDate: new Date(), endDate: new Date() });
@@ -242,30 +203,32 @@ export class RegisterAvailabilityTimeSlotComponent {
     this.unavailableTimeSlots.splice(index, 1);
   }
 
-
-  slotDateMap: { [key: number]: string } = {};
-  slotStartTimeMap: { [key: number]: string } = {};
-  slotEndTimeMap: { [key: number]: string } = {};
-
-
   getUnavailableSlotsUTC() {
-    return this.unavailableTimeSlots.map((slot, i) => {
-      if (this.isSingleDay) {
-        const [year, month, day] = this.selectedDate.split('-').map(Number);
-        const [startHour, startMin] = this.slotStartTimeMap[i].split(':').map(Number);
-        const [endHour, endMin] = this.slotEndTimeMap[i].split(':').map(Number);
+    return this.unavailableTimeSlots
+      .map((slot, i) => {
+        if (this.isSingleDay) {
+          const dateParts = this.selectedDate?.split('-').map(Number);
+          const startParts = this.slotStartTimeMap[i]?.split(':').map(Number);
+          const endParts = this.slotEndTimeMap[i]?.split(':').map(Number);
 
-        // Creamos un Date local combinando fecha + hora del slot
-        const startLocal = new Date(year, month - 1, day, startHour, startMin, 0, 0);
-        const endLocal = new Date(year, month - 1, day, endHour, endMin, 0, 0);
+          if (!dateParts || dateParts.length < 3) return null;
+          if (!startParts || startParts.length < 2) return null;
+          if (!endParts || endParts.length < 2) return null;
 
-        // Convertimos a UTC para el backend
-        return { StartDate: fromLocalToUTC(startLocal), EndDate: fromLocalToUTC(endLocal) };
-      } else {
-        // Rango de días: usamos datetime-local de cada slot
-        return { StartDate: fromLocalToUTC(slot.startDate), EndDate: fromLocalToUTC(slot.endDate) };
-      }
-    });
+          const [year, month, day] = dateParts;
+          const [startHour, startMin] = startParts;
+          const [endHour, endMin] = endParts;
+
+          const startLocal = new Date(year, month - 1, day, startHour, startMin, 0, 0);
+          const endLocal = new Date(year, month - 1, day, endHour, endMin, 0, 0);
+
+          return { StartDate: fromLocalToUTC(startLocal), EndDate: fromLocalToUTC(endLocal) };
+        } else {
+          if (!slot.startDate || !slot.endDate) return null;
+          return { StartDate: fromLocalToUTC(slot.startDate), EndDate: fromLocalToUTC(slot.endDate) };
+        }
+      })
+      .filter((slot) => slot !== null);
   }
 
 }
