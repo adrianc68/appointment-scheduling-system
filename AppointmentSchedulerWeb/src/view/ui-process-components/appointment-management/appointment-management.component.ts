@@ -82,7 +82,7 @@ export class AppointmentManagementComponent {
           this.scheduledAppointments = [...response.result!].sort((a, b) => {
             const dateA = new Date(a.startDate).getTime();
             const dateB = new Date(b.startDate).getTime();
-            return dateA - dateB;
+            return dateB - dateA;
           });
 
           this.systemMessage = code;

@@ -1,21 +1,18 @@
 <section class="main-section">
 
-  <section class="calendar data-section sp-bottom card">
-
+  <section class="calendar data-section sp-bottom card max-w-lg m-x-center">
     <app-calendar (dateSelected)="onDateSelected($event)" [slots]="slots"
       (currentDateChange)="onCurrentDateChange($event)"></app-calendar>
-
-
   </section>
 
-  <section class="select-date data-section sp-bottom card">
-    <h2>1. Selecciona una fecha</h2>
-    <input class="input m-top-base" type="date" [ngModel]="selectedDate" (ngModelChange)="onDateChange($event)" />
-  </section>
+  <!--<section class="select-date data-section sp-bottom card">-->
+  <!--  <h2>1. Selecciona una fecha</h2>-->
+  <!--  <input class="input m-top-base" type="date" [ngModel]="selectedDate" (ngModelChange)="onDateChange($event)" />-->
+  <!--</section>-->
+  <!---->
 
 
-
-  <section class="select-client data-section sp-bottom card">
+  <section class="select-client data-section sp-bottom card max-w-md m-x-center">
     <h2>1.1 Seleccionar cliente</h2>
 
     <div class="data-container m-top-base">
@@ -73,7 +70,7 @@
     </div>
   </section>
 
-  <section class="select-service data-section sp-bottom card">
+  <section class="select-service data-section sp-bottom card max-w-md m-x-center">
     <h2>2. Selecciona los servicios</h2>
 
     <div class="data-container">
@@ -112,7 +109,7 @@
   </section>
 
 
-  <section class="selected-service data-section sp-bottom card">
+  <section class="selected-service data-section sp-bottom card max-w-md m-x-center">
     <h2>3. Servicios seleccionados</h2>
     <div class="data-container">
       <div class="data-actions">

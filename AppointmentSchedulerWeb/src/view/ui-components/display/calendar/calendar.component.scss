@@ -1,45 +1,28 @@
 @use '../../../../styles/variables.scss' as variables;
 @use '../../../../styles/breakpoints.scss' as breakpoints;
 
+
 /* 🔹 Estilo general del calendario */
 :host ::ng-deep .fc {
   border: none !important;
-  // background-color: red;
   padding: 0 !important;
   margin: 0 !important;
-
   width: 100%;
-  height: 100%;
+  height: auto !important;
   color: variables.$text;
-  // font-family: 'Inter', sans-serif;
+  aspect-ratio: 1 / 1 !important;
+
 }
 
-:host ::ng-deep .fc-view-harness {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-:host ::ng-deep .fc-daygrid-day-frame {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
+:host ::ng-deep .fc-view-harness,
+:host ::ng-deep .fc-daygrid-day-frame,
 :host ::ng-deep .fc-scroller {
   padding: 0 !important;
   margin: 0 !important;
 }
 
-
 :host ::ng-deep .fc-theme-standard .fc-scrollgrid,
-:host ::ng-deep .fc-theme-standard .fc-scrollgrid-section>td {
-  border: none !important;
-}
-
-:host ::ng-deep .fc {
-  height: auto !important;
-}
-
-
+:host ::ng-deep .fc-theme-standard .fc-scrollgrid-section>td,
 :host ::ng-deep .fc-theme-standard td,
 :host ::ng-deep .fc-theme-standard th {
   border: none !important;
@@ -47,17 +30,19 @@
 
 :host ::ng-deep .fc-daygrid-day-frame {
   border: 1px solid variables.$border;
+  // border:0;
+
 }
 
 :host ::ng-deep .fc-col-header-cell {
-  // border: 1px solid variables.$border !important;
   border: 1px solid variables.$border !important;
+  border:0;
+  background-color: variables.$bg;
 }
-
 
 :host ::ng-deep .fc-scroller {
   height: auto !important;
-  max-height: none !important;
+  max-height: auto !important; // ✅ ya no "none"
 }
 
 :host ::ng-deep .fc-header-toolbar {
@@ -95,6 +80,6 @@
 :host ::ng-deep .fc-event {
   border: none !important;
   background: #3b82f6; // azul
-  border-radius: 8px;
+  // border-radius: 8px;
   padding: 2px 6px;
 }
