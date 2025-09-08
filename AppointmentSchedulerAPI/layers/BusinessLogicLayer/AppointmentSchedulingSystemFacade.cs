@@ -195,24 +195,18 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 var result = OperationResult<DateTime, GenericError>.Failure(errorMessages, MessageCodeType.SERVICES_ARE_NOT_CONTIGUOUS);
                 return result;
             }
-
-            // range.EndDate = services.Min(asd => asd.ServiceStartDate!.Value);
-            // range.EndDate = range.EndDate.AddMinutes(services.Sum(service => service.ServicesMinutes!.Value));
-
-
-            // range.StartDate = services.Min(s => s.ServiceStartDate!.Value).ToUniversalTime();
-            // range.EndDate = range.StartDate.AddMinutes(services.Sum(s => s.ServicesMinutes!.Value)).ToUniversalTime();
-
             range.StartDate = services.Min(s => s.ServiceStartDate!.Value).ToUniversalTime();
-            // range.EndDate = services.Max(s => s.ServiceStartDate!.Value.AddMinutes(s.ServicesMinutes!.Value)).ToUniversalTime();
             range.EndDate = range.StartDate.AddMinutes(services.Sum(s => s.ServicesMinutes!.Value)).ToUniversalTime();
 
 
             foreach (var scheduledService in services)
             {
-                DateTime proposedStartDateTime = scheduledService.ServiceStartDate!.Value;
-                DateTime proposedEndDateTime = proposedStartDateTime.AddMinutes(scheduledService.ServicesMinutes!.Value);
+                DateTime proposedStartDateTime = DateTime.SpecifyKind(
+            scheduledService.ServiceStartDate!.Value,
+            DateTimeKind.Utc
+        );
 
+                DateTime proposedEndDateTime = proposedStartDateTime.AddMinutes(scheduledService.ServicesMinutes!.Value);
 
                 DateTimeRange serviceRange = new()
                 {
