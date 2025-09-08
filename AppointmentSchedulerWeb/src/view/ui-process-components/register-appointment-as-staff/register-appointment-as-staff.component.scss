@@ -6,7 +6,7 @@
   .service-card-container {
     width: 100%;
     position: relative;
-    max-height: 250px;
+    max-height: variables.$container-xs;
     overflow-y: auto;
   }
 
@@ -86,7 +86,7 @@
 .client-card-container {
   width: 100%;
   position: relative;
-  max-height: 250px;
+  max-height: variables.$container-xs;
   overflow-y: auto;
 
   .client-data {

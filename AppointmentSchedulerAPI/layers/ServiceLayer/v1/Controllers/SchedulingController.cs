@@ -393,7 +393,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             List<AppointmentDetailsDTO> appointments = [];
             try
             {
-                Console.WriteLine("LA PUTA MADREEEE$");
                 List<Appointment> result = await systemFacade.GetScheduledOrConfirmedAppoinmentsAsync(dto.StartDate, dto.EndDate);
                 appointments = result.Select(app => new AppointmentDetailsDTO
                 {
@@ -443,7 +442,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 List<Appointment> result = await systemFacade.GetScheduledOrConfirmedAppoinmentsAsync(dto.StartDate, dto.EndDate);
 
 
-                
+
                 appointments = result.Select(app => new AppointmentDetailsDTO
                 {
                     Uuid = app.Uuid ?? Guid.Empty,
@@ -653,6 +652,8 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 DateTime startDateTime = dto.SelectedServices
                     .Min(s => DateTime.SpecifyKind(dto.Date.ToDateTime(s.StartTime), DateTimeKind.Local).ToUniversalTime());
 
+
+
                 Appointment appointment = new Appointment
                 {
                     StartDate = startDateTime,
@@ -660,6 +661,10 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     ScheduledServices = new List<ScheduledService>(),
                     Uuid = Guid.CreateVersion7()
                 };
+
+                Console.WriteLine("<<<<<<<<<<<<<<<<");
+                PropToString.PrintData(startDateTime);
+                PropToString.PrintData(appointment);
 
                 foreach (var serviceOffer in dto.SelectedServices)
                 {
@@ -716,14 +721,14 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
             DateTimeRange range = new DateTimeRange
             {
-                StartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(earliestTime), DateTimeKind.Local).ToUniversalTime(),
-                EndDate = DateTime.SpecifyKind(dto.Date.ToDateTime(latestTime), DateTimeKind.Local).ToUniversalTime()
+                StartDate = dto.Date.ToDateTime(earliestTime).ToUniversalTime(),
+                EndDate = dto.Date.ToDateTime(latestTime).ToUniversalTime()
             };
 
             List<ScheduledService> services = dto.SelectedServices.Select(service => new ScheduledService
             {
                 Uuid = service.Uuid,
-                ServiceStartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(service.StartTime), DateTimeKind.Local).ToUniversalTime()
+                ServiceStartDate = dto.Date.ToDateTime(service.StartTime).ToUniversalTime()
             }).ToList();
 
 

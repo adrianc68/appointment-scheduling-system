@@ -155,9 +155,9 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                     Id = app.Client.IdUserAccount,
                     Name = app.Client.UserAccount.UserInformation!.Name,
                     PhoneNumber = app.Client.UserAccount.UserInformation!.PhoneNumber,
-                    Username =  app.Client.UserAccount.Username,
+                    Username = app.Client.UserAccount.Username,
                     Email = app.Client.UserAccount.Email,
-                    Status =  (BusinessLogicLayer.Model.Types.AccountStatusType?)app.Client.UserAccount.Status
+                    Status = (BusinessLogicLayer.Model.Types.AccountStatusType?)app.Client.UserAccount.Status
 
                 },
                 ScheduledServices = app.ScheduledServices!.Select(aso => new BusinessLogicLayer.Model.ScheduledService
@@ -254,7 +254,7 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
             var serviceOffers = availableServices
                    .SelectMany(slot =>
                        slot.Assistant?.ServiceOffers!
-                           .Where(asService => asService.Status != Model.Types.ServiceOfferStatusType.DELETED) 
+                           .Where(asService => asService.Status != Model.Types.ServiceOfferStatusType.DELETED)
                            .Select(asService => new BusinessLogicLayer.Model.ServiceOffer
                            {
                                Assistant = new BusinessLogicLayer.Model.Assistant
@@ -343,8 +343,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
                 .Include(slot => slot.UnavailableTimeSlots)
                 .Where(slot => slot.IdAssistant == idAssistant
                                && slot.Status == Model.Types.AvailabilityTimeSlotStatusType.ENABLED
-                               && slot.StartDate <= range.StartDate
-                               && slot.EndDate >= range.EndDate)
+                               && slot.StartDate < range.EndDate
+                               && slot.EndDate > range.StartDate)
                 .ToListAsync();
 
             foreach (var slot in coveringSlots)

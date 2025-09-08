@@ -21,6 +21,7 @@ import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/reada
 import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
 import { CalendarComponent } from '../../ui-components/display/calendar/calendar.component';
 import { AvailabilityTimeSlot } from '../../../view-model/business-entities/availability-time-slot';
+import { fromLocalToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
 
 @Component({
   selector: 'app-register-appointment-as-staff',
@@ -38,15 +39,16 @@ export class RegisterAppointmentAsStaffComponent {
   selectedDate: string = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
   selectedServicesOffer: ServiceOffer[] = [];
 
+  startTimes: { [uuid: string]: string } = {};
+  selectedClient?: Client;
+  slots: { startDate: string, endDate: string }[] = [];
 
-  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService, private clientService: ClientService) {
-
+  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private loggingService: LoggingService, private clientService: ClientService) {
     this.clientService.getClientList().pipe(
       switchMap((response: OperationResult<Client[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.clients = [...response.result!];
-          this.clients.map(d => console.log(d));
           this.systemMessage = code;
           return of(true);
         } else {
@@ -54,21 +56,7 @@ export class RegisterAppointmentAsStaffComponent {
           return of(false);
         }
       })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-        //if(result) {
-        //  thos.setSuccessfulTask();
-        //} else {
-        //  this.setUn
-        //}
-      },
-      error: (err) => {
-        this.logginService.error(err);
-
-      }
-    })
-
+    ).subscribe();
   }
 
 
@@ -112,9 +100,6 @@ export class RegisterAppointmentAsStaffComponent {
       this.servicesAvailable.push(serviceOffer);
     }
   }
-  //startDate: string = "2024-01-01";
-  //endDate: string = "2026-01-01";
-
 
   loadAppointments(startDate: string, endDate: string): void {
     this.scheduledAppointments = [];
@@ -132,19 +117,13 @@ export class RegisterAppointmentAsStaffComponent {
           return of(false);
         }
       })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-      },
-      error: (err) => {
-        this.logginService.error(err);
-      }
-    });
+    ).subscribe();
   }
 
 
 
   blockTimeRange(): void {
+    console.log(this.selectedDate);
 
     const payload = {
       date: this.selectedDate,
@@ -153,7 +132,15 @@ export class RegisterAppointmentAsStaffComponent {
         uuid: s.uuid,
         startTime: this.startTimes[s.uuid]
       }))
-    }; this.schedulerService.blockTimeRange(payload).pipe(
+    };
+    console.log("BLOCKED TIME RANGE PAYLOAD");
+    console.log(payload);
+
+    console.log("BLOCKED TIME RANGE PAYLOAD");
+
+
+
+    this.schedulerService.blockTimeRange(payload).pipe(
       switchMap((response: OperationResult<Date, ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           console.log(response);
@@ -165,21 +152,10 @@ export class RegisterAppointmentAsStaffComponent {
           return of(false);
         }
       })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-      },
-      error: (err) => {
-        this.logginService.error(err);
-      }
-    }
-    )
+    ).subscribe();
   }
 
-
-
   registerAppointmentAsClient(): void {
-
     const payload = {
       date: this.selectedDate,
       clientUuid: this.selectedClient?.uuid,
@@ -201,19 +177,10 @@ export class RegisterAppointmentAsStaffComponent {
           return of(false);
         }
       })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-      },
-      error: (err) => {
-        this.logginService.error(err);
-      }
-    }
-    )
+    ).subscribe();
   }
 
 
-  selectedClient?: Client;
 
   registerAppointmentAsStaff(): void {
     console.log("called");
@@ -239,33 +206,23 @@ export class RegisterAppointmentAsStaffComponent {
           return of(false);
         }
       })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-      },
-      error: (err) => {
-        this.logginService.error(err);
-      }
-    }
-    )
+    ).subscribe();
   }
 
 
-  startTimes: { [uuid: string]: string } = {};
   getEarliestStartTime(): Date | null {
     if (!this.selectedServicesOffer || this.selectedServicesOffer.length === 0) return null;
 
     const times = this.selectedServicesOffer
-      .map(s => this.startTimes[s.uuid]) // tomamos del mapa
-      .filter(t => t)                     // eliminamos undefined/null
-      .map(t => new Date(`${this.selectedDate}T${t}`)); // combinamos con la fecha del appointment
+      .map(s => this.startTimes[s.uuid])
+      .filter(t => t)
+      .map(t => new Date(`${this.selectedDate}T${t}`));
 
     if (times.length === 0) return null;
 
     return new Date(Math.min(...times.map(d => d.getTime())));
   }
 
-  // Devuelve la hora de fin estimada sumando la duración total
   getEstimatedEndTime(): Date | null | undefined {
     const start = this.getEarliestStartTime();
     if (!start) return null;
@@ -281,14 +238,12 @@ export class RegisterAppointmentAsStaffComponent {
   onDateChange(date: string) {
     this.selectedDate = date;
     this.getAvailableServices(date);
-    console.log("SELECTEDATE")
-    console.log(this.selectedDate);
     this.loadAppointments(date, date);
 
   }
 
   onDateSelected(date: string) {
-    console.log('El padre recibió la fecha:', date);
+    this.selectedDate = date;
     this.loadAppointments(date, date);
     this.getAvailableServices(date);
   }
@@ -296,9 +251,6 @@ export class RegisterAppointmentAsStaffComponent {
 
 
   onCurrentDateChange(date: Date) {
-    console.log('El padre recibió la fecha:', date);
-
-    // ejemplo: mostrar en español
     const formatted = date.toLocaleString('es-MX', { month: 'long', year: 'numeric' });
     console.log('Mes actual:', formatted);
 
@@ -307,26 +259,31 @@ export class RegisterAppointmentAsStaffComponent {
     const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     console.log('Rango del mes:', start, end);
 
-    this.getAvailabilityTimeSlots(start, end);
+    //this.getAvailabilityTimeSlots(start.toString(), end.toString());
 
+    this.getAvailabilityTimeSlots(
+      this.formatDateToApi(start),
+      this.formatDateToApi(end)
+    );
+
+  }
+
+  private formatDateToApi(date: Date): string {
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth() + 1; // enero = 0
+    const day = date.getUTCDate();
+    return `${year}-${month}-${day}`;
   }
 
 
   //slots: AvailabilityTimeSlot[] = [];
-  slots: { startDate: string, endDate: string }[] = [];
 
-  getAvailabilityTimeSlots(startDate: Date, endDate: Date) {
-    this.schedulerService.getAvailabilityTimeSlots("2024-1-11", "2026-1-11").pipe(
+  getAvailabilityTimeSlots(startDate: string, endDate: string) {
+    this.schedulerService.getAvailabilityTimeSlots(startDate, endDate).pipe(
       switchMap((response: OperationResult<AvailabilityTimeSlot[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          //let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          //this.slots = [...response.result!].sort((a, b) => {
-          //  return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
-          //});
-          //this.systemMessage = code;
-
           this.slots = response.result!.map(slot => ({
-            startDate: new Date(slot.startDate).toISOString(), // convertir a string
+            startDate: new Date(slot.startDate).toISOString(),
             endDate: new Date(slot.endDate).toISOString()
           })); return of(true);
         } else {
@@ -334,20 +291,7 @@ export class RegisterAppointmentAsStaffComponent {
           return of(false);
         }
       })
-    ).subscribe({
-      next: (result) => {
-        console.log(result);
-        //if(result) {
-        //  thos.setSuccessfulTask();
-        //} else {
-        //  this.setUn
-        //}
-      },
-      error: (err) => {
-        this.logginService.error(err);
-
-      }
-    })
+    ).subscribe();
   }
 
   getAvailableServices(date: string) {
@@ -368,10 +312,7 @@ export class RegisterAppointmentAsStaffComponent {
           return of(false);
         }
       })
-    ).subscribe({
-      next: (result) => console.log(result),
-      error: (err) => this.logginService.error(err)
-    });
+    ).subscribe();
   }
 
 
