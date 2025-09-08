@@ -5,6 +5,7 @@ import { CalendarOptions, DatesSetArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';      // vista mes
 import timeGridPlugin from '@fullcalendar/timegrid';    // vista semana/día
 import interactionPlugin from '@fullcalendar/interaction'; // interacciones (drag/drop)
+import esLocale from '@fullcalendar/core/locales/es';
 
 
 
@@ -25,10 +26,13 @@ export class CalendarComponent {
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     contentHeight: 'auto',
+    locales: [esLocale],
+    fixedWeekCount: false,
+
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      right: ''
     },
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
     datesSet: this.handleDatesSet.bind(this),
@@ -49,7 +53,6 @@ export class CalendarComponent {
       const calendarApi = this.calendar.getApi();
       calendarApi.removeAllEvents();
 
-      // Usamos un Set para no duplicar días
       const daysSet = new Set<string>();
 
       this.slots.forEach(slot => {
@@ -58,19 +61,17 @@ export class CalendarComponent {
 
         let current = new Date(start);
         while (current <= end) {
-          // Guardamos solo la fecha YYYY-MM-DD
           daysSet.add(current.toISOString().split('T')[0]);
           current.setDate(current.getDate() + 1);
         }
       });
 
-      // Creamos eventos de todo el día para marcar los días
       daysSet.forEach(day => {
         calendarApi.addEvent({
           start: day,
           allDay: true,
           display: 'background',
-          backgroundColor: '#4caf50', // verde para disponibilidad
+          backgroundColor: '#4caf50',
         });
       });
     }

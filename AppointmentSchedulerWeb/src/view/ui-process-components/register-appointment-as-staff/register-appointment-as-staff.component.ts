@@ -21,7 +21,6 @@ import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/reada
 import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
 import { CalendarComponent } from '../../ui-components/display/calendar/calendar.component';
 import { AvailabilityTimeSlot } from '../../../view-model/business-entities/availability-time-slot';
-import { fromLocalToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
 
 @Component({
   selector: 'app-register-appointment-as-staff',
@@ -36,12 +35,33 @@ export class RegisterAppointmentAsStaffComponent {
   servicesAvailable: ServiceOffer[] = [];
   scheduledAppointments: Appointment[] = [];
   clients: Client[] = [];
-  selectedDate: string = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+  selectedDate: string = new Date().toISOString().split("T")[0];
   selectedServicesOffer: ServiceOffer[] = [];
-
   startTimes: { [uuid: string]: string } = {};
   selectedClient?: Client;
   slots: { startDate: string, endDate: string }[] = [];
+
+  currentStep = 1;
+  previousStep = 1;
+
+  nextStep() {
+    this.currentStep++;
+  }
+
+  prevStep() {
+    this.currentStep--;
+  }
+
+
+  ngAfterViewChecked(): void {
+    if (this.previousStep !== this.currentStep) {
+      window.scrollTo(0, 0);
+      this.previousStep = this.currentStep;
+    }
+  }
+
+
+
 
   constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private loggingService: LoggingService, private clientService: ClientService) {
     this.clientService.getClientList().pipe(
