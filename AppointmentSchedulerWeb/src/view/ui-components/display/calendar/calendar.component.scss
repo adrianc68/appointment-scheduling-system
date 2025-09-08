@@ -13,6 +13,14 @@
 
 }
 
+::ng-deep .fc-daygrid-day.day-selected {
+  background-color: variables.$bg-selected !important;
+}
+
+::ng-deep .fc-daygrid-day.day-selected.fc-day-today {
+  background-color: variables.$bg-selected !important;
+}
+
 :host ::ng-deep .fc-view-harness,
 :host ::ng-deep .fc-daygrid-day-frame,
 :host ::ng-deep .fc-scroller {
@@ -84,7 +92,7 @@
 }
 
 :host ::ng-deep .fc-day-today {
-  background-color: variables.$bg-brand !important;
+  background-color: variables.$bg !important;
 }
 
 :host ::ng-deep .fc-event {

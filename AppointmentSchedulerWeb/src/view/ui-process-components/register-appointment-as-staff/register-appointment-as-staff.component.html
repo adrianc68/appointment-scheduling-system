@@ -2,10 +2,19 @@
 
   <div class="process" *ngIf="currentStep === 1">
 
-    <h2 class="t-left m-bottom-md max-w-lg m-x-center">Selecciona una fecha</h2>
+    <h1 class="t-left m-bottom-md max-w-lg m-x-center">Selecciona una fecha</h1>
     <section class=" data-section sp-bottom card max-w-lg m-x-center m-top-md">
-      <app-calendar (dateSelected)="onDateSelected($event)" [slots]="slots"
+      <app-calendar [selectedDate]="selectedDate" (dateSelected)="onDateSelected($event)" [slots]="slots"
         (currentDateChange)="onCurrentDateChange($event)"></app-calendar>
+      <div class="data-selected">
+        <div class="data-selected m-top-md" *ngIf="selectedDate">
+          <h3 class="m-bottom-md">Fecha seleccionada: </h3>
+          <div>
+            <span class="fs-base t-muted m-bottom-base"> Día seleccionado:</span>
+            <span class="fs-base t-emphasis m-left-base">{{ selectedDate }}</span>
+          </div>
+        </div>
+      </div>
     </section>
     <section class="process-buttons d-flex gap-md j-content-end max-w-lg m-x-center m-bottom-lg">
       <button class="button primary w-auto" *ngIf="selectedDate" (click)="nextStep()">Siguiente</button>
@@ -14,7 +23,7 @@
 
 
   <div class="process" *ngIf="currentStep === 2">
-    <h2 class="t-center">¿Para qué cliente es la cita?</h2>
+    <h1 class="t-center">¿Para qué cliente es la cita?</h1>
     <p class="t-center m-top-base">Buscar por un cliente existente...</p>
     <section class="select-client data-section sp-bottom card max-w-md m-x-center m-top-md">
       <div class="data-container">
@@ -80,7 +89,7 @@
   </div>
 
   <div class="process" *ngIf="currentStep === 3">
-    <h2 class="t-center">Selecciona los servicios</h2>
+    <h1 class="t-center">Selecciona los servicios</h1>
     <p class="t-center m-top-base">Escoge los servicios que deseas agendar</p>
     <section class="select-service data-section sp-bottom card max-w-md m-x-center m-top-md">
       <div class="data-container">
@@ -91,7 +100,7 @@
           </div>
         </div>
         <div class="data-header">
-          <span>Servicios disponibles</span>
+          <span>Servicios disponibles en: {{selectedDate}}</span>
         </div>
         <div class="data-body table-type">
           <div class="data-body-no-data" *ngIf="servicesAvailable?.length === 0">
@@ -100,12 +109,12 @@
           </div>
           <div class="service-card-container scroll-visible">
             <div class="service-data data-row-item" *ngFor="let serviceOffer of servicesAvailable">
-              <div class="icon">
-                <mat-icon>support_agent</mat-icon>
-                <span class="fs-base m-top-base">{{ serviceOffer.assistant?.name }}</span>
-              </div>
               <div class="service-info">
-                <span class="fs-base t-emphasis fw-bold">{{ serviceOffer.name}}</span>
+                <h3 class="fs-base t-emphasis fw-bold service-name">{{ serviceOffer.name}}</h3>
+                <div class="d-flex gap-base j-content-start a-items-center m-top-base">
+                  <mat-icon>support_agent</mat-icon>
+                  <span class="fs-sm">{{ serviceOffer.assistant?.name }}</span>
+                </div>
                 <div class="m-top-base">
                   <span class="fs-sm t-muted">$ {{ serviceOffer.price}}</span>
                   <span class="fs-sm t-muted m-left-base">-</span>
@@ -130,7 +139,7 @@
 
 
   <div class="process" *ngIf="currentStep === 4">
-    <h2 class="t-center">Ajusta tus horarios</h2>
+    <h1 class="t-center">Ajusta tus horarios</h1>
     <p class="t-center m-top-base">Revisa los servicios y ajusta los horarios de acuerdo a tus tiempos</p>
     <section class="selected-service data-section sp-bottom card max-w-md m-x-center m-top-md">
       <div class="data-body-no-data" *ngIf="selectedServicesOffer?.length === 0">
@@ -436,7 +445,7 @@
 
 
   <div class="process" *ngIf="currentStep === 5">
-    <h2 class="t-center">Confirma tu cita</h2>
+    <h1 class="t-center">Confirma tu cita</h1>
     <p class="t-center m-top-base">Revisa los servicios seleccionados y ajusta los tiempos antes de confirmar</p>
     <section class="summary data-section sp-bottom card max-w-md m-x-center m-top-md">
       <div class="slot-data-row">
@@ -476,9 +485,8 @@
       </div>
     </section>
 
-    <section class="process-buttons d-flex gap-md j-content-between max-w-md m-x-center  m-bottom-lg">
+    <section class="process-buttons d-flex gap-md j-content-start max-w-md m-x-center  m-bottom-lg">
       <button class="button secondary w-auto" *ngIf="selectedDate" (click)="prevStep()">Regresar</button>
-      <button class="button primary w-auto" *ngIf="selectedDate" (click)="nextStep()">Siguiente</button>
     </section>
 
   </div>
