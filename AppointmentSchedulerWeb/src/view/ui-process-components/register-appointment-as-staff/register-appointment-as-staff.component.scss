@@ -54,22 +54,13 @@
     width: 100%;
     align-items: center;
     border-bottom: 1px solid variables.$border;
+    // background-color: red;
+    position: relative;
+    z-index:0;
 
     &:last-child {
       border-bottom: 1px solid transparent;
-    }
-
-    .icon {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-
-      mat-icon {
-        font-size: 2rem;
-        width: 2rem;
-        height: 2rem;
-      }
+      // background-color: red;
     }
 
     .service-info {
@@ -78,6 +69,20 @@
       display: flex;
       justify-content: space-between;
       flex-direction: column;
+      z-index:1;
+      // background-color: red;
+
+      .service-name {
+        margin-right:calc(variables.$padding-sm * 2 + variables.$spacing-md);
+      }
+    }
+
+    .button {
+      position: absolute;
+      top:0.625rem;
+      right:0;
+      z-index:2;
+      // background-color: red;
     }
   }
 }
