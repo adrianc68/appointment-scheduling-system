@@ -22,6 +22,8 @@ export class CalendarComponent {
   @Output() dateSelected = new EventEmitter<string>();
   @Output() currentDateChange = new EventEmitter<Date>();
   @Input() slots: { startDate: string, endDate: string }[] = [];
+  @Input() selectedDate: string | null = null;
+
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -41,11 +43,28 @@ export class CalendarComponent {
   };
 
   handleDateClick(arg: any) {
+    this.selectedDate = arg.dateStr;
+
+    // Quitar selección previa
+    document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
+      cell.classList.remove('day-selected');
+    });
+
+    // Agregar clase al día clicado
+    arg.dayEl.classList.add('day-selected');
+
     this.dateSelected.emit(arg.dateStr);
   }
 
   handleDatesSet(arg: DatesSetArg) {
     this.currentDateChange.emit(arg.view.currentStart);
+
+    if (this.selectedDate) {
+      const dayCell = document.querySelector(`.fc-daygrid-day[data-date="${this.selectedDate}"]`);
+      if (dayCell) {
+        dayCell.classList.add('day-selected');
+      }
+    }
   }
 
   ngOnChanges() {
@@ -74,6 +93,13 @@ export class CalendarComponent {
           backgroundColor: '#4caf50',
         });
       });
+    }
+
+    if (this.selectedDate) {
+      const dayCell = document.querySelector(`.fc-daygrid-day[data-date="${this.selectedDate}"]`);
+      if (dayCell) {
+        dayCell.classList.add('day-selected');
+      }
     }
   }
 }
