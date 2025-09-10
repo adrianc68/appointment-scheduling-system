@@ -698,9 +698,13 @@ $width: (
 .data-section {
   // padding-top: variables.$padding-lg;
   // padding-bottom: variables.$padding-lg;
-  padding: variables.$padding-lg;
+  padding: variables.$padding-md;
   // min-height: min-content;
   height: auto;
+
+  &.p-all-none {
+    padding: 0;
+  }
 
   &.sp-top {
     margin-top: variables.$spacing-lg;
@@ -826,6 +830,10 @@ $width: (
     // border-style: solid;
     border-radius: variables.$border-radius-md;
     background-color: variables.$bg-subtle;
+
+    &.muted {
+      background-color: variables.$bg-muted;
+    }
   }
 
 

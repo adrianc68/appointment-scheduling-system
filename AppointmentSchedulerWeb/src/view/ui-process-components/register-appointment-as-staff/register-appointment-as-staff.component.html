@@ -1,31 +1,21 @@
 <section class="main-section">
 
   <div class="process" *ngIf="currentStep === 1">
-
-    <h1 class="t-left m-bottom-md max-w-lg m-x-center">Selecciona una fecha</h1>
-    <section class=" data-section sp-bottom card max-w-lg m-x-center m-top-md">
+    <h1 class="t-left m-bottom-md m-x-center t-center">Selecciona un día</h1>
+    <section class="calendar data-section sp-bottom card max-w-md m-x-center m-top-md">
       <app-calendar [selectedDate]="selectedDate" (dateSelected)="onDateSelected($event)" [slots]="slots"
         (currentDateChange)="onCurrentDateChange($event)"></app-calendar>
-      <div class="data-selected">
-        <div class="data-selected m-top-md" *ngIf="selectedDate">
-          <h3 class="m-bottom-md">Fecha seleccionada: </h3>
-          <div>
-            <span class="fs-base t-muted m-bottom-base"> Día seleccionado:</span>
-            <span class="fs-base t-emphasis m-left-base">{{ selectedDate }}</span>
-          </div>
-        </div>
-      </div>
     </section>
-    <section class="process-buttons d-flex gap-md j-content-end max-w-lg m-x-center m-bottom-lg">
-      <button class="button primary w-auto" *ngIf="selectedDate" (click)="nextStep()">Siguiente</button>
+    <section class="process-buttons d-flex gap-md j-content-end max-w-md m-x-center m-bottom-lg">
+      <button class="button primary w-auto" [disabled]="!selectedDate" [ngClass]="{'disabled': !selectedDate}"
+        (click)=" nextStep()">Siguiente</button>
     </section>
   </div>
 
-
   <div class="process" *ngIf="currentStep === 2">
-    <h1 class="t-center">¿Para qué cliente es la cita?</h1>
+    <h1 class="t-center">¿Para qué cliente?</h1>
     <p class="t-center m-top-base">Buscar por un cliente existente...</p>
-    <section class="select-client data-section sp-bottom card max-w-md m-x-center m-top-md">
+    <section class="select-client data-section p-all-none sp-bottom max-w-sm m-x-center m-top-md">
       <div class="data-container">
         <div class="data-actions">
           <div class="input container">
@@ -55,35 +45,13 @@
             </div>
           </div>
         </div>
-        <div class="data-selected">
-          <div class="data-selected m-top-md" *ngIf="selectedClient">
-            <h3 class="m-bottom-md">Asistente seleccionado: </h3>
-            <div class="assistant-summary">
-              <div>
-                <span class="fs-base t-muted m-bottom-base"> Nombre:</span>
-                <span class="fs-base t-emphasis m-left-base">{{ selectedClient.name }}</span>
-              </div>
-              <div>
-                <span class="fs-base t-muted m-bottom-base"> Nombre de usuario:</span>
-                <span class="fs-base t-emphasis m-left-base"> {{ selectedClient.username}}</span>
-              </div>
-              <div>
-                <span class="fs-base t-muted m-bottom-base"> Correo:</span>
-                <span class="fs-base t-emphasis m-left-base"> {{ selectedClient.email}}</span>
-              </div>
-              <div>
-                <span class="fs-base t-muted m-bottom-base"> Telefono:</span>
-                <span class="fs-base t-emphasis m-left-base"> {{ selectedClient.phoneNumber}}</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
 
-    <section class="process-buttons d-flex gap-md j-content-between max-w-md m-x-center m-bottom-lg">
-      <button class="button secondary w-auto" *ngIf="selectedDate" (click)="prevStep()">Regresar</button>
-      <button class="button primary w-auto" *ngIf="selectedDate" (click)="nextStep()">Siguiente</button>
+    <section class="process-buttons d-flex gap-md j-content-between max-w-sm m-x-center m-bottom-lg">
+      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
+      <button class="button primary w-auto" [disabled]="!selectedClient" [ngClass]="{'disabled': !selectedClient}"
+        (click)="nextStep()">Siguiente</button>
     </section>
 
   </div>
@@ -91,7 +59,7 @@
   <div class="process" *ngIf="currentStep === 3">
     <h1 class="t-center">Selecciona los servicios</h1>
     <p class="t-center m-top-base">Escoge los servicios que deseas agendar</p>
-    <section class="select-service data-section sp-bottom card max-w-md m-x-center m-top-md">
+    <section class="select-service data-section p-all-none sp-bottom max-w-sm m-x-center m-top-md">
       <div class="data-container">
         <div class="data-actions">
           <div class="input container">
@@ -105,7 +73,7 @@
         <div class="data-body table-type">
           <div class="data-body-no-data" *ngIf="servicesAvailable?.length === 0">
             <mat-icon>search_off</mat-icon>
-            <span>No se han encontrado registros</span>
+            <span class="t-center">No se han encontrado servicios disponibles para este día</span>
           </div>
           <div class="service-card-container scroll-visible">
             <div class="service-data data-row-item" *ngFor="let serviceOffer of servicesAvailable">
@@ -130,9 +98,10 @@
       </div>
     </section>
 
-    <section class="process-buttons d-flex gap-md j-content-between max-w-md m-x-center m-bottom-lg ">
-      <button class="button secondary w-auto" *ngIf="selectedDate" (click)="prevStep()">Regresar</button>
-      <button class="button primary w-auto" *ngIf="selectedDate" (click)="nextStep()">Siguiente</button>
+    <section class="process-buttons d-flex gap-md j-content-between max-w-sm m-x-center m-bottom-lg ">
+      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
+      <button class="button primary w-auto" [disabled]="selectedServicesOffer.length === 0"
+        [ngClass]="{'disabled': selectedServicesOffer.length === 0 }" (click)="nextStep()">Siguiente</button>
     </section>
 
   </div>
@@ -141,54 +110,86 @@
   <div class="process" *ngIf="currentStep === 4">
     <h1 class="t-center">Ajusta tus horarios</h1>
     <p class="t-center m-top-base">Revisa los servicios y ajusta los horarios de acuerdo a tus tiempos</p>
-    <section class="selected-service data-section sp-bottom card max-w-md m-x-center m-top-md">
+    <section class="selected-service data-section p-all-none sp-bottom max-w-md m-x-center m-top-md">
       <div class="data-body-no-data" *ngIf="selectedServicesOffer?.length === 0">
         <mat-icon>search_off</mat-icon>
         <span>No se han seleccionado servicios.</span>
       </div>
-      <div class="service-data m-bottom-md" *ngFor="let serviceOffer of selectedServicesOffer; let i = index;">
-        <div class="service-info">
-          <h3 class="fs-base t-emphasis fw-bold service-name">{{ serviceOffer.name}}</h3>
-          <div class="d-flex gap-base j-content-start a-items-center m-top-base">
-            <mat-icon>support_agent</mat-icon>
-            <span class="fs-sm">{{ serviceOffer.assistant?.name }}</span>
-          </div>
-          <div class="m-top-base">
-            <span class="fs-sm t-muted">Precio: $ {{ serviceOffer.price}}</span>
-            <span class="fs-sm t-muted m-left-base">-</span>
-            <span class="fs-sm t-muted m-left-base">Duración: {{ serviceOffer.minutes}} min</span>
-          </div>
-          <div class="m-top-base d-flex-col gap-base">
-            <label class="w-auto" for="startTime{{i}}">Hora de inicio:</label>
-            <input class="input m-top-md w-auto" id="startTime{{i}}" name="startTime{{i}}" type="time" step="1"
-              [(ngModel)]="startTimes[serviceOffer.uuid]" required />
-          </div>
-          <!--<div class="d-flex-col gap-base m-top-md">-->
-          <!--  <span class="fs-base t-muted"> Descripción:</span>-->
-          <!--  <p class="fs-base t-emphasis"> {{ serviceOffer.description}}</p>-->
-          <!--</div>-->
+
+      <div class="start-time-container m-bottom-md d-flex-col gap-base card data-section">
+        <label for="globalStartTime">Hora de inicio de la cita:</label>
+        <input type="time" id="globalStartTime" class="input" [(ngModel)]="globalStartTime"
+          (change)="updateStartTimesFromGlobal()" step="1" />
+      </div>
+
+      <section class="selected-service data-section sp-bottom p-all-none max-w-md m-x-center m-top-md">
+        <div class="data-body-no-data" *ngIf="selectedServicesOffer?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han seleccionado servicios.</span>
         </div>
 
-        <button class="button bordered m-y-center w-auto p-all-sm" (click)="removeSelectedService(serviceOffer)">
-          <mat-icon class="danger">delete</mat-icon>
-        </button>
+        <div class="wrapper" cdkDropList (cdkDropListDropped)="dropService($event)">
+          <div class="service-data card"
+            *ngFor="let serviceOffer of selectedServicesOffer; let i = index; trackBy: trackByUuid" cdkDrag>
 
-      </div>
-      <div class="slot-data-container">
-        <div class="slot-data d-flex-col">
-          <span class="fs-base t-muted m-top-md"> Duración de la cita:</span>
-          <span class="fs-base t-emphasis"> {{ getTotalMinutes() }} minutos</span>
+            <ng-template cdkDragPreview>
+              <div class="service-data card data-section drag-preview">
+                <div class="service-draggable">
+                  <span class="service-number">{{ i + 1 }}</span>
+                  <mat-icon>drag_indicator</mat-icon>
+                </div>
+                <div class="service-info">
+                  <h3 class="fs-base t-emphasis fw-bold service-name">{{ serviceOffer.name }}</h3>
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template cdkDragPlaceholder>
+              <div class="service-data card placeholder"></div>
+            </ng-template>
+
+            <div class="service-draggable" cdkDragHandle>
+              <mat-icon>drag_indicator</mat-icon>
+            </div>
+
+            <div class="service-info">
+              <h3 class="fs-base t-emphasis fw-bold service-name">{{ i + 1 }} - {{ serviceOffer.name }}</h3>
+              <div class="d-flex gap-base j-content-start a-items-center m-top-base">
+                <mat-icon>support_agent</mat-icon>
+                <span class="fs-sm">{{ serviceOffer.assistant?.name }}</span>
+              </div>
+              <div class="m-top-base">
+                <span class="fs-sm t-muted">Precio: $ {{ serviceOffer.price }}</span>
+                <span class="fs-sm t-muted m-left-base">-</span>
+                <span class="fs-sm t-muted m-left-base">Duración: {{ serviceOffer.minutes }} min</span>
+              </div>
+              <div class="m-top-base d-flex gap-base">
+                <span class="fs-sm w-auto t-muted">Hora de inicio:</span>
+                <span class="fs-sm">{{ startTimes[serviceOffer.uuid] }}</span>
+              </div>
+              <div class="m-top-base d-flex gap-base">
+                <span class="fs-sm w-auto t-muted">Fin:</span>
+                <span class="fs-sm">{{ getEndTime(serviceOffer) }}</span>
+              </div>
+            </div>
+
+            <button class="button bordered m-y-center w-auto p-all-sm" (click)="removeSelectedService(serviceOffer)">
+              <mat-icon class="danger">delete</mat-icon>
+            </button>
+
+          </div>
         </div>
-        <div class="slot-data d-flex-col">
-          <span class="fs-base t-muted  m-top-md"> Total:</span>
-          <span class="fs-base t-emphasis"> {{ getTotalPrice() | currency }}</span>
-        </div>
-      </div>
+
+      </section>
+
+
+
     </section>
 
     <section class="process-buttons d-flex gap-md j-content-between max-w-md m-x-center m-bottom-lg">
-      <button class="button secondary w-auto" *ngIf="selectedDate" (click)="prevStep()">Regresar</button>
-      <button class="button primary w-auto" *ngIf="selectedDate" (click)="nextStep()">Siguiente</button>
+      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
+      <button class="button primary w-auto" [disabled]="!allStartTimesDefined()"
+        [ngClass]="{'disabled': !allStartTimesDefined()}" (click)="nextStep()">Siguiente</button>
     </section>
 
 
@@ -452,6 +453,7 @@
         <div class="slot-data d-flex-col">
           <span class="fs-base t-muted"> Fecha:</span>
           <span class="fs-base t-emphasis"> {{ selectedDate }}</span>
+          <span class="fs-base t-muted"> ({{ (selectedDate | readableDate).split(",")[0] }})</span>
         </div>
       </div>
       <div class="slot-data-row">
@@ -474,19 +476,54 @@
           <span class="fs-base t-emphasis"> {{ getTotalPrice() | currency }}</span>
         </div>
       </div>
-      <div class="d-flex-col gap-md m-top-lg">
-        <div class="d-flex gap-md">
-          <button class="button primary w-auto" (click)="blockTimeRange()">Bloquear rango de tiempo</button>
-          <button class="button primary w-auto" (click)="registerAppointmentAsStaff()">Agendar cita</button>
+
+
+      <div class="slot-data-row d-flex-col">
+        <span class="t-muted">Servicios: </span>
+        <div class="slot-data-row type-card muted d-flex-col transparent p-all-sm"
+          *ngFor="let scheduleService of selectedServicesOffer">
+          <div class="slot-data d-inline">
+            <span class="t-muted">
+              Servicio:
+            </span>
+            <span class="t-emphasis m-left-base">
+              {{scheduleService.name }}
+            </span>
+          </div>
+          <div class="slot-data d-inline">
+            <span class="t-muted">
+              Precio:
+            </span>
+            <span class="t-emphasis m-left-base">
+              $ {{ scheduleService.price }}
+            </span>
+          </div>
+          <div class="slot-data d-inline">
+            <span class="t-muted">
+              Con asistente:
+            </span>
+            <span class="t-emphasis m-left-base">
+              $ {{ scheduleService.assistant?.name }}
+            </span>
+          </div>
         </div>
-        <span>
+      </div>
+
+
+      <div class="d-flex-col gap-md m-top-base">
+        <span class="t-danger t-center">
           {{ translate(systemMessage ?? translationCodes.TC_EMPTY) }}
         </span>
       </div>
     </section>
 
-    <section class="process-buttons d-flex gap-md j-content-start max-w-md m-x-center  m-bottom-lg">
-      <button class="button secondary w-auto" *ngIf="selectedDate" (click)="prevStep()">Regresar</button>
+
+    <section class="process-buttons d-flex gap-md j-content-between max-w-md m-x-center  m-bottom-lg">
+      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
+      <div class="d-flex gap-md">
+        <button class="button primary w-auto" (click)="blockTimeRange()">Validar datos</button>
+        <button class="button primary w-auto" (click)="registerAppointmentAsStaff()">Agendar cita</button>
+      </div>
     </section>
 
   </div>

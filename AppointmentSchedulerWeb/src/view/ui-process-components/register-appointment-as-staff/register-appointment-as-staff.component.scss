@@ -1,13 +1,63 @@
 @use '../../../styles/mixins.scss' as mixins;
 @use '../../../styles/variables.scss' as variables;
 
+.calendar {
+  // background-color: red;
+  min-height: 50vh;
+
+  // height: 50vh;
+}
+
+.process {
+  // background-color: red;
+}
+
+
+.client-card-container {
+  width: 100%;
+  position: relative;
+  overflow-y: auto;
+  max-height: variables.$container-xxs;
+
+  .client-data {
+    display: flex;
+    gap: variables.$spacing-md;
+    padding: variables.$padding-md;
+    width: 100%;
+    align-items: center;
+    border-bottom: 1px solid variables.$border;
+
+    &:last-child {
+      border-bottom: 1px solid transparent;
+    }
+
+    .profile-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .client-info {
+      flex: 1;
+      word-break: break-word;
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+    }
+  }
+}
+
 
 .select-service {
   .service-card-container {
     width: 100%;
     position: relative;
-    max-height: variables.$container-xs;
+    max-height: variables.$container-xxs;
     overflow-y: auto;
+
   }
 
   .service-data {
@@ -46,87 +96,64 @@
 }
 
 .selected-service {
+
+
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: variables.$spacing-md;
+  }
+
   .service-data {
     display: flex;
-    gap: variables.$spacing-md;
-    padding: variables.$padding-md;
+    // gap: variables.$spacing-base;
     width: 100%;
-    align-items: center;
-    border-bottom: 1px solid variables.$border;
-    // background-color: red;
+    align-items: flex-start;
     position: relative;
-    z-index:0;
+    z-index: 0;
+    height: 100%;
 
-    &:last-child {
-      border-bottom: 1px solid transparent;
-      // background-color: red;
+    .service-draggable {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100%;
+      padding-left: variables.$padding-sm;
+      padding-right: variables.$padding-sm;
+      // background-color:red;
+      cursor: grab;
+      border-radius: variables.$border-radius-sm;
     }
 
     .service-info {
       flex: 1;
-      word-break: break-word;
       display: flex;
-      justify-content: space-between;
       flex-direction: column;
-      z-index:1;
-      // background-color: red;
-
-      .service-name {
-        margin-right:calc(variables.$padding-sm * 2 + variables.$spacing-md);
-      }
+      z-index: 1;
+      padding: variables.$padding-md;
+      margin-left: calc(variables.$padding-md * 2);
     }
 
     .button {
       position: absolute;
-      top:0.625rem;
-      right:0;
-      z-index:2;
-      // background-color: red;
+      top: variables.$padding-sm;
+      right: variables.$padding-sm;
+      z-index: 2;
     }
+  }
+
+  .placeholder {
+    min-height: 80px;
+    border: 2px dashed #ccc;
+    background-color: variables.$bg;
   }
 }
 
 
-.client-card-container {
-  width: 100%;
-  position: relative;
-  max-height: variables.$container-xs;
-  overflow-y: auto;
-
-  .client-data {
-    display: flex;
-    gap: variables.$spacing-md;
-    padding: variables.$padding-md;
-    width: 100%;
-    align-items: center;
-    border-bottom: 1px solid variables.$border;
-
-    &:last-child {
-      border-bottom: 1px solid transparent;
-    }
-
-    .profile-icon {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2rem;
-      width: 2rem;
-      height: 2rem;
-    }
-
-    .client-info {
-      flex: 1;
-      word-break: break-word;
-      display: flex;
-      justify-content: space-between;
-      flex-direction: column;
-    }
-  }
-}
 
 .appointments-scheduled {
-
-
   .card-container {
     width: 100%;
     display: flex;
