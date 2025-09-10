@@ -1,8 +1,7 @@
 @use '../../../../styles/variables.scss' as variables;
 @use '../../../../styles/breakpoints.scss' as breakpoints;
 
-
-/* 🔹 Estilo general del calendario */
+/* 🔹 Estilo general */
 :host ::ng-deep .fc {
   border: none !important;
   padding: 0 !important;
@@ -10,24 +9,24 @@
   width: 100%;
   height: auto !important;
   color: variables.$text;
-
 }
 
-::ng-deep .fc-daygrid-day.day-selected {
-  background-color: variables.$bg-selected !important;
+/* 🔹 Quitar transición de las celdas */
+:host ::ng-deep .fc-daygrid-day,
+:host ::ng-deep .fc-daygrid-day-frame,
+:host ::ng-deep .fc-daygrid-day.day-selected {
+  transition: none !important;
 }
 
+/* 🔹 Días seleccionados */
+::ng-deep .fc-daygrid-day.day-selected,
 ::ng-deep .fc-daygrid-day.day-selected.fc-day-today {
   background-color: variables.$bg-selected !important;
+  border-radius: variables.$border-radius-pill;
+
 }
 
-:host ::ng-deep .fc-view-harness,
-:host ::ng-deep .fc-daygrid-day-frame,
-:host ::ng-deep .fc-scroller {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
+/* 🔹 Quitar bordes */
 :host ::ng-deep .fc-theme-standard .fc-scrollgrid,
 :host ::ng-deep .fc-theme-standard .fc-scrollgrid-section>td,
 :host ::ng-deep .fc-theme-standard td,
@@ -35,18 +34,51 @@
   border: none !important;
 }
 
+/* 🔹 Celdas cuadradas */
+:host ::ng-deep .fc-daygrid-day {
+  aspect-ratio: 1 / 1 !important;
+  max-height: 50px !important;
+  // background-color: red;
+}
+
+/* 🔹 Cada celda se convierte en un contenedor flex centrado */
 :host ::ng-deep .fc-daygrid-day-frame {
-  border: 1px solid variables.$border;
-  // border-radius: 5px;
-  // border:0;
+  display: flex;
+  justify-content: center; // centra horizontal
+  align-items: center; // centra vertical
+  min-height: 50px; // ajusta el tamaño de la celda
+  position: relative;
+  border: 0px;
+  border-radius: variables.$border-radius-pill;
+  padding: 0 !important;
 
 }
 
+/* 🔹 Quitamos el comportamiento de "arriba" */
+:host ::ng-deep .fc-daygrid-day-top {
+  position: static !important;
+  transform: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 🔹 Ajustamos el número */
+:host ::ng-deep .fc-daygrid-day-number {
+  font-size: variables.$font-size-sm;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+/* 🔹 Encabezado de columnas */
 :host ::ng-deep .fc-col-header-cell {
-  // border: 1px solid variables.$border !important;
-  // border: 0;
-  padding: variables.$padding-sm;
+  padding: variables.$padding-sm !important;
+
   background-color: variables.$bg;
+
 
   &:first-child {
     border-top-left-radius: variables.$border-radius-sm;
@@ -54,87 +86,65 @@
 
   &:last-child {
     border-top-right-radius: variables.$border-radius-sm;
-
   }
 }
 
-:host ::ng-deep .fc-scroller {
-  height: auto !important;
-  max-height: auto !important;
-}
-
-:host ::ng-deep .fc-header-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  padding: variables.$padding-sm;
-  gap: variables.$spacing-md;
-}
-
-@media (max-width: 600px) {
-  :host ::ng-deep .fc-header-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    text-align: center;
-  }
-
-  :host ::ng-deep .fc-toolbar-chunk {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
-
-  :host ::ng-deep .fc .fc-button-group,
-  :host ::ng-deep .fc .fc-button {
-    flex: 1 1 auto;
-  }
-}
-
+/* 🔹 Hoy */
 :host ::ng-deep .fc-day-today {
   background-color: variables.$bg !important;
+  border-radius: variables.$border-radius-pill;
 }
 
+/* 🔹 Eventos */
 :host ::ng-deep .fc-event {
   border: none !important;
   background: variables.$bg-brand;
-  // border-radius: 8px;
-  padding: 2px 6px;
+
+  padding: variables.$padding-sm;
+  border-radius: variables.$border-radius-pill;
 }
 
+/* 🔹 Toolbar (título y botones) */
+:host ::ng-deep .fc-header-toolbar {
+  display: flex;
+  flex-wrap: nowrap !important;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px !important;
+  gap: variables.$spacing-md !important;
+  // background-color: brown;
+}
+
+/* 🔹 Compactar título */
+:host ::ng-deep .fc-toolbar-title {
+  font-size: variables.$font-size-sm !important;
+  font-weight: variables.$font-weight-regular !important;
+  // line-height: 1.2;
+  margin: 0;
+  padding: 0;
+  // background-color: blue;
+}
+
+/* 🔹 Botones */
 :host ::ng-deep .fc .fc-button {
-  // background-color: variables.$bg;
   color: variables.$text;
   border: none;
   border-radius: variables.$border-radius-sm;
-  padding: variables.$padding-sm;
   font-size: variables.$font-size-sm;
+  padding: variables.$padding-sm !important;
+  // min-height: 24px !important;
+  background-color: transparent;
   cursor: pointer;
-  background-color: transparent;
 }
 
-:host ::ng-deep .fc .fc-button:hover {
-  // background-color: darken(variables.$primary, 10%);
-  background-color: transparent;
-}
-
-:host ::ng-deep .fc .fc-button:active {
-  // background-color: darken(variables.$primary, 20%);
-  background-color: transparent;
-
-}
-
-:host ::ng-deep .fc .fc-button:disabled {
-  // background-color: variables.$border;
-  color: variables.$text;
-  opacity: 0.6;
-  cursor: not-allowed;
-
-  background-color: transparent;
-}
-
-/* 🔹 Botón activo (ej: "dayGridMonth", "timeGridWeek") */
 :host ::ng-deep .fc .fc-button.fc-button-active {
   background-color: variables.$bg-brand;
   color: #fff;
+}
+
+:host ::ng-deep .fc .fc-button:disabled {
+  color: variables.$text;
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: transparent;
 }

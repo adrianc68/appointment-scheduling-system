@@ -21,10 +21,13 @@ import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/reada
 import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
 import { CalendarComponent } from '../../ui-components/display/calendar/calendar.component';
 import { AvailabilityTimeSlot } from '../../../view-model/business-entities/availability-time-slot';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+
+
 
 @Component({
   selector: 'app-register-appointment-as-staff',
-  imports: [CommonModule, FormsModule, MatIconModule, SlotDateRangePipe, ReadableTimePipe, ReadableDatePipe, DurationDatePipe, CalendarComponent],
+  imports: [CommonModule, FormsModule, MatIconModule, SlotDateRangePipe, ReadableTimePipe, ReadableDatePipe, DurationDatePipe, CalendarComponent, DragDropModule],
   templateUrl: './register-appointment-as-staff.component.html',
   styleUrl: './register-appointment-as-staff.component.scss'
 })
@@ -61,7 +64,49 @@ export class RegisterAppointmentAsStaffComponent {
   }
 
 
+trackByUuid(index: number, service: ServiceOffer) {
+  return service.uuid;
+}
 
+  globalStartTime: string = ''; // HH:MM:SS
+
+
+  updateStartTimesFromGlobal() {
+    if (!this.globalStartTime) return;
+
+    let [h, m, s] = this.globalStartTime.split(':').map(Number);
+    let currentDate = new Date();
+    currentDate.setHours(h, m, s, 0);
+
+    this.selectedServicesOffer.forEach(service => {
+      const startStr = currentDate.toTimeString().split(' ')[0];
+      this.startTimes[service.uuid] = startStr;
+
+      currentDate.setMinutes(currentDate.getMinutes() + service.minutes);
+    });
+  }
+
+  getEndTime(service: ServiceOffer): string {
+    const start = this.startTimes[service.uuid];
+    if (!start) return '';
+
+    const [hours, minutes, seconds] = start.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes + service.minutes;
+    const endHours = Math.floor(totalMinutes / 60);
+    const endMinutes = totalMinutes % 60;
+
+    return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:${seconds}`;
+  }
+
+
+
+
+  dropService(event: CdkDragDrop<any[]>) {
+    moveItemInArray(this.selectedServicesOffer, event.previousIndex, event.currentIndex);
+
+    this.updateStartTimesFromGlobal();
+
+  }
 
   constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private loggingService: LoggingService, private clientService: ClientService) {
     this.clientService.getClientList().pipe(
@@ -69,7 +114,7 @@ export class RegisterAppointmentAsStaffComponent {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.clients = [...response.result!];
-          this.systemMessage = code;
+          //this.systemMessage = code;
           return of(true);
         } else {
           this.handleErrorResponse(response);
@@ -130,7 +175,7 @@ export class RegisterAppointmentAsStaffComponent {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.scheduledAppointments = [...response.result!];
           this.scheduledAppointments.map(d => console.log(d));
-          this.systemMessage = code;
+          //this.systemMessage = code;
           return of(true);
         } else {
           this.handleErrorResponse(response);
@@ -138,6 +183,16 @@ export class RegisterAppointmentAsStaffComponent {
         }
       })
     ).subscribe();
+  }
+
+
+  allStartTimesDefined(): boolean {
+    if (!this.selectedServicesOffer || this.selectedServicesOffer.length === 0) return false;
+
+    return this.selectedServicesOffer.every(service => {
+      const startTime = this.startTimes[service.uuid];
+      return startTime && startTime.trim() !== '';
+    });
   }
 
 
@@ -190,7 +245,7 @@ export class RegisterAppointmentAsStaffComponent {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           console.log(response);
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = response.result ? new Date(response.result).toISOString() : code;
+          this.systemMessage = code;
           return of(true);
         } else {
           this.handleErrorResponse(response);
@@ -286,6 +341,9 @@ export class RegisterAppointmentAsStaffComponent {
       this.formatDateToApi(end)
     );
 
+    this.selectedServicesOffer = [];
+    this.selectedClient = undefined;
+
   }
 
   private formatDateToApi(date: Date): string {
@@ -325,7 +383,7 @@ export class RegisterAppointmentAsStaffComponent {
           );
 
           //this.servicesAvailable.map(d => console.log(d));
-          this.systemMessage = code;
+          //this.systemMessage = code;
           return of(true);
         } else {
           this.handleErrorResponse(response);
