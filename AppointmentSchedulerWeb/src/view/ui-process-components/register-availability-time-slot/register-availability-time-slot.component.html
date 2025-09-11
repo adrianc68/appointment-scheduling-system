@@ -32,29 +32,8 @@
         </div>
       </div>
     </div>
-    <div class="data-selected m-top-md" *ngIf="selectedAssistant">
-      <h3 class="m-bottom-md">Asistente seleccionado: </h3>
-      <div class="assistant-summary">
-        <div>
-          <span class="fs-base t-muted m-bottom-base"> Nombre:</span>
-          <span class="fs-base t-emphasis">{{ selectedAssistant.name }}</span>
-        </div>
-        <div>
-          <span class="fs-base t-muted m-bottom-base"> Nombre de usuario:</span>
-          <span class="fs-base t-emphasis"> {{ selectedAssistant.username}}</span>
-        </div>
-        <div>
-          <span class="fs-base t-muted m-bottom-base"> Correo:</span>
-          <span class="fs-base t-emphasis"> {{ selectedAssistant.email}}</span>
-        </div>
-        <div>
-          <span class="fs-base t-muted m-bottom-base"> Telefono:</span>
-          <span class="fs-base t-emphasis"> {{ selectedAssistant.phoneNumber}}</span>
-        </div>
-      </div>
 
-      <button class="button primary m-top-lg" *ngIf="selectedAssistant" (click)="nextStep()">Siguiente</button>
-    </div>
+    <button class="button primary m-top-lg" *ngIf="selectedAssistant" (click)="nextStep()">Siguiente</button>
   </section>
 
   <section class="datetime-select data-section sp-bottom card max-w-md m-x-center" *ngIf="currentStep === 2">
@@ -130,7 +109,7 @@
 
         <button class="button danger w-auto p-all-sm delete-btn" type="button" (click)="removeUnavailableTimeSlot(i)">
           <mat-icon class="f-danger">delete</mat-icon>
-    </button>
+        </button>
       </div>
     </div>
 

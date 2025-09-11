@@ -73,7 +73,7 @@
         <div class="data-body table-type">
           <div class="data-body-no-data" *ngIf="servicesAvailable?.length === 0">
             <mat-icon>search_off</mat-icon>
-            <span class="t-center">No se han encontrado servicios disponibles para este día</span>
+            <span class="t-center">No se han encontrado servicios.</span>
           </div>
           <div class="service-card-container scroll-visible">
             <div class="service-data data-row-item" *ngFor="let serviceOffer of servicesAvailable">
@@ -111,19 +111,30 @@
     <h1 class="t-center">Ajusta tus horarios</h1>
     <p class="t-center m-top-base">Revisa los servicios y ajusta los horarios de acuerdo a tus tiempos</p>
     <section class="selected-service data-section p-all-none sp-bottom max-w-md m-x-center m-top-md">
-      <div class="data-body-no-data" *ngIf="selectedServicesOffer?.length === 0">
-        <mat-icon>search_off</mat-icon>
-        <span>No se han seleccionado servicios.</span>
+      <div class="start-time-container m-bottom-base d-flex-col gap-base card data-section">
+        <label for="globalStartTime" class="t-muted">Selecciona la hora de inicio de la cita:</label>
+        <input type="time" id="globalStartTime" class="input m-top-base" [(ngModel)]="globalStartTime"
+          (change)="updateStartTimesFromGlobal()" step="60" />
       </div>
 
-      <div class="start-time-container m-bottom-md d-flex-col gap-base card data-section">
-        <label for="globalStartTime">Hora de inicio de la cita:</label>
-        <input type="time" id="globalStartTime" class="input" [(ngModel)]="globalStartTime"
-          (change)="updateStartTimesFromGlobal()" step="1" />
-      </div>
+
+      <section class="unavailable-times" *ngIf="availabilitySlots?.length">
+        <h4>Horarios no disponibles</h4>
+
+        <div *ngFor="let slot of availabilitySlots">
+          <ul>
+            <li *ngFor="let u of slot.unavailableTimeSlots">
+              <span>
+                {{ (u.startDate | date:'shortTime') }} - {{ (u.endDate | date:'shortTime') }}
+              </span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
 
       <section class="selected-service data-section sp-bottom p-all-none max-w-md m-x-center m-top-md">
-        <div class="data-body-no-data" *ngIf="selectedServicesOffer?.length === 0">
+        <div class="data-body-no-data d-flex j-content-center gap-base" *ngIf="selectedServicesOffer?.length === 0">
           <mat-icon>search_off</mat-icon>
           <span>No se han seleccionado servicios.</span>
         </div>
@@ -131,7 +142,6 @@
         <div class="wrapper" cdkDropList (cdkDropListDropped)="dropService($event)">
           <div class="service-data card"
             *ngFor="let serviceOffer of selectedServicesOffer; let i = index; trackBy: trackByUuid" cdkDrag>
-
             <ng-template cdkDragPreview>
               <div class="service-data card data-section drag-preview">
                 <div class="service-draggable">
@@ -152,7 +162,69 @@
               <mat-icon>drag_indicator</mat-icon>
             </div>
 
+
+            <!--<div *ngIf="isServiceInConflict(serviceOffer)" class="conflict-warning">-->
+            <!--  ⚠ Este servicio entra en conflicto con otra cita-->
+            <!--  <div *ngIf="getServiceConflictInfo(serviceOffer).conflictingAppointments.length">-->
+            <!--    <div *ngFor="let conflict of getServiceConflictInfo(serviceOffer).conflictingAppointments">-->
+            <!--      {{ conflict.clientName }}: {{ conflict.start | date:'shortTime' }} - {{ conflict.end |-->
+            <!--      date:'shortTime' }}-->
+            <!--    </div>-->
+            <!--  </div>-->
+            <!--  <div *ngIf="getServiceConflictInfo(serviceOffer).unavailable">-->
+            <!--    ⚠ El asistente no está disponible en este horario-->
+            <!--  </div>-->
+            <!--</div>-->
+            <!---->
+
+            <div *ngIf="isServiceInConflict(serviceOffer)" class="conflict-warning">
+              ⚠ Este servicio tiene conflicto:
+
+              <!-- Conflictos con otras citas -->
+              <div *ngIf="getServiceConflictInfo(serviceOffer).conflictingAppointments.length">
+                <div *ngFor="let app of getServiceConflictInfo(serviceOffer).conflictingAppointments">
+                  {{ app.start | date:'shortTime' }} - {{ app.end | date:'shortTime' }} ({{ app.clientName }})
+                </div>
+              </div>
+
+              <!-- Conflicto por disponibilidad -->
+              <div *ngIf="getServiceConflictInfo(serviceOffer).unavailable">
+                - El asistente no está disponible en este horario
+                <div *ngFor="let range of getUnavailableRangesForService(serviceOffer)">
+                  {{ range.start | date:'shortTime' }} - {{ range.end | date:'shortTime' }}
+                </div>
+              </div>
+
+              <!---->
+              <!--<div *ngIf="getServiceConflictInfo(serviceOffer).unavailable">-->
+              <!--  - El asistente no está disponible en este horario-->
+              <!--  <div *ngFor="let range of getAvailabilityAndUnavailableForService(serviceOffer)">-->
+              <!--    <span *ngIf="range.type === 'availability'">Disponibilidad completa: </span>-->
+              <!--    <span *ngIf="range.type === 'unavailable'">Bloqueado: </span>-->
+              <!--    {{ range.start | date:'shortTime' }} - {{ range.end | date:'shortTime' }}-->
+              <!--  </div>-->
+              <!--</div>-->
+              <div *ngIf="getServiceConflictInfo(serviceOffer).unavailable">
+                - El asistente no está disponible en este horario
+                <div *ngFor="let slot of getAvailabilityAndUnavailableForSelectedDate(serviceOffer)">
+                  Disponibilidad completa: {{ slot.availabilityStart | date:'shortTime' }} - {{ slot.availabilityEnd |
+                  date:'shortTime' }}
+                  <div *ngFor="let u of slot.unavailableSlots">
+                    Bloqueado: {{ u.start | date:'shortTime' }} - {{ u.end | date:'shortTime' }}
+                  </div>
+                </div>
+              </div>
+
+
+
+
+
+            </div>
+
+
+
             <div class="service-info">
+
               <h3 class="fs-base t-emphasis fw-bold service-name">{{ i + 1 }} - {{ serviceOffer.name }}</h3>
               <div class="d-flex gap-base j-content-start a-items-center m-top-base">
                 <mat-icon>support_agent</mat-icon>

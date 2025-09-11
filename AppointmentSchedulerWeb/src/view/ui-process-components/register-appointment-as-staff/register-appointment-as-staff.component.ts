@@ -43,7 +43,9 @@ export class RegisterAppointmentAsStaffComponent {
   startTimes: { [uuid: string]: string } = {};
   selectedClient?: Client;
   slots: { startDate: string, endDate: string }[] = [];
+  globalStartTime: string = '';
 
+  openedSlots = new Set<number>();
   currentStep = 1;
   previousStep = 1;
 
@@ -64,11 +66,10 @@ export class RegisterAppointmentAsStaffComponent {
   }
 
 
-trackByUuid(index: number, service: ServiceOffer) {
-  return service.uuid;
-}
+  trackByUuid(index: number, service: ServiceOffer) {
+    return service.uuid;
+  }
 
-  globalStartTime: string = ''; // HH:MM:SS
 
 
   updateStartTimesFromGlobal() {
@@ -76,7 +77,7 @@ trackByUuid(index: number, service: ServiceOffer) {
 
     let [h, m, s] = this.globalStartTime.split(':').map(Number);
     let currentDate = new Date();
-    currentDate.setHours(h, m, s, 0);
+    currentDate.setHours(h, m, 0, 0);
 
     this.selectedServicesOffer.forEach(service => {
       const startStr = currentDate.toTimeString().split(' ')[0];
@@ -95,7 +96,9 @@ trackByUuid(index: number, service: ServiceOffer) {
     const endHours = Math.floor(totalMinutes / 60);
     const endMinutes = totalMinutes % 60;
 
-    return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:${seconds}`;
+    //return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:${seconds}`;
+    return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:00`;
+
   }
 
 
@@ -125,7 +128,6 @@ trackByUuid(index: number, service: ServiceOffer) {
   }
 
 
-  openedSlots = new Set<number>();
 
   toggleSlot(index: number) {
     if (this.openedSlots.has(index)) {
@@ -149,6 +151,8 @@ trackByUuid(index: number, service: ServiceOffer) {
     const exists = this.selectedServicesOffer.some(s => s.uuid === serviceOffer.uuid);
     if (!exists) {
       this.selectedServicesOffer.push(serviceOffer);
+
+      this.updateStartTimesFromGlobal();
 
       const index = this.servicesAvailable.findIndex(service => service.uuid === serviceOffer.uuid);
       if (index !== -1) {
@@ -356,10 +360,13 @@ trackByUuid(index: number, service: ServiceOffer) {
 
   //slots: AvailabilityTimeSlot[] = [];
 
+  availabilitySlots: AvailabilityTimeSlot[] = [];
+
   getAvailabilityTimeSlots(startDate: string, endDate: string) {
     this.schedulerService.getAvailabilityTimeSlots(startDate, endDate).pipe(
       switchMap((response: OperationResult<AvailabilityTimeSlot[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          this.availabilitySlots = response.result ?? [];
           this.slots = response.result!.map(slot => ({
             startDate: new Date(slot.startDate).toISOString(),
             endDate: new Date(slot.endDate).toISOString()
@@ -422,5 +429,186 @@ trackByUuid(index: number, service: ServiceOffer) {
   }
 
 
+  private hasTimeConflict(start1: Date, end1: Date, start2: Date, end2: Date): boolean {
+    return start1 < end2 && end1 > start2;
+  }
 
+  getServiceConflictInfo(service: ServiceOffer): ConflictInfo {
+    const startStr = this.startTimes[service.uuid];
+    if (!startStr) return { hasConflict: false, conflictingAppointments: [], unavailable: false };
+
+    const [hours, minutes] = startStr.split(':').map(Number);
+    const start = new Date(this.selectedDate + 'T00:00:00');
+    start.setHours(hours, minutes, 0, 0);
+
+    const end = new Date(start);
+    end.setMinutes(end.getMinutes() + service.minutes);
+
+    // Buscar conflictos con citas del mismo asistente
+    const conflictingAppointments = this.scheduledAppointments
+      .filter(app =>
+        app.scheduledServices?.some(s => s.assistant.uuid === service.assistant?.uuid) &&
+        this.hasTimeConflict(start, end, new Date(app.startDate), new Date(app.endDate))
+      )
+      .map(app => ({
+        start: new Date(app.startDate),
+        end: new Date(app.endDate),
+        clientName: app.client?.name || 'Cliente'
+      }));
+
+    // Verificar disponibilidad del asistente en los slots
+    const isAvailable = service.assistant ? this.isAssistantAvailable(service.assistant.uuid, start, end) : true;
+
+    return {
+      hasConflict: conflictingAppointments.length > 0 || !isAvailable,
+      conflictingAppointments,
+      unavailable: !isAvailable
+    };
+  }
+
+  // Ahora isServiceInConflict solo llama a getServiceConflictInfo
+  isServiceInConflict(service: ServiceOffer): boolean {
+    const info = this.getServiceConflictInfo(service);
+    return info.hasConflict;
+  }
+
+  isAssistantAvailable(assistantUuid: string, start: Date, end: Date): boolean {
+    const assistantSlots = this.availabilitySlots.filter(slot => slot.assistant.uuid === assistantUuid);
+
+    if (assistantSlots.length === 0) return false;
+
+    return assistantSlots.some(slot => {
+      const slotStart = new Date(slot.startDate);
+      const slotEnd = new Date(slot.endDate);
+
+      if (start >= slotStart && end <= slotEnd) {
+        // Revisar si entra en algún unavailableTimeSlot
+        const conflicts = slot.unavailableTimeSlots.some(u =>
+          this.hasTimeConflict(start, end, new Date(u.startDate), new Date(u.endDate))
+        );
+        return !conflicts;
+      }
+      return false;
+    });
+  }
+
+  getUnavailableRangesForService(service: ServiceOffer) {
+    if (!service.assistant) return [];
+
+    const conflicts: { start: Date; end: Date }[] = [];
+
+    // Iteramos todos los slots del asistente
+    this.availabilitySlots.forEach(slot => {
+      if (slot.assistant?.uuid !== service.assistant!.uuid) return;
+
+      // Verificar si el servicio seleccionado se cruza con algún unavailableTimeSlot
+      const serviceStartStr = this.startTimes[service.uuid];
+      if (!serviceStartStr) return;
+
+      const [hours, minutes] = serviceStartStr.split(':').map(Number);
+      const serviceStart = new Date(this.selectedDate + 'T00:00:00');
+      serviceStart.setHours(hours, minutes, 0, 0);
+      const serviceEnd = new Date(serviceStart);
+      serviceEnd.setMinutes(serviceEnd.getMinutes() + service.minutes);
+
+      const overlaps = slot.unavailableTimeSlots.some(u =>
+        this.hasTimeConflict(serviceStart, serviceEnd, new Date(u.startDate), new Date(u.endDate))
+      );
+
+      if (overlaps) {
+        // Incluimos **todos** los unavailableTimeSlots del slot
+        slot.unavailableTimeSlots.forEach(u => {
+          conflicts.push({ start: new Date(u.startDate), end: new Date(u.endDate) });
+        });
+      }
+    });
+
+    return conflicts;
+  }
+
+
+  getAvailabilityAndUnavailableForService(service: ServiceOffer) {
+    if (!service.assistant) return [];
+
+    const selectedDate = new Date(this.selectedDate);
+    const dayStart = new Date(selectedDate);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(selectedDate);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    const ranges: { start: Date; end: Date; type: 'availability' | 'unavailable' }[] = [];
+
+    this.availabilitySlots.forEach(slot => {
+      if (slot.assistant?.uuid !== service.assistant!.uuid) return;
+
+      const slotStart = new Date(slot.startDate);
+      const slotEnd = new Date(slot.endDate);
+
+      // Solo AvailabilityTimeSlot que intersecten con el selectedDate
+      if (slotEnd > dayStart && slotStart < dayEnd) {
+        // Agregamos el rango completo del slot
+        ranges.push({ start: slotStart, end: slotEnd, type: 'availability' });
+
+        // Agregamos los unavailableTimeSlots dentro de este slot
+        slot.unavailableTimeSlots.forEach(u => {
+          const uStart = new Date(u.startDate);
+          const uEnd = new Date(u.endDate);
+          if (uEnd > dayStart && uStart < dayEnd) {
+            ranges.push({ start: uStart, end: uEnd, type: 'unavailable' });
+          }
+        });
+      }
+    });
+
+    return ranges;
+  }
+
+
+
+  getServicesWithConflictInfo() {
+    return this.selectedServicesOffer.map(service => ({
+      service,
+      conflictInfo: this.getServiceConflictInfo(service)
+    }));
+  }
+
+
+getAvailabilityAndUnavailableForSelectedDate(service: ServiceOffer) {
+  if (!service.assistant) return [];
+
+  const selectedDate = new Date(this.selectedDate);
+  const dayStart = new Date(selectedDate);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(selectedDate);
+  dayEnd.setHours(23, 59, 59, 999);
+
+  // Filtramos solo los AvailabilityTimeSlot del asistente que intersecten con el selectedDate
+  return this.availabilitySlots
+    .filter(slot =>
+      slot.assistant?.uuid === service.assistant!.uuid &&
+      new Date(slot.endDate) > dayStart &&
+      new Date(slot.startDate) < dayEnd
+    )
+    .map(slot => ({
+      availabilityStart: new Date(slot.startDate),
+      availabilityEnd: new Date(slot.endDate),
+      unavailableSlots: slot.unavailableTimeSlots
+        .filter(u => new Date(u.endDate) > dayStart && new Date(u.startDate) < dayEnd)
+        .map(u => ({ start: new Date(u.startDate), end: new Date(u.endDate) }))
+    }));
+}
+
+
+
+
+
+
+}
+
+
+
+interface ConflictInfo {
+  hasConflict: boolean;
+  conflictingAppointments: { start: Date; end: Date; clientName: string }[];
+  unavailable: boolean; // nuevo
 }
