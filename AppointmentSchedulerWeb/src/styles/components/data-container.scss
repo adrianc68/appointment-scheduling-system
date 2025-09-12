@@ -20,7 +20,11 @@
     border-bottom: 0;
     border-top-left-radius: variables.$border-radius-md;
     border-top-right-radius: variables.$border-radius-md;
-    // background-color: red;
+    // background-color: variables.$bg-brand;
+    //
+    // span {
+    //   color: variables.$bg-brand-text;
+    // }
   }
 
   .data-body {

@@ -1,13 +1,11 @@
 <div class="edit-container">
-  <form class="form card max-w-sm" (ngSubmit)="onSubmit()" *ngIf="service">
-    <div class="form-header">
-      <h1 class="m-bottom-base">
-        Editar servicio
-      </h1>
-      <p>
-        Actualiza la información del servicio.
-      </p>
-    </div>
+  <h1 class="t-center">
+    Editar servicio
+  </h1>
+  <p class="t-center m-top-base">
+    Actualiza la información del servicio.
+  </p>
+  <form class="form card max-w-sm m-top-md" (ngSubmit)="onSubmit()" *ngIf="service">
     <div class="form-body">
       <div class="form-input">
         <label for="name">

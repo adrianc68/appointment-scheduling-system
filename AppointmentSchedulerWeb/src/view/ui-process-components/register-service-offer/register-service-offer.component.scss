@@ -59,7 +59,7 @@
 
 .assigned-services {
   .assigned-services-container {
-    max-height: variables.$container-xs;
+    max-height: variables.$container-xxs;
     overflow-y: auto;
 
     .assigned-service-card {
@@ -104,7 +104,7 @@
 .services-available {
 
   .services-available-container {
-    max-height: variables.$container-sm;
+    max-height: variables.$container-xxs;
     overflow-y: auto;
 
     .service-available-card {

@@ -12,7 +12,7 @@
     </section>
   </div>
 
-  <div class="process" *ngIf="currentStep === 2">
+  <div class="process" *ngIf="currentStep === 4">
     <h1 class="t-center">¿Para qué cliente?</h1>
     <p class="t-center m-top-base">Buscar por un cliente existente...</p>
     <section class="select-client data-section p-all-none sp-bottom max-w-sm m-x-center m-top-md">
@@ -56,7 +56,7 @@
 
   </div>
 
-  <div class="process" *ngIf="currentStep === 3">
+  <div class="process" *ngIf="currentStep === 2">
     <h1 class="t-center">Selecciona los servicios</h1>
     <p class="t-center m-top-base">Escoge los servicios que deseas agendar</p>
     <section class="select-service data-section p-all-none sp-bottom max-w-sm m-x-center m-top-md">
@@ -107,7 +107,7 @@
   </div>
 
 
-  <div class="process" *ngIf="currentStep === 4">
+  <div class="process" *ngIf="currentStep === 3">
     <h1 class="t-center">Ajusta tus horarios</h1>
     <p class="t-center m-top-base">Revisa los servicios y ajusta los horarios de acuerdo a tus tiempos</p>
     <section class="selected-service data-section p-all-none sp-bottom max-w-md m-x-center m-top-md">
@@ -115,22 +115,10 @@
         <label for="globalStartTime" class="t-muted">Selecciona la hora de inicio de la cita:</label>
         <input type="time" id="globalStartTime" class="input m-top-base" [(ngModel)]="globalStartTime"
           (change)="updateStartTimesFromGlobal()" step="60" />
+        <p class="m-top-md">Nota: Si tienes conflicto en algún servicio, puedes tratar cambiando la hora de inicio o
+          cambiando el orden del servicio (si hay más de uno).</p>
       </div>
 
-
-      <section class="unavailable-times" *ngIf="availabilitySlots?.length">
-        <h4>Horarios no disponibles</h4>
-
-        <div *ngFor="let slot of availabilitySlots">
-          <ul>
-            <li *ngFor="let u of slot.unavailableTimeSlots">
-              <span>
-                {{ (u.startDate | date:'shortTime') }} - {{ (u.endDate | date:'shortTime') }}
-              </span>
-            </li>
-          </ul>
-        </div>
-      </section>
 
 
       <section class="selected-service data-section sp-bottom p-all-none max-w-md m-x-center m-top-md">
@@ -158,98 +146,94 @@
               <div class="service-data card placeholder"></div>
             </ng-template>
 
-            <div class="service-draggable" cdkDragHandle>
-              <mat-icon>drag_indicator</mat-icon>
-            </div>
-
-
-            <!--<div *ngIf="isServiceInConflict(serviceOffer)" class="conflict-warning">-->
-            <!--  ⚠ Este servicio entra en conflicto con otra cita-->
-            <!--  <div *ngIf="getServiceConflictInfo(serviceOffer).conflictingAppointments.length">-->
-            <!--    <div *ngFor="let conflict of getServiceConflictInfo(serviceOffer).conflictingAppointments">-->
-            <!--      {{ conflict.clientName }}: {{ conflict.start | date:'shortTime' }} - {{ conflict.end |-->
-            <!--      date:'shortTime' }}-->
-            <!--    </div>-->
-            <!--  </div>-->
-            <!--  <div *ngIf="getServiceConflictInfo(serviceOffer).unavailable">-->
-            <!--    ⚠ El asistente no está disponible en este horario-->
-            <!--  </div>-->
-            <!--</div>-->
-            <!---->
-
             <div *ngIf="isServiceInConflict(serviceOffer)" class="conflict-warning">
-              ⚠ Este servicio tiene conflicto:
 
+              <mat-icon *ngIf="isServiceInConflict(serviceOffer)">warning</mat-icon>
               <!-- Conflictos con otras citas -->
               <div *ngIf="getServiceConflictInfo(serviceOffer).conflictingAppointments.length">
+                <span>
+                  Este servicio tiene conflicto con otros servicios de otras citas:
+                </span>
                 <div *ngFor="let app of getServiceConflictInfo(serviceOffer).conflictingAppointments">
-                  {{ app.start | date:'shortTime' }} - {{ app.end | date:'shortTime' }} ({{ app.clientName }})
+                  <span>
+                    - {{ app.start | date:'shortTime' }} - {{ app.end | date:'shortTime' }}
+                    | Servicio: {{ app.serviceName }}
+                  </span>
                 </div>
               </div>
 
               <!-- Conflicto por disponibilidad -->
               <div *ngIf="getServiceConflictInfo(serviceOffer).unavailable">
-                - El asistente no está disponible en este horario
-                <div *ngFor="let range of getUnavailableRangesForService(serviceOffer)">
-                  {{ range.start | date:'shortTime' }} - {{ range.end | date:'shortTime' }}
-                </div>
-              </div>
+                <span>
+                  El asistente no se encuentra disponible en el rango solicitado ({{ startTimes[serviceOffer.uuid]}} -
+                  {{
+                  getEndTime(serviceOffer) }}).
+                </span>
 
-              <!---->
-              <!--<div *ngIf="getServiceConflictInfo(serviceOffer).unavailable">-->
-              <!--  - El asistente no está disponible en este horario-->
-              <!--  <div *ngFor="let range of getAvailabilityAndUnavailableForService(serviceOffer)">-->
-              <!--    <span *ngIf="range.type === 'availability'">Disponibilidad completa: </span>-->
-              <!--    <span *ngIf="range.type === 'unavailable'">Bloqueado: </span>-->
-              <!--    {{ range.start | date:'shortTime' }} - {{ range.end | date:'shortTime' }}-->
-              <!--  </div>-->
-              <!--</div>-->
-              <div *ngIf="getServiceConflictInfo(serviceOffer).unavailable">
-                - El asistente no está disponible en este horario
                 <div *ngFor="let slot of getAvailabilityAndUnavailableForSelectedDate(serviceOffer)">
-                  Disponibilidad completa: {{ slot.availabilityStart | date:'shortTime' }} - {{ slot.availabilityEnd |
-                  date:'shortTime' }}
-                  <div *ngFor="let u of slot.unavailableSlots">
-                    Bloqueado: {{ u.start | date:'shortTime' }} - {{ u.end | date:'shortTime' }}
+                  <span>
+                    - Jornada: {{ slot.availabilityStart | date:'shortTime' }} - {{ slot.availabilityEnd |
+                    date:'shortTime' }}
+                  </span>
+                  <div *ngIf="slot.unavailableSlots.length > 0">
+                    <span>
+                      - Pausas:
+                    </span>
+                    <br>
+                    <ul class="m-left-md">
+                      <li *ngFor="let u of slot.unavailableSlots; let i = index">
+                        <span>
+                          {{ u.start | date:'shortTime' }} - {{ u.end | date:'shortTime' }}
+                          <br>
+                        </span>
+
+                      </li>
+                    </ul>
                   </div>
                 </div>
               </div>
-
-
-
-
-
             </div>
 
 
 
-            <div class="service-info">
+            <div class="service-wrapper">
+              <div class="service-draggable" cdkDragHandle>
+                <mat-icon>drag_indicator</mat-icon>
+              </div>
 
-              <h3 class="fs-base t-emphasis fw-bold service-name">{{ i + 1 }} - {{ serviceOffer.name }}</h3>
-              <div class="d-flex gap-base j-content-start a-items-center m-top-base">
-                <mat-icon>support_agent</mat-icon>
-                <span class="fs-sm">{{ serviceOffer.assistant?.name }}</span>
+              <div class="service-info">
+                <h3 class="fs-base t-emphasis fw-bold service-name">{{ i + 1 }} - {{ serviceOffer.name }}</h3>
+                <div class="d-flex gap-base j-content-start a-items-center m-top-base">
+                  <mat-icon>support_agent</mat-icon>
+                  <span class="fs-sm">{{ serviceOffer.assistant?.name }}</span>
+                </div>
+                <div class="m-top-base">
+                  <span class="fs-sm t-muted">Precio: $ {{ serviceOffer.price }}</span>
+                  <span class="fs-sm t-muted m-left-base">-</span>
+                  <span class="fs-sm t-muted m-left-base">Duración: {{ serviceOffer.minutes }} min</span>
+                </div>
+                <div class="m-top-base d-flex gap-base">
+                  <span class="fs-sm w-auto t-muted">Hora de inicio:</span>
+                  <span class="fs-sm">{{ startTimes[serviceOffer.uuid] }}</span>
+                </div>
+                <div class="m-top-base d-flex gap-base">
+                  <span class="fs-sm w-auto t-muted">Fin:</span>
+                  <span class="fs-sm">{{ getEndTime(serviceOffer) }}</span>
+                </div>
               </div>
-              <div class="m-top-base">
-                <span class="fs-sm t-muted">Precio: $ {{ serviceOffer.price }}</span>
-                <span class="fs-sm t-muted m-left-base">-</span>
-                <span class="fs-sm t-muted m-left-base">Duración: {{ serviceOffer.minutes }} min</span>
-              </div>
-              <div class="m-top-base d-flex gap-base">
-                <span class="fs-sm w-auto t-muted">Hora de inicio:</span>
-                <span class="fs-sm">{{ startTimes[serviceOffer.uuid] }}</span>
-              </div>
-              <div class="m-top-base d-flex gap-base">
-                <span class="fs-sm w-auto t-muted">Fin:</span>
-                <span class="fs-sm">{{ getEndTime(serviceOffer) }}</span>
-              </div>
+              <button class="button bordered m-y-center w-auto p-all-sm" (click)="removeSelectedService(serviceOffer)">
+                <mat-icon class="danger">delete</mat-icon>
+              </button>
             </div>
 
-            <button class="button bordered m-y-center w-auto p-all-sm" (click)="removeSelectedService(serviceOffer)">
-              <mat-icon class="danger">delete</mat-icon>
-            </button>
+
+
+
+
 
           </div>
+
+
         </div>
 
       </section>
@@ -263,256 +247,6 @@
       <button class="button primary w-auto" [disabled]="!allStartTimesDefined()"
         [ngClass]="{'disabled': !allStartTimesDefined()}" (click)="nextStep()">Siguiente</button>
     </section>
-
-
-    <section class="appointments-scheduled data-section sp-bottom card max-w-md m-x-center">
-      <section class="data-container">
-        <section class="data-actions">
-          <div class="grid-input-search input container">
-            <label class="input-icon" for="search">
-              <mat-icon>search</mat-icon>
-            </label>
-            <input id="search" class="input" type="text" placeholder="Buscar..." />
-          </div>
-        </section>
-
-        <div class="data-header">
-          <span class="fw-bold">Citas agendadas</span>
-        </div>
-        <div class="data-body table-type">
-
-          <div class="data-body-no-data" *ngIf="scheduledAppointments?.length === 0">
-            <mat-icon>search_off</mat-icon>
-            <span>No se han encontrado registros</span>
-          </div>
-          <div class="card-container data-row-item accordion-type"
-            *ngFor="let appointment of scheduledAppointments; let i = index">
-            <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
-              <div class="card-icon">
-                <mat-icon>person</mat-icon>
-              </div>
-              <div class="card-title d-flex">
-                <div class="d-flex-col">
-                  <span class="fs-base fw-bold t-emphasis m-bottom-base">
-                    Cita con {{ appointment.client?.name}}
-                  </span>
-                  <span class="fs-sm t-muted">
-                    {{ appointment.startDate | slotDateRange: (appointment.endDate)}}
-                  </span>
-                </div>
-                <span class="fs-xs fw-bold" [ngClass]="{
-        't-success': appointment.status === 'CONFIRMED',
-        't-brand': appointment.status === 'SCHEDULED',
-        't-danger': appointment.status === 'CANCELED',
-        't-inverted': appointment.status === 'RESCHEDULED',
-        't-muted': appointment.status === 'FINISHED',}">
-                  {{ appointment.status }}
-                </span>
-              </div>
-
-              <button [class.clicked]="openedSlots.has(i)">
-                <mat-icon>
-                  keyboard_arrow_right
-                </mat-icon>
-              </button>
-
-            </div>
-            <div class="card-body accordion-body" [class.expanded]="openedSlots.has(i)">
-              <div class="wrapper  p-all-md">
-                <div class="data-mgt">
-                  <div class="slot-data-row unbordered">
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Fecha de creación:
-                      </span>
-                      <span class="t-emphasis ">
-                        {{ appointment.createdAt | readableDate }}
-                      </span>
-                    </div>
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Fecha:
-                      </span>
-                      <span class="t-emphasis ">
-                        {{ (appointment.startDate | slotDateRange: (appointment.endDate)).split('|')[0]}}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="slot-data-row">
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Hora de inicio:
-                      </span>
-                      <span class="t-emphasis ">
-                        {{ appointment.startDate | readableTime }}
-                      </span>
-                    </div>
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Hora de fin:
-                      </span>
-                      <span class="t-emphasis">
-                        {{ appointment.endDate | readableTime }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="slot-data-row">
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Estado:
-                      </span>
-                      <span class="t-emphasis">
-                        {{ appointment.status }}
-                      </span>
-                    </div>
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Costo:
-                      </span>
-                      <span class="t-emphasis">
-                        $ {{ appointment.totalCost}}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="slot-data-row">
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Duración:
-                      </span>
-                      <span class="t-emphasis">
-                        {{ appointment.startDate | durationDate:appointment.endDate }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="slot-data-row">
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Identificador:
-                      </span>
-                      <span class="t-emphasis fs-xs">
-                        {{ appointment.uuid }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="data-mgt m-bottom-md m-top-md">
-                  <span class="t-muted">Cliente: </span>
-                  <div class="slot-data-row unbordered">
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Nombre:
-                      </span>
-                      <span class="t-emphasis">
-                        {{ appointment.client?.name }}
-                      </span>
-                    </div>
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Teléfono:
-                      </span>
-                      <span class="t-emphasis">
-                        {{ appointment.client!.phoneNumber }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="slot-data-row">
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Usuario:
-                      </span>
-                      <span class="t-emphasis">
-                        {{ appointment.client?.username }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="slot-data-row">
-                    <div class="slot-data d-flex-col">
-                      <span class="t-muted">
-                        Correo:
-                      </span>
-                      <span class="t-emphasis">
-                        {{ appointment.client!.email }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <span class="t-muted">Servicios: </span>
-                <div class="slot-data-row type-card d-flex-col transparent p-all-sm m-top-base"
-                  *ngFor="let scheduleService of appointment.scheduledServices">
-                  <div class="slot-data d-inline">
-                    <span class="t-muted">
-                      Servicio:
-                    </span>
-                    <span class="t-emphasis m-left-base">
-                      {{ scheduleService.service.name }}
-                    </span>
-                  </div>
-                  <div class="slot-data d-inline">
-                    <span class="t-muted">
-                      Precio:
-                    </span>
-                    <span class="t-emphasis m-left-base">
-                      $ {{ scheduleService.service.price }}
-                    </span>
-                  </div>
-                  <div class="slot-data d-inline">
-                    <span class="t-muted">
-                      Fecha:
-                    </span>
-                    <span class="t-emphasis m-left-base">
-                      {{ (scheduleService.service.startDate | slotDateRange: (scheduleService.service.endDate))}}
-                    </span>
-                  </div>
-                  <div class="slot-data d-inline">
-                    <span class="t-muted">
-                      Duración:
-                    </span>
-                    <span class="t-emphasis m-left-base">
-                      {{ scheduleService.service.startDate | durationDate:scheduleService.service.endDate}}
-                    </span>
-                  </div>
-                </div>
-
-                <span class="t-muted m-top-md">Asistentes: </span>
-                <div class="slot-data-row type-card d-flex-col transparent p-all-sm m-top-base"
-                  *ngFor="let scheduleService of appointment.scheduledServices">
-                  <div class="slot-data d-inline">
-                    <span class="t-muted">
-                      Asistente:
-                    </span>
-                    <span class="t-emphasis m-left-base">
-                      {{ scheduleService.assistant.name }}
-                    </span>
-                  </div>
-                  <div class="slot-data d-inline">
-                    <span class="t-muted">
-                      Teléfono:
-                    </span>
-                    <span class="t-emphasis m-left-base">
-                      {{ scheduleService.assistant.phoneNumber }}
-                    </span>
-                  </div>
-                  <div class="slot-data d-inline">
-                    <span class="t-muted">
-                      Fecha de servicio:
-                    </span>
-                    <span class="t-emphasis">
-                      {{ (scheduleService.service.startDate | slotDateRange: (scheduleService.service.endDate))}}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </section>
-
-
-
-
 
   </div>
 
@@ -548,6 +282,15 @@
           <span class="fs-base t-emphasis"> {{ getTotalPrice() | currency }}</span>
         </div>
       </div>
+      <div class="slot-data-row">
+        <div class="slot-data d-flex-col">
+          <span class="fs-base t-muted "> Cliente:</span>
+          <span class="fs-base t-emphasis"> {{ selectedClient?.name }}</span>
+        </div>
+
+      </div>
+
+
 
 
       <div class="slot-data-row d-flex-col">
@@ -575,7 +318,15 @@
               Con asistente:
             </span>
             <span class="t-emphasis m-left-base">
-              $ {{ scheduleService.assistant?.name }}
+              {{ scheduleService.assistant?.name }}
+            </span>
+          </div>
+          <div class="slot-data d-inline">
+            <span class="t-muted">
+              Horas:
+            </span>
+            <span class="t-emphasis m-left-base">
+              {{ startTimes[scheduleService.uuid] }} - {{ getEndTime(scheduleService)}}
             </span>
           </div>
         </div>
