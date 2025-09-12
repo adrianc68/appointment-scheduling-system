@@ -1,14 +1,11 @@
 <div class="edit-container">
-  <form class="form card max-w-sm" (ngSubmit)="onSubmit()" *ngIf="client">
-    <div clas="form-header">
-      <h1 class="m-bottom-base">
-        Editar cliente
-      </h1>
-      <p>
-        Actualiza la información del cliente.
-      </p>
-
-    </div>
+  <h1 class="t-center">
+    Editar cliente
+  </h1>
+  <p class="t-center m-top-base">
+    Actualiza la información del cliente.
+  </p>
+  <form class="form card max-w-sm m-top-md" (ngSubmit)="onSubmit()" *ngIf="client">
     <div class="form-body">
       <div class="form-input">
         <label for="username">

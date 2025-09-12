@@ -99,7 +99,6 @@
 
 .selected-service {
 
-
   .wrapper {
     display: flex;
     flex-direction: column;
@@ -111,17 +110,34 @@
     // gap: variables.$spacing-base;
     width: 100%;
     align-items: flex-start;
+    flex-direction: column;
     position: relative;
     z-index: 0;
     height: 100%;
 
     .conflict-warning {
-      position: absolute;
+      // position: absolute;
       background-color: variables.$bg-warning;
       color: variables.$text-inverted;
       width: 100%;
       padding: variables.$padding-sm;
       z-index: 2;
+      border-radius: inherit;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+      display:flex;
+      gap: variables.$spacing-base;
+
+      .mat-icon {
+        fill: variables.$text-warning;
+        color: variables.$text-warning;
+      }
+    }
+
+    .service-wrapper {
+      width: 100%;
+      position: relative;
+
     }
 
     .service-draggable {
@@ -136,6 +152,8 @@
       // background-color:red;
       cursor: grab;
       border-radius: variables.$border-radius-sm;
+
+
     }
 
     .service-info {
@@ -143,6 +161,7 @@
       display: flex;
       flex-direction: column;
       z-index: 1;
+      flex: 1;
       padding: variables.$padding-md;
       margin-left: calc(variables.$padding-md * 2);
     }

@@ -30,7 +30,7 @@ export class RegisterServiceOfferComponent {
   assistantUuid: string = '';
   newServiceUuid: string = '';
   selectedServices: string[] = [];
-  systemMessage: string | undefined = '';
+  systemMessage: string = '';
   selectedAssistant?: Assistant;
   assistants: Assistant[] = [];
   assistantSelected: string | undefined;
@@ -120,7 +120,7 @@ export class RegisterServiceOfferComponent {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.servicesOfferAssigned = [...response.result!];
-          this.systemMessage = code;
+          this.systemMessage = code || "";
           const assignedServiceIds = this.servicesOfferAssigned.map(s => s.serviceUuid);
           this.serviceNotAssignedOfAssistant = this.allServices.filter(
             s => !assignedServiceIds.includes(s.uuid)
@@ -128,7 +128,7 @@ export class RegisterServiceOfferComponent {
           return true;
         } else {
           let code = this.errorUIService.handleError(response);
-          this.systemMessage = code;
+          this.systemMessage = code || "";
           return false;
         }
       }),
@@ -148,7 +148,7 @@ export class RegisterServiceOfferComponent {
           return true;
         }
         let code = this.errorUIService.handleError(response);
-        this.systemMessage = code;
+        this.systemMessage = code || "";
         return false;
       }),
       catchError(err => {
@@ -173,7 +173,7 @@ export class RegisterServiceOfferComponent {
       catchError(err => {
         this.loggingService.error(err);
         let code = this.errorUIService.handleError(err);
-        this.systemMessage = code;
+        this.systemMessage = code || "";
         return of([]);
       })
     ).subscribe();
@@ -214,7 +214,7 @@ export class RegisterServiceOfferComponent {
               this.serviceNotAssignedOfAssistant.splice(index, 1)[0];
             }
           }
-          this.systemMessage = code;
+          this.systemMessage = code || "";
           return of(false);
         }
       }),
@@ -234,7 +234,7 @@ export class RegisterServiceOfferComponent {
           return of(true);
         } else {
           let code = this.errorUIService.handleError(response);
-          this.systemMessage = code;
+          this.systemMessage = code || "";
           return of(false);
         }
       }),
@@ -253,7 +253,7 @@ export class RegisterServiceOfferComponent {
           return of(true);
         } else {
           let code = this.errorUIService.handleError(response);
-          this.systemMessage = code;
+          this.systemMessage = code || "";
           return of(false);
         }
       }),
@@ -284,7 +284,7 @@ export class RegisterServiceOfferComponent {
           return of(true);
         } else {
           let code = this.errorUIService.handleError(response);
-          this.systemMessage = code;
+          this.systemMessage = code || "";
           return of(false);
         }
       }),

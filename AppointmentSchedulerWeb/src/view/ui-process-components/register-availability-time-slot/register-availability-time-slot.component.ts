@@ -40,7 +40,7 @@ export class RegisterAvailabilityTimeSlotComponent {
   selectedAssistant?: Assistant;
 
   errorValidationMessage: { [field: string]: string[] } = {};
-  systemMessage?: string = '';
+  systemMessage: string = '';
   loadingState: LoadingState = LoadingState.NO_ACTION_PERFORMED;
   isSingleDay: boolean = true;
   currentStep = 1;
@@ -174,7 +174,7 @@ export class RegisterAvailabilityTimeSlotComponent {
           return true;
         } else {
           let code = this.errorUIService.handleError(response);
-          this.systemMessage = code;
+          this.systemMessage = code || "";
           const validationErrors = this.errorUIService.getValidationErrors(response);
           Object.entries(validationErrors).forEach(([field, messages]) => {
             this.setErrorValidationMessage(field, messages);

@@ -1,138 +1,153 @@
 <section class="main-section">
-  <section class="assistant-select data-section sp-bottom card max-w-md m-x-center" *ngIf="currentStep === 1">
-    <h2 class="m-bottom-lg">1. Selecciona un asistente</h2>
-    <div class="data-container">
-      <div class="data-actions">
-        <div class="input container max-w-sm">
-          <label class="input-icon" for="search">
-            <mat-icon>search</mat-icon>
-          </label>
-          <input id="search" class="input" type="text" placeholder="Buscar..." />
-        </div>
-      </div>
-      <div class="data-header">
-        <span>Asistentes disponibles</span>
-      </div>
-      <div class="data-body table-type">
-        <div class="data-body-no-data" *ngIf="assistants?.length === 0">
-          <mat-icon>search_off</mat-icon>
-          <span>No se han encontrado registros</span>
-        </div>
-        <div class="assistants-container scroll-visible">
-          <li class="assistant-card data-row-item" [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
-            (click)="selectedAssistant = data" *ngFor="let data of assistants">
-            <div class="card-icon">
-              <mat-icon>person</mat-icon>
-            </div>
-            <div class="card-body">
-              <h3 class="fs-base">{{ data.name }}</h3>
-              <p class="fs-xs"> {{ data.username }}</p>
-              <!--<p class="fs-xs">{{ data.phoneNumber }}</p>-->
-            </div>
-        </div>
-      </div>
-    </div>
 
-    <button class="button primary m-top-lg" *ngIf="selectedAssistant" (click)="nextStep()">Siguiente</button>
-  </section>
+  <div class="process" *ngIf="currentStep === 1">
 
-  <section class="datetime-select data-section sp-bottom card max-w-md m-x-center" *ngIf="currentStep === 2">
-
-    <h2 class="m-bottom-lg">Selecciona el día y hora</h2>
-
-    <div class="date-type m-bottom-lg d-flex gap-md">
-      <label>
-        <input type="radio" name="dateType" [(ngModel)]="isSingleDay" [value]="true" />
-        Solo un día
-      </label>
-      <label>
-        <input type="radio" name="dateType" [(ngModel)]="isSingleDay" [value]="false" />
-        Rango de días
-      </label>
-    </div>
-
-    <div *ngIf="!isSingleDay">
-      <label for="startDate">Inicio</label>
-      <input class="input m-top-base m-bottom-base" id="startDate" type="datetime-local" step="1"
-        [(ngModel)]="startDate" name="startDate" required />
-      <label for="endDate">Fin</label>
-      <input class="input m-top-base" id="endDate" type="datetime-local" step="1" [(ngModel)]="endDate" name="endDate"
-        required />
-    </div>
-
-    <div *ngIf="isSingleDay" class="m-top-lg">
-      <label for="selectedDate">Fecha</label>
-      <input class="input m-top-base m-bottom-lg" id="selectedDate" type="date" [(ngModel)]="selectedDate"
-        name="selectedDate" required />
-
-      <label for="startTime">Hora de inicio</label>
-      <input class="input m-top-base m-bottom-base" id="startTime" type="time" step="1" [(ngModel)]="startTime"
-        name="startTime" required />
-
-      <label for="endTime">Hora de fin</label>
-      <input class="input m-top-base" id="endTime" type="time" step="1" [(ngModel)]="endTime" name="endTime" required />
-    </div>
-
-    <h2 class="m-bottom-md m-top-lg">Horas de descanso</h2>
-
-    <span class="t-muted fs-sm" *ngIf="unavailableTimeSlots.length === 0">No añadidos</span>
-    <div class="unavailability-slot m-bottom-md" *ngFor="let slot of unavailableTimeSlots; let i = index">
-      <div class="una-container" *ngIf="isSingleDay">
-        <div class="una-input-group">
-          <div class="una-input">
-            <label>Hora inicio</label>
-            <input class="input" type="time" step="1" [(ngModel)]="slotStartTimeMap[i]" name="slotStart{{i}}"
-              required />
-          </div>
-          <div class="una-input">
-            <label>Hora fin</label>
-            <input class="input" type="time" step="1" [(ngModel)]="slotEndTimeMap[i]" name="slotEnd{{i}}" required />
+    <h2 class="t-center">Selecciona un asistente</h2>
+    <section class="assistant-select data-section sp-bottom card max-w-sm m-x-center m-top-md">
+      <div class="data-container">
+        <div class="data-actions">
+          <div class="input container">
+            <label class="input-icon" for="search">
+              <mat-icon>search</mat-icon>
+            </label>
+            <input id="search" class="input" type="text" placeholder="Buscar..." />
           </div>
         </div>
+        <div class="data-header">
+          <span>Asistentes disponibles</span>
+        </div>
+        <div class="data-body table-type">
+          <div class="data-body-no-data" *ngIf="assistants?.length === 0">
+            <mat-icon>search_off</mat-icon>
+            <span>No se han encontrado registros</span>
+          </div>
+          <div class="assistants-container scroll-visible">
+            <li class="assistant-card data-row-item" [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
+              (click)="selectedAssistant = data" *ngFor="let data of assistants">
+              <div class="card-icon">
+                <mat-icon>person</mat-icon>
+              </div>
+              <div class="card-body">
+                <h3 class="fs-base">{{ data.name }}</h3>
+                <p class="fs-xs"> {{ data.username }}</p>
+                <!--<p class="fs-xs">{{ data.phoneNumber }}</p>-->
+              </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="process-buttons d-flex gap-md j-content-end max-w-sm m-x-center m-bottom-lg">
+      <button class="button primary w-auto" [disabled]="!selectedAssistant" [ngClass]="{'disabled': !selectedAssistant}"
+        (click)="nextStep()">Siguiente</button>
+    </section>
+  </div>
 
-        <button class="button danger w-auto p-all-sm delete-btn" type="button" (click)="removeUnavailableTimeSlot(i)">
-          <mat-icon class="f-danger">delete</mat-icon>
+  <div class="process" *ngIf="currentStep === 2">
+
+
+
+    <h2 class="t-center">Selecciona el horario laboral</h2>
+    <section class="datetime-select data-section sp-bottom card max-w-md m-x-center m-top-md">
+      <h3 class="m-bottom-md fs-lg">Selecciona dia(s)</h3>
+      <div class="date-type m-bottom-lg d-flex gap-md">
+        <label>
+          <input type="radio" name="dateType" [(ngModel)]="isSingleDay" [value]="true" />
+          Solo un día
+        </label>
+        <label>
+          <input type="radio" name="dateType" [(ngModel)]="isSingleDay" [value]="false" />
+          Rango de días
+        </label>
+      </div>
+
+      <div *ngIf="!isSingleDay">
+        <label for="startDate">Inicio</label>
+        <input class="input m-top-base m-bottom-base" id="startDate" type="datetime-local" step="1"
+          [(ngModel)]="startDate" name="startDate" required />
+        <label for="endDate">Fin</label>
+        <input class="input m-top-base" id="endDate" type="datetime-local" step="1" [(ngModel)]="endDate" name="endDate"
+          required />
+      </div>
+
+      <div *ngIf="isSingleDay" class="m-top-lg">
+        <label for="selectedDate">Fecha</label>
+        <input class="input m-top-base m-bottom-lg" id="selectedDate" type="date" [(ngModel)]="selectedDate"
+          name="selectedDate" required />
+
+        <label for="startTime">Hora de inicio</label>
+        <input class="input m-top-base m-bottom-base" id="startTime" type="time" step="1" [(ngModel)]="startTime"
+          name="startTime" required />
+
+        <label for="endTime">Hora de fin</label>
+        <input class="input m-top-base" id="endTime" type="time" step="1" [(ngModel)]="endTime" name="endTime"
+          required />
+      </div>
+
+      <h3 class="fs-lg m-bottom-md m-top-md">Horas de descanso</h3>
+
+      <span class="t-muted fs-sm" *ngIf="unavailableTimeSlots.length === 0">No añadidos</span>
+      <div class="unavailability-slot m-bottom-md" *ngFor="let slot of unavailableTimeSlots; let i = index">
+        <div class="una-container" *ngIf="isSingleDay">
+          <div class="una-input-group">
+            <div class="una-input">
+              <label>Hora inicio</label>
+              <input class="input" type="time" step="1" [(ngModel)]="slotStartTimeMap[i]" name="slotStart{{i}}"
+                required />
+            </div>
+            <div class="una-input">
+              <label>Hora fin</label>
+              <input class="input" type="time" step="1" [(ngModel)]="slotEndTimeMap[i]" name="slotEnd{{i}}" required />
+            </div>
+          </div>
+
+          <button class="button danger w-auto p-all-sm delete-btn" type="button" (click)="removeUnavailableTimeSlot(i)">
+            <mat-icon class="f-danger">delete</mat-icon>
+          </button>
+        </div>
+
+        <div class="una-container" *ngIf="!isSingleDay">
+          <div class="una-input-group">
+            <div class="una-input">
+              <label>Inicio</label>
+              <input class="input" type="datetime-local" [(ngModel)]="slot.startDate" name="slotStart{{i}}" required />
+            </div>
+            <div class="una-input">
+              <label>Fin</label>
+              <input class="input" type="datetime-local" [(ngModel)]="slot.endDate" name="slotEnd{{i}}" required />
+            </div>
+          </div>
+
+          <button class="button danger w-auto p-all-sm delete-btn" type="button" (click)="removeUnavailableTimeSlot(i)">
+            <mat-icon class="f-danger">delete</mat-icon>
+          </button>
+        </div>
+      </div>
+
+
+
+      <div class="w-100 d-flex j-content-end m-top-md m-bottom-lg">
+        <button class="button brand w-auto p-all-sm" type="button" (click)="addUnavailableTimeSlot()">
+          <mat-icon>
+            add
+          </mat-icon>
         </button>
       </div>
 
-      <div class="una-container" *ngIf="!isSingleDay">
-        <div class="una-input-group">
-          <div class="una-input">
-            <label>Inicio</label>
-            <input class="input" type="datetime-local" [(ngModel)]="slot.startDate" name="slotStart{{i}}" required />
-          </div>
-          <div class="una-input">
-            <label>Fin</label>
-            <input class="input" type="datetime-local" [(ngModel)]="slot.endDate" name="slotEnd{{i}}" required />
-          </div>
-        </div>
 
-        <button class="button danger w-auto p-all-sm delete-btn" type="button" (click)="removeUnavailableTimeSlot(i)">
-          <mat-icon class="f-danger">delete</mat-icon>
-        </button>
-      </div>
-    </div>
+      <span class="m-top-lg m-bottom-lg" *ngIf="systemMessage.length > 0">
+        {{ systemMessage }}
+      </span>
+
+      <app-button-task class="" (click)="onSubmit()" type="submit" [loadingState]="loadingState"
+        [text]="translate(translationCodes.TC_REGISTER_BUTTON_LABEL)" />
+    </section>
+    <section class="process-buttons d-flex gap-md j-content-between max-w-md m-x-center m-bottom-lg">
+      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
+    </section>
+
+  </div>
 
 
-
-    <div class="w-100 d-flex j-content-end m-top-md m-bottom-lg">
-      <button class="button brand w-auto p-all-sm" type="button" (click)="addUnavailableTimeSlot()">
-        <mat-icon>
-          add
-        </mat-icon>
-      </button>
-    </div>
-
-
-    <span class="m-top-lg m-bottom-lg">
-      {{ systemMessage }}
-    </span>
-
-    <app-button-task class="" (click)="onSubmit()" type="submit" [loadingState]="loadingState"
-      [text]="translate(translationCodes.TC_REGISTER_BUTTON_LABEL)" />
-
-    <button class="button secondary m-top-base" (click)="prevStep()">Regresar</button>
-  </section>
 
 
 </section>

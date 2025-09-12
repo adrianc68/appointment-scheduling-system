@@ -1,159 +1,161 @@
 <section class="main-section">
 
 
+  <div class="process" *ngIf="currentStep === 1">
+    <h2 class="t-center">Selecciona un asistente</h2>
+    <section class="assistant-select data-section sp-bottom card max-w-sm m-x-center m-top-md"
+      *ngIf="currentStep === 1">
+      <div class="data-container">
+        <div class="data-actions">
+          <div class="input container">
+            <label class="input-icon" for="search">
+              <mat-icon>search</mat-icon>
+            </label>
+            <input id="search" class="input" type="text" placeholder="Buscar..." />
+          </div>
+        </div>
+        <div class="data-header">
+          <span>Asistentes disponibles</span>
+        </div>
+        <div class="data-body table-type">
+          <div class="data-body-no-data" *ngIf="assistants?.length === 0">
+            <mat-icon>search_off</mat-icon>
+            <span>No se han encontrado registros</span>
+          </div>
+          <div class="assistants-container scroll-visible">
+            <li class="assistant-card data-row-item accordion-type"
+              [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
+              (click)="selectedAssistant = data; getAssignedServicesOfAssistant(data.uuid)"
+              *ngFor="let data of assistants">
+              <div class="card-icon">
+                <mat-icon>person</mat-icon>
+              </div>
+              <div class="card-body">
+                <h3 class="fs-base">{{ data.name }}</h3>
+                <p class="fs-xs"> {{ data.username }}</p>
+                <!--<p class="fs-xs">{{ data.phoneNumber }}</p>-->
+              </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="process-buttons d-flex gap-md j-content-end max-w-sm m-x-center m-bottom-lg">
+      <button class="button primary w-auto" [disabled]="!selectedAssistant" [ngClass]="{'disabled': !selectedAssistant}"
+        (click)="nextStep()">Siguiente</button>
+    </section>
+  </div>
 
-  <section class="assistant-select data-section sp-bottom card max-w-md m-x-center" *ngIf="currentStep === 1">
-    <h2 class="m-bottom-lg">1. Selecciona un asistente</h2>
-    <div class="data-container">
-      <div class="data-actions">
-        <div class="input container max-w-sm">
-          <label class="input-icon" for="search">
-            <mat-icon>search</mat-icon>
-          </label>
-          <input id="search" class="input" type="text" placeholder="Buscar..." />
-        </div>
-      </div>
-      <div class="data-header">
-        <span>Asistentes disponibles</span>
-      </div>
-      <div class="data-body table-type">
-        <div class="data-body-no-data" *ngIf="assistants?.length === 0">
-          <mat-icon>search_off</mat-icon>
-          <span>No se han encontrado registros</span>
-        </div>
-        <div class="assistants-container scroll-visible">
-          <li class="assistant-card data-row-item accordion-type"
-            [class.selected-item-bg]="selectedAssistant?.uuid === data.uuid"
-            (click)="selectedAssistant = data; getAssignedServicesOfAssistant(data.uuid)"
-            *ngFor="let data of assistants">
-            <div class="card-icon">
-              <mat-icon>person</mat-icon>
-            </div>
-            <div class="card-body">
-              <h3 class="fs-base">{{ data.name }}</h3>
-              <p class="fs-xs"> {{ data.username }}</p>
-              <!--<p class="fs-xs">{{ data.phoneNumber }}</p>-->
-            </div>
-        </div>
-      </div>
-    </div>
-    <div class="data-selected m-top-md" *ngIf="selectedAssistant">
-      <h3 class="m-bottom-md">Asistente seleccionado: </h3>
-      <div class="assistant-summary">
-        <div>
-          <span class="fs-base t-muted m-bottom-base"> Nombre:</span>
-          <span class="fs-base t-emphasis">{{ selectedAssistant.name }}</span>
-        </div>
-        <div>
-          <span class="fs-base t-muted m-bottom-base"> Nombre de usuario:</span>
-          <span class="fs-base t-emphasis"> {{ selectedAssistant.username}}</span>
-        </div>
-        <div>
-          <span class="fs-base t-muted m-bottom-base"> Correo:</span>
-          <span class="fs-base t-emphasis"> {{ selectedAssistant.email}}</span>
-        </div>
-        <div>
-          <span class="fs-base t-muted m-bottom-base"> Telefono:</span>
-          <span class="fs-base t-emphasis"> {{ selectedAssistant.phoneNumber}}</span>
-        </div>
-      </div>
-      <button class="button primary m-top-lg" *ngIf="selectedAssistant" (click)="nextStep()">Siguiente</button>
-    </div>
-  </section>
 
-  <section class="assigned-services data-section sp-bottom card max-w-md m-x-center" *ngIf="currentStep === 2">
-    <h2 class="m-bottom-lg">Servicios asignados</h2>
-    <div class="data-container">
-      <div class="data-actions">
-        <div class="input container max-w-sm">
-          <label class="input-icon" for="search">
-            <mat-icon>search</mat-icon>
-          </label>
-          <input id="search" class="input" type="text" placeholder="Buscar..." />
-        </div>
-      </div>
-      <div class="data-header">
-        <span>Servicios asignados</span>
-      </div>
-      <div class="data-body table-type">
-        <div class="data-body-no-data" *ngIf="servicesOfferAssigned?.length === 0">
-          <mat-icon>search_off</mat-icon>
-          <span>No se han encontrado registros</span>
-        </div>
-        <div class="assigned-services-container scroll-visible">
-          <li class="assigned-service-card data-row-item " *ngFor="let data of servicesOfferAssigned">
-            <div class="card-icon">
-              <mat-icon>business_center</mat-icon>
-            </div>
-            <div class="card-body">
-              <span class="t-emphasis fw-bold m-bottom-base">{{data.name}}</span>
-              <span class="t-muted fs-sm">$ {{data.price}}</span>
-              <span class="t-muted fs-sm">{{data.minutes}} minutos</span>
-              <!--<span class="t-muted fs-sm">{{data.description}}</span>-->
-              <span class="t-muted fs-sm">{{data.status}}</span>
-            </div>
-            <div class="actions">
-              <button *ngIf="data.status === 'DISABLED'" class="button unbordered w-auto p-all-sm m-bottom-base"
-                (click)="enableAssignedService(data.uuid)">
-                <span class="fs-sm t-brand">Activar</span>
-              </button>
+  <div class="process" *ngIf="currentStep === 2">
 
-              <button *ngIf="data.status === 'ENABLED'" class="button unbordered w-auto p-all-sm m-bottom-base"
-                (click)="disableAssignedService(data.uuid)">
-                <span class="fs-sm t-brand">Desactivar</span>
-              </button>
+    <h2 class="t-center">Servicios asignados</h2>
+    <section class="assigned-services data-section sp-bottom card max-w-md m-x-center m-top-md">
+      <div class="data-container">
+        <div class="data-actions">
+          <div class="input container">
+            <label class="input-icon" for="search">
+              <mat-icon>search</mat-icon>
+            </label>
+            <input id="search" class="input" type="text" placeholder="Buscar..." />
+          </div>
+        </div>
+        <div class="data-header">
+          <span>Servicios asignados</span>
+        </div>
+        <div class="data-body table-type">
+          <div class="data-body-no-data" *ngIf="servicesOfferAssigned?.length === 0">
+            <mat-icon>search_off</mat-icon>
+            <span>No se han encontrado registros</span>
+          </div>
+          <div class="assigned-services-container scroll-visible">
+            <li class="assigned-service-card data-row-item " *ngFor="let data of servicesOfferAssigned">
+              <div class="card-icon">
+                <mat-icon>business_center</mat-icon>
+              </div>
+              <div class="card-body">
+                <span class="t-emphasis fw-bold m-bottom-base">{{data.name}}</span>
+                <span class="t-muted fs-sm">$ {{data.price}}</span>
+                <span class="t-muted fs-sm">{{data.minutes}} minutos</span>
+                <!--<span class="t-muted fs-sm">{{data.description}}</span>-->
+                <span class="t-muted fs-sm">{{data.status}}</span>
+              </div>
+              <div class="actions">
+                <button *ngIf="data.status === 'DISABLED'" class="button unbordered w-auto p-all-sm m-bottom-base"
+                  (click)="enableAssignedService(data.uuid)">
+                  <span class="fs-sm t-brand">Activar</span>
+                </button>
 
-              <button class="button unbordered w-auto p-all-sm" (click)="deleteAssignedService(data.uuid)">
-                <span class="fs-sm t-danger">Desvincular</span>
-              </button>
-            </div>
+                <button *ngIf="data.status === 'ENABLED'" class="button unbordered w-auto p-all-sm m-bottom-base"
+                  (click)="disableAssignedService(data.uuid)">
+                  <span class="fs-sm t-brand">Desactivar</span>
+                </button>
+
+                <button class="button unbordered w-auto p-all-sm" (click)="deleteAssignedService(data.uuid)">
+                  <span class="fs-sm t-danger">Desvincular</span>
+                </button>
+              </div>
+          </div>
         </div>
       </div>
+    </section>
 
-      <button class="button primary m-top-lg" (click)="prevStep()">Regresar</button>
-    </div>
-  </section>
+    <section class="process-buttons d-flex gap-md j-content-between max-w-md m-x-center m-bottom-lg">
+      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
+      <button class="button primary w-auto" (click)="nextStep()">Asignar otros</button>
+    </section>
+  </div>
 
-  <section class="services-available data-section sp-bottom card max-w-md m-x-center" *ngIf="currentStep === 2">
-    <h2 class="m-bottom-lg">Servicios disponibles</h2>
-    <div class="data-container">
-      <div class="data-actions">
-        <div class="input container max-w-sm">
-          <label class="input-icon" for="search">
-            <mat-icon>search</mat-icon>
-          </label>
-          <input id="search" class="input" type="text" placeholder="Buscar..." />
+
+  <div class="process" *ngIf="currentStep === 3">
+
+    <h2 class="t-center">Servicios disponibles</h2>
+    <section class="services-available data-section sp-bottom card max-w-md m-x-center m-top-md">
+      <div class="data-container">
+        <div class="data-actions">
+          <div class="input container max-w-sm">
+            <label class="input-icon" for="search">
+              <mat-icon>search</mat-icon>
+            </label>
+            <input id="search" class="input" type="text" placeholder="Buscar..." />
+          </div>
+        </div>
+        <div class="data-header">
+          <span>Servicios disponibles para asignar</span>
+        </div>
+        <div class="data-body table-type">
+          <div class="data-body-no-data" *ngIf="serviceNotAssignedOfAssistant?.length === 0">
+            <mat-icon>search_off</mat-icon>
+            <span>No se han encontrado registros</span>
+          </div>
+          <ul class="services-available-container scroll-visible">
+            <li class="service-available-card data-row-item" *ngFor="let data of serviceNotAssignedOfAssistant">
+              <div class="card-icon">
+                <mat-icon>business_center</mat-icon>
+              </div>
+              <div class="card-body">
+                <span class="t-emphasis fw-bold m-bottom-base">{{data.name}}</span>
+                <span class="t-muted fs-sm">${{data.price}}</span>
+                <span class="t-muted fs-sm">{{data.minutes}} minutos</span>
+                <!--<span class="t-muted fs-sm">{{data.description}}</span>-->
+                <span class="t-muted fs-sm">{{data.status}}</span>
+              </div>
+              <div class="actions">
+                <button class="button m-y-center unbordered w-auto p-all-sm" (click)="assignService(data.uuid)">
+                  <span class="fs-sm t-brand">Asignar</span>
+                </button>
+              </div>
+          </ul>
         </div>
       </div>
-      <div class="data-header">
-        <span>Servicios disponibles para asignar</span>
-      </div>
-      <div class="data-body table-type">
-        <div class="data-body-no-data" *ngIf="serviceNotAssignedOfAssistant?.length === 0">
-          <mat-icon>search_off</mat-icon>
-          <span>No se han encontrado registros</span>
-        </div>
-        <ul class="services-available-container scroll-visible">
-          <li class="service-available-card data-row-item" *ngFor="let data of serviceNotAssignedOfAssistant">
-            <div class="card-icon">
-              <mat-icon>business_center</mat-icon>
-            </div>
-            <div class="card-body">
-              <span class="t-emphasis fw-bold m-bottom-base">{{data.name}}</span>
-              <span class="t-muted fs-sm">${{data.price}}</span>
-              <span class="t-muted fs-sm">{{data.minutes}} minutos</span>
-              <!--<span class="t-muted fs-sm">{{data.description}}</span>-->
-              <span class="t-muted fs-sm">{{data.status}}</span>
-            </div>
-            <div class="actions">
-              <button class="button m-y-center unbordered w-auto p-all-sm" (click)="assignService(data.uuid)">
-                <span class="fs-sm t-brand">Asignar</span>
-              </button>
-            </div>
-        </ul>
-      </div>
-    </div>
-  </section>
+    </section>
+    <section class="process-buttons d-flex gap-md j-content-between max-w-md m-x-center m-bottom-lg">
+      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
+    </section>
+  </div>
+
+
+
+
 
   <div class="actions-footer m-top-md flex justify-between">
   </div>
