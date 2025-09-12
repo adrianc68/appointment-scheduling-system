@@ -433,7 +433,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpGet("appointment/details")]
         [Authorize]
-        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT)]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public async Task<IActionResult> GetAppointmentsDetailsFromScheduler([FromQuery] GetAllAppointmentsDTO dto)
         {
             List<AppointmentDetailsDTO> appointments = [];
@@ -599,27 +599,32 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         public async Task<IActionResult> ScheduleAppointmentAsClientAsync([FromBody] CreateAppointmentAsClientDTO dto)
         {
             Guid? guid;
+
             try
             {
+                DateTime startDateTime = dto.SelectedServices
+                    .Min(s => DateTime.SpecifyKind(dto.Date.ToDateTime(s.StartTime), DateTimeKind.Local).ToUniversalTime());
+
                 var claims = ClaimsPOCO.GetUserClaims(User);
                 Appointment appointment = new Appointment
                 {
-                    // Date = dto.Date,
+                    StartDate = startDateTime,
                     Client = new Client { Uuid = claims.Uuid },
-                    ScheduledServices = [],
-                    Uuid = Guid.CreateVersion7(),
-                    StartDate = dto.SelectedServices.Min(service => dto.Date.ToDateTime(service.StartTime))
+                    ScheduledServices = new List<ScheduledService>(),
+                    Uuid = Guid.CreateVersion7()
                 };
-                foreach (var serviceOfferUuid in dto.SelectedServices)
+
+                foreach (var serviceOffer in dto.SelectedServices)
                 {
-                    var selectedService = new ScheduledService
+                    appointment.ScheduledServices!.Add(new ScheduledService
                     {
-                        Uuid = serviceOfferUuid.Uuid,
-                        ServiceStartDate = dto.Date.ToDateTime(serviceOfferUuid.StartTime)
-                    };
-                    appointment.ScheduledServices!.Add(selectedService);
+                        Uuid = serviceOffer.Uuid,
+                        ServiceStartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(serviceOffer.StartTime), DateTimeKind.Local).ToUniversalTime()
+                    });
                 }
+
                 OperationResult<Guid, GenericError> result = await systemFacade.ScheduleAppointmentAsClientAsync(appointment);
+
                 if (result.IsSuccessful)
                 {
                     guid = result.Result;
@@ -627,17 +632,17 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 else
                 {
                     if (result.Errors != null && result.Errors.Any())
-                    {
                         return httpResponseService.Conflict(result.Errors, ApiVersionEnum.V1, result.Code.ToString());
-                    }
+
                     return httpResponseService.Conflict(result.Error, ApiVersionEnum.V1, result.Code.ToString());
                 }
 
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
             }
+
             return httpResponseService.OkResponse(guid, ApiVersionEnum.V1);
         }
 
@@ -661,10 +666,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     ScheduledServices = new List<ScheduledService>(),
                     Uuid = Guid.CreateVersion7()
                 };
-
-                Console.WriteLine("<<<<<<<<<<<<<<<<");
-                PropToString.PrintData(startDateTime);
-                PropToString.PrintData(appointment);
 
                 foreach (var serviceOffer in dto.SelectedServices)
                 {

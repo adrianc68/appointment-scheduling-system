@@ -22,7 +22,6 @@ import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/durat
 import { CalendarComponent } from '../../ui-components/display/calendar/calendar.component';
 import { AvailabilityTimeSlot } from '../../../view-model/business-entities/availability-time-slot';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { AppointmentScheduledService } from '../../../view-model/business-entities/appointment-scheduled-service';
 
 
 
