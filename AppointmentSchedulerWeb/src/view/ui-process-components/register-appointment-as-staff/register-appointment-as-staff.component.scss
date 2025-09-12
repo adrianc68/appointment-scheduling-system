@@ -131,6 +131,11 @@
       .mat-icon {
         fill: variables.$text-warning;
         color: variables.$text-warning;
+        flex-shrink: 0;
+      }
+
+      span {
+        color: variables.$text-warning;
       }
     }
 
