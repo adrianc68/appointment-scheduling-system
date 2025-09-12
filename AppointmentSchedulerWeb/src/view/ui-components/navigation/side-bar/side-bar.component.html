@@ -11,7 +11,7 @@
 
     <ng-container [ngSwitch]="accountData.role">
       <li *ngSwitchCase="roleTypes.CLIENT" routerLinkActive="active">
-        <a [routerLink]="[webRoutes.root]">
+        <a [routerLink]="[webRoutes.appointment_management]">
           <mat-icon class="sidebar-icon">calendar_month</mat-icon>
           <span>
             {{translate(translationCodes.TC_APPOINTMENT_CREATE_DIRECTORY)}}

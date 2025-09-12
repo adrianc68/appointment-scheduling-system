@@ -1,1 +1,322 @@
-<p>client-home works!</p>
+<section class="main-section">
+
+  <div class="process" *ngIf="currentStep === 1">
+    <h1 class="t-left m-bottom-md m-x-center t-center">Selecciona un día</h1>
+    <section class="calendar data-section sp-bottom card max-w-md m-x-center m-top-md">
+      <app-calendar [selectedDate]="selectedDate" (dateSelected)="onDateSelected($event)" [slots]="slots"
+        (currentDateChange)="onCurrentDateChange($event)"></app-calendar>
+    </section>
+    <section class="process-buttons d-flex gap-md j-content-end max-w-md m-x-center m-bottom-lg">
+      <button class="button primary w-auto" [disabled]="!selectedDate" [ngClass]="{'disabled': !selectedDate}"
+        (click)=" nextStep()">Siguiente</button>
+    </section>
+  </div>
+
+
+
+  <div class="process" *ngIf="currentStep === 2">
+    <h1 class="t-center">Selecciona los servicios</h1>
+    <p class="t-center m-top-base">Escoge los servicios que deseas agendar</p>
+    <section class="select-service data-section p-all-none sp-bottom max-w-sm m-x-center m-top-md">
+      <div class="data-container">
+        <div class="data-actions">
+          <div class="input container">
+            <label class="input-icon" for="search"><mat-icon>search</mat-icon></label>
+            <input id="search" class="input" type="text" placeholder="Buscar..." />
+          </div>
+        </div>
+        <div class="data-header">
+          <span>Servicios disponibles en: {{selectedDate}}</span>
+        </div>
+        <div class="data-body table-type">
+          <div class="data-body-no-data" *ngIf="servicesAvailable?.length === 0">
+            <mat-icon>search_off</mat-icon>
+            <span class="t-center">No se han encontrado servicios.</span>
+          </div>
+          <div class="service-card-container scroll-visible">
+            <div class="service-data data-row-item" *ngFor="let serviceOffer of servicesAvailable">
+              <div class="service-info">
+                <h3 class="fs-base t-emphasis fw-bold service-name">{{ serviceOffer.name}}</h3>
+                <div class="d-flex gap-base j-content-start a-items-center m-top-base">
+                  <mat-icon>support_agent</mat-icon>
+                  <span class="fs-sm">{{ serviceOffer.assistant?.name }}</span>
+                </div>
+                <div class="m-top-base">
+                  <span class="fs-sm t-muted">$ {{ serviceOffer.price}}</span>
+                  <span class="fs-sm t-muted m-left-base">-</span>
+                  <span class="fs-sm t-muted m-left-base">{{ serviceOffer.minutes}} min</span>
+                </div>
+              </div>
+              <button class="button bordered m-y-center w-auto p-all-sm" (click)="selectServiceOffer(serviceOffer)">
+                <mat-icon class="brand">add</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="process-buttons d-flex gap-md j-content-between max-w-sm m-x-center m-bottom-lg ">
+      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
+      <button class="button primary w-auto" [disabled]="selectedServicesOffer.length === 0"
+        [ngClass]="{'disabled': selectedServicesOffer.length === 0 }" (click)="nextStep()">Siguiente</button>
+    </section>
+
+  </div>
+
+
+  <div class="process" *ngIf="currentStep === 3">
+    <h1 class="t-center">Ajusta tus horarios</h1>
+    <p class="t-center m-top-base">Revisa los servicios y ajusta los horarios de acuerdo a tus tiempos</p>
+    <section class="selected-service data-section p-all-none sp-bottom max-w-md m-x-center m-top-md">
+      <div class="start-time-container m-bottom-base d-flex-col gap-base card data-section">
+        <label for="globalStartTime" class="t-muted">Selecciona la hora de inicio de la cita:</label>
+        <input type="time" id="globalStartTime" class="input m-top-base" [(ngModel)]="globalStartTime"
+          (change)="updateStartTimesFromGlobal()" step="60" />
+        <p class="m-top-md">Nota: Si tienes conflicto en algún servicio, puedes tratar cambiando la hora de inicio o
+          cambiando el orden del servicio (si hay más de uno).</p>
+      </div>
+
+
+
+      <section class="selected-service data-section sp-bottom p-all-none max-w-md m-x-center m-top-md">
+        <div class="data-body-no-data d-flex j-content-center gap-base" *ngIf="selectedServicesOffer?.length === 0">
+          <mat-icon>search_off</mat-icon>
+          <span>No se han seleccionado servicios.</span>
+        </div>
+
+        <div class="wrapper" cdkDropList (cdkDropListDropped)="dropService($event)">
+          <div class="service-data card"
+            *ngFor="let serviceOffer of selectedServicesOffer; let i = index; trackBy: trackByUuid" cdkDrag>
+            <ng-template cdkDragPreview>
+              <div class="service-data card data-section drag-preview">
+                <div class="service-draggable">
+                  <span class="service-number">{{ i + 1 }}</span>
+                  <mat-icon>drag_indicator</mat-icon>
+                </div>
+                <div class="service-info">
+                  <h3 class="fs-base t-emphasis fw-bold service-name">{{ serviceOffer.name }}</h3>
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template cdkDragPlaceholder>
+              <div class="service-data card placeholder"></div>
+            </ng-template>
+
+            <div *ngIf="isServiceInConflict(serviceOffer)" class="conflict-warning">
+
+              <mat-icon *ngIf="isServiceInConflict(serviceOffer)">warning</mat-icon>
+              <!-- Conflictos con otras citas -->
+              <div *ngIf="getServiceConflictInfo(serviceOffer).conflictingAppointments.length">
+                <span>
+                  Este servicio tiene conflicto con otros servicios de otras citas:
+                </span>
+                <div *ngFor="let app of getServiceConflictInfo(serviceOffer).conflictingAppointments">
+                  <span>
+                    - {{ app.start | date:'shortTime' }} - {{ app.end | date:'shortTime' }}
+                    | Servicio: {{ app.serviceName }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Conflicto por disponibilidad -->
+              <div *ngIf="getServiceConflictInfo(serviceOffer).unavailable">
+                <span>
+                  El asistente no se encuentra disponible en el rango solicitado ({{ startTimes[serviceOffer.uuid]}} -
+                  {{
+                  getEndTime(serviceOffer) }}).
+                </span>
+
+                <div *ngFor="let slot of getAvailabilityAndUnavailableForSelectedDate(serviceOffer)">
+                  <span>
+                    - Jornada: {{ slot.availabilityStart | date:'shortTime' }} - {{ slot.availabilityEnd |
+                    date:'shortTime' }}
+                  </span>
+                  <div *ngIf="slot.unavailableSlots.length > 0">
+                    <span>
+                      - Pausas:
+                    </span>
+                    <br>
+                    <ul class="m-left-md">
+                      <li *ngFor="let u of slot.unavailableSlots; let i = index">
+                        <span>
+                          {{ u.start | date:'shortTime' }} - {{ u.end | date:'shortTime' }}
+                          <br>
+                        </span>
+
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+            <div class="service-wrapper">
+              <div class="service-draggable" cdkDragHandle>
+                <mat-icon>drag_indicator</mat-icon>
+              </div>
+
+              <div class="service-info">
+                <h3 class="fs-base t-emphasis fw-bold service-name">{{ i + 1 }} - {{ serviceOffer.name }}</h3>
+                <div class="d-flex gap-base j-content-start a-items-center m-top-base">
+                  <mat-icon>support_agent</mat-icon>
+                  <span class="fs-sm">{{ serviceOffer.assistant?.name }}</span>
+                </div>
+                <div class="m-top-base">
+                  <span class="fs-sm t-muted">Precio: $ {{ serviceOffer.price }}</span>
+                  <span class="fs-sm t-muted m-left-base">-</span>
+                  <span class="fs-sm t-muted m-left-base">Duración: {{ serviceOffer.minutes }} min</span>
+                </div>
+                <div class="m-top-base d-flex gap-base">
+                  <span class="fs-sm w-auto t-muted">Hora de inicio:</span>
+                  <span class="fs-sm">{{ startTimes[serviceOffer.uuid] }}</span>
+                </div>
+                <div class="m-top-base d-flex gap-base">
+                  <span class="fs-sm w-auto t-muted">Fin:</span>
+                  <span class="fs-sm">{{ getEndTime(serviceOffer) }}</span>
+                </div>
+              </div>
+              <button class="button bordered m-y-center w-auto p-all-sm" (click)="removeSelectedService(serviceOffer)">
+                <mat-icon class="danger">delete</mat-icon>
+              </button>
+            </div>
+
+
+
+
+
+
+          </div>
+
+
+        </div>
+
+      </section>
+
+
+
+    </section>
+
+    <section class="process-buttons d-flex gap-md j-content-between max-w-md m-x-center m-bottom-lg">
+      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
+      <button class="button primary w-auto" [disabled]="!allStartTimesDefined()"
+        [ngClass]="{'disabled': !allStartTimesDefined()}" (click)="nextStep()">Siguiente</button>
+    </section>
+
+  </div>
+
+
+  <div class="process" *ngIf="currentStep === 4">
+    <h1 class="t-center">Confirma tu cita</h1>
+    <p class="t-center m-top-base">Revisa los servicios seleccionados y ajusta los tiempos antes de confirmar</p>
+    <section class="summary data-section sp-bottom card max-w-md m-x-center m-top-md">
+      <div class="slot-data-row">
+        <div class="slot-data d-flex-col">
+          <span class="fs-base t-muted"> Fecha:</span>
+          <span class="fs-base t-emphasis"> {{ selectedDate }}</span>
+          <span class="fs-base t-muted"> ({{ (selectedDate | readableDate).split(",")[0] }})</span>
+        </div>
+      </div>
+      <div class="slot-data-row">
+        <div class="slot-data d-flex-col">
+          <span class="fs-base t-muted  "> Hora inicio:</span>
+          <span class="fs-base t-emphasis"> {{ getEarliestStartTime() | readableTime }}</span>
+        </div>
+        <div class="slot-data d-flex-col">
+          <span class="fs-base t-muted "> Hora fin:</span>
+          <span class="fs-base t-emphasis"> {{ getEstimatedEndTime() | readableTime }}</span>
+        </div>
+      </div>
+      <div class="slot-data-row">
+        <div class="slot-data d-flex-col">
+          <span class="fs-base t-muted "> Duración de la cita:</span>
+          <span class="fs-base t-emphasis"> {{ getTotalMinutes() }} minutos</span>
+        </div>
+        <div class="slot-data d-flex-col">
+          <span class="fs-base t-muted "> Total:</span>
+          <span class="fs-base t-emphasis"> {{ getTotalPrice() | currency }}</span>
+        </div>
+      </div>
+      <div class="slot-data-row">
+        <div class="slot-data d-flex-col">
+          <span class="fs-base t-muted "> Cliente:</span>
+          <span class="fs-base t-emphasis"> {{ selectedClient?.name }}</span>
+        </div>
+
+      </div>
+
+
+
+
+      <div class="slot-data-row d-flex-col">
+        <span class="t-muted">Servicios: </span>
+        <div class="slot-data-row type-card muted d-flex-col transparent p-all-sm"
+          *ngFor="let scheduleService of selectedServicesOffer">
+          <div class="slot-data d-inline">
+            <span class="t-muted">
+              Servicio:
+            </span>
+            <span class="t-emphasis m-left-base">
+              {{scheduleService.name }}
+            </span>
+          </div>
+          <div class="slot-data d-inline">
+            <span class="t-muted">
+              Precio:
+            </span>
+            <span class="t-emphasis m-left-base">
+              $ {{ scheduleService.price }}
+            </span>
+          </div>
+          <div class="slot-data d-inline">
+            <span class="t-muted">
+              Con asistente:
+            </span>
+            <span class="t-emphasis m-left-base">
+              {{ scheduleService.assistant?.name }}
+            </span>
+          </div>
+          <div class="slot-data d-inline">
+            <span class="t-muted">
+              Horas:
+            </span>
+            <span class="t-emphasis m-left-base">
+              {{ startTimes[scheduleService.uuid] }} - {{ getEndTime(scheduleService)}}
+            </span>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="d-flex-col gap-md m-top-base">
+        <span class="t-danger t-center">
+          {{ translate(systemMessage ?? translationCodes.TC_EMPTY) }}
+        </span>
+      </div>
+    </section>
+
+
+    <section class="process-buttons d-flex gap-md j-content-between max-w-md m-x-center  m-bottom-lg">
+      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
+      <div class="d-flex gap-md">
+        <button class="button primary w-auto" (click)="blockTimeRange()">Validar datos</button>
+        <button class="button primary w-auto" (click)="registerAppointmentAsClient()">Agendar cita</button>
+      </div>
+    </section>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+</section>
