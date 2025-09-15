@@ -12,12 +12,13 @@ export class RedirectIfAuthenticatedGuard implements CanActivate {
 
   canActivate(): Observable<boolean> {
     return this.authService.isAuthenticated().pipe(
-      tap((isAuth) => {
+      map(isAuth => {
         if (isAuth) {
           this.router.navigate(['/']);
+          return false;
         }
-      }),
-      map(isAuth => !isAuth)
+        return true;
+      })
     );
   }
 }

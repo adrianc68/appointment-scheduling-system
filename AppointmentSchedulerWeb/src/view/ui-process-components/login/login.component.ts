@@ -2,20 +2,19 @@ import { Component, NgZone, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
-import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { AuthenticationService } from '../../../cross-cutting/security/authentication/authentication.service';
-import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { of, switchMap, take } from 'rxjs';
 import { NavigationEnd, Router } from '@angular/router';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
 import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
-import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { ApiDataErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { TaskStateManagerService } from '../../model/task-state-manager.service';
 import { LoadingState } from '../../model/loading-state.type';
 import { Title } from '@angular/platform-browser';
+import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 
 @Component({
   selector: 'app-login',
@@ -33,12 +32,10 @@ export class LoginComponent implements OnInit {
   systemMessage?: string = '';
   errorValidationMessage: { [field: string]: string[] } = {};
 
-  currentTaskState: LoadingState;
+  loadingState: LoadingState = LoadingState.NO_ACTION_PERFORMED;
 
 
-  constructor(private titleService: Title, private authenticationService: AuthenticationService, private router: Router, private ngZone: NgZone, private i18nService: I18nService, private logginService: LoggingService, private stateManagerService: TaskStateManagerService) {
-    this.currentTaskState = this.stateManagerService.getState();
-    this.stateManagerService.getStateAsObservable().subscribe(state => { this.currentTaskState = state });
+  constructor(private titleService: Title, private authenticationService: AuthenticationService, private router: Router, private i18nService: I18nService, private errorUIService: ErrorUIService) {
   }
 
   private updateTitle(): void {
@@ -60,49 +57,53 @@ export class LoginComponent implements OnInit {
 
 
   onSubmit() {
-    this.systemMessage = "";
-    this.errorValidationMessage = {};
-
-    if (this.currentTaskState === LoadingState.LOADING) {
+    if (this.loadingState === LoadingState.LOADING || this.loadingState == LoadingState.WORK_DONE) {
       return;
     }
 
-    this.stateManagerService.setState(LoadingState.LOADING);
+    if (this.loadingState === LoadingState.SUCCESSFUL_TASK) {
+      this.loadingState = LoadingState.WORK_DONE;
+      return;
+    }
+
+
+    this.loadingState = LoadingState.LOADING;
     this.systemMessage = "";
     this.errorValidationMessage = {};
 
 
     this.authenticationService.loginJwt(this.account, this.password).pipe(
-      switchMap((response) => {
+      switchMap((response: OperationResult<boolean, ApiDataErrorResponse>) => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
-          return this.authenticationService.getAccountDataFromServer();
-        } else {
-          this.handleErrorResponse(response);
-          return of(response.error);
-        }
-      }),
-      switchMap((isDataReceived) => {
-        if (isDataReceived) {
-          return this.authenticationService.getAccountData().pipe(
-            take(1),
+          return this.authenticationService.getAccountDataFromServer().pipe(
+            switchMap((result) => {
+              if (result.isSuccessful) {
+                this.loadingState = LoadingState.SUCCESSFUL_TASK;
+                return this.authenticationService.getAccountData().pipe(take(1));
+              }
+              return of(null);
+            })
           );
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          this.loadingState = LoadingState.UNSUCCESSFUL_TASK;
+          return of(null);
         }
-        return of(null);
       })
     ).subscribe({
       next: (accountData) => {
         if (accountData) {
-          this.setSuccessfulTask();
-        } else {
-          this.setUnsuccessfulTask(LoadingState.UNSUCCESSFUL_TASK);
+          this.router.navigate(['/']);
         }
-      },
-      error: (err) => {
-        this.logginService.error(err);
       }
     });
+
+
+
   }
 
   translate(key: string): string {
@@ -113,47 +114,8 @@ export class LoginComponent implements OnInit {
     this.router.navigate([WebRoutes.signup])
   }
 
-  private handleErrorResponse(response: OperationResult<boolean, ApiDataErrorResponse>): void {
-
-    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
-    if (isGenericErrorResponse(response.error)) {
-      let codeMessage = getStringEnumKeyByValue(MessageCodeType, response.error.message);
-      if (response.error.additionalData?.["field"] !== undefined) {
-        this.setErrorValidationMessage(response.error.additionalData["field"], [codeMessage!]);
-      }
-      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
-    } else if (isValidationErrorResponse(response.error)) {
-      response.error.forEach(errorItem => {
-        this.setErrorValidationMessage(errorItem.field, errorItem.messages);
-      });
-      code = this.translationCodes.TC_VALIDATION_ERROR;
-    } else if (isServerErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    } else if (isEmptyErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    }
-    this.systemMessage = code;
-  }
-
   private setErrorValidationMessage(key: string, value: string[]) {
     this.errorValidationMessage[key.toLowerCase()] = value;
-  }
-
-  private setUnsuccessfulTask(state: LoadingState): void {
-    this.stateManagerService.setState(state);
-
-    setTimeout(() => {
-      this.stateManagerService.setState(LoadingState.NO_ACTION_PERFORMED);
-    }, 0);
-  }
-
-  private setSuccessfulTask(): void {
-    this.stateManagerService.setState(LoadingState.SUCCESSFUL_TASK);
-    setTimeout(() => {
-      this.ngZone.run(() => {
-        this.router.navigate([WebRoutes.root]);
-      });
-    }, 0)
   }
 
 
