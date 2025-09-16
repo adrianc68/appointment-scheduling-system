@@ -171,6 +171,22 @@ export class AvailabilityTimeSlotManagementComponent {
     this.router.navigate([WebRoutes.availability_time_slot_management_edit_slot], { state: { slot } });
   }
 
+  getActiveSlots(): number {
+    return this.slots.filter(s => s.status === 'ENABLED').length;
+  }
+
+  getInactiveSlots(): number {
+    return this.slots.filter(s => s.status === 'DISABLED').length;
+  }
+
+
+  getTotalDurationHours(): number {
+    return this.slots.reduce((acc, s) => {
+      const diff = (new Date(s.endDate).getTime() - new Date(s.startDate).getTime()) / (1000 * 60 * 60);
+      return acc + diff;
+    }, 0);
+  }
+
 
   translate(key: string): string {
     return this.i18nService.translate(key);

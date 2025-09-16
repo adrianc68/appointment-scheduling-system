@@ -136,6 +136,36 @@
 
     <section class="item-management card">
       <div class="item-header">
+        <h1>Formato de hora</h1>
+        <div class="item-description">
+          <span class="fw-bold t-emphasis fs-md">
+            Configura el formato de hora (12 o 24 horas) del sistema
+          </span>
+          <p>
+            Este formato solo afecta la visualización de las horas en la aplicación.
+            No cambia la zona horaria ni las fechas.
+          </p>
+
+          <div class="d-flex gap-md">
+            <label>
+              <input class="" type="radio" [checked]="hour12" (change)="setHourFormat(true)" />
+              Formato 12 horas
+            </label>
+
+            <label>
+              <input class="" type="radio" [checked]="!hour12" (change)="setHourFormat(false)" />
+              Formato 24 horas
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="item-content d-flex gap-base">
+        <button class="button primary" (click)="setClockFormat()">Aplicar</button>
+      </div>
+    </section>
+
+    <section class="item-management card">
+      <div class="item-header">
         <h1>Moneda local</h1>
         <div class="item-description">
           <span class="fw-bold t-emphasis fs-md">Moneda local del sistema</span>

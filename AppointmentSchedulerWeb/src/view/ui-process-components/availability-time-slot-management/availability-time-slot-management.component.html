@@ -5,16 +5,16 @@
   </p>
   <div class="summary-data-management m-bottom-md">
     <div class="summary-item card">
-      <span class="t-muted"> Horarios registrados </span>
-      <span class="fw-bold fs-xl">{{slots.length}}</span>
+      <span class="t-muted">Horarios</span>
+      <span class="fw-bold fs-xl">{{ slots.length }}</span>
     </div>
     <div class="summary-item card">
       <span class="t-muted">Horarios activos</span>
-      <span class="fw-bold fs-xl">{{ slots.length}}</span>
+      <span class="fw-bold fs-xl">{{ getActiveSlots() }}</span>
     </div>
     <div class="summary-item card">
       <span class="t-muted">Horarios inactivos</span>
-      <span class="fw-bold fs-xl">{{ slots.length}}</span>
+      <span class="fw-bold fs-xl">{{ getInactiveSlots() }}</span>
     </div>
   </div>
 
@@ -25,13 +25,12 @@
       </label>
       <!--<input id="search" class="input" type="text" placeholder="Buscar..." />-->
       <input id="search" class="input w-100" type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
-        placeholder="Buscar..." />
+        placeholder="Buscar...">
     </div>
 
     <div class="input container filter-item">
       <label class="p-all-sm t-muted">De: </label>
-      <input class="" type="date" [ngModel]="startDate" (ngModelChange)="onDateRangeChange($event, 'start')"
-        placeholder="Hola" />
+      <input class="" type="date" [ngModel]="startDate" (ngModelChange)="onDateRangeChange($event, 'start')" />
     </div>
 
     <div class="input container filter-item">
@@ -57,7 +56,7 @@
 
 
     <div class="data-header">
-      <span class="fw-bold">Horarios registrados</span>
+      <span class="fw-bold">Disponibilidad</span>
     </div>
     <div class="data-body table-type">
       <div class="data-body-no-data" *ngIf="filteredItems?.length === 0">
@@ -69,9 +68,13 @@
         <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
           <div class="card-title">
             <span class="fs-base t-emphasis">
-              {{ slot.startDate | slotDateRange: (slot.endDate) }}
+              {{ slot.startDate | readableDate}}
+              <span class="t-muted">
+                |
+                {{ (slot.startDate | slotDateRange: (slot.endDate)).split("|")[1] }}
+              </span>
             </span>
-            <span class="fs-base t-muted">{{ slot.assistant.name }} </span>
+            <span class="fs-sm t-muted">{{ slot.assistant.name }} </span>
           </div>
           <button [class.clicked]="openedSlots.has(i)">
             <mat-icon>

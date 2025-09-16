@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 @use 'styles/variables.scss' as variables;
 // @use 'styles/components/button.scss' as button;
 @use 'styles/components/buttons.scss' as button;
@@ -930,3 +932,15 @@ $width: (
 .user-select-none {
   user-select: none;
 }
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+

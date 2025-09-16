@@ -5,11 +5,10 @@ import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/trans
 import { AssistantService } from '../../../model/communication-components/assistant.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
-import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { ApiDataErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
-import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { ServiceAssignment } from '../../../view-model/business-entities/service-assignment';
-import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 import { SHARED_STANDALONE_COMPONENTS } from '../../ui-components/shared-components';
 import { Router } from '@angular/router';
 import { WebRoutes } from '../../../cross-cutting/operation-management/model/web-routes.constants';
@@ -65,6 +64,16 @@ export class ServiceOfferManagementComponent {
       this.openedSlots.add(index);
     }
   }
+
+  getTotalServices(): number {
+    return this.serviceOffers.reduce((acc, sa) => acc + sa.serviceOffer.length, 0);
+  }
+
+  getAverageServices(): string {
+    if (this.serviceOffers.length === 0) return "0.00";
+    return (this.getTotalServices() / this.serviceOffers.length).toFixed(2);
+  }
+
 
 
 

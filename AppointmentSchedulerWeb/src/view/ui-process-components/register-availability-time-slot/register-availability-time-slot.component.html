@@ -62,11 +62,11 @@
 
       <div *ngIf="!isSingleDay">
         <label for="startDate">Inicio</label>
-        <input class="input m-top-base m-bottom-base" id="startDate" type="datetime-local" step="1"
+        <input class="input m-top-base m-bottom-base" id="startDate" type="datetime-local" step="60"
           [(ngModel)]="startDate" name="startDate" required />
         <label for="endDate">Fin</label>
-        <input class="input m-top-base" id="endDate" type="datetime-local" step="1" [(ngModel)]="endDate" name="endDate"
-          required />
+        <input class="input m-top-base" id="endDate" type="datetime-local" step="60" [(ngModel)]="endDate"
+          name="endDate" required />
       </div>
 
       <div *ngIf="isSingleDay" class="m-top-lg">
@@ -75,11 +75,11 @@
           name="selectedDate" required />
 
         <label for="startTime">Hora de inicio</label>
-        <input class="input m-top-base m-bottom-base" id="startTime" type="time" step="1" [(ngModel)]="startTime"
+        <input class="input m-top-base m-bottom-base" id="startTime" type="time" step="60" [(ngModel)]="startTime"
           name="startTime" required />
 
         <label for="endTime">Hora de fin</label>
-        <input class="input m-top-base" id="endTime" type="time" step="1" [(ngModel)]="endTime" name="endTime"
+        <input class="input m-top-base" id="endTime" type="time" step="60" [(ngModel)]="endTime" name="endTime"
           required />
       </div>
 
@@ -91,12 +91,13 @@
           <div class="una-input-group">
             <div class="una-input">
               <label>Hora inicio</label>
-              <input class="input" type="time" step="1" [(ngModel)]="slotStartTimeMap[i]" name="slotStart{{i}}"
-                required />
+              <input class="input" type="time" step="1" [(ngModel)]="slotStartTimeMap[i]" step="60"
+                name="slotStart{{i}}" required />
             </div>
             <div class="una-input">
               <label>Hora fin</label>
-              <input class="input" type="time" step="1" [(ngModel)]="slotEndTimeMap[i]" name="slotEnd{{i}}" required />
+              <input class="input" type="time" step="1" [(ngModel)]="slotEndTimeMap[i]" step="60" name="slotEnd{{i}}"
+                required />
             </div>
           </div>
 
@@ -109,11 +110,13 @@
           <div class="una-input-group">
             <div class="una-input">
               <label>Inicio</label>
-              <input class="input" type="datetime-local" [(ngModel)]="slot.startDate" name="slotStart{{i}}" required />
+              <input class="input" type="datetime-local" [(ngModel)]="slot.startDate" step="60" name="slotStart{{i}}"
+                required />
             </div>
             <div class="una-input">
               <label>Fin</label>
-              <input class="input" type="datetime-local" [(ngModel)]="slot.endDate" name="slotEnd{{i}}" required />
+              <input class="input" type="datetime-local" [(ngModel)]="slot.endDate" step="60" name="slotEnd{{i}}"
+                required />
             </div>
           </div>
 

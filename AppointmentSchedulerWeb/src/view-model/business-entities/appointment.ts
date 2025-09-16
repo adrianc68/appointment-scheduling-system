@@ -1,7 +1,5 @@
 import { AppointmentScheduledService } from "./appointment-scheduled-service";
 import { Client } from "./client";
-import { AppointmentNotification } from "./notification/appointment-notification";
-import { ScheduledService } from "./scheduled-service";
 import { AppointmentStatusType } from "./types/appointment-status.types";
 
 export class Appointment {
@@ -11,8 +9,6 @@ export class Appointment {
   status?: AppointmentStatusType;
   totalCost?: number;
   createdAt: Date;
-  //assistants: Assistant[];
-  //selectedServices?: ScheduledService[]
   scheduledServices?: AppointmentScheduledService[]
   client?: Client;
 

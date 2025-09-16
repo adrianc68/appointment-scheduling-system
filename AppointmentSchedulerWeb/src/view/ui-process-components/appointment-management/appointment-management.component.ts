@@ -20,6 +20,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { SlotDateRangePipe } from '../../../cross-cutting/helper/date-utils/slot-date-range.pipe';
 import { ReadableTimePipe } from '../../../cross-cutting/helper/date-utils/readable-time.pipe';
 import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
+import { AppointmentStatusType } from '../../../view-model/business-entities/types/appointment-status.types';
 
 @Component({
   selector: 'app-appointment-management',
@@ -132,6 +133,25 @@ export class AppointmentManagementComponent {
 
   translate(key: string): string {
     return this.i18nService.translate(key);
+  }
+
+  getConfirmedAppointments(): number {
+    return this.scheduledAppointments.filter(a => a.status === AppointmentStatusType.CONFIRMED).length;
+  }
+
+  getCancelledAppointments(): number {
+    return this.scheduledAppointments.filter(a => a.status === AppointmentStatusType.CANCELED).length;
+  }
+
+  getScheduledAppointments(): number {
+    return this.scheduledAppointments.filter(a => a.status === AppointmentStatusType.SCHEDULED).length;
+  }
+
+  getUniqueClients(): number {
+    const clientUuids = this.scheduledAppointments
+      .map(a => a.client?.uuid)
+      .filter(uuid => !!uuid);
+    return new Set(clientUuids).size;
   }
 
 

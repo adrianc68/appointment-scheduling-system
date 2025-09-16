@@ -6,16 +6,16 @@
 
   <section class="summary-data-management m-bottom-xl">
     <div class="summary-item card">
-      <span class="t-muted">Resumen 1</span>
-      <span class="fw-bold fs-xl">1</span>
+      <span class="t-muted">Asistentes</span>
+      <span class="fw-bold fs-xl">{{serviceOffers.length}}</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">Resumen 2</span>
-      <span class="fw-bold fs-xl">2</span>
+      <span class="t-muted">Servicios asignados</span>
+      <span class="fw-bold fs-xl">{{getTotalServices()}}</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">Resumen 3</span>
-      <span class="fw-bold fs-xl">3</span>
+      <span class="t-muted">Promedio por asistente</span>
+      <span class="fw-bold fs-xl">{{getAverageServices()}}</span>
     </div>
   </section>
 
@@ -27,7 +27,7 @@
         <input id="search" class="input" type="text" placeholder="Buscar..." />
       </div>
       <button class="button primary w-auto" (click)="redirectToRegisterServiceOffer()">
-        Asignar servicios
+        Asignar
       </button>
     </div>
     <div class="data-header">
@@ -56,8 +56,8 @@
             <ul class="service-list-container">
               <li *ngFor="let service of data.serviceOffer">
                 <div class="service-item-container">
-                  <span class="">{{service.name}}</span>
-                  <span class="t-muted">Duración: {{service.minutes}} {{TranslationCodes.TC_MINUTES_LABEL |
+                  <span class="t-emphasis">{{service.name}}</span>
+                  <span class="t-muted fs-xs">Duración: {{service.minutes}} {{TranslationCodes.TC_MINUTES_LABEL |
                     translate}}</span>
                   <!--<span class="t-muted">$ {{service.price}}</span>-->
                 </div>

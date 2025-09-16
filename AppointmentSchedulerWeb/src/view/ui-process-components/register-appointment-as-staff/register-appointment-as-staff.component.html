@@ -12,49 +12,6 @@
     </section>
   </div>
 
-  <div class="process" *ngIf="currentStep === 4">
-    <h1 class="t-center">¿Para qué cliente?</h1>
-    <p class="t-center m-top-base">Buscar por un cliente existente...</p>
-    <section class="select-client data-section p-all-none sp-bottom max-w-sm m-x-center m-top-md">
-      <div class="data-container">
-        <div class="data-actions">
-          <div class="input container">
-            <label class="input-icon" for="search"><mat-icon>search</mat-icon></label>
-            <input id="search" class="input" type="text" placeholder="Buscar..." />
-          </div>
-        </div>
-        <div class="data-header">
-          <span class="fw-bold">Clientes registrados</span>
-        </div>
-        <div class="data-body table-type">
-
-          <div class="data-body-no-data" *ngIf="clients?.length === 0">
-            <mat-icon>search_off</mat-icon>
-            <span>No se han encontrado registros</span>
-          </div>
-          <div class="client-card-container scroll-visible">
-            <div class="client-data data-row-item" [class.selected-item-bg]="selectedClient?.uuid === data.uuid"
-              (click)="selectedClient = data" *ngFor="let data of clients">
-              <mat-icon class="profile-icon">person</mat-icon>
-              <div class="client-info">
-                <span class="fw-bold">{{data.name}}</span>
-                <span class="fs-sm t-secondary">{{data.username}}</span>
-                <!--<span class="fs-sm t-secondary">{{data.phoneNumber}}</span>-->
-                <!--<span class="fs-sm t-secondary">{{data.status!}}</span>-->
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="process-buttons d-flex gap-md j-content-between max-w-sm m-x-center m-bottom-lg">
-      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
-      <button class="button primary w-auto" [disabled]="!selectedClient" [ngClass]="{'disabled': !selectedClient}"
-        (click)="nextStep()">Siguiente</button>
-    </section>
-
-  </div>
 
   <div class="process" *ngIf="currentStep === 2">
     <h1 class="t-center">Selecciona los servicios</h1>
@@ -225,27 +182,61 @@
                 <mat-icon class="danger">delete</mat-icon>
               </button>
             </div>
-
-
-
-
-
-
           </div>
-
-
         </div>
-
       </section>
-
-
-
     </section>
 
     <section class="process-buttons d-flex gap-md j-content-between max-w-md m-x-center m-bottom-lg">
       <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
       <button class="button primary w-auto" [disabled]="!allStartTimesDefined()"
         [ngClass]="{'disabled': !allStartTimesDefined()}" (click)="nextStep()">Siguiente</button>
+    </section>
+
+  </div>
+
+
+
+  <div class="process" *ngIf="currentStep === 4">
+    <h1 class="t-center">¿Para qué cliente?</h1>
+    <p class="t-center m-top-base">Buscar por un cliente existente...</p>
+    <section class="select-client data-section p-all-none sp-bottom max-w-sm m-x-center m-top-md">
+      <div class="data-container">
+        <div class="data-actions">
+          <div class="input container">
+            <label class="input-icon" for="search"><mat-icon>search</mat-icon></label>
+            <input id="search" class="input" type="text" placeholder="Buscar..." />
+          </div>
+        </div>
+        <div class="data-header">
+          <span class="fw-bold">Clientes registrados</span>
+        </div>
+        <div class="data-body table-type">
+
+          <div class="data-body-no-data" *ngIf="clients?.length === 0">
+            <mat-icon>search_off</mat-icon>
+            <span>No se han encontrado registros</span>
+          </div>
+          <div class="client-card-container scroll-visible">
+            <div class="client-data data-row-item" [class.selected-item-bg]="selectedClient?.uuid === data.uuid"
+              (click)="selectedClient = data" *ngFor="let data of clients">
+              <mat-icon class="profile-icon">person</mat-icon>
+              <div class="client-info">
+                <span class="fw-bold">{{data.name}}</span>
+                <span class="fs-sm t-secondary">{{data.username}}</span>
+                <!--<span class="fs-sm t-secondary">{{data.phoneNumber}}</span>-->
+                <!--<span class="fs-sm t-secondary">{{data.status!}}</span>-->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="process-buttons d-flex gap-md j-content-between max-w-sm m-x-center m-bottom-lg">
+      <button class="button secondary w-auto" (click)="prevStep()">Regresar</button>
+      <button class="button primary w-auto" [disabled]="!selectedClient" [ngClass]="{'disabled': !selectedClient}"
+        (click)="nextStep()">Siguiente</button>
     </section>
 
   </div>
@@ -259,7 +250,7 @@
         <div class="slot-data d-flex-col">
           <span class="fs-base t-muted"> Fecha:</span>
           <span class="fs-base t-emphasis"> {{ selectedDate }}</span>
-          <span class="fs-base t-muted"> ({{ (selectedDate | readableDate).split(",")[0] }})</span>
+          <span class="fs-base t-muted"> ({{ selectedDate | readableDate }})</span>
         </div>
       </div>
       <div class="slot-data-row">
@@ -311,6 +302,14 @@
             </span>
             <span class="t-emphasis m-left-base">
               $ {{ scheduleService.price }}
+            </span>
+          </div>
+          <div class="slot-data d-inline">
+            <span class="t-muted">
+              Duración:
+            </span>
+            <span class="t-emphasis m-left-base">
+              {{ scheduleService.minutes }} min
             </span>
           </div>
           <div class="slot-data d-inline">

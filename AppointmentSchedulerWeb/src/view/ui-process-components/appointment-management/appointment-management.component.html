@@ -9,16 +9,16 @@
 
   <div class="summary-data-management m-bottom-md">
     <div class="summary-item card">
-      <span class="t-muted"> Citas confirmadas</span>
-      <span class="fw-bold fs-xl">1</span>
+      <span class="t-muted">Citas programadas</span>
+      <span class="fw-bold fs-xl">{{ scheduledAppointments.length }}</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">Citas pendientes</span>
-      <span class="fw-bold fs-xl">2</span>
+      <span class="t-muted">Confirmadas</span>
+      <span class="fw-bold fs-xl">{{ getConfirmedAppointments() }}</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">Citas canceladas</span>
-      <span class="fw-bold fs-xl">3</span>
+      <span class="t-muted">Canceladas</span>
+      <span class="fw-bold fs-xl">{{ getCancelledAppointments() }}</span>
     </div>
   </div>
 
@@ -48,24 +48,12 @@
       <label class="p-all-sm t-muted">Hoy: </label>
       <span class="fs-sm">{{( today | readableDate).split(",")[0]}}</span>
     </div>
-
-    <!--<div class="filter-item input">-->
-    <!--  Filtro n-->
-    <!--</div>-->
-    <!---->
-    <!--<div class="filter-item input">-->
-    <!--  Filtro n-->
-    <!--</div>-->
-    <!---->
-    <!--<div class="filter-item input">-->
-    <!--  Filtro n-->
-    <!--</div>-->
   </section>
 
   <div class="d-flex w-100 j-content-end">
     <button class="button primary w-auto m-bottom-md f-inverted" (click)="redirectToRegisterAppointment()">
       <mat-icon class="button-icon">add</mat-icon>
-      Registrar nueva cita
+      Registrar cita
     </button>
   </div>
 
@@ -89,10 +77,10 @@
           <div class="card-title d-flex">
             <div class="d-flex-col">
               <span class="fs-base fw-bold t-emphasis m-bottom-base">
-                Cita con {{ appointment.client!.name}}
+                Cita de: {{ appointment.client!.name}}
               </span>
               <span class="fs-sm t-muted">
-                {{ appointment.startDate | slotDateRange: (appointment.endDate)}}
+                {{ appointment.startDate | readableDate}}
               </span>
             </div>
             <span class="fs-xs fw-bold" [ngClass]="{
