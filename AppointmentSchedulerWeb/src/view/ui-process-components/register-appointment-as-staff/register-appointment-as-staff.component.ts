@@ -49,15 +49,6 @@ export class RegisterAppointmentAsStaffComponent {
   currentStep = 1;
   previousStep = 1;
 
-  nextStep() {
-    this.currentStep++;
-  }
-
-  prevStep() {
-    this.currentStep--;
-  }
-
-
   ngAfterViewChecked(): void {
     if (this.previousStep !== this.currentStep) {
       window.scrollTo(0, 0);
@@ -323,6 +314,8 @@ export class RegisterAppointmentAsStaffComponent {
 
   onDateSelected(date: string) {
     this.selectedDate = date;
+    console.log("SELECTEDDATE");
+    console.log(this.selectedDate);
     this.loadAppointments(date, date);
     this.getAvailableServices(date);
   }
@@ -330,15 +323,8 @@ export class RegisterAppointmentAsStaffComponent {
 
 
   onCurrentDateChange(date: Date) {
-    const formatted = date.toLocaleString('es-MX', { month: 'long', year: 'numeric' });
-    console.log('Mes actual:', formatted);
-
-    // ejemplo: podrías calcular el rango del mes
     const start = new Date(date.getFullYear(), date.getMonth(), 1);
     const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    console.log('Rango del mes:', start, end);
-
-    //this.getAvailabilityTimeSlots(start.toString(), end.toString());
 
     this.getAvailabilityTimeSlots(
       this.formatDateToApi(start),
@@ -347,7 +333,6 @@ export class RegisterAppointmentAsStaffComponent {
 
     this.selectedServicesOffer = [];
     this.selectedClient = undefined;
-
   }
 
   private formatDateToApi(date: Date): string {
@@ -650,12 +635,24 @@ export class RegisterAppointmentAsStaffComponent {
   }
 
 
+
+  nextStep() {
+    this.currentStep++;
+  }
+
+  prevStep() {
+    this.currentStep--;
+  }
+
+
+
+
 }
 
 
 
 interface ConflictInfo {
   hasConflict: boolean;
-  conflictingAppointments: { start: Date; end: Date; clientName: string ; serviceName?: string}[];
+  conflictingAppointments: { start: Date; end: Date; clientName: string; serviceName?: string }[];
   unavailable: boolean; // nuevo
 }

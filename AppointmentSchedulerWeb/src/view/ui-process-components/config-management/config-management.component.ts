@@ -9,6 +9,7 @@ import { TranslationCodes } from '../../../cross-cutting/helper/i18n/model/trans
 import { TimeZoneService } from '../../../cross-cutting/operation-management/timeZoneService/time-zone.service';
 import { FormsModule } from '@angular/forms';
 import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
+import { ClockFormatService } from '../../../cross-cutting/operation-management/clock-format-service/clock-format.service';
 
 @Component({
   selector: 'app-config-management',
@@ -31,9 +32,9 @@ export class ConfigManagementComponent {
   ];
   selectedTimeZone: string = '';
   now: Date = new Date();
+  hour12!: boolean;
 
-
-  constructor(private themeService: ThemeService, private i18nService: I18nService, private timeZoneService: TimeZoneService) {
+  constructor(private themeService: ThemeService, private i18nService: I18nService, private timeZoneService: TimeZoneService, private clockFormatService: ClockFormatService) {
     this.themeService.currentTheme$.subscribe(theme => {
       this.currentTheme = theme;
     });
@@ -45,8 +46,20 @@ export class ConfigManagementComponent {
     this.timeZoneService.currentTimeZone$.subscribe(tz => {
       this.currentTimeZone = tz;
       this.selectedTimeZone = tz;
-
     });
+
+    this.clockFormatService.hour12$.subscribe(hour12 => {
+      this.hour12 = hour12;
+    });
+  }
+
+setHourFormat(is12: boolean) {
+  this.hour12 = is12;
+}
+
+
+  setClockFormat() {
+    this.clockFormatService.setHour12(this.hour12);
   }
 
   toggleTheme() {

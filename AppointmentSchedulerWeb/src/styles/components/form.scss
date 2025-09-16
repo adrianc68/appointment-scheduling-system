@@ -43,7 +43,7 @@
 .form-footer {
   display: flex;
   flex-direction: column;
-  gap: variables.$spacing-md;
+  gap: variables.$spacing-base;
 
   .system-error {
     text-align: center;

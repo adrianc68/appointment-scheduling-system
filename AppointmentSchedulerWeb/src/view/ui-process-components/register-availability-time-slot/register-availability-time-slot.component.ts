@@ -16,8 +16,12 @@ import { SchedulerService } from '../../../model/communication-components/schedu
 import { fromLocalToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
 import { AssistantService } from '../../../model/communication-components/assistant.service';
 import { Assistant } from '../../../view-model/business-entities/assistant';
-import { MatIconModule } from '@angular/material/icon';
 import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
+
+
+
+import { ClockFormatService } from '../../../cross-cutting/operation-management/clock-format-service/clock-format.service';
+import { MatIconModule } from '@angular/material/icon';
 
 
 @Component({
@@ -31,7 +35,7 @@ import { ErrorUIService } from '../../../cross-cutting/communication/handle-erro
 export class RegisterAvailabilityTimeSlotComponent {
 
   translationCodes = TranslationCodes;
-
+  hour12: boolean = true;
   startDate: Date = new Date();
   endDate: Date = new Date();
   assistantUuid: string = '';
@@ -50,33 +54,14 @@ export class RegisterAvailabilityTimeSlotComponent {
   slotStartTimeMap: { [key: number]: string } = {};
   slotEndTimeMap: { [key: number]: string } = {};
 
-
-  constructor(private i18nService: I18nService, private loggingService: LoggingService, private schedulerService: SchedulerService, private assistantService: AssistantService, private errorUIService: ErrorUIService) {
+  constructor(private i18nService: I18nService, private loggingService: LoggingService, private schedulerService: SchedulerService, private assistantService: AssistantService, private errorUIService: ErrorUIService, private clockFormatService: ClockFormatService) {
 
     this.getAssistantList();
+
+    this.clockFormatService.hour12$.subscribe(value => {
+      this.hour12 = value;
+    });
   }
-
-
-
-  translate(key: string): string {
-    return this.i18nService.translate(key);
-  }
-
-  startTime: string = '09:00';
-  endTime: string = '17:00';
-  selectedDate: string = new Date().toISOString().split('T')[0];
-
-
-  nextStep() {
-    this.currentStep++;
-  }
-
-  prevStep() {
-    this.currentStep--;
-
-    this.loadingState = LoadingState.NO_ACTION_PERFORMED;
-  }
-
 
   ngAfterViewChecked(): void {
     if (this.previousStep !== this.currentStep) {
@@ -84,50 +69,6 @@ export class RegisterAvailabilityTimeSlotComponent {
       this.previousStep = this.currentStep;
     }
   }
-
-
-
-  getStartEndDate(): { start: Date, end: Date } {
-
-
-    if (this.isSingleDay) {
-      const [startHour, startMin] = this.startTime.split(':').map(Number);
-      const [endHour, endMin] = this.endTime.split(':').map(Number);
-      const [year, month, day] = this.selectedDate.split('-').map(Number);
-      const start = new Date(year, month - 1, day, startHour, startMin, 0, 0);
-      const end = new Date(year, month - 1, day, endHour, endMin, 0, 0);
-
-      return { start, end };
-    } else {
-      return { start: this.startDate, end: this.endDate };
-    }
-  }
-
-
-
-
-  private getAssistantList(): void {
-    this.assistantService.getAssistantList().pipe(
-      map((response: OperationResult<Assistant[], ApiDataErrorResponse>) => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK && response.result) {
-          return response.result;
-        } else {
-          this.errorUIService.handleError(response);
-          return [];
-        }
-      }),
-      catchError(err => {
-        this.loggingService.error(err);
-        this.errorUIService.handleError(err);
-        return of([]);
-      })
-    ).subscribe((assistants: Assistant[]) => {
-      this.assistants = assistants;
-    })
-  }
-
-
-
 
   onSubmit() {
     if (this.loadingState === LoadingState.LOADING || this.loadingState == LoadingState.WORK_DONE) {
@@ -152,7 +93,7 @@ export class RegisterAvailabilityTimeSlotComponent {
     const availabilitySlot = {
       StartDate: fromLocalToUTC(start),
       EndDate: fromLocalToUTC(end),
-      AssistantUuid: this.selectedAssistant.uuid,
+      AssistantUuid: this.selectedAssistant?.uuid,
       UnavailableTimeSlots: this.getUnavailableSlotsUTC()
 
     };
@@ -166,41 +107,26 @@ export class RegisterAvailabilityTimeSlotComponent {
     })
   }
 
-
-  private registerAvailabilityTimeSlot(payload: any): Observable<boolean> {
-    return this.schedulerService.registerAvailabilityTimeSlot(payload).pipe(
-      map((response: OperationResult<string, ApiDataErrorResponse>): boolean => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          return true;
-        } else {
-          let code = this.errorUIService.handleError(response);
-          this.systemMessage = code || "";
-          const validationErrors = this.errorUIService.getValidationErrors(response);
-          Object.entries(validationErrors).forEach(([field, messages]) => {
-            this.setErrorValidationMessage(field, messages);
-          });
-          return false;
-        }
-      }),
-      catchError(err => {
-        this.loggingService.error(err);
-        return of(false);
-      })
-    )
-  }
-
-
-  private setErrorValidationMessage(key: string, value: string[]) {
-    this.errorValidationMessage[key.toLowerCase()] = value;
-  }
-
-
   addUnavailableTimeSlot() {
     this.unavailableTimeSlots.push({ startDate: new Date(), endDate: new Date() });
   }
 
   removeUnavailableTimeSlot(index: number) {
     this.unavailableTimeSlots.splice(index, 1);
+  }
+
+  getStartEndDate(): { start: Date, end: Date } {
+    if (this.isSingleDay) {
+      const [startHour, startMin] = this.startTime.split(':').map(Number);
+      const [endHour, endMin] = this.endTime.split(':').map(Number);
+      const [year, month, day] = this.selectedDate.split('-').map(Number);
+      const start = new Date(year, month - 1, day, startHour, startMin, 0, 0);
+      const end = new Date(year, month - 1, day, endHour, endMin, 0, 0);
+
+      return { start, end };
+    } else {
+      return { start: this.startDate, end: this.endDate };
+    }
   }
 
   getUnavailableSlotsUTC() {
@@ -231,4 +157,71 @@ export class RegisterAvailabilityTimeSlotComponent {
       .filter((slot) => slot !== null);
   }
 
+
+  private registerAvailabilityTimeSlot(payload: any): Observable<boolean> {
+    return this.schedulerService.registerAvailabilityTimeSlot(payload).pipe(
+      map((response: OperationResult<string, ApiDataErrorResponse>): boolean => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          return true;
+        } else {
+          let code = this.errorUIService.handleError(response);
+          this.systemMessage = code || "";
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return false;
+        }
+      }),
+      catchError(err => {
+        this.loggingService.error(err);
+        return of(false);
+      })
+    )
+  }
+
+
+  translate(key: string): string {
+    return this.i18nService.translate(key);
+  }
+
+  startTime: string = '09:00';
+  endTime: string = '17:00';
+  selectedDate: string = new Date().toISOString().split('T')[0];
+
+
+  nextStep() {
+    this.currentStep++;
+  }
+
+  prevStep() {
+    this.currentStep--;
+
+    this.loadingState = LoadingState.NO_ACTION_PERFORMED;
+  }
+
+
+  private setErrorValidationMessage(key: string, value: string[]) {
+    this.errorValidationMessage[key.toLowerCase()] = value;
+  }
+
+  private getAssistantList(): void {
+    this.assistantService.getAssistantList().pipe(
+      map((response: OperationResult<Assistant[], ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK && response.result) {
+          return response.result;
+        } else {
+          this.errorUIService.handleError(response);
+          return [];
+        }
+      }),
+      catchError(err => {
+        this.loggingService.error(err);
+        this.errorUIService.handleError(err);
+        return of([]);
+      })
+    ).subscribe((assistants: Assistant[]) => {
+      this.assistants = assistants;
+    })
+  }
 }

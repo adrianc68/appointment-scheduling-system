@@ -37,10 +37,11 @@
       <span class="system-error">
         {{translate(systemMessage ?? translationCodes.TC_EMPTY)}}
       </span>
+      <button class="button secondary" (click)="signUp()">
+        {{translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)}}
+      </button>
     </div>
-    <button class="button secondary" (click)="signUp()">
-      {{translate(translationCodes.TC_SIGN_UP_BUTTON_LABEL)}}
-    </button>
+
   </form>
 
 

@@ -1,7 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { I18nService } from '../i18n/i18n.service';
 import { LanguageTypes } from '../i18n/model/languages.types';
-import { TimeZoneService } from '../../operation-management/timeZoneService/time-zone.service';
 
 @Pipe({
   name: 'readableDate',
@@ -9,43 +8,46 @@ import { TimeZoneService } from '../../operation-management/timeZoneService/time
   pure: false
 })
 export class ReadableDatePipe implements PipeTransform {
-  private currentLanguage = LanguageTypes.es_MX;
-  private currentTimeZone: string = 'UTC';
+  private currentLanguage: string = 'es-MX';
 
-  constructor(private i18nService: I18nService, private timezoneService: TimeZoneService) {
+  constructor(
+    private i18nService: I18nService,
+  ) {
     this.i18nService.getLanguageAsObservable().subscribe(language => {
-      this.currentLanguage = language;
+      this.currentLanguage = this.mapLanguageToString(language);
     });
 
-    this.timezoneService.currentTimeZone$.subscribe(tz => {
-      this.currentTimeZone = tz;
-    });
+
   }
 
-  transform(isoString: string | Date | null | undefined, timeZone?: string): string {
-    if (!isoString) return '';
+  transform(value: string | Date | null | undefined): string {
+    if (!value) return '';
 
-    const date = new Date(isoString);
+    let year: number, month: number, day: number;
 
-    const formattedDate = date.toLocaleDateString(this.getCurrentLanguage(), {
-      day: '2-digit',
-      month: 'long',
+    if (typeof value === 'string') {
+      [year, month, day] = value.split('-').map(Number);
+    } else if (value instanceof Date) {
+      year = value.getFullYear();
+      month = value.getMonth() + 1;
+      day = value.getDate();
+    } else {
+      return '';
+    }
+
+    const dateForFormat = new Date(Date.UTC(year, month - 1, day, 12));
+
+    const options: Intl.DateTimeFormatOptions = {
       year: 'numeric',
-      timeZone: timeZone || this.currentTimeZone || 'UTC',
-    });
+      month: 'long',
+      day: '2-digit'
+    };
 
-    const formattedTime = date.toLocaleTimeString(this.getCurrentLanguage(), {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-      timeZone: timeZone || this.currentTimeZone || 'UTC',
-    });
-
-    return `${formattedDate}, ${formattedTime}`;
+    return new Intl.DateTimeFormat(this.currentLanguage, options).format(dateForFormat);
   }
 
-  private getCurrentLanguage(): string {
-    switch (this.currentLanguage) {
+  private mapLanguageToString(language: LanguageTypes): string {
+    switch (language) {
       case LanguageTypes.es_MX: return 'es-MX';
       case LanguageTypes.en_US: return 'en-US';
       default: return 'es-MX';
