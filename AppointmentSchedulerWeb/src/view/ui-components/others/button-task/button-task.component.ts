@@ -20,6 +20,10 @@ export class ButtonTaskComponent {
   @Input() placeholder: string = '';
   @Input() disabled: boolean = false;
   @Input() class: string = "";
+  @Input() successfulText: string = "Tarea completada exitosamente";
+  @Input() unsuccessfulText: string = "No se pudo completar la tarea";
+  @Input() workDoneText: string = "Tarea completada";
+  @Input() loadingText: string = "Cargando...";
   @Output() clicked = new EventEmitter<void>();
   loadingStateType = LoadingState;
 

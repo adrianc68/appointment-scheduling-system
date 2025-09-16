@@ -8,7 +8,7 @@ import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
-import { Observable, of, switchMap } from 'rxjs';
+import { map } from 'rxjs';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { Appointment } from '../../../view-model/business-entities/appointment';
@@ -76,7 +76,7 @@ export class AppointmentManagementComponent {
 
     this.schedulerService.getScheduledOrConfirmedAppointmentsAsStaff(startDate, endDate).pipe(
 
-      switchMap((response: OperationResult<Appointment[], ApiDataErrorResponse>): Observable<boolean> => {
+      map((response: OperationResult<Appointment[], ApiDataErrorResponse>): boolean => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.scheduledAppointments = [...response.result!];
@@ -87,10 +87,10 @@ export class AppointmentManagementComponent {
           });
 
           this.systemMessage = code;
-          return of(true);
+          return true;
         } else {
           this.handleErrorResponse(response);
-          return of(false);
+          return false;
         }
       })
     ).subscribe();

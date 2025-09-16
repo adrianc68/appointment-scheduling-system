@@ -10,10 +10,12 @@ import { TimeZoneService } from '../../../cross-cutting/operation-management/tim
 import { FormsModule } from '@angular/forms';
 import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
 import { ClockFormatService } from '../../../cross-cutting/operation-management/clock-format-service/clock-format.service';
+import { ButtonTaskComponent } from '../../ui-components/others/button-task/button-task.component';
+import { LoadingState } from '../../model/loading-state.type';
 
 @Component({
   selector: 'app-config-management',
-  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, TranslatePipe, FormsModule, ReadableDatePipe],
+  imports: [CommonModule, ...SHARED_STANDALONE_COMPONENTS, TranslatePipe, FormsModule, ReadableDatePipe, ButtonTaskComponent],
   standalone: true,
   templateUrl: './config-management.component.html',
   styleUrl: './config-management.component.scss'
@@ -53,14 +55,12 @@ export class ConfigManagementComponent {
     });
   }
 
-setHourFormat(is12: boolean) {
-  this.hour12 = is12;
-}
-
-
-  setClockFormat() {
-    this.clockFormatService.setHour12(this.hour12);
+  setHourFormat(is12: boolean) {
+    this.hour12 = is12;
   }
+
+
+
 
   toggleTheme() {
     this.themeService.setTheme(this.currentTheme);
@@ -70,25 +70,49 @@ setHourFormat(is12: boolean) {
     this.themeService.setTheme(theme);
   }
 
-  changeLanguageToEnglish(): void {
-    this.i18nService.setLanguage(LanguageTypes.en_US);
-  }
-
-  changeLanguageToSpanish(): void {
-    this.i18nService.setLanguage(LanguageTypes.es_MX);
-  }
 
   changeLanguage(lang: LanguageTypes) {
     this.i18nService.setLanguage(lang);
+
   }
 
   changeTimeZone() {
+    this.timezoneState = LoadingState.LOADING;
+
     if (this.selectedTimeZone && this.availableTimeZones.includes(this.selectedTimeZone)) {
       this.timeZoneService.setTimeZone(this.selectedTimeZone);
+
+      setTimeout(() => {
+        this.timezoneState = LoadingState.SUCCESSFUL_TASK;
+      }, 500);
     } else {
-      alert('Zona horaria no válida');
+      this.timezoneState = LoadingState.UNSUCCESSFUL_TASK;
     }
   }
+
+
+  setClockFormat() {
+    this.clockFormatState = LoadingState.LOADING;
+    this.clockFormatService.setHour12(this.hour12);
+
+    setTimeout(() => {
+      this.clockFormatState = LoadingState.SUCCESSFUL_TASK;
+    }, 500);
+  }
+
+  changeCurrency() {
+    this.localCurrencyState = LoadingState.LOADING;
+    setTimeout(() => {
+      this.localCurrencyState = LoadingState.SUCCESSFUL_TASK;
+    }, 500);
+
+  }
+
+  localCurrencyState: LoadingState = LoadingState.NO_ACTION_PERFORMED;
+  timezoneState: LoadingState = LoadingState.NO_ACTION_PERFORMED;
+  clockFormatState: LoadingState = LoadingState.NO_ACTION_PERFORMED;
+
+
 
 
 }

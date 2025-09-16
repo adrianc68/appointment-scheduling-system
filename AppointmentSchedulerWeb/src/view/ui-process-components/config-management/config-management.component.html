@@ -129,8 +129,8 @@
         <select [(ngModel)]="selectedTimeZone" class="input m-bottom-md">
           <option *ngFor="let tz of availableTimeZones" [value]="tz">{{ tz }}</option>
         </select>
-
-        <button class="button primary" (click)="changeTimeZone()">Aplicar</button>
+        <app-button-task class="w-100" [loadingState]="timezoneState" (click)="changeTimeZone()" text="Aplicar"
+          successfulText="Cambios aplicados" />
       </div>
     </section>
 
@@ -160,7 +160,8 @@
         </div>
       </div>
       <div class="item-content d-flex gap-base">
-        <button class="button primary" (click)="setClockFormat()">Aplicar</button>
+        <app-button-task class="w-100" [loadingState]="clockFormatState" (click)="setClockFormat()" text="Aplicar"
+          successfulText="Cambios aplicados" />
       </div>
     </section>
 
@@ -178,7 +179,8 @@
         <!--  <option *ngFor="let tz of availableTimeZones" [value]="tz">{{ tz }}</option>-->
         <!--</select>-->
 
-        <button class="button primary">Aplicar</button>
+        <app-button-task class="w-100" [loadingState]="localCurrencyState" (click)="changeCurrency()" text="Aplicar"
+          successfulText="Cambios aplicados" />
       </div>
     </section>
 
