@@ -3,6 +3,7 @@ import { I18nService } from '../i18n/i18n.service';
 import { LanguageTypes } from '../i18n/model/languages.types';
 import { TimeZoneService } from '../../operation-management/timeZoneService/time-zone.service';
 import { ClockFormatService } from '../../operation-management/clock-format-service/clock-format.service';
+import { isSubscription } from 'rxjs/internal/Subscription';
 
 
 
@@ -32,7 +33,18 @@ export class ReadableTimePipe implements PipeTransform {
   transform(isoString: string | Date | null | undefined, timeZone?: string): string {
     if (!isoString) return '';
 
-    const date = new Date(isoString);
+
+    let date: Date;
+
+    if (typeof isoString === 'string' && /^\d{1,2}:\d{2}(:\d{2})?$/.test(isoString)) {
+      const parts = isoString.split(':').map(Number);
+      const [hours, minutes, seconds = 0] = parts;
+      const today = new Date();
+      date = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hours, minutes, seconds);
+    } else {
+      date = new Date(isoString);
+      if (isNaN(date.getTime())) return '';
+    }
 
     const formattedTime = date.toLocaleTimeString(this.getCurrentLanguage(), {
       hour: '2-digit',

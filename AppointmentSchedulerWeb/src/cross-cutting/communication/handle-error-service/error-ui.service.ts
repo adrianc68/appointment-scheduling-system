@@ -12,10 +12,6 @@ export class ErrorUIService {
   constructor() { }
 
   public handleError<T>(response: OperationResult<T, ApiDataErrorResponse>): string | undefined {
-    console.log("<<<<<<<<<<<");
-    console.log(response);
-
-    console.log("<<<<<<<<<<<");
     let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
 
     if (isGenericErrorResponse(response.error)) {

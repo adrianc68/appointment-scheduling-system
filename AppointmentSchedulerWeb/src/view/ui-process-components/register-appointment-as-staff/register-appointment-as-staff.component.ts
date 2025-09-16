@@ -7,28 +7,23 @@ import { ServiceOffer } from '../../../view-model/business-entities/service-offe
 import { Appointment } from '../../../view-model/business-entities/appointment';
 import { SchedulerService } from '../../../model/communication-components/scheduler.service';
 import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
-import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
-import { Observable, of, switchMap } from 'rxjs';
+import { map } from 'rxjs';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
-import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
+import { ApiDataErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { Client } from '../../../view-model/business-entities/client';
 import { ClientService } from '../../../model/communication-components/client.service';
-import { SlotDateRangePipe } from '../../../cross-cutting/helper/date-utils/slot-date-range.pipe';
 import { ReadableTimePipe } from '../../../cross-cutting/helper/date-utils/readable-time.pipe';
 import { ReadableDatePipe } from '../../../cross-cutting/helper/date-utils/readable-date.pipe';
-import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
 import { CalendarComponent } from '../../ui-components/display/calendar/calendar.component';
 import { AvailabilityTimeSlot } from '../../../view-model/business-entities/availability-time-slot';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 
-
-
 @Component({
   selector: 'app-register-appointment-as-staff',
-  imports: [CommonModule, FormsModule, MatIconModule, SlotDateRangePipe, ReadableTimePipe, ReadableDatePipe, DurationDatePipe, CalendarComponent, DragDropModule],
+  imports: [CommonModule, FormsModule, MatIconModule, ReadableTimePipe, ReadableDatePipe, CalendarComponent, DragDropModule],
   templateUrl: './register-appointment-as-staff.component.html',
   styleUrl: './register-appointment-as-staff.component.scss'
 })
@@ -59,19 +54,23 @@ export class RegisterAppointmentAsStaffComponent {
     }
   }
 
-  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private loggingService: LoggingService, private clientService: ClientService, private errorUIService: ErrorUIService) {
+  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private clientService: ClientService, private errorUIService: ErrorUIService) {
+    this.getClientList();
+  }
+
+  getClientList(): void {
     this.clientService.getClientList().pipe(
-      switchMap((response: OperationResult<Client[], ApiDataErrorResponse>): Observable<boolean> => {
+      map((response: OperationResult<Client[], ApiDataErrorResponse>): boolean => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           this.clients = [...response.result!];
-          return of(true);
+          return true;
         } else {
           this.errorUIService.handleError(response);
           const validationErrors = this.errorUIService.getValidationErrors(response);
           Object.entries(validationErrors).forEach(([field, messages]) => {
             this.setErrorValidationMessage(field, messages);
           });
-          return of(false);
+          return false;
         }
       })
     ).subscribe();
@@ -88,19 +87,19 @@ export class RegisterAppointmentAsStaffComponent {
     };
 
     this.schedulerService.blockTimeRange(payload).pipe(
-      switchMap((response: OperationResult<Date, ApiDataErrorResponse>): Observable<boolean> => {
+      map((response: OperationResult<Date, ApiDataErrorResponse>): boolean => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          console.log(response);
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.systemMessage = response.result ? new Date(response.result).toISOString() : code;
-          return of(true);
+          return true;
         } else {
-          this.errorUIService.handleError(response);
+          let code = this.errorUIService.handleError(response);
+          this.systemMessage = code;
           const validationErrors = this.errorUIService.getValidationErrors(response);
           Object.entries(validationErrors).forEach(([field, messages]) => {
             this.setErrorValidationMessage(field, messages);
           });
-          return of(false);
+          return false;
         }
       })
     ).subscribe();
@@ -117,19 +116,19 @@ export class RegisterAppointmentAsStaffComponent {
     };
 
     this.schedulerService.registerAppointmentAsClient(payload).pipe(
-      switchMap((response: OperationResult<Date, ApiDataErrorResponse>): Observable<boolean> => {
+      map((response: OperationResult<Date, ApiDataErrorResponse>): boolean => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          console.log(response);
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.systemMessage = code;
-          return of(true);
+          return true;
         } else {
-          this.errorUIService.handleError(response);
+          let code = this.errorUIService.handleError(response);
+          this.systemMessage = code;
           const validationErrors = this.errorUIService.getValidationErrors(response);
           Object.entries(validationErrors).forEach(([field, messages]) => {
             this.setErrorValidationMessage(field, messages);
           });
-          return of(false);
+          return false;
         }
       })
     ).subscribe();
@@ -149,19 +148,20 @@ export class RegisterAppointmentAsStaffComponent {
     };
 
     this.schedulerService.registerAppointmentAsStaff(payload).pipe(
-      switchMap((response: OperationResult<Date, ApiDataErrorResponse>): Observable<boolean> => {
+      map((response: OperationResult<Date, ApiDataErrorResponse>): boolean => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          console.log(response);
           let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.systemMessage = code;
-          return of(true);
+          return true;
         } else {
-          this.errorUIService.handleError(response);
+          let code = this.errorUIService.handleError(response);
+          this.systemMessage = code;
           const validationErrors = this.errorUIService.getValidationErrors(response);
           Object.entries(validationErrors).forEach(([field, messages]) => {
             this.setErrorValidationMessage(field, messages);
           });
-          return of(false);
+
+          return false;
         }
       })
     ).subscribe();
@@ -190,7 +190,7 @@ export class RegisterAppointmentAsStaffComponent {
 
   private formatDateToApi(date: Date): string {
     const year = date.getUTCFullYear();
-    const month = date.getUTCMonth() + 1; // enero = 0
+    const month = date.getUTCMonth() + 1;
     const day = date.getUTCDate();
     return `${year}-${month}-${day}`;
   }
@@ -202,20 +202,17 @@ export class RegisterAppointmentAsStaffComponent {
     this.scheduledAppointments = [];
 
     this.schedulerService.getScheduledOrConfirmedAppointmentsAsStaff(startDate, endDate).pipe(
-      switchMap((response: OperationResult<Appointment[], ApiDataErrorResponse>): Observable<boolean> => {
+      map((response: OperationResult<Appointment[], ApiDataErrorResponse>): boolean => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.scheduledAppointments = [...response.result!];
-          this.scheduledAppointments.map(d => console.log(d));
-          //this.systemMessage = code;
-          return of(true);
+          return true;
         } else {
           this.errorUIService.handleError(response);
           const validationErrors = this.errorUIService.getValidationErrors(response);
           Object.entries(validationErrors).forEach(([field, messages]) => {
             this.setErrorValidationMessage(field, messages);
           });
-          return of(false);
+          return false;
         }
       })
     ).subscribe();
@@ -223,19 +220,19 @@ export class RegisterAppointmentAsStaffComponent {
 
   getAvailableServices(date: string) {
     this.schedulerService.getAvailableServices(date).pipe(
-      switchMap((response: OperationResult<ServiceOffer[], ApiDataErrorResponse>): Observable<boolean> => {
+      map((response: OperationResult<ServiceOffer[], ApiDataErrorResponse>): boolean => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           this.servicesAvailable = [...response.result!].sort((a, b) =>
             a.name.localeCompare(b.name)
           );
-          return of(true);
+          return true;
         } else {
           this.errorUIService.handleError(response);
           const validationErrors = this.errorUIService.getValidationErrors(response);
           Object.entries(validationErrors).forEach(([field, messages]) => {
             this.setErrorValidationMessage(field, messages);
           });
-          return of(false);
+          return false;
         }
       })
     ).subscribe();
@@ -243,13 +240,14 @@ export class RegisterAppointmentAsStaffComponent {
 
   getAvailabilityTimeSlots(startDate: string, endDate: string) {
     this.schedulerService.getAvailabilityTimeSlots(startDate, endDate).pipe(
-      switchMap((response: OperationResult<AvailabilityTimeSlot[], ApiDataErrorResponse>): Observable<boolean> => {
+      map((response: OperationResult<AvailabilityTimeSlot[], ApiDataErrorResponse>): boolean => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
           this.availabilitySlots = response.result ?? [];
           this.slots = response.result!.map(slot => ({
             startDate: new Date(slot.startDate).toISOString(),
             endDate: new Date(slot.endDate).toISOString()
-          })); return of(true);
+          }));
+          return true;
         } else {
           this.errorUIService.handleError(response);
           const validationErrors = this.errorUIService.getValidationErrors(response);
@@ -257,7 +255,7 @@ export class RegisterAppointmentAsStaffComponent {
             this.setErrorValidationMessage(field, messages);
           });
           // return false;
-          return of(false);
+          return false;
         }
       })
     ).subscribe();
@@ -566,7 +564,7 @@ export class RegisterAppointmentAsStaffComponent {
   }
 
 
-  trackByUuid(index: number, service: ServiceOffer) {
+  trackByUuid(_: number, service: ServiceOffer) {
     return service.uuid;
   }
 

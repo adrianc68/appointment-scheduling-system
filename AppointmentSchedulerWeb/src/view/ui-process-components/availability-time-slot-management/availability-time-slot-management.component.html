@@ -90,19 +90,20 @@
                 <span class="t-emphasis">{{ (slot.startDate | slotDateRange: (slot.endDate)).split('|')[0]}}</span>
               </div>
               <div class="slot-data d-flex-col">
-                <span class="t-muted">Horario inicio</span>
-                <span class="t-emphasis">{{ slot.startDate | readableTime }}</span>
+                <span class="t-muted">Nombre del asistente</span>
+                <span class="t-emphasis">{{ slot.assistant.name }}</span>
               </div>
             </div>
             <div class="slot-data-row">
               <div class="slot-data d-flex-col">
+                <span class="t-muted">Horario inicio</span>
+                <span class="t-emphasis">{{ slot.startDate | readableTime }}</span>
+              </div>
+              <div class="slot-data d-flex-col">
                 <span class="t-muted">Horario fin</span>
                 <span class="t-emphasis">{{ slot.endDate | readableTime }}</span>
               </div>
-              <div class="slot-data d-flex-col">
-                <span class="t-muted">Nombre del asistente</span>
-                <span class="t-emphasis">{{ slot.assistant.name }}</span>
-              </div>
+
             </div>
             <div class="slot-data-row">
               <div class="slot-data d-flex-col">

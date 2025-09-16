@@ -25,7 +25,7 @@
           </div>
         </div>
         <div class="data-header">
-          <span>Servicios disponibles en: {{selectedDate}}</span>
+          <span>Servicios disponibles en: {{selectedDate | readableDate}}</span>
         </div>
         <div class="data-body table-type">
           <div class="data-body-no-data" *ngIf="servicesAvailable?.length === 0">
@@ -109,11 +109,11 @@
               <!-- Conflictos con otras citas -->
               <div *ngIf="getServiceConflictInfo(serviceOffer).conflictingAppointments.length">
                 <span>
-                  Este servicio tiene conflicto con otros servicios de otras citas:
+                  El asistente o servicio no está disponible en este horario:
                 </span>
                 <div *ngFor="let app of getServiceConflictInfo(serviceOffer).conflictingAppointments">
                   <span>
-                    - {{ app.start | date:'shortTime' }} - {{ app.end | date:'shortTime' }}
+                    - {{ app.start | readableTime }} - {{ app.end | readableTime }}
                     | Servicio: {{ app.serviceName }}
                   </span>
                 </div>
@@ -129,8 +129,7 @@
 
                 <div *ngFor="let slot of getAvailabilityAndUnavailableForSelectedDate(serviceOffer)">
                   <span>
-                    - Jornada: {{ slot.availabilityStart | date:'shortTime' }} - {{ slot.availabilityEnd |
-                    date:'shortTime' }}
+                    - Jornada: {{ slot.availabilityStart | readableTime }} - {{ slot.availabilityEnd | readableTime }}
                   </span>
                   <div *ngIf="slot.unavailableSlots.length > 0">
                     <span>
@@ -140,7 +139,7 @@
                     <ul class="m-left-md">
                       <li *ngFor="let u of slot.unavailableSlots; let i = index">
                         <span>
-                          {{ u.start | date:'shortTime' }} - {{ u.end | date:'shortTime' }}
+                          {{ u.start | readableTime }} - {{ u.end |  readableTime}}
                           <br>
                         </span>
 
@@ -171,11 +170,11 @@
                 </div>
                 <div class="m-top-base d-flex gap-base">
                   <span class="fs-sm w-auto t-muted">Hora de inicio:</span>
-                  <span class="fs-sm">{{ startTimes[serviceOffer.uuid] }}</span>
+                  <span class="fs-sm">{{ startTimes[serviceOffer.uuid] | readableTime }}</span>
                 </div>
                 <div class="m-top-base d-flex gap-base">
                   <span class="fs-sm w-auto t-muted">Fin:</span>
-                  <span class="fs-sm">{{ getEndTime(serviceOffer) }}</span>
+                  <span class="fs-sm">{{ getEndTime(serviceOffer) | readableTime }}</span>
                 </div>
               </div>
               <button class="button bordered m-y-center w-auto p-all-sm" (click)="removeSelectedService(serviceOffer)">

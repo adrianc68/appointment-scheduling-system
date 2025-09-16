@@ -1,75 +1,502 @@
 <section class="main-section">
-  <ul>
-    <li>
-      <a [routerLink]="[webRoutes.appointment_management]">
-        <div class="page-icon">
-          <mat-icon class="icon">calendar_month</mat-icon>
-        </div>
-        <span>
-          {{translate(translationCodes.TC_APPOINTMENT_CREATE_DIRECTORY)}}
-        </span>
-      </a>
-    </li>
-    <li>
-      <a [routerLink]="[webRoutes.availability_time_slot_management]">
-        <div class="page-icon">
-          <mat-icon class="icon">access_time</mat-icon>
-        </div>
-        <span>
-          {{translate(translationCodes.TC_MANAGEMENT_AVAILABILITY_TIME_SLOT_DIRECTORY) }}
-        </span>
-      </a>
-    </li>
-    <li>
-      <a [routerLink]="[webRoutes.service_offer_management]">
-        <div class="page-icon">
-          <mat-icon class="icon">assignment</mat-icon>
-        </div>
-        <span>
-          {{translate(translationCodes.TC_MANAGEMENT_SERVICE_OFFER_DIRECTORY) }}
-        </span>
-      </a>
-    </li>
-    <li>
-      <a [routerLink]="[webRoutes.assistant_management]">
-        <div class="page-icon">
-          <mat-icon class="icon">support_agent</mat-icon>
-        </div>
-        <span>
-          {{translate(translationCodes.TC_MANAGEMENT_ASSISTANT_DIRECTORY) }}
-        </span>
-      </a>
-    </li>
-    <li>
-      <a [routerLink]="[webRoutes.service_management]">
-        <div class="page-icon">
-          <mat-icon class="icon">business_center</mat-icon>
-        </div>
-        <span>
-          {{translate(translationCodes.TC_MANAGEMENT_SERVICE_DIRECTORY) }}
-        </span>
-      </a>
-    </li>
-    <li>
-      <a [routerLink]="[webRoutes.client_management]">
-        <div class="page-icon">
-          <mat-icon class="icon">groups_3</mat-icon>
-        </div>
-        <span>
-          {{ translate(translationCodes.TC_MANAGEMENT_CLIENT_DIRECTORY)}}
-        </span>
-      </a>
-    </li>
+  <h1 class="m-bottom-base">Dashboard</h1>
+  <p class="m-bottom-lg">Bienvenido de vuelta. Aquí encuentras un resumen para esta semana</p>
 
-    <li>
-      <a [routerLink]="[webRoutes.configuration]">
-        <div class="page-icon">
-          <mat-icon class="icon">settings</mat-icon>
+  <div class="summary-data-management m-bottom-lg">
+    <div class="summary-item card">
+      <span class="t-muted">Citas programadas</span>
+      <span class="fw-bold fs-xl">{{ scheduledAppointments.length }}</span>
+    </div>
+    <div class="summary-item card">
+      <span class="t-muted">Citas canceladas</span>
+      <span class="fw-bold fs-xl">{{ getConfirmedAppointments() }}</span>
+    </div>
+    <div class="summary-item card">
+      <span class="t-muted">Citas por confirmar</span>
+      <span class="fw-bold fs-xl">{{ getCancelledAppointments() }}</span>
+    </div>
+  </div>
+
+  <h2 class="m-bottom-md">Hoy</h2>
+  <section class="data-container m-bottom-lg">
+    <div class="data-header">
+      <span class="fw-bold">Citas</span>
+    </div>
+    <div class="data-body table-type">
+      <div class="data-body-no-data" *ngIf="scheduledAppointments?.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <span>No se han encontrado registros</span>
+      </div>
+
+      <div class="card-container data-row-item accordion-type"
+        *ngFor="let appointment of getAppointmentsForTodayUTC(); let i = index">
+        <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
+          <div class="card-title d-flex">
+            <div class="d-flex gap-md j-content-between a-items-center">
+              <span class="fs-base fw-bold t-emphasis">
+                {{ appointment.startDate | readableTime}}
+              </span>
+              <span class="fs-base fw-bold t-emphasis">
+                {{ appointment.client!.name}}
+              </span>
+              <span class="fs-xs fw-bold" [ngClass]="{
+        't-success': appointment.status === 'CONFIRMED',
+        't-brand': appointment.status === 'SCHEDULED',
+        't-danger': appointment.status === 'CANCELED',
+        't-inverted': appointment.status === 'RESCHEDULED',
+        't-muted': appointment.status === 'FINISHED',}">
+                {{ appointment.status }}
+              </span>
+            </div>
+          </div>
+
+          <button [class.clicked]="openedSlots.has(i)">
+            <mat-icon>
+              keyboard_arrow_right
+            </mat-icon>
+          </button>
+
         </div>
-        <span>
-          {{translate(translationCodes.TC_CONFIGURATION_DIRECTORY)}}
-        </span>
-      </a>
-    </li>
-  </ul>
-</section>
+        <div class="card-body accordion-body" [class.expanded]="openedSlots.has(i)">
+          <div class="wrapper p-left-lg p-right-lg p-top-md p-bottom-lg">
+            <div class="data-mgt">
+              <div class="slot-data-row unbordered">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Fecha:
+                  </span>
+                  <span class="t-emphasis ">
+                    {{ (appointment.startDate | slotDateRange: (appointment.endDate)).split('|')[0]}}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Hora de inicio:
+                  </span>
+                  <span class="t-emphasis ">
+                    {{ appointment.startDate | readableTime }}
+                  </span>
+                </div>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Hora de fin:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.endDate | readableTime }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Estado:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.status }}
+                  </span>
+                </div>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Costo:
+                  </span>
+                  <span class="t-emphasis">
+                    $ {{ appointment.totalCost}}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Duración:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.startDate | durationDate:appointment.endDate }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data  d-flex-col">
+                  <span class="t-muted">
+                    Fecha de creación:
+                  </span>
+                  <span class="t-emphasis fs-base">
+                    {{ appointment.createdAt | readableDate }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+
+              </div>
+
+
+
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Identificador:
+                  </span>
+                  <span class="t-emphasis fs-base">
+                    {{ appointment.uuid }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="data-mgt m-bottom-md m-top-md">
+              <span class="t-muted">Cliente: </span>
+              <div class="slot-data-row unbordered">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Nombre:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.client!.name }}
+                  </span>
+                </div>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Teléfono:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.client!.phoneNumber }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Usuario:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.client?.username }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Correo:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.client!.email }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <span class="t-muted">Servicios: </span>
+            <div class="slot-data-row type-card d-flex-col transparent p-all-sm m-top-base"
+              *ngFor="let scheduleService of appointment.scheduledServices">
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Servicio:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  {{ scheduleService.service.name }}
+                </span>
+              </div>
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Precio:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  $ {{ scheduleService.service.price }}
+                </span>
+              </div>
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Fecha:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  {{ (scheduleService.service.startDate | slotDateRange: (scheduleService.service.endDate))}}
+                </span>
+              </div>
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Duración:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  {{ scheduleService.service.startDate | durationDate:scheduleService.service.endDate}}
+                </span>
+              </div>
+            </div>
+
+            <span class="t-muted m-top-md">Asistentes: </span>
+            <div class="slot-data-row type-card d-flex-col transparent p-all-sm m-top-base"
+              *ngFor="let scheduleService of appointment.scheduledServices">
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Asistente:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  {{ scheduleService.assistant.name }}
+                </span>
+              </div>
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Teléfono:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  {{ scheduleService.assistant.phoneNumber }}
+                </span>
+              </div>
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Fecha de servicio:
+                </span>
+                <span class="t-emphasis">
+                  {{ (scheduleService.service.startDate | slotDateRange: (scheduleService.service.endDate))}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+
+  <h2 class="m-bottom-md">Por venir...</h2>
+  <section class="data-container">
+    <div class="data-header">
+      <span class="fw-bold">Citas agendadas</span>
+    </div>
+
+    <div class="data-body table-type">
+      <div class="data-body-no-data" *ngIf="scheduledAppointments?.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <span>No se han encontrado registros</span>
+      </div>
+
+      <div class="card-container data-row-item accordion-type"
+        *ngFor="let appointment of getAppointmentsNotForTodayUTC(); let i = index">
+        <div class="card-header" [class.expanded]="openedSlotsNotToday.has(i)" (click)="toggleSlotNotToday(i)">
+          <div class="card-icon">
+            <mat-icon>event_note</mat-icon>
+          </div>
+          <div class="card-title d-flex">
+            <div class="d-flex-col">
+              <span class="fs-base fw-bold t-emphasis m-bottom-base">
+                Cita de: {{ appointment.client!.name}}
+              </span>
+              <span class="fs-sm t-muted">
+                {{ appointment.startDate | readableDate}}
+              </span>
+            </div>
+            <span class="fs-xs fw-bold" [ngClass]="{
+        't-success': appointment.status === 'CONFIRMED',
+        't-brand': appointment.status === 'SCHEDULED',
+        't-danger': appointment.status === 'CANCELED',
+        't-inverted': appointment.status === 'RESCHEDULED',
+        't-muted': appointment.status === 'FINISHED',}">
+              {{ appointment.status }}
+            </span>
+          </div>
+
+          <button [class.clicked]="openedSlots.has(i)">
+            <mat-icon>
+              keyboard_arrow_right
+            </mat-icon>
+          </button>
+
+        </div>
+        <div class="card-body accordion-body" [class.expanded]="openedSlots.has(i)">
+          <div class="wrapper p-left-lg p-right-lg p-top-md p-bottom-lg">
+            <div class="data-mgt">
+              <div class="slot-data-row unbordered">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Fecha:
+                  </span>
+                  <span class="t-emphasis ">
+                    {{ (appointment.startDate | slotDateRange: (appointment.endDate)).split('|')[0]}}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Hora de inicio:
+                  </span>
+                  <span class="t-emphasis ">
+                    {{ appointment.startDate | readableTime }}
+                  </span>
+                </div>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Hora de fin:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.endDate | readableTime }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Estado:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.status }}
+                  </span>
+                </div>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Costo:
+                  </span>
+                  <span class="t-emphasis">
+                    $ {{ appointment.totalCost}}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Duración:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.startDate | durationDate:appointment.endDate }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data  d-flex-col">
+                  <span class="t-muted">
+                    Fecha de creación:
+                  </span>
+                  <span class="t-emphasis fs-base">
+                    {{ appointment.createdAt | readableDate }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+
+              </div>
+
+
+
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Identificador:
+                  </span>
+                  <span class="t-emphasis fs-base">
+                    {{ appointment.uuid }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="data-mgt m-bottom-md m-top-md">
+              <span class="t-muted">Cliente: </span>
+              <div class="slot-data-row unbordered">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Nombre:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.client!.name }}
+                  </span>
+                </div>
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Teléfono:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.client!.phoneNumber }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Usuario:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.client?.username }}
+                  </span>
+                </div>
+              </div>
+              <div class="slot-data-row">
+                <div class="slot-data d-flex-col">
+                  <span class="t-muted">
+                    Correo:
+                  </span>
+                  <span class="t-emphasis">
+                    {{ appointment.client!.email }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <span class="t-muted">Servicios: </span>
+            <div class="slot-data-row type-card d-flex-col transparent p-all-sm m-top-base"
+              *ngFor="let scheduleService of appointment.scheduledServices">
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Servicio:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  {{ scheduleService.service.name }}
+                </span>
+              </div>
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Precio:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  $ {{ scheduleService.service.price }}
+                </span>
+              </div>
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Fecha:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  {{ (scheduleService.service.startDate | slotDateRange: (scheduleService.service.endDate))}}
+                </span>
+              </div>
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Duración:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  {{ scheduleService.service.startDate | durationDate:scheduleService.service.endDate}}
+                </span>
+              </div>
+            </div>
+
+            <span class="t-muted m-top-md">Asistentes: </span>
+            <div class="slot-data-row type-card d-flex-col transparent p-all-sm m-top-base"
+              *ngFor="let scheduleService of appointment.scheduledServices">
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Asistente:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  {{ scheduleService.assistant.name }}
+                </span>
+              </div>
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Teléfono:
+                </span>
+                <span class="t-emphasis m-left-base">
+                  {{ scheduleService.assistant.phoneNumber }}
+                </span>
+              </div>
+              <div class="slot-data d-inline">
+                <span class="t-muted">
+                  Fecha de servicio:
+                </span>
+                <span class="t-emphasis">
+                  {{ (scheduleService.service.startDate | slotDateRange: (scheduleService.service.endDate))}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>

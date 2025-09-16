@@ -12,27 +12,27 @@
     <ng-container *ngSwitchCase="loadingStateType.LOADING">
       <span>
         <!--{{ translate(loadingState) }}-->
-        Cargando...
+        {{ loadingText}}
       </span>
       <mat-icon class="loading-icon">loop</mat-icon>
     </ng-container>
     <ng-container *ngSwitchCase="loadingStateType.SUCCESSFUL_TASK">
       <span>
-        Tarea completada exitosamente...
+        {{ successfulText}}
         <!--{{ translate(loadingState) }}-->
       </span>
       <mat-icon class="success-icon">check_circle</mat-icon>
     </ng-container>
     <ng-container *ngSwitchCase="loadingStateType.UNSUCCESSFUL_TASK">
       <span>
-        No se pudo completar la tarea
+        {{ unsuccessfulText}}
         <!--{{ translate(loadingState) }}-->
       </span>
       <mat-icon>error</mat-icon>
     </ng-container>
     <ng-container *ngSwitchCase="loadingStateType.WORK_DONE">
       <span>
-        {{ translate(loadingState) }}
+        {{ workDoneText }}
       </span>
       <mat-icon>task_alt</mat-icon>
     </ng-container>
