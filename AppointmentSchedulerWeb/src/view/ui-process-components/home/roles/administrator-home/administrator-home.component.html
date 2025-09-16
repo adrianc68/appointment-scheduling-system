@@ -295,14 +295,14 @@
             </span>
           </div>
 
-          <button [class.clicked]="openedSlots.has(i)">
+          <button [class.clicked]="openedSlotsNotToday.has(i)">
             <mat-icon>
               keyboard_arrow_right
             </mat-icon>
           </button>
 
         </div>
-        <div class="card-body accordion-body" [class.expanded]="openedSlots.has(i)">
+        <div class="card-body accordion-body" [class.expanded]="openedSlotsNotToday.has(i)">
           <div class="wrapper p-left-lg p-right-lg p-top-md p-bottom-lg">
             <div class="data-mgt">
               <div class="slot-data-row unbordered">
