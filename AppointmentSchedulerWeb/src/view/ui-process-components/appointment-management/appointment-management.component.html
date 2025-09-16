@@ -72,7 +72,7 @@
         *ngFor="let appointment of scheduledAppointments; let i = index">
         <div class="card-header" [class.expanded]="openedSlots.has(i)" (click)="toggleSlot(i)">
           <div class="card-icon">
-            <mat-icon>person</mat-icon>
+            <mat-icon>event_note</mat-icon>
           </div>
           <div class="card-title d-flex">
             <div class="d-flex-col">
