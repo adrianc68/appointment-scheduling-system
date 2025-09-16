@@ -22,6 +22,7 @@ import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/durat
 import { CalendarComponent } from '../../ui-components/display/calendar/calendar.component';
 import { AvailabilityTimeSlot } from '../../../view-model/business-entities/availability-time-slot';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 
 
 
@@ -45,6 +46,8 @@ export class RegisterAppointmentAsStaffComponent {
   slots: { startDate: string, endDate: string }[] = [];
   globalStartTime: string = '';
 
+  availabilitySlots: AvailabilityTimeSlot[] = [];
+
   openedSlots = new Set<number>();
   currentStep = 1;
   previousStep = 1;
@@ -56,145 +59,25 @@ export class RegisterAppointmentAsStaffComponent {
     }
   }
 
-
-  trackByUuid(index: number, service: ServiceOffer) {
-    return service.uuid;
-  }
-
-
-
-  updateStartTimesFromGlobal() {
-    if (!this.globalStartTime) return;
-
-    let [h, m, s] = this.globalStartTime.split(':').map(Number);
-    let currentDate = new Date();
-    currentDate.setHours(h, m, 0, 0);
-
-    this.selectedServicesOffer.forEach(service => {
-      const startStr = currentDate.toTimeString().split(' ')[0];
-      this.startTimes[service.uuid] = startStr;
-
-      currentDate.setMinutes(currentDate.getMinutes() + service.minutes);
-    });
-  }
-
-  getEndTime(service: ServiceOffer): string {
-    const start = this.startTimes[service.uuid];
-    if (!start) return '';
-
-    const [hours, minutes, seconds] = start.split(':').map(Number);
-    const totalMinutes = hours * 60 + minutes + service.minutes;
-    const endHours = Math.floor(totalMinutes / 60);
-    const endMinutes = totalMinutes % 60;
-
-    //return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:${seconds}`;
-    return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:00`;
-
-  }
-
-
-
-
-  dropService(event: CdkDragDrop<any[]>) {
-    moveItemInArray(this.selectedServicesOffer, event.previousIndex, event.currentIndex);
-
-    this.updateStartTimesFromGlobal();
-
-  }
-
-  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private loggingService: LoggingService, private clientService: ClientService) {
+  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private loggingService: LoggingService, private clientService: ClientService, private errorUIService: ErrorUIService) {
     this.clientService.getClientList().pipe(
       switchMap((response: OperationResult<Client[], ApiDataErrorResponse>): Observable<boolean> => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
           this.clients = [...response.result!];
-          //this.systemMessage = code;
           return of(true);
         } else {
-          this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
           return of(false);
         }
       })
     ).subscribe();
   }
-
-
-
-  toggleSlot(index: number) {
-    if (this.openedSlots.has(index)) {
-      this.openedSlots.delete(index);
-    } else {
-      this.openedSlots.add(index);
-    }
-  }
-
-  getTotalMinutes(): number {
-    if (!this.selectedServicesOffer) return 0;
-    return this.selectedServicesOffer.reduce((total, service) => total + service.minutes, 0);
-  }
-
-  getTotalPrice(): number {
-    if (!this.selectedServicesOffer) return 0;
-    return this.selectedServicesOffer.reduce((total, service) => total + service.price, 0);
-  }
-
-  selectServiceOffer(serviceOffer: ServiceOffer) {
-    const exists = this.selectedServicesOffer.some(s => s.uuid === serviceOffer.uuid);
-    if (!exists) {
-      this.selectedServicesOffer.push(serviceOffer);
-
-      this.updateStartTimesFromGlobal();
-
-      const index = this.servicesAvailable.findIndex(service => service.uuid === serviceOffer.uuid);
-      if (index !== -1) {
-        this.servicesAvailable.splice(index, 1);
-      }
-    }
-  }
-
-  removeSelectedService(serviceOffer: ServiceOffer) {
-    const index = this.selectedServicesOffer.findIndex(service => service.uuid === serviceOffer.uuid);
-    if (index !== -1) {
-      this.selectedServicesOffer.splice(index, 1);
-
-      this.servicesAvailable.push(serviceOffer);
-    }
-  }
-
-  loadAppointments(startDate: string, endDate: string): void {
-    this.scheduledAppointments = [];
-
-    this.schedulerService.getScheduledOrConfirmedAppointmentsAsStaff(startDate, endDate).pipe(
-      switchMap((response: OperationResult<Appointment[], ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.scheduledAppointments = [...response.result!];
-          this.scheduledAppointments.map(d => console.log(d));
-          //this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      })
-    ).subscribe();
-  }
-
-
-  allStartTimesDefined(): boolean {
-    if (!this.selectedServicesOffer || this.selectedServicesOffer.length === 0) return false;
-
-    return this.selectedServicesOffer.every(service => {
-      const startTime = this.startTimes[service.uuid];
-      return startTime && startTime.trim() !== '';
-    });
-  }
-
-
 
   blockTimeRange(): void {
-    console.log(this.selectedDate);
-
     const payload = {
       date: this.selectedDate,
       clientUuid: this.selectedClient?.uuid,
@@ -203,12 +86,6 @@ export class RegisterAppointmentAsStaffComponent {
         startTime: this.startTimes[s.uuid]
       }))
     };
-    console.log("BLOCKED TIME RANGE PAYLOAD");
-    console.log(payload);
-
-    console.log("BLOCKED TIME RANGE PAYLOAD");
-
-
 
     this.schedulerService.blockTimeRange(payload).pipe(
       switchMap((response: OperationResult<Date, ApiDataErrorResponse>): Observable<boolean> => {
@@ -218,7 +95,11 @@ export class RegisterAppointmentAsStaffComponent {
           this.systemMessage = response.result ? new Date(response.result).toISOString() : code;
           return of(true);
         } else {
-          this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
           return of(false);
         }
       })
@@ -243,7 +124,11 @@ export class RegisterAppointmentAsStaffComponent {
           this.systemMessage = code;
           return of(true);
         } else {
-          this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
           return of(false);
         }
       })
@@ -253,7 +138,6 @@ export class RegisterAppointmentAsStaffComponent {
 
 
   registerAppointmentAsStaff(): void {
-    console.log("called");
 
     const payload = {
       date: this.selectedDate,
@@ -272,13 +156,178 @@ export class RegisterAppointmentAsStaffComponent {
           this.systemMessage = code;
           return of(true);
         } else {
-          this.handleErrorResponse(response);
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
           return of(false);
         }
       })
     ).subscribe();
   }
 
+
+
+  onDateSelected(date: string) {
+    this.selectedDate = date;
+    this.loadAppointments(date, date);
+    this.getAvailableServices(date);
+  }
+
+  onCurrentDateChange(date: Date) {
+    const start = new Date(date.getFullYear(), date.getMonth(), 1);
+    const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+    this.getAvailabilityTimeSlots(
+      this.formatDateToApi(start),
+      this.formatDateToApi(end)
+    );
+
+    this.selectedServicesOffer = [];
+    this.selectedClient = undefined;
+  }
+
+  private formatDateToApi(date: Date): string {
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth() + 1; // enero = 0
+    const day = date.getUTCDate();
+    return `${year}-${month}-${day}`;
+  }
+
+
+  errorValidationMessage: { [field: string]: string[] } = {};
+
+  loadAppointments(startDate: string, endDate: string): void {
+    this.scheduledAppointments = [];
+
+    this.schedulerService.getScheduledOrConfirmedAppointmentsAsStaff(startDate, endDate).pipe(
+      switchMap((response: OperationResult<Appointment[], ApiDataErrorResponse>): Observable<boolean> => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
+          this.scheduledAppointments = [...response.result!];
+          this.scheduledAppointments.map(d => console.log(d));
+          //this.systemMessage = code;
+          return of(true);
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return of(false);
+        }
+      })
+    ).subscribe();
+  }
+
+  getAvailableServices(date: string) {
+    this.schedulerService.getAvailableServices(date).pipe(
+      switchMap((response: OperationResult<ServiceOffer[], ApiDataErrorResponse>): Observable<boolean> => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          this.servicesAvailable = [...response.result!].sort((a, b) =>
+            a.name.localeCompare(b.name)
+          );
+          return of(true);
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return of(false);
+        }
+      })
+    ).subscribe();
+  }
+
+  getAvailabilityTimeSlots(startDate: string, endDate: string) {
+    this.schedulerService.getAvailabilityTimeSlots(startDate, endDate).pipe(
+      switchMap((response: OperationResult<AvailabilityTimeSlot[], ApiDataErrorResponse>): Observable<boolean> => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          this.availabilitySlots = response.result ?? [];
+          this.slots = response.result!.map(slot => ({
+            startDate: new Date(slot.startDate).toISOString(),
+            endDate: new Date(slot.endDate).toISOString()
+          })); return of(true);
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          // return false;
+          return of(false);
+        }
+      })
+    ).subscribe();
+  }
+
+
+  private setErrorValidationMessage(key: string, value: string[]) {
+    this.errorValidationMessage[key.toLowerCase()] = value;
+  }
+
+
+  selectServiceOffer(serviceOffer: ServiceOffer) {
+    const exists = this.selectedServicesOffer.some(s => s.uuid === serviceOffer.uuid);
+    if (!exists) {
+      this.selectedServicesOffer.push(serviceOffer);
+
+      this.updateStartTimesFromGlobal();
+
+      const index = this.servicesAvailable.findIndex(service => service.uuid === serviceOffer.uuid);
+      if (index !== -1) {
+        this.servicesAvailable.splice(index, 1);
+      }
+    }
+  }
+
+  removeSelectedService(serviceOffer: ServiceOffer) {
+    const index = this.selectedServicesOffer.findIndex(service => service.uuid === serviceOffer.uuid);
+    if (index !== -1) {
+      this.selectedServicesOffer.splice(index, 1);
+
+      this.servicesAvailable.push(serviceOffer);
+    }
+  }
+
+
+
+
+
+
+
+
+  dropService(event: CdkDragDrop<any[]>) {
+    moveItemInArray(this.selectedServicesOffer, event.previousIndex, event.currentIndex);
+    this.updateStartTimesFromGlobal();
+  }
+
+  updateStartTimesFromGlobal() {
+    if (!this.globalStartTime) return;
+
+    let [h, m, s] = this.globalStartTime.split(':').map(Number);
+    let currentDate = new Date();
+    currentDate.setHours(h, m, 0, 0);
+
+    this.selectedServicesOffer.forEach(service => {
+      const startStr = currentDate.toTimeString().split(' ')[0];
+      this.startTimes[service.uuid] = startStr;
+
+      currentDate.setMinutes(currentDate.getMinutes() + service.minutes);
+    });
+  }
+
+  getEndTime(service: ServiceOffer): string {
+    const start = this.startTimes[service.uuid];
+    if (!start) return '';
+    const [hours, minutes, seconds] = start.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes + service.minutes;
+    const endHours = Math.floor(totalMinutes / 60);
+    const endMinutes = totalMinutes % 60;
+    return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:00`;
+  }
 
   getEarliestStartTime(): Date | null {
     if (!this.selectedServicesOffer || this.selectedServicesOffer.length === 0) return null;
@@ -304,154 +353,21 @@ export class RegisterAppointmentAsStaffComponent {
     return end;
   }
 
+  allStartTimesDefined(): boolean {
+    if (!this.selectedServicesOffer || this.selectedServicesOffer.length === 0) return false;
 
-  onDateChange(date: string) {
-    this.selectedDate = date;
-    this.getAvailableServices(date);
-    this.loadAppointments(date, date);
-
-  }
-
-  onDateSelected(date: string) {
-    this.selectedDate = date;
-    console.log("SELECTEDDATE");
-    console.log(this.selectedDate);
-    this.loadAppointments(date, date);
-    this.getAvailableServices(date);
+    return this.selectedServicesOffer.every(service => {
+      const startTime = this.startTimes[service.uuid];
+      return startTime && startTime.trim() !== '';
+    });
   }
 
 
-
-  onCurrentDateChange(date: Date) {
-    const start = new Date(date.getFullYear(), date.getMonth(), 1);
-    const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-    this.getAvailabilityTimeSlots(
-      this.formatDateToApi(start),
-      this.formatDateToApi(end)
-    );
-
-    this.selectedServicesOffer = [];
-    this.selectedClient = undefined;
-  }
-
-  private formatDateToApi(date: Date): string {
-    const year = date.getUTCFullYear();
-    const month = date.getUTCMonth() + 1; // enero = 0
-    const day = date.getUTCDate();
-    return `${year}-${month}-${day}`;
-  }
-
-
-  //slots: AvailabilityTimeSlot[] = [];
-
-  availabilitySlots: AvailabilityTimeSlot[] = [];
-
-  getAvailabilityTimeSlots(startDate: string, endDate: string) {
-    this.schedulerService.getAvailabilityTimeSlots(startDate, endDate).pipe(
-      switchMap((response: OperationResult<AvailabilityTimeSlot[], ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          this.availabilitySlots = response.result ?? [];
-          this.slots = response.result!.map(slot => ({
-            startDate: new Date(slot.startDate).toISOString(),
-            endDate: new Date(slot.endDate).toISOString()
-          })); return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      })
-    ).subscribe();
-  }
-
-  getAvailableServices(date: string) {
-    this.schedulerService.getAvailableServices(date).pipe(
-      switchMap((response: OperationResult<ServiceOffer[], ApiDataErrorResponse>): Observable<boolean> => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-
-          this.servicesAvailable = [...response.result!].sort((a, b) =>
-            a.name.localeCompare(b.name)
-          );
-
-          //this.servicesAvailable.map(d => console.log(d));
-          //this.systemMessage = code;
-          return of(true);
-        } else {
-          this.handleErrorResponse(response);
-          return of(false);
-        }
-      })
-    ).subscribe();
-  }
-
-
-
-
-  private handleErrorResponse(response: OperationResult<any, ApiDataErrorResponse>): void {
-
-    let code = getStringEnumKeyByValue(MessageCodeType, MessageCodeType.UNKNOWN_ERROR);
-    console.log("handleErrorResponse");
-    console.log(code);
-    console.log(response);
-    console.log(response.error);
-    if (isGenericErrorResponse(response.error)) {
-      code = this.translationCodes.TC_GENERIC_ERROR_CONFLICT;
-      code = getStringEnumKeyByValue(MessageCodeType, response.error.message);
-    } else if (isValidationErrorResponse(response.error)) {
-      code = this.translationCodes.TC_VALIDATION_ERROR;
-    } else if (isServerErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    } else if (isEmptyErrorResponse(response.error)) {
-      code = getStringEnumKeyByValue(MessageCodeType, response.code);
-    }
-
-    this.systemMessage = code;
-  }
-
-  translate(key: string): string {
-    return this.i18nService.translate(key);
-  }
 
 
   private hasTimeConflict(start1: Date, end1: Date, start2: Date, end2: Date): boolean {
     return start1 < end2 && end1 > start2;
   }
-
-  //getServiceConflictInfo(service: ServiceOffer): ConflictInfo {
-  //  const startStr = this.startTimes[service.uuid];
-  //  if (!startStr) return { hasConflict: false, conflictingAppointments: [], unavailable: false };
-  //
-  //  const [hours, minutes] = startStr.split(':').map(Number);
-  //  const start = new Date(this.selectedDate + 'T00:00:00');
-  //  start.setHours(hours, minutes, 0, 0);
-  //
-  //  const end = new Date(start);
-  //  end.setMinutes(end.getMinutes() + service.minutes);
-  //
-  //  // Buscar conflictos con citas del mismo asistente
-  //  const conflictingAppointments = this.scheduledAppointments
-  //    .filter(app =>
-  //      app.scheduledServices?.some(s => s.assistant.uuid === service.assistant?.uuid) &&
-  //      this.hasTimeConflict(start, end, new Date(app.startDate), new Date(app.endDate))
-  //    )
-  //    .map(app => ({
-  //      start: new Date(app.startDate),
-  //      end: new Date(app.endDate),
-  //      clientName: app.client?.name || 'Cliente'
-  //    }));
-  //
-  //  // Verificar disponibilidad del asistente en los slots
-  //  const isAvailable = service.assistant ? this.isAssistantAvailable(service.assistant.uuid, start, end) : true;
-  //
-  //  return {
-  //    hasConflict: conflictingAppointments.length > 0 || !isAvailable,
-  //    conflictingAppointments,
-  //    unavailable: !isAvailable
-  //  };
-  //}
-  //
-  //
 
 
   getServiceConflictInfo(service: ServiceOffer): ConflictInfo {
@@ -530,11 +446,9 @@ export class RegisterAppointmentAsStaffComponent {
 
     const conflicts: { start: Date; end: Date }[] = [];
 
-    // Iteramos todos los slots del asistente
     this.availabilitySlots.forEach(slot => {
       if (slot.assistant?.uuid !== service.assistant!.uuid) return;
 
-      // Verificar si el servicio seleccionado se cruza con algún unavailableTimeSlot
       const serviceStartStr = this.startTimes[service.uuid];
       if (!serviceStartStr) return;
 
@@ -549,7 +463,6 @@ export class RegisterAppointmentAsStaffComponent {
       );
 
       if (overlaps) {
-        // Incluimos **todos** los unavailableTimeSlots del slot
         slot.unavailableTimeSlots.forEach(u => {
           conflicts.push({ start: new Date(u.startDate), end: new Date(u.endDate) });
         });
@@ -577,12 +490,9 @@ export class RegisterAppointmentAsStaffComponent {
       const slotStart = new Date(slot.startDate);
       const slotEnd = new Date(slot.endDate);
 
-      // Solo AvailabilityTimeSlot que intersecten con el selectedDate
       if (slotEnd > dayStart && slotStart < dayEnd) {
-        // Agregamos el rango completo del slot
         ranges.push({ start: slotStart, end: slotEnd, type: 'availability' });
 
-        // Agregamos los unavailableTimeSlots dentro de este slot
         slot.unavailableTimeSlots.forEach(u => {
           const uStart = new Date(u.startDate);
           const uEnd = new Date(u.endDate);
@@ -635,6 +545,17 @@ export class RegisterAppointmentAsStaffComponent {
   }
 
 
+  getTotalMinutes(): number {
+
+    if (!this.selectedServicesOffer) return 0;
+    return this.selectedServicesOffer.reduce((total, service) => total + service.minutes, 0);
+  }
+
+  getTotalPrice(): number {
+    if (!this.selectedServicesOffer) return 0;
+    return this.selectedServicesOffer.reduce((total, service) => total + service.price, 0);
+  }
+
 
   nextStep() {
     this.currentStep++;
@@ -644,6 +565,14 @@ export class RegisterAppointmentAsStaffComponent {
     this.currentStep--;
   }
 
+
+  trackByUuid(index: number, service: ServiceOffer) {
+    return service.uuid;
+  }
+
+  translate(key: string): string {
+    return this.i18nService.translate(key);
+  }
 
 
 
