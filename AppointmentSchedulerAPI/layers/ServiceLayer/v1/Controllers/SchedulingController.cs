@@ -393,56 +393,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             List<AppointmentDetailsDTO> appointments = [];
             try
             {
-                List<Appointment> result = await systemFacade.GetScheduledOrConfirmedAppoinmentsAsync(dto.StartDate, dto.EndDate);
-                appointments = result.Select(app => new AppointmentDetailsDTO
-                {
-                    Uuid = app.Uuid ?? Guid.Empty,
-                    StartDate = app.StartDate,
-                    EndDate = app.EndDate,
-                    Status = app.Status,
-                    CreatedAt = app.CreatedAt ?? DateTime.MinValue,
-                    ScheduledServices = app.ScheduledServices!.Select(serviceSelected => new AppointmentServiceDTO
-                    {
-                        Assistant = new AssistantScheduledServiceDTO
-                        {
-                            Name = serviceSelected.ServiceOffer!.Assistant!.Name,
-                            Uuid = serviceSelected.ServiceOffer!.Assistant.Uuid,
-                            PhoneNumber = serviceSelected.ServiceOffer!.Assistant.PhoneNumber,
-                            Email = serviceSelected.ServiceOffer.Assistant!.Email
-                        },
-                        Service = new ScheduledServiceDTO
-                        {
-                            StartDate = serviceSelected.ServiceStartDate!.Value.Date,
-                            EndDate = serviceSelected.ServiceEndDate!.Value.Date,
-                            Price = serviceSelected.ServicePrice,
-                            Minutes = serviceSelected.ServicesMinutes,
-                            Name = serviceSelected.ServiceName,
-                            Uuid = serviceSelected.ServiceOffer.Uuid!.Value
-                        }
-                    }).ToList(),
-                }).ToList();
-
-            }
-
-            catch (System.Exception ex)
-            {
-                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
-            }
-            return httpResponseService.OkResponse(appointments, ApiVersionEnum.V1);
-        }
-
-        [HttpGet("appointment/details")]
-        [Authorize]
-        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
-        public async Task<IActionResult> GetAppointmentsDetailsFromScheduler([FromQuery] GetAllAppointmentsDTO dto)
-        {
-            List<AppointmentDetailsDTO> appointments = [];
-            try
-            {
-                List<Appointment> result = await systemFacade.GetScheduledOrConfirmedAppoinmentsAsync(dto.StartDate, dto.EndDate);
-
-
-
+                List<Appointment> result = await systemFacade.GetAllAppoinmentsAsync(dto.StartDate, dto.EndDate);
                 appointments = result.Select(app => new AppointmentDetailsDTO
                 {
                     Uuid = app.Uuid ?? Guid.Empty,
@@ -479,9 +430,60 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                         }
                     }).ToList(),
                 }).ToList();
+            }
 
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(appointments, ApiVersionEnum.V1);
+        }
 
-
+        [HttpGet("appointment/details")]
+        [Authorize]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
+        public async Task<IActionResult> GetAppointmentsDetailsFromScheduler([FromQuery] GetAllAppointmentsDTO dto)
+        {
+            List<AppointmentDetailsDTO> appointments = [];
+            try
+            {
+                List<Appointment> result = await systemFacade.GetScheduledOrConfirmedAppoinmentsAsync(dto.StartDate, dto.EndDate);
+                appointments = result.Select(app => new AppointmentDetailsDTO
+                {
+                    Uuid = app.Uuid ?? Guid.Empty,
+                    StartDate = app.StartDate,
+                    EndDate = app.EndDate,
+                    Status = app.Status,
+                    TotalCost = app.TotalCost,
+                    CreatedAt = app.CreatedAt ?? DateTime.MinValue,
+                    Client = new ClientAppointmentDTO
+                    {
+                        Uuid = app.Client?.Uuid,
+                        Name = app.Client?.Name,
+                        PhoneNumber = app.Client?.PhoneNumber,
+                        Email = app.Client?.Email,
+                        Username = app.Client?.Username
+                    },
+                    ScheduledServices = app.ScheduledServices!.Select(serviceSelected => new AppointmentServiceDTO
+                    {
+                        Assistant = new AssistantScheduledServiceDTO
+                        {
+                            Name = serviceSelected.ServiceOffer!.Assistant!.Name,
+                            Uuid = serviceSelected.ServiceOffer!.Assistant.Uuid,
+                            PhoneNumber = serviceSelected.ServiceOffer!.Assistant.PhoneNumber,
+                            Email = serviceSelected.ServiceOffer.Assistant!.Email
+                        },
+                        Service = new ScheduledServiceDTO
+                        {
+                            StartDate = serviceSelected.ServiceStartDate!.Value,
+                            EndDate = serviceSelected.ServiceEndDate!.Value,
+                            Price = serviceSelected.ServicePrice,
+                            Minutes = serviceSelected.ServicesMinutes,
+                            Name = serviceSelected.ServiceName,
+                            Uuid = serviceSelected.ServiceOffer.Uuid!.Value
+                        }
+                    }).ToList(),
+                }).ToList();
             }
 
             catch (System.Exception ex)
@@ -656,8 +658,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             {
                 DateTime startDateTime = dto.SelectedServices
                     .Min(s => DateTime.SpecifyKind(dto.Date.ToDateTime(s.StartTime), DateTimeKind.Local).ToUniversalTime());
-
-
 
                 Appointment appointment = new Appointment
                 {
@@ -844,7 +844,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             try
             {
                 var claims = ClaimsPOCO.GetUserClaims(User);
-                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelfAsync(dto.AppointmentUuid, claims.Uuid);
+                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentClientSelfAsync(dto.Uuid, claims.Uuid);
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;
@@ -870,7 +870,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             bool isConfirmed = false;
             try
             {
-                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentStaffAssistedAsync(dto.AppointmentUuid);
+                OperationResult<bool, GenericError> result = await systemFacade.CancelAppointmentStaffAssistedAsync(dto.Uuid);
                 if (result.IsSuccessful)
                 {
                     isConfirmed = result.Result;
