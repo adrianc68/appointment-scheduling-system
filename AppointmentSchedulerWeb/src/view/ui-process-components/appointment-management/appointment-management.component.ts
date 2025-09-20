@@ -8,7 +8,7 @@ import { I18nService } from '../../../cross-cutting/helper/i18n/i18n.service';
 import { LoggingService } from '../../../cross-cutting/operation-management/logginService/logging.service';
 import { OperationResult } from '../../../cross-cutting/communication/model/operation-result.response';
 import { ApiDataErrorResponse, isEmptyErrorResponse, isGenericErrorResponse, isServerErrorResponse, isValidationErrorResponse } from '../../../cross-cutting/communication/model/api-response.error';
-import { map } from 'rxjs';
+import { catchError, map, of } from 'rxjs';
 import { MessageCodeType } from '../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../cross-cutting/helper/enum-utils/enum.utils';
 import { Appointment } from '../../../view-model/business-entities/appointment';
@@ -21,6 +21,7 @@ import { SlotDateRangePipe } from '../../../cross-cutting/helper/date-utils/slot
 import { ReadableTimePipe } from '../../../cross-cutting/helper/date-utils/readable-time.pipe';
 import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
 import { AppointmentStatusType } from '../../../view-model/business-entities/types/appointment-status.types';
+import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 
 @Component({
   selector: 'app-appointment-management',
@@ -43,7 +44,7 @@ export class AppointmentManagementComponent {
   today: Date = new Date();
 
 
-  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService, private router: Router) {
+  constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private logginService: LoggingService, private router: Router, private errorUIService: ErrorUIService) {
 
     const past = new Date(this.today);
     past.setMonth(this.today.getMonth() - 1);
@@ -74,7 +75,7 @@ export class AppointmentManagementComponent {
   loadAppointments(startDate: string, endDate: string): void {
     this.scheduledAppointments = [];
 
-    this.schedulerService.getScheduledOrConfirmedAppointmentsAsStaff(startDate, endDate).pipe(
+    this.schedulerService.getScheduledAppointmentsDetails(startDate, endDate).pipe(
 
       map((response: OperationResult<Appointment[], ApiDataErrorResponse>): boolean => {
         if (response.isSuccessful && response.code === MessageCodeType.OK) {
@@ -96,6 +97,95 @@ export class AppointmentManagementComponent {
     ).subscribe();
   }
 
+  errorValidationMessage: { [field: string]: string[] } = {};
+  private setErrorValidationMessage(key: string, value: string[]) {
+    this.errorValidationMessage[key.toLowerCase()] = value;
+  }
+
+
+  cancelAppointment(uuid: string): void {
+    const appointment = this.scheduledAppointments.find(a => a.uuid === uuid);
+
+    if (!appointment || appointment.status === AppointmentStatusType.CANCELED) {
+      return;
+    }
+
+    this.schedulerService.cancelAppointmentAsStaff(uuid).pipe(
+      map((response: OperationResult<boolean, ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          appointment.status = AppointmentStatusType.CANCELED;
+          return true;
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return false;
+        }
+      }),
+      catchError(err => {
+        this.logginService.error(err);
+        return of(false);
+      })
+    ).subscribe()
+  }
+
+  finalizeAppointment(uuid: string): void {
+    const appointment = this.scheduledAppointments.find(a => a.uuid === uuid);
+
+    if (!appointment || appointment.status === AppointmentStatusType.FINISHED) {
+      return;
+    }
+
+    this.schedulerService.finalizeAppointment(uuid).pipe(
+      map((response: OperationResult<boolean, ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          appointment.status = AppointmentStatusType.FINISHED;
+          return true;
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return false;
+        }
+      }),
+      catchError(err => {
+        this.logginService.error(err);
+        return of(false);
+      })
+    ).subscribe()
+  }
+
+  confirmAppointment(uuid: string): void {
+    const appointment = this.scheduledAppointments.find(a => a.uuid === uuid);
+
+    if (!appointment || appointment.status === AppointmentStatusType.CONFIRMED) {
+      return;
+    }
+
+    this.schedulerService.confirmAppointment(uuid).pipe(
+      map((response: OperationResult<boolean, ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          appointment.status = AppointmentStatusType.CONFIRMED;
+          return true;
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return false;
+        }
+      }),
+      catchError(err => {
+        this.logginService.error(err);
+        return of(false);
+      })
+    ).subscribe()
+  }
 
 
 

@@ -5,14 +5,14 @@
   <div class="summary-data-management m-bottom-lg">
     <div class="summary-item card">
       <span class="t-muted">Citas programadas</span>
-      <span class="fw-bold fs-xl">{{ scheduledAppointments.length }}</span>
+      <span class="fw-bold fs-xl">{{ getScheduledAppointments() }}</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">Citas canceladas</span>
+      <span class="t-muted">Citas confirmadas</span>
       <span class="fw-bold fs-xl">{{ getConfirmedAppointments() }}</span>
     </div>
     <div class="summary-item card">
-      <span class="t-muted">Citas por confirmar</span>
+      <span class="t-muted">Citas canceladas</span>
       <span class="fw-bold fs-xl">{{ getCancelledAppointments() }}</span>
     </div>
   </div>
@@ -60,7 +60,32 @@
         <div class="card-body accordion-body" [class.expanded]="openedSlots.has(i)">
           <div class="wrapper p-left-lg p-right-lg p-top-md p-bottom-lg">
             <div class="data-mgt">
+
+              <div class="d-flex j-content-end gap-md">
+
+                <button class="button danger t-danger w-auto"
+                  *ngIf="appointment.status !== 'CANCELED' && appointment.status !== 'FINISHED'"
+                  (click)="cancelAppointment(appointment.uuid)">
+                  Cancelar
+                </button>
+
+                <button class="button primary t-emphasis w-auto"
+                  *ngIf="appointment.status !== 'FINISHED' && appointment.status !== 'CANCELED'"
+                  (click)="finalizeAppointment(appointment.uuid)">
+                  Finalizar
+                </button>
+
+                <button class="button success w-auto"
+                  *ngIf="appointment.status !== 'CONFIRMED' && appointment.status !== 'CANCELED' && appointment.status !== 'FINISHED'"
+                  (click)="confirmAppointment(appointment.uuid)">
+                  Confirmar
+                </button>
+
+              </div>
+
+
               <div class="slot-data-row unbordered">
+
                 <div class="slot-data d-flex-col">
                   <span class="t-muted">
                     Fecha:
@@ -250,7 +275,9 @@
                 </span>
               </div>
             </div>
+
           </div>
+
         </div>
       </div>
     </div>
@@ -258,7 +285,7 @@
   </section>
 
 
-  <h2 class="m-bottom-md">Por venir...</h2>
+  <h2 class="m-bottom-md">Próximas citas...</h2>
   <section class="data-container">
     <div class="data-header">
       <span class="fw-bold">Citas agendadas</span>
@@ -279,7 +306,7 @@
           <div class="card-title d-flex">
             <div class="d-flex-col">
               <span class="fs-base fw-bold t-emphasis m-bottom-base">
-                Cita de: {{ appointment.client!.name}}
+                Cita con: {{ appointment.client!.name}}
               </span>
               <span class="fs-sm t-muted">
                 {{ appointment.startDate | readableDate}}
@@ -305,6 +332,28 @@
         <div class="card-body accordion-body" [class.expanded]="openedSlotsNotToday.has(i)">
           <div class="wrapper p-left-lg p-right-lg p-top-md p-bottom-lg">
             <div class="data-mgt">
+
+              <div class="d-flex j-content-end gap-md">
+
+                <button class="button danger t-danger w-auto"
+                  *ngIf="appointment.status !== 'CANCELED' && appointment.status !== 'FINISHED'"
+                  (click)="cancelAppointment(appointment.uuid)">
+                  Cancelar
+                </button>
+
+                <button class="button primary t-emphasis w-auto"
+                  *ngIf="appointment.status !== 'FINISHED' && appointment.status !== 'CANCELED'"
+                  (click)="finalizeAppointment(appointment.uuid)">
+                  Finalizar
+                </button>
+
+                <button class="button success w-auto"
+                  *ngIf="appointment.status !== 'CONFIRMED' && appointment.status !== 'CANCELED' && appointment.status !== 'FINISHED'"
+                  (click)="confirmAppointment(appointment.uuid)">
+                  Confirmar
+                </button>
+
+              </div>
               <div class="slot-data-row unbordered">
                 <div class="slot-data d-flex-col">
                   <span class="t-muted">

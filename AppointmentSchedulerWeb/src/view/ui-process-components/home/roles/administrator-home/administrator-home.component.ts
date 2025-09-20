@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { I18nService } from '../../../../../cross-cutting/helper/i18n/i18n.service';
 import { TranslationCodes } from '../../../../../cross-cutting/helper/i18n/model/translation-codes.types';
 import { WebRoutes } from '../../../../../cross-cutting/operation-management/model/web-routes.constants';
@@ -10,7 +10,7 @@ import { LoggingService } from '../../../../../cross-cutting/operation-managemen
 import { Appointment } from '../../../../../view-model/business-entities/appointment';
 import { OperationResult } from '../../../../../cross-cutting/communication/model/operation-result.response';
 import { ApiDataErrorResponse } from '../../../../../cross-cutting/communication/model/api-response.error';
-import { map } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { MessageCodeType } from '../../../../../cross-cutting/communication/model/message-code.types';
 import { getStringEnumKeyByValue } from '../../../../../cross-cutting/helper/enum-utils/enum.utils';
 import { ErrorUIService } from '../../../../../cross-cutting/communication/handle-error-service/error-ui.service';
@@ -80,7 +80,6 @@ export class AdministratorHomeComponent {
 
   getAppointmentsForTodayUTC(): Appointment[] {
     const today = new Date();
-    // Fecha UTC de hoy a la medianoche
     const startOfDayUTC = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
     const endOfDayUTC = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1);
 
@@ -131,6 +130,94 @@ export class AdministratorHomeComponent {
     ).subscribe();
   }
 
+
+  cancelAppointment(uuid: string): void {
+    const appointment = this.scheduledAppointments.find(a => a.uuid === uuid);
+
+    if (!appointment || appointment.status === AppointmentStatusType.CANCELED) {
+      return;
+    }
+
+    this.schedulerService.cancelAppointmentAsStaff(uuid).pipe(
+      map((response: OperationResult<boolean, ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          appointment.status = AppointmentStatusType.CANCELED;
+          return true;
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return false;
+        }
+      }),
+      catchError(err => {
+        this.logginService.error(err);
+        return of(false);
+      })
+    ).subscribe()
+  }
+
+  finalizeAppointment(uuid: string): void {
+    const appointment = this.scheduledAppointments.find(a => a.uuid === uuid);
+
+    if (!appointment || appointment.status === AppointmentStatusType.FINISHED) {
+      return;
+    }
+
+    this.schedulerService.finalizeAppointment(uuid).pipe(
+      map((response: OperationResult<boolean, ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          appointment.status = AppointmentStatusType.FINISHED;
+          return true;
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return false;
+        }
+      }),
+      catchError(err => {
+        this.logginService.error(err);
+        return of(false);
+      })
+    ).subscribe()
+  }
+
+  confirmAppointment(uuid: string): void {
+    const appointment = this.scheduledAppointments.find(a => a.uuid === uuid);
+
+    if (!appointment || appointment.status === AppointmentStatusType.CONFIRMED) {
+      return;
+    }
+
+    this.schedulerService.confirmAppointment(uuid).pipe(
+      map((response: OperationResult<boolean, ApiDataErrorResponse>) => {
+        if (response.isSuccessful && response.code === MessageCodeType.OK) {
+          appointment.status = AppointmentStatusType.CONFIRMED;
+          return true;
+        } else {
+          this.errorUIService.handleError(response);
+          const validationErrors = this.errorUIService.getValidationErrors(response);
+          Object.entries(validationErrors).forEach(([field, messages]) => {
+            this.setErrorValidationMessage(field, messages);
+          });
+          return false;
+        }
+      }),
+      catchError(err => {
+        this.logginService.error(err);
+        return of(false);
+      })
+    ).subscribe()
+  }
+
+
+
+
   translate(key: string): string {
     return this.i18nService.translate(key);
   }
@@ -146,5 +233,8 @@ export class AdministratorHomeComponent {
   getScheduledAppointments(): number {
     return this.scheduledAppointments.filter(a => a.status === AppointmentStatusType.SCHEDULED).length;
   }
+
+
+
 
 }
