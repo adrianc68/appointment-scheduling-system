@@ -16,14 +16,13 @@ import { ServiceOfferDTO } from "../dtos/response/service-offer.dto";
 import { AppointmentDTO } from "../dtos/response/appointment.dto";
 import { Appointment } from "../../view-model/business-entities/appointment";
 import { UnavailableTimeSlot } from "../../view-model/business-entities/unavailable-time-slot";
-import { UnavailableTimeSlotDTO } from "../dtos/unavailable-time-slot.dto";
 import { ClientDTO } from "../dtos/client.dto";
 import { Client } from "../../view-model/business-entities/client";
 import { RoleType } from "../../view-model/business-entities/types/role.types";
 import { Assistant } from "../../view-model/business-entities/assistant";
 import { AppointmentScheduledService } from "../../view-model/business-entities/appointment-scheduled-service";
 import { ScheduledService } from "../../view-model/business-entities/scheduled-service";
-import { AccountStatusType } from "../../view-model/business-entities/types/account-status.types";
+import { AppointmentStatusType } from "../../view-model/business-entities/types/appointment-status.types";
 
 @Injectable({
   providedIn: 'root'
@@ -200,6 +199,29 @@ export class SchedulerService {
     );
   }
 
+  getScheduledAppointmentsDetails(startDate: string, endDate: string): Observable<OperationResult<Appointment[], ApiDataErrorResponse>> {
+
+    return this.httpServiceAdapter.get<AppointmentDTO>(`${this.apiUrl}${ApiRoutes.getScheduledAppointments}?startDate=${startDate}&endDate=${endDate}`).pipe(
+      map((response: ApiResponse<AppointmentDTO[], ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<AppointmentDTO[]>(response)) {
+          const appointments: Appointment[] = response.data.map(dto => this.parseAppointments(dto));
+          return OperationResultService.createSuccess(appointments, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
 
   registerAvailabilityTimeSlot(availabilitySlot: any) {
     return this.httpServiceAdapter.post<string>(`${this.apiUrl}${ApiRoutes.registerAvailabilityTimeSlot}`, availabilitySlot).pipe(
@@ -247,6 +269,96 @@ export class SchedulerService {
   //}
   //
   //
+  //
+
+
+  confirmAppointment(uuid: string) {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.confirmAppointment}`, { uuid: uuid }).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          const guid = response.data;
+          return OperationResultService.createSuccess(guid, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  finalizeAppointment(uuid: string) {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.finalizeAppointment}`, { uuid: uuid }).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          const guid = response.data;
+          return OperationResultService.createSuccess(guid, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  cancelAppointmentAsStaff(uuid: string) {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.cancelAppointmentAsStaff}`, { uuid: uuid }).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          const guid = response.data;
+          return OperationResultService.createSuccess(guid, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  cancelAppointmentAsClient(uuid: string) {
+    return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.cancelAppointmentAsClient}`, { uuid: uuid }).pipe(
+      map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
+          const guid = response.data;
+          return OperationResultService.createSuccess(guid, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
 
 
   disableAvailabilityTimeSlot(uuid: string) {
@@ -432,17 +544,24 @@ export class SchedulerService {
 
     const client = dto.client ? this.mapClient(dto.client) : undefined;
 
+    const rawStatus = (dto.status ?? '').toString().trim().toUpperCase();
+    const status = Object.values(AppointmentStatusType).includes(rawStatus as AppointmentStatusType)
+      ? rawStatus as AppointmentStatusType
+      : undefined;
+
     return new Appointment(
       dto.uuid,
       new Date(dto.startDate),
       new Date(dto.endDate),
       new Date(dto.createdAt),
-      dto.status,
+      status,
       dto.totalCost,
       scheduledServices,
       client
     );
   }
+
+
   private mapClient(dto?: ClientDTO): Client | undefined {
     if (!dto) return undefined;
     return new Client(

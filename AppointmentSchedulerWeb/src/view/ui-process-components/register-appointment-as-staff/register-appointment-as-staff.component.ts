@@ -56,6 +56,7 @@ export class RegisterAppointmentAsStaffComponent {
 
   constructor(private schedulerService: SchedulerService, private i18nService: I18nService, private clientService: ClientService, private errorUIService: ErrorUIService) {
     this.getClientList();
+    this.onDateSelected(this.selectedDate);
   }
 
   getClientList(): void {

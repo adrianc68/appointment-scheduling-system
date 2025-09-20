@@ -30,6 +30,11 @@ export const ApiRoutes = {
   blockTimeRangeAppointment: `/scheduling/appointment/range/block`,
   registerAppointmentAsClient: `/scheduling/appointment/asClient`,
   registerAppointmentAsStaff: `/scheduling/appointment/asStaff`,
+  confirmAppointment: `/scheduling/appointment/confirm`,
+  finalizeAppointment: `/scheduling/appointment/finalize`,
+  cancelAppointmentAsClient: `/scheduling/appointment/cancel/asClient`,
+  cancelAppointmentAsStaff: `/scheduling/appointment/cancel/asStaff`,
+
 
 
   getAllAssistantServiceOffers: `/assistant/service/all`,

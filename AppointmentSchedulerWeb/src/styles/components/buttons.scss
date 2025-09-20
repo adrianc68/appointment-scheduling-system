@@ -27,15 +27,16 @@
   }
 
 
+
 }
 
-button.primary {
+.button.primary {
   background-color: variables.$bg-inverted;
   color: variables.$text-inverted;
   // transition: background-color variables.$transition-duration-fast variables.$ease-in, color variables.$transition-duration-fast variables.$ease-in;
 }
 
-button.secondary {
+.button.secondary {
   background-color: transparent;
   color: variables.$text-muted;
 
