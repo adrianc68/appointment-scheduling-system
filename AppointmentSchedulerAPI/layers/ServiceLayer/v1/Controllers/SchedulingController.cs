@@ -713,7 +713,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             try
             {
                 DateTime startDateTime = dto.SelectedServices
-                    .Min(s => DateTime.SpecifyKind(dto.Date.ToDateTime(s.StartTime), DateTimeKind.Local).ToUniversalTime());
+                    .Min(s => DateTime.SpecifyKind(dto.Date.ToDateTime(s.StartTime), DateTimeKind.Utc));
 
                 var claims = ClaimsPOCO.GetUserClaims(User);
                 Appointment appointment = new Appointment
@@ -729,7 +729,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     appointment.ScheduledServices!.Add(new ScheduledService
                     {
                         Uuid = serviceOffer.Uuid,
-                        ServiceStartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(serviceOffer.StartTime), DateTimeKind.Local).ToUniversalTime()
+                        ServiceStartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(serviceOffer.StartTime), DateTimeKind.Utc)
                     });
                 }
 
@@ -765,7 +765,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             try
             {
                 DateTime startDateTime = dto.SelectedServices
-                    .Min(s => DateTime.SpecifyKind(dto.Date.ToDateTime(s.StartTime), DateTimeKind.Local).ToUniversalTime());
+                    .Min(s => DateTime.SpecifyKind(dto.Date.ToDateTime(s.StartTime), DateTimeKind.Utc));
 
                 Appointment appointment = new Appointment
                 {
@@ -780,7 +780,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     appointment.ScheduledServices!.Add(new ScheduledService
                     {
                         Uuid = serviceOffer.Uuid,
-                        ServiceStartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(serviceOffer.StartTime), DateTimeKind.Local).ToUniversalTime()
+                        ServiceStartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(serviceOffer.StartTime), DateTimeKind.Utc)
                     });
                 }
 
@@ -813,8 +813,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
         public async Task<IActionResult> BlockTimeRange([FromBody] BlockTimeRangeDTO dto)
         {
-
-
             var claims = ClaimsPOCO.GetUserClaims(User);
             if (claims.Role == RoleType.CLIENT && claims.Uuid != dto.ClientUuid)
             {
@@ -828,20 +826,24 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             var earliestTime = dto.SelectedServices.Min(s => s.StartTime);
             var latestTime = dto.SelectedServices.Max(s => s.StartTime);
 
+            // Construir DateTime en UTC directamente
             DateTimeRange range = new DateTimeRange
             {
-                StartDate = dto.Date.ToDateTime(earliestTime).ToUniversalTime(),
-                EndDate = dto.Date.ToDateTime(latestTime).ToUniversalTime()
+                StartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(earliestTime), DateTimeKind.Utc),
+                EndDate = DateTime.SpecifyKind(dto.Date.ToDateTime(latestTime), DateTimeKind.Utc)
             };
 
             List<ScheduledService> services = dto.SelectedServices.Select(service => new ScheduledService
             {
                 Uuid = service.Uuid,
-                ServiceStartDate = dto.Date.ToDateTime(service.StartTime).ToUniversalTime()
+                ServiceStartDate = DateTime.SpecifyKind(
+                    dto.Date.ToDateTime(service.StartTime),
+                    DateTimeKind.Utc
+                )
             }).ToList();
 
-
-            OperationResult<DateTime, GenericError> result = await systemFacade.BlockTimeRangeAsync(services, range, dto.ClientUuid);
+            OperationResult<DateTime, GenericError> result =
+                await systemFacade.BlockTimeRangeAsync(services, range, dto.ClientUuid);
 
             if (!result.IsSuccessful)
             {
@@ -853,6 +855,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
             return httpResponseService.OkResponse(result.Result, ApiVersionEnum.V1);
         }
+
 
         [HttpGet("appointment/conflict")]
         [Authorize]
