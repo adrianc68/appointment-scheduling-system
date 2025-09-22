@@ -1,0 +1,15 @@
+@use '../../../styles/mixins.scss' as mixins;
+@use '../../../styles/variables.scss' as variables;
+
+
+.services {
+  ul {
+    display: grid;
+    gap: variables.$spacing-lg;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+    li {
+      padding: variables.$padding-md;
+    }
+  }
+}

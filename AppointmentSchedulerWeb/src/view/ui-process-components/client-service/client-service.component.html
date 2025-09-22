@@ -1,0 +1,47 @@
+<section class="main-section">
+  <h1 class="m-bottom-base">Servicios</h1>
+  <p class="m-bottom-lg">En este apartado, se muestran los servicios que podemos ofrecer.</p>
+
+  <section class="services">
+    <h2 class="m-bottom-md">Nuestros servicios</h2>
+    <ul>
+      <li class="card" *ngFor="let service of services">
+        <div class="ua-header d-flex j-content-between gap-md m-bottom-base">
+          <div class="ua-header-data d-flex-col">
+            <span class="fs-md t-emphasis fw-bold">
+              {{service.name}}
+            </span>
+          </div>
+          <div class="ua-header-status confirmed">
+            <span class="fs-xs badge" [ngClass]="
+              {
+              'active': service.status === 'ENABLED',
+              'inactive': service.status === 'DISABLED',
+              'deleted': service.status === 'DELETED'
+            }">
+              {{service.status}}
+            </span>
+          </div>
+        </div>
+        <div class="ua-body d-flex-col gap-base">
+          <div class="d-flex-col gap-base m-bottom-md">
+            <p class="fs-base t-muted ">
+              {{ service.description}}
+            </p>
+          </div>
+          <div class="d-flex j-content-start">
+            <span class="fs-md fw-bold t-emphasis">
+              $ {{ service.price}}
+            </span>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+
+
+
+  </section>
+
+
+</section>

@@ -56,6 +56,8 @@ export const ApiRoutes = {
   getAvailabilityTimeSlots: `/scheduling/availabilityTimeSlot`,
   getAvailableServices: `/scheduling/services/available`,
   getScheduledAppointments: `/scheduling/appointment`,
+  getAppointmentsOfClient: `/scheduling/appointment/client`,
+  getAllAppointmentsOfClient: `/scheduling/appointment/client/all`,
   getScheduledAppointmentsDetails: `/scheduling/appointment/details`
 
 };
