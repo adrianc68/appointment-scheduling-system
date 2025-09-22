@@ -4,13 +4,11 @@ using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model;
 using AppointmentSchedulerAPI.layers.BusinessLogicLayer.Model.Types;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.HttpResponseService;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Communication.Model;
-using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Helper;
 using AppointmentSchedulerAPI.layers.CrossCuttingLayer.Security.Authorization.Attributes;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request;
 using AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 {
@@ -66,6 +64,116 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 LockExpirationTime = slot.LockExpirationTime
             }).ToList();
             return httpResponseService.OkResponse(rangesBlocked, ApiVersionEnum.V1);
+        }
+
+        [HttpGet("appointment/client")]
+        [Authorize]
+        [AllowedRoles(RoleType.CLIENT)]
+        public async Task<IActionResult> GetAppointmentOfClient([FromQuery] GetAllAppointmentsDTO dto)
+        {
+            var claims = ClaimsPOCO.GetUserClaims(User);
+            List<AppointmentDetailsDTO> appointments = [];
+            try
+            {
+                List<Appointment> result = await systemFacade.GetAppointmentsOfUserByUuidAndRange(dto.StartDate, dto.EndDate, claims.Uuid);
+                appointments = result.Select(app => new AppointmentDetailsDTO
+                {
+                    Uuid = app.Uuid ?? Guid.Empty,
+                    StartDate = app.StartDate,
+                    EndDate = app.EndDate,
+                    Status = app.Status,
+                    TotalCost = app.TotalCost,
+                    CreatedAt = app.CreatedAt ?? DateTime.MinValue,
+                    Client = new ClientAppointmentDTO
+                    {
+                        Uuid = app.Client?.Uuid,
+                        Name = app.Client?.Name,
+                        PhoneNumber = app.Client?.PhoneNumber,
+                        Email = app.Client?.Email,
+                        Username = app.Client?.Username
+                    },
+                    ScheduledServices = app.ScheduledServices!.Select(serviceSelected => new AppointmentServiceDTO
+                    {
+                        Assistant = new AssistantScheduledServiceDTO
+                        {
+                            Name = serviceSelected.ServiceOffer!.Assistant!.Name,
+                            Uuid = serviceSelected.ServiceOffer!.Assistant.Uuid,
+                            PhoneNumber = serviceSelected.ServiceOffer!.Assistant.PhoneNumber,
+                            Email = serviceSelected.ServiceOffer.Assistant!.Email
+                        },
+                        Service = new ScheduledServiceDTO
+                        {
+                            StartDate = serviceSelected.ServiceStartDate!.Value,
+                            EndDate = serviceSelected.ServiceEndDate!.Value,
+                            Price = serviceSelected.ServicePrice,
+                            Minutes = serviceSelected.ServicesMinutes,
+                            Name = serviceSelected.ServiceName,
+                            Uuid = serviceSelected.ServiceOffer.Uuid!.Value
+                        }
+                    }).ToList(),
+                }).ToList();
+            }
+
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(appointments, ApiVersionEnum.V1);
+        }
+
+        [HttpGet("appointment/client/all")]
+        [Authorize]
+        [AllowedRoles(RoleType.CLIENT)]
+        public async Task<IActionResult> GetAllAppointmentOfClient()
+        {
+            var claims = ClaimsPOCO.GetUserClaims(User);
+            List<AppointmentDetailsDTO> appointments = [];
+            try
+            {
+                List<Appointment> result = await systemFacade.GetAppointmentsOfUserByUuid(claims.Uuid);
+                appointments = result.Select(app => new AppointmentDetailsDTO
+                {
+                    Uuid = app.Uuid ?? Guid.Empty,
+                    StartDate = app.StartDate,
+                    EndDate = app.EndDate,
+                    Status = app.Status,
+                    TotalCost = app.TotalCost,
+                    CreatedAt = app.CreatedAt ?? DateTime.MinValue,
+                    Client = new ClientAppointmentDTO
+                    {
+                        Uuid = app.Client?.Uuid,
+                        Name = app.Client?.Name,
+                        PhoneNumber = app.Client?.PhoneNumber,
+                        Email = app.Client?.Email,
+                        Username = app.Client?.Username
+                    },
+                    ScheduledServices = app.ScheduledServices!.Select(serviceSelected => new AppointmentServiceDTO
+                    {
+                        Assistant = new AssistantScheduledServiceDTO
+                        {
+                            Name = serviceSelected.ServiceOffer!.Assistant!.Name,
+                            Uuid = serviceSelected.ServiceOffer!.Assistant.Uuid,
+                            PhoneNumber = serviceSelected.ServiceOffer!.Assistant.PhoneNumber,
+                            Email = serviceSelected.ServiceOffer.Assistant!.Email
+                        },
+                        Service = new ScheduledServiceDTO
+                        {
+                            StartDate = serviceSelected.ServiceStartDate!.Value,
+                            EndDate = serviceSelected.ServiceEndDate!.Value,
+                            Price = serviceSelected.ServicePrice,
+                            Minutes = serviceSelected.ServicesMinutes,
+                            Name = serviceSelected.ServiceName,
+                            Uuid = serviceSelected.ServiceOffer.Uuid!.Value
+                        }
+                    }).ToList(),
+                }).ToList();
+            }
+
+            catch (System.Exception ex)
+            {
+                return httpResponseService.InternalServerErrorResponse(ex, ApiVersionEnum.V1);
+            }
+            return httpResponseService.OkResponse(appointments, ApiVersionEnum.V1);
         }
 
         [HttpDelete("appointment/range/unblock")]

@@ -15,6 +15,8 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessInterfaces
         Task<List<DateTimeRange>> GetAppointmentDateTimeRangeConflictsByRangeAsync(DateTimeRange range);
         Task<int> GetAppointmentsScheduledCountByClientId(int idClient);
         Task<List<Appointment>> GetAllAppoinmentsAsync(DateOnly startDate, DateOnly endDate);
+        Task<List<Appointment>> GetAppointmentsOfUserByUuidAndRange(DateOnly startDate, DateOnly endDate, Guid uuid);
+        Task<List<Appointment>> GetAppointmentsOfUserByUuid(Guid uuid);
         Task<bool> HasAssistantConflictingAppoinmentsAsync(DateTimeRange range, int idAssistant);
 
         // Availability Time Slot

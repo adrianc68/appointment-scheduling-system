@@ -16,6 +16,8 @@ namespace AppointmentSchedulerAPI.layers.DataLayer.DatabaseComponents.Repository
         Task<int?> GetAppointmentIdByUuidAsync(Guid uuid);
         Task<IEnumerable<Appointment>> GetScheduledOrConfirmedAppoinmentsAsync(DateOnly startDate, DateOnly endDate);
         Task<IEnumerable<Appointment>> GetAllAppoinmentsAsync(DateOnly startDate, DateOnly endDate);
+        Task<IEnumerable<Appointment>> GetAppointmentsOfUserByUuidAndRange(DateOnly startDate, DateOnly endDate, Guid uuid);
+        Task<IEnumerable<Appointment>> GetAppointmentsOfUserByUuid(Guid uuid);
         Task<int> GetAppointmentsScheduledCountByClientUuidAsync(int idClient);
         Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAsync(int idAssistant);
         Task<List<Appointment>> GetScheduledOrConfirmedAppointmentsOfAsssistantByIdAndRangeAsync(int idAssistant, DateTimeRange range);

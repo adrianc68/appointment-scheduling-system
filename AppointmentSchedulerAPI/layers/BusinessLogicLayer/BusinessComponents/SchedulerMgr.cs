@@ -35,6 +35,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.BusinessComponents
             return (List<Appointment>)await schedulerRepository.GetAllAppoinmentsAsync(startDate, endDate);
         }
 
+        public async Task<List<Appointment>> GetAppointmentsOfUserByUuidAndRange(DateOnly startDate, DateOnly endDate, Guid Uuid)
+        {
+            return (List<Appointment>)await schedulerRepository.GetAppointmentsOfUserByUuidAndRange(startDate, endDate, Uuid);
+        }
+
+        public async Task<List<Appointment>> GetAppointmentsOfUserByUuid(Guid Uuid)
+        {
+            return (List<Appointment>)await schedulerRepository.GetAppointmentsOfUserByUuid(Uuid);
+        }
+
         public async Task<List<ServiceOffer>> GetAvailableServicesAsync(DateOnly date)
         {
             return (List<ServiceOffer>)await schedulerRepository.GetAvailableServicesAsync(date);
