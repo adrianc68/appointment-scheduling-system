@@ -26,6 +26,9 @@ import { ServiceOfferManagementComponent } from '../view/ui-process-components/s
 import { RegisterServiceOfferComponent } from '../view/ui-process-components/register-service-offer/register-service-offer.component';
 import { RegisterAppointmentAsStaffComponent } from '../view/ui-process-components/register-appointment-as-staff/register-appointment-as-staff.component';
 import { ManagementLayoutComponent } from '../view/ui-components/navigation/management-layout/management-layout.component';
+import { RegisterAppointmentAsClientComponent } from '../view/ui-process-components/register-appointment-as-client/register-appointment-as-client.component';
+import { ClientService } from '../model/communication-components/client.service';
+import { ClientServiceComponent } from '../view/ui-process-components/client-service/client-service.component';
 
 export const routes: Routes = [
   {
@@ -54,9 +57,21 @@ export const routes: Routes = [
             component: HomeComponent,
           },
           {
+            path: "appointment",
+            canActivate: [AuthGuard, RoleGuard],
+            data: { roles: [RoleType.CLIENT], breadcrumb: "Citas" },
+            component: RegisterAppointmentAsClientComponent
+          },
+          {
+            path: "services",
+            canActivate: [AuthGuard, RoleGuard],
+            data: { roles: [RoleType.CLIENT, RoleType.ADMINISTRATOR, RoleType.ASSISTANT], breadcrumb: "Servicios" },
+            component: ClientServiceComponent
+          },
+          {
             path: "management",
             canActivate: [AuthGuard, RoleGuard],
-            data: { roles: [RoleType.ADMINISTRATOR] },
+            data: { roles: [RoleType.ADMINISTRATOR], },
             children: [
               {
                 path: "availability-time-slots", data: { breadcrumb: "Disponibilidad" },

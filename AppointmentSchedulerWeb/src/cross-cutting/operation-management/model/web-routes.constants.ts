@@ -13,7 +13,11 @@ export const WebRoutes = {
   availability_time_slot_management_edit_slot: "management/availability-time-slots/edit",
 
 
+  client_appointment_register: "/appointment",
+  client_services: "/services",
+
   appointment_management: "/management/appointment",
+
 
   appointment_management_register_as_staff: "/management/appointment/staff",
 

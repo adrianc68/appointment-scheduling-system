@@ -358,6 +358,18 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return appointment;
         }
 
+        public async Task<List<Appointment>> GetAppointmentsOfUserByUuidAndRange(DateOnly startDate, DateOnly endDate, Guid uuid)
+        {
+            List<Appointment>? appointment = await schedulerMgr.GetAppointmentsOfUserByUuidAndRange(startDate, endDate, uuid);
+            return appointment;
+        }
+
+     public async Task<List<Appointment>> GetAppointmentsOfUserByUuid(Guid uuid)
+        {
+            List<Appointment>? appointment = await schedulerMgr.GetAppointmentsOfUserByUuid(uuid);
+            return appointment;
+        }
+
         public async Task<OperationResult<Appointment, GenericError>> GetAppointmentDetailsAsync(Guid appointmentUuid)
         {
             Appointment? appointment = await schedulerMgr.GetAppointmentDetailsByUuidAsync(appointmentUuid);

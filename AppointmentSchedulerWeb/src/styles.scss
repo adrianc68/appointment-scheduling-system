@@ -668,10 +668,47 @@ $width: (
 }
 
 
-.badge-left {
-  border-left: 4px solid variables.$bg-brand;
-  padding-left: 0.8rem;
+.badge {
+  background-color: variables.$bg-inverted;
+  border-radius: variables.$border-radius-lg;
+  padding: variables.$padding-sm;
+
+  &.scheduled {
+    background-color: variables.$bg-brand;
+    color: variables.$bg-brand-text;
+  }
+
+  &.confirmed {
+    background-color: variables.$bg-success;
+    color: variables.$bg-success-text;
+  }
+
+  &.canceled {
+    background-color: variables.$bg-error;
+    color: variables.$bg-error-text
+  }
+
+  &.finished {
+    background-color: variables.$border;
+    color: variables.$text;
+  }
+
+  &.active {
+    background-color: variables.$bg-success;
+    color: variables.$bg-success-text;
+  }
+
+  &.inactive {
+    background-color: variables.$bg-error;
+    color: variables.$bg-error-text;
+  }
+
+  &.deleted {
+    background-color: variables.$bg-warning;
+    color: variables.$text-warning;
+  }
 }
+
 
 .ul-bullet-style {
   list-style: none;
@@ -726,6 +763,9 @@ $width: (
 }
 
 // FLEX
+.d-flex-1 {
+  flex:1;
+}
 
 .d-inline {
   display: inline;
@@ -942,5 +982,3 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
-
-

@@ -26,7 +26,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
         [HttpGet]
         [Authorize]
-        [AllowedRoles(RoleType.ADMINISTRATOR)]
+        [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.CLIENT, RoleType.ASSISTANT)]
         public async Task<IActionResult> GetAllServices()
         {
             List<ServiceDetailsDTO> serviceDtos = [];

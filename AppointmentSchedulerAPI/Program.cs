@@ -192,7 +192,7 @@ var app = builder.Build();
 
 app.UseStaticFiles();
 app.UseCors(policy => policy
-    .WithOrigins("http://localhost:4200", "http://localhost:8080", "http://192.168.50.64:4200", "https://appointment-scheduler-web-seven.vercel.app/")
+    .WithOrigins("http://localhost:4200", "http://localhost:8080", "http://192.168.50.63:4200", "https://appointment-scheduler-web-seven.vercel.app/")
     // .WithOrigins("https://app.angeladrian.mx")
     // .AllowAnyOrigin()
     .AllowAnyHeader()

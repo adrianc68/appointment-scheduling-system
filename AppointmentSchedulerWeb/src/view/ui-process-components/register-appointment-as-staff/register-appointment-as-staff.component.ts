@@ -20,6 +20,7 @@ import { CalendarComponent } from '../../ui-components/display/calendar/calendar
 import { AvailabilityTimeSlot } from '../../../view-model/business-entities/availability-time-slot';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
+import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
 
 @Component({
   selector: 'app-register-appointment-as-staff',
@@ -105,36 +106,6 @@ export class RegisterAppointmentAsStaffComponent {
       })
     ).subscribe();
   }
-
-  registerAppointmentAsClient(): void {
-    const payload = {
-      date: this.selectedDate,
-      clientUuid: this.selectedClient?.uuid,
-      selectedServices: this.selectedServicesOffer.map(s => ({
-        uuid: s.uuid,
-        startTime: this.startTimes[s.uuid]
-      }))
-    };
-
-    this.schedulerService.registerAppointmentAsClient(payload).pipe(
-      map((response: OperationResult<Date, ApiDataErrorResponse>): boolean => {
-        if (response.isSuccessful && response.code === MessageCodeType.OK) {
-          let code = getStringEnumKeyByValue(MessageCodeType, response.code);
-          this.systemMessage = code;
-          return true;
-        } else {
-          let code = this.errorUIService.handleError(response);
-          this.systemMessage = code;
-          const validationErrors = this.errorUIService.getValidationErrors(response);
-          Object.entries(validationErrors).forEach(([field, messages]) => {
-            this.setErrorValidationMessage(field, messages);
-          });
-          return false;
-        }
-      })
-    ).subscribe();
-  }
-
 
 
   registerAppointmentAsStaff(): void {

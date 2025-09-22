@@ -245,6 +245,52 @@ export class SchedulerService {
     );
   }
 
+  getAppointmentsOfClient(startDate: string, endDate: string): Observable<OperationResult<Appointment[], ApiDataErrorResponse>> {
+
+    return this.httpServiceAdapter.get<AppointmentDTO>(`${this.apiUrl}${ApiRoutes.getAppointmentsOfClient}?startDate=${startDate}&endDate=${endDate}`).pipe(
+      map((response: ApiResponse<AppointmentDTO[], ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<AppointmentDTO[]>(response)) {
+          const appointments: Appointment[] = response.data.map(dto => this.parseAppointments(dto));
+          return OperationResultService.createSuccess(appointments, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  getAllAppointmentsOfClient(): Observable<OperationResult<Appointment[], ApiDataErrorResponse>> {
+
+    return this.httpServiceAdapter.get<AppointmentDTO>(`${this.apiUrl}${ApiRoutes.getAllAppointmentsOfClient}`).pipe(
+      map((response: ApiResponse<AppointmentDTO[], ApiDataErrorResponse>) => {
+        if (this.httpServiceAdapter.isSuccessResponse<AppointmentDTO[]>(response)) {
+          const appointments: Appointment[] = response.data.map(dto => this.parseAppointments(dto));
+          return OperationResultService.createSuccess(appointments, response.message);
+        }
+        return OperationResultService.createFailure(response.data, response.message);
+      }),
+      catchError((err) => {
+        if (err instanceof HttpErrorResponse) {
+          let codeError = MessageCodeType.UNKNOWN_ERROR;
+          if (err.status == 500) {
+            codeError = MessageCodeType.SERVER_ERROR;
+          }
+          return of(OperationResultService.createFailure<ApiDataErrorResponse>(err.error, codeError));
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
   //editAvailabilityTimeSlot(slot: AvailabilityTimeSlot) {
   //
   //  return this.httpServiceAdapter.put<AvailabilityTimeSlot>(`${this.apiUrl}${ApiRoutes.editAvailabilityTimeSlot}`, slot).pipe(

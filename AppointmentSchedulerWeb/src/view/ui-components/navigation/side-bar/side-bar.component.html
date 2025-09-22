@@ -11,10 +11,18 @@
 
     <ng-container [ngSwitch]="accountData.role">
       <li *ngSwitchCase="roleTypes.CLIENT" routerLinkActive="active">
-        <a [routerLink]="[webRoutes.appointment_management]">
+        <a [routerLink]="[webRoutes.client_appointment_register]">
           <mat-icon class="sidebar-icon">calendar_month</mat-icon>
           <span>
             {{translate(translationCodes.TC_APPOINTMENT_CREATE_DIRECTORY)}}
+          </span>
+        </a>
+      </li>
+      <li *ngSwitchCase="roleTypes.CLIENT" routerLinkActive="active">
+        <a [routerLink]="[webRoutes.client_services]">
+          <mat-icon class="sidebar-icon">content_cut</mat-icon>
+          <span>
+          Servicios
           </span>
         </a>
       </li>
