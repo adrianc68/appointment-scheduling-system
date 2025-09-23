@@ -7,6 +7,6 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers.DTO.Request
         [Required(ErrorMessage = "Uuid is required.")]
         public required Guid Uuid { get; set; }
         [Required(ErrorMessage = "StartTime is required.")]
-        public required TimeOnly StartTime { get; set; }
+        public required DateTime StartDate { get; set; }
     }
 }

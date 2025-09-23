@@ -712,13 +712,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
 
             try
             {
-                DateTime startDateTime = dto.SelectedServices
-                    .Min(s => DateTime.SpecifyKind(dto.Date.ToDateTime(s.StartTime), DateTimeKind.Utc));
-
+                var firstService = dto.SelectedServices.OrderBy(s => s.StartDate).First();
+                DateTime startDateTimeUtc = firstService.StartDate; 
                 var claims = ClaimsPOCO.GetUserClaims(User);
                 Appointment appointment = new Appointment
                 {
-                    StartDate = startDateTime,
+                    StartDate = startDateTimeUtc,
                     Client = new Client { Uuid = claims.Uuid },
                     ScheduledServices = new List<ScheduledService>(),
                     Uuid = Guid.CreateVersion7()
@@ -729,7 +728,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     appointment.ScheduledServices!.Add(new ScheduledService
                     {
                         Uuid = serviceOffer.Uuid,
-                        ServiceStartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(serviceOffer.StartTime), DateTimeKind.Utc)
+                        ServiceStartDate = serviceOffer.StartDate, 
                     });
                 }
 
@@ -764,12 +763,12 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
             Guid? guid;
             try
             {
-                DateTime startDateTime = dto.SelectedServices
-                    .Min(s => DateTime.SpecifyKind(dto.Date.ToDateTime(s.StartTime), DateTimeKind.Utc));
+                var firstService = dto.SelectedServices.OrderBy(s => s.StartDate).First();
+                DateTime startDateTimeUtc = firstService.StartDate; 
 
                 Appointment appointment = new Appointment
                 {
-                    StartDate = startDateTime,
+                    StartDate = startDateTimeUtc,
                     Client = new Client { Uuid = dto.ClientUuid },
                     ScheduledServices = new List<ScheduledService>(),
                     Uuid = Guid.CreateVersion7()
@@ -780,7 +779,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                     appointment.ScheduledServices!.Add(new ScheduledService
                     {
                         Uuid = serviceOffer.Uuid,
-                        ServiceStartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(serviceOffer.StartTime), DateTimeKind.Utc)
+                        ServiceStartDate = serviceOffer.StartDate, 
                     });
                 }
 
@@ -808,6 +807,7 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
         }
 
 
+
         [HttpPost("appointment/range/block")]
         [Authorize]
         [AllowedRoles(RoleType.ADMINISTRATOR, RoleType.ASSISTANT, RoleType.CLIENT)]
@@ -823,27 +823,13 @@ namespace AppointmentSchedulerAPI.layers.ServiceLayer.v1.Controllers
                 );
             }
 
-            var earliestTime = dto.SelectedServices.Min(s => s.StartTime);
-            var latestTime = dto.SelectedServices.Max(s => s.StartTime);
-
-            // Construir DateTime en UTC directamente
-            DateTimeRange range = new DateTimeRange
-            {
-                StartDate = DateTime.SpecifyKind(dto.Date.ToDateTime(earliestTime), DateTimeKind.Utc),
-                EndDate = DateTime.SpecifyKind(dto.Date.ToDateTime(latestTime), DateTimeKind.Utc)
-            };
-
             List<ScheduledService> services = dto.SelectedServices.Select(service => new ScheduledService
             {
                 Uuid = service.Uuid,
-                ServiceStartDate = DateTime.SpecifyKind(
-                    dto.Date.ToDateTime(service.StartTime),
-                    DateTimeKind.Utc
-                )
+                ServiceStartDate = service.StartDate
             }).ToList();
 
-            OperationResult<DateTime, GenericError> result =
-                await systemFacade.BlockTimeRangeAsync(services, range, dto.ClientUuid);
+            OperationResult<DateTime, GenericError> result = await systemFacade.BlockTimeRangeAsync(services, dto.ClientUuid);
 
             if (!result.IsSuccessful)
             {
