@@ -25,7 +25,7 @@
           </div>
         </div>
         <div class="data-header">
-          <span>Servicios disponibles en: {{selectedDate | readableDate}}</span>
+          <span>Servicios disponibles</span>
         </div>
         <div class="data-body table-type">
           <div class="data-body-no-data" *ngIf="servicesAvailable?.length === 0">
@@ -72,8 +72,6 @@
         <label for="globalStartTime" class="t-muted">Selecciona la hora de inicio de la cita:</label>
         <input type="time" id="globalStartTime" class="input m-top-base" [(ngModel)]="globalStartTime"
           (change)="updateStartTimesFromGlobal()" step="60" />
-        <p class="m-top-md">Nota: Si tienes conflicto en algún servicio, puedes tratar cambiando la hora de inicio o
-          cambiando el orden del servicio (si hay más de uno).</p>
       </div>
 
 
@@ -105,9 +103,9 @@
 
             <div *ngIf="isServiceInConflict(serviceOffer)" class="conflict-warning">
 
-              <mat-icon *ngIf="isServiceInConflict(serviceOffer)">warning</mat-icon>
               <!-- Conflictos con otras citas -->
               <div *ngIf="getServiceConflictInfo(serviceOffer).conflictingAppointments.length">
+                <mat-icon>warning</mat-icon>
                 <span>
                   El asistente o servicio no está disponible en este horario:
                 </span>
@@ -121,6 +119,7 @@
 
               <!-- Conflicto por disponibilidad -->
               <div *ngIf="getServiceConflictInfo(serviceOffer).unavailable">
+                <mat-icon>warning</mat-icon>
                 <span>
                   El asistente no se encuentra disponible en el rango solicitado ({{ startTimes[serviceOffer.uuid]}} -
                   {{

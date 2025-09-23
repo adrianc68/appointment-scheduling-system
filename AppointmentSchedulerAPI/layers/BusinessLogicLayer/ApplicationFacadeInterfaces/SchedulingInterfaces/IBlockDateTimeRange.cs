@@ -6,6 +6,6 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer.ApplicationFacadeInt
 {
     public interface IBlockDateTimeRange
     {
-      Task<OperationResult<DateTime, GenericError>> BlockTimeRangeAsync(List<ScheduledService> services, DateTimeRange range, Guid clientUuid);
+      Task<OperationResult<DateTime, GenericError>> BlockTimeRangeAsync(List<ScheduledService> services, Guid clientUuid);
     }
 }

@@ -27,7 +27,7 @@ export class ClientService {
   getClientList(): Observable<OperationResult<Client[], ApiDataErrorResponse>> {
     return this.httpServiceAdapter.get<ClientDTO[]>(`${this.apiUrl}${ApiRoutes.getAllClients}`).pipe(
       map((response: ApiResponse<ClientDTO[], ApiDataErrorResponse>) => {
-        console.log(response);
+        //console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<ClientDTO[]>(response)) {
           const clients: Client[] = response.data.map(dto => this.parseClient(dto));
           return OperationResultService.createSuccess(clients, response.message);
@@ -71,7 +71,7 @@ export class ClientService {
   disableClient(uuid: string): Observable<OperationResult<boolean, ApiDataErrorResponse>> {
     return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.disableClient}`, { uuid: uuid }).pipe(
       map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
-        console.log(response);
+        //console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
           return OperationResultService.createSuccess(response.data, response.message);
         }
@@ -94,7 +94,7 @@ export class ClientService {
     return this.httpServiceAdapter.patch<boolean>(`${this.apiUrl}${ApiRoutes.enableClient}`, { uuid: uuid }).pipe(
       map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
 
-        console.log(response);
+        //console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
           return OperationResultService.createSuccess(response.data, response.message);
         }
@@ -118,7 +118,7 @@ export class ClientService {
     return this.httpServiceAdapter.delete<boolean>(`${this.apiUrl}${ApiRoutes.deleteClient}?uuid=${uuid}`).pipe(
       map((response: ApiResponse<boolean, ApiDataErrorResponse>) => {
 
-        console.log(response);
+        //console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<boolean>(response)) {
           return OperationResultService.createSuccess(response.data, response.message);
         }

@@ -67,9 +67,10 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return timeRangeLockMgr.GetBlockedTimeSlotsByDate(date);
         }
 
-        public async Task<OperationResult<DateTime, GenericError>> BlockTimeRangeAsync(List<ScheduledService> services, DateTimeRange range, Guid clientUuid)
+        public async Task<OperationResult<DateTime, GenericError>> BlockTimeRangeAsync(List<ScheduledService> services, Guid clientUuid)
         {
-            DateTime currentDateTime = DateTime.Now;
+            DateTime currentDateTimeUtc = DateTime.UtcNow;
+
             int MAX_DAYS_FROM_NOW = int.Parse(envService.Get("MAX_DAYS_FOR_SCHEDULE"));
             int MAX_WEEKS_FOR_SCHEDULE = int.Parse(envService.Get("MAX_WEEKS_FOR_SCHEDULE"));
             int MAX_MONTHS_FOR_SCHEDULE = int.Parse(envService.Get("MAX_MONTHS_FOR_SCHEDULE"));
@@ -77,27 +78,28 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             int MAX_APPOINTMENTS_PER_CLIENT = int.Parse(envService.Get("MAX_APPOINTMENTS_PER_CLIENT"));
             bool IsPastSchedulingAllowed = bool.Parse(envService.Get("ALLOW_SCHEDULE_IN_THE_PAST"));
 
-            DateTime maxDate = currentDateTime
+            DateTime maxDate = currentDateTimeUtc
                       .AddMonths(MAX_MONTHS_FOR_SCHEDULE)
                       .AddDays(MAX_WEEKS_FOR_SCHEDULE * 7)
                       .AddDays(MAX_DAYS_FROM_NOW);
 
-            DateTime startDateTime = range.StartDate;
+
+            var startDateTime = services.OrderBy(s => s.ServiceStartDate).First().ServiceStartDate;
 
             // Check for past scheduling
-            if (!IsPastSchedulingAllowed && startDateTime < currentDateTime)
+            if (!IsPastSchedulingAllowed && startDateTime < currentDateTimeUtc)
             {
-                GenericError genericError = new GenericError($"You cannot schedule an appoinment in the past. You can only schedule from the current time", []);
-                genericError.AddData("SelectedDateTime", startDateTime.ToUniversalTime());
-                genericError.AddData("SuggestedDateTime", currentDateTime.AddMinutes(1).ToUniversalTime());
+                GenericError genericError = new GenericError("You cannot schedule an appointment in the past. You can only schedule from the current time", []);
+                genericError.AddData("SelectedDateTime", startDateTime);
+                genericError.AddData("SuggestedDateTime", currentDateTimeUtc.AddMinutes(1));
                 return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SCHEDULING_IN_THE_PAST_NOT_ALLOWED);
             }
 
             if (startDateTime > maxDate)
             {
-                GenericError genericError = new GenericError($"You cannot schedule an appoinment beyond {maxDate}.", []);
-                genericError.AddData("SelectedDateTime", startDateTime.ToUniversalTime());
-                genericError.AddData("SuggestedDateTime", currentDateTime.AddMinutes(5).ToUniversalTime());
+                GenericError genericError = new GenericError($"You cannot schedule an appointment beyond {maxDate}.", []);
+                genericError.AddData("SelectedDateTime", startDateTime); // ya UTC
+                genericError.AddData("SuggestedDateTime", currentDateTimeUtc.AddMinutes(5)); // ya UTC
                 return OperationResult<DateTime, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SCHEDULING_BEYOND_X_NOT_ALLOWED);
             }
 
@@ -176,15 +178,16 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
 
             services = services.OrderBy(so => so.ServiceStartDate).ToList();
 
-            List<GenericError> errorMessages = [];
+            // 7. Check contiguos services
+            List<GenericError> errorMessages = new List<GenericError>();
             for (int i = 1; i < services.Count; i++)
             {
                 var prevService = services[i - 1];
                 var currentService = services[i];
 
-                if (currentService.ServiceStartDate != prevService.ServiceEndDate)
+                if (currentService.ServiceStartDate!.Value != prevService.ServiceEndDate!.Value)
                 {
-                    GenericError genericError = new GenericError($"Service with UUID <{currentService!.Uuid!.Value}> is not contiguous with the previous service. <{prevService!.Uuid!.Value}>. Suggestions <ServiceOfferUuid>:<StartTime>:", []);
+                    GenericError genericError = new GenericError($"Service with UUID <{currentService.Uuid!.Value}> is not contiguous with the previous service <{prevService.Uuid!.Value}>. Suggested <ServiceOfferUuid>:<StartTime>:", []);
                     genericError.AddData($"{currentService.Uuid.Value}", prevService.ServiceEndDate!.Value.TimeOfDay);
                     errorMessages.Add(genericError);
                 }
@@ -195,17 +198,17 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 var result = OperationResult<DateTime, GenericError>.Failure(errorMessages, MessageCodeType.SERVICES_ARE_NOT_CONTIGUOUS);
                 return result;
             }
-            range.StartDate = services.Min(s => s.ServiceStartDate!.Value).ToUniversalTime();
-            range.EndDate = range.StartDate.AddMinutes(services.Sum(s => s.ServicesMinutes!.Value)).ToUniversalTime();
 
+            services = services.OrderBy(s => s.ServiceStartDate).ToList();
 
+            DateTimeRange range = new DateTimeRange
+            {
+                StartDate = services.First().ServiceStartDate!.Value,
+                EndDate = services.Last().ServiceEndDate!.Value
+            };
             foreach (var scheduledService in services)
             {
-                DateTime proposedStartDateTime = DateTime.SpecifyKind(
-            scheduledService.ServiceStartDate!.Value,
-            DateTimeKind.Utc
-        );
-
+                DateTime proposedStartDateTime = DateTime.SpecifyKind(scheduledService.ServiceStartDate!.Value, DateTimeKind.Utc);
                 DateTime proposedEndDateTime = proposedStartDateTime.AddMinutes(scheduledService.ServicesMinutes!.Value);
 
                 DateTimeRange serviceRange = new()
@@ -364,7 +367,7 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             return appointment;
         }
 
-     public async Task<List<Appointment>> GetAppointmentsOfUserByUuid(Guid uuid)
+        public async Task<List<Appointment>> GetAppointmentsOfUserByUuid(Guid uuid)
         {
             List<Appointment>? appointment = await schedulerMgr.GetAppointmentsOfUserByUuid(uuid);
             return appointment;
@@ -1203,10 +1206,9 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 .AddDays(MAX_WEEKS_FOR_SCHEDULE * 7)
                 .AddDays(MAX_DAYS_FROM_NOW);
 
-            // Convert appointment.StartDate to UTC real
-            DateTime startDateTimeUtc = appointment.StartDate.ToUniversalTime();
 
-            // 1. Check max services per client
+            var startDateTime = appointment!.ScheduledServices!.OrderBy(s => s.ServiceStartDate).First().ServiceStartDate;
+
             if (appointment.ScheduledServices!.Count > MAX_SERVICES_PER_CLIENT)
             {
                 GenericError genericError = new GenericError(
@@ -1218,25 +1220,25 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             }
 
             // 2. Check past scheduling
-            if (!IsPastSchedulingAllowed && startDateTimeUtc < currentDateTimeUtc)
+            if (!IsPastSchedulingAllowed && startDateTime < currentDateTimeUtc)
             {
                 GenericError genericError = new GenericError(
                     $"You cannot schedule an appointment in the past. You can only schedule from the current time to {maxDateUtc}",
                     []
                 );
-                genericError.AddData("SelectedDateTime", startDateTimeUtc);
+                genericError.AddData("SelectedDateTime", startDateTime);
                 genericError.AddData("SuggestedDateTime", currentDateTimeUtc.AddMinutes(1));
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SCHEDULING_IN_THE_PAST_NOT_ALLOWED);
             }
 
             // 3. Check max date
-            if (startDateTimeUtc > maxDateUtc)
+            if (startDateTime > maxDateUtc)
             {
                 GenericError genericError = new GenericError(
                     $"You cannot schedule an appointment beyond {maxDateUtc}.",
                     []
                 );
-                genericError.AddData("SelectedDateTime", startDateTimeUtc);
+                genericError.AddData("SelectedDateTime", startDateTime);
                 genericError.AddData("SuggestedDateTime", currentDateTimeUtc.AddMinutes(5));
                 return OperationResult<Guid, GenericError>.Failure(genericError, MessageCodeType.APPOINTMENT_SCHEDULING_BEYOND_X_NOT_ALLOWED);
             }
@@ -1341,6 +1343,19 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
                 }
             }
 
+            for (int i = 1; i < appointment.ScheduledServices.Count; i++)
+            {
+                var prevService = appointment.ScheduledServices[i - 1];
+                var currentService = appointment.ScheduledServices[i];
+
+                if (currentService.ServiceStartDate!.Value != prevService.ServiceEndDate!.Value)
+                {
+                    GenericError genericError = new GenericError($"Service with UUID <{currentService.Uuid!.Value}> is not contiguous with the previous service <{prevService.Uuid!.Value}>. Suggested <ServiceOfferUuid>:<StartTime>:", []);
+                    genericError.AddData($"{currentService.Uuid.Value}", prevService.ServiceEndDate!.Value.TimeOfDay);
+                    errorMessages.Add(genericError);
+                }
+            }
+
             if (errorMessages.Any())
                 return OperationResult<Guid, GenericError>.Failure(errorMessages, MessageCodeType.SERVICES_ARE_NOT_CONTIGUOUS);
 
@@ -1389,13 +1404,13 @@ namespace AppointmentSchedulerAPI.layers.BusinessLogicLayer
             // 10. Check assistant availability and conflicts
             foreach (var scheduledService in appointment.ScheduledServices)
             {
-                DateTime serviceStartUtc = scheduledService.ServiceStartDate!.Value.ToUniversalTime();
-                DateTime serviceEndUtc = scheduledService.ServiceEndDate!.Value.ToUniversalTime();
+                DateTime proposedStartDateTime = DateTime.SpecifyKind(scheduledService.ServiceStartDate!.Value, DateTimeKind.Utc);
+                DateTime proposedEndDateTime = proposedStartDateTime.AddMinutes(scheduledService.ServicesMinutes!.Value);
 
                 DateTimeRange serviceRange = new()
                 {
-                    StartDate = serviceStartUtc,
-                    EndDate = serviceEndUtc
+                    StartDate = proposedStartDateTime,
+                    EndDate = proposedEndDateTime
                 };
 
                 bool isAssistantAvailable = await schedulerMgr.IsAssistantAvailableInAvailabilityTimeSlotsAsync(

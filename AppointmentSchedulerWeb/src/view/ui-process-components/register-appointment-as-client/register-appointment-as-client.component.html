@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="data-header">
-          <span>Servicios disponibles en: {{selectedDate}}</span>
+          <span>Servicios disponibles</span>
         </div>
         <div class="data-body table-type">
           <div class="data-body-no-data" *ngIf="servicesAvailable?.length === 0">
@@ -106,9 +106,9 @@
 
             <div *ngIf="isServiceInConflict(serviceOffer)" class="conflict-warning">
 
-              <mat-icon *ngIf="isServiceInConflict(serviceOffer)">warning</mat-icon>
               <!-- Conflictos con otras citas -->
               <div *ngIf="getServiceConflictInfo(serviceOffer).conflictingAppointments.length">
+                <mat-icon *ngIf="isServiceInConflict(serviceOffer)">warning</mat-icon>
                 <span>
                   Este servicio tiene conflicto con otros servicios de otras citas:
                 </span>
@@ -122,6 +122,7 @@
 
               <!-- Conflicto por disponibilidad -->
               <div *ngIf="getServiceConflictInfo(serviceOffer).unavailable">
+                <mat-icon *ngIf="isServiceInConflict(serviceOffer)">warning</mat-icon>
                 <span>
                   El asistente no se encuentra disponible en el rango solicitado ({{ startTimes[serviceOffer.uuid]}} -
                   {{
