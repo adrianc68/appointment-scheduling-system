@@ -24,6 +24,7 @@ import { MessageCodeType } from '../../../cross-cutting/communication/model/mess
 import { AvailabilityTimeSlot } from '../../../view-model/business-entities/availability-time-slot';
 import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 import { AuthenticationService } from '../../../cross-cutting/security/authentication/authentication.service';
+import { fromLocalDateAndTimeToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
 
 @Component({
   selector: 'app-register-appointment-as-client',
@@ -69,11 +70,10 @@ export class RegisterAppointmentAsClientComponent {
     let clientUuid = accountData?.uuid;
 
     const payload = {
-      date: this.selectedDate,
       clientUuid: clientUuid,
       selectedServices: this.selectedServicesOffer.map(s => ({
         uuid: s.uuid,
-        startTime: this.startTimes[s.uuid]
+        startDate: fromLocalDateAndTimeToUTC(this.selectedDate, this.startTimes[s.uuid])
       }))
     };
 
@@ -100,16 +100,11 @@ export class RegisterAppointmentAsClientComponent {
     const accountData = await firstValueFrom(this.authenticationService.getAccountData());
     let clientUuid = accountData?.uuid;
 
-
-    console.log(">>>>>>>>>");
-    console.log(clientUuid);
-
     const payload = {
-      date: this.selectedDate,
       clientUuid: clientUuid,
       selectedServices: this.selectedServicesOffer.map(s => ({
         uuid: s.uuid,
-        startTime: this.startTimes[s.uuid]
+        startDate: fromLocalDateAndTimeToUTC(this.selectedDate, this.startTimes[s.uuid])
       }))
     };
 

@@ -125,7 +125,8 @@
       border-radius: inherit;
       border-bottom-right-radius: 0;
       border-bottom-left-radius: 0;
-      display:flex;
+      display: flex;
+      flex-direction: column;
       gap: variables.$spacing-base;
 
       .mat-icon {

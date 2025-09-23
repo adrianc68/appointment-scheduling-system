@@ -30,6 +30,8 @@ export function fromLocalToUTC(value: string | Date): string {
 }
 
 
+
+
 export function fromUTCtoLocal(value: string | Date): string {
   let date: Date;
 
@@ -56,5 +58,14 @@ export function fromLocalDateTimeToUTC(dateTimeLocal: string): Date {
   const [hours, minutes] = time.split(':').map(Number);
 
   return new Date(Date.UTC(year, month - 1, day, hours, minutes));
+}
+
+export function fromLocalDateAndTimeToUTC(date: string, time: string): string {
+  const [year, month, day] = date.split('-').map(Number);
+  const [hours, minutes, seconds] = time.split(':').map(Number);
+
+  const localDate = new Date(year, month - 1, day, hours, minutes, seconds);
+
+  return localDate.toISOString();
 }
 

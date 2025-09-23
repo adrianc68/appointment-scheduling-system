@@ -21,6 +21,7 @@ import { AvailabilityTimeSlot } from '../../../view-model/business-entities/avai
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ErrorUIService } from '../../../cross-cutting/communication/handle-error-service/error-ui.service';
 import { DurationDatePipe } from '../../../cross-cutting/helper/date-utils/duration-date.pipe';
+import { fromLocalDateAndTimeToUTC, fromLocalDateTimeToUTC } from '../../../cross-cutting/helper/date-utils/date.utils';
 
 @Component({
   selector: 'app-register-appointment-as-staff',
@@ -79,12 +80,12 @@ export class RegisterAppointmentAsStaffComponent {
   }
 
   blockTimeRange(): void {
+
     const payload = {
-      date: this.selectedDate,
       clientUuid: this.selectedClient?.uuid,
       selectedServices: this.selectedServicesOffer.map(s => ({
         uuid: s.uuid,
-        startTime: this.startTimes[s.uuid]
+        startDate: fromLocalDateAndTimeToUTC(this.selectedDate, this.startTimes[s.uuid])
       }))
     };
 
@@ -111,11 +112,10 @@ export class RegisterAppointmentAsStaffComponent {
   registerAppointmentAsStaff(): void {
 
     const payload = {
-      date: this.selectedDate,
       clientUuid: this.selectedClient?.uuid,
       selectedServices: this.selectedServicesOffer.map(s => ({
         uuid: s.uuid,
-        startTime: this.startTimes[s.uuid]
+        startDate: fromLocalDateAndTimeToUTC(this.selectedDate, this.startTimes[s.uuid])
       }))
     };
 

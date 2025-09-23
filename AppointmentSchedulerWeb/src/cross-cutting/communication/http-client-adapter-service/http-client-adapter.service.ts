@@ -64,8 +64,8 @@ export class HttpClientAdapter {
   }
 
   private handleErrorResponse(error: HttpErrorResponse): Observable<ApiErrorResponse<ApiDataErrorResponse>> {
-    console.log("Error happened");
-    console.log(error);
+    //console.log("Error happened");
+    //console.log(error);
     if (error instanceof HttpErrorResponse) {
       switch (error.status) {
         case 0: // No connection with server
@@ -74,9 +74,9 @@ export class HttpClientAdapter {
         case 401: // Unauthorized
         case 409: // Conflict
           const parsedMessage = parseStringToEnum(MessageCodeType, error.error.message);
-          console.log("*******");
-          console.log(error.error.message);
-          console.log(parsedMessage);
+          //console.log("*******");
+          //console.log(error.error.message);
+          //console.log(parsedMessage);
           if (parsedMessage === undefined) {
             throw new InvalidValueEnumValueException("Not possible to parse MessageCodeType");
           }
@@ -102,14 +102,13 @@ export class HttpClientAdapter {
           throwError(() => error);
       }
     }
-    console.log("NOT ASDFKDALSFAKSDLFASD");
     throw error;
   }
 
 
   private handleSuccessResponse<TData>(response: ApiResponse<TData, ApiDataErrorResponse>): ApiSuccessResponse<TData> {
     if (this.isSuccessResponse(response)) {
-      console.log(response);
+      //console.log(response);
       return {
         status: response.status,
         message: parseStringToEnum(MessageCodeType, response.message.toString()) ?? MessageCodeType.UNKNOWN_ERROR,

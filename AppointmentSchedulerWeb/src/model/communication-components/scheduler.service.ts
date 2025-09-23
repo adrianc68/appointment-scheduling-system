@@ -39,7 +39,7 @@ export class SchedulerService {
   blockTimeRange(appointment: any): Observable<OperationResult<Date, ApiDataErrorResponse>> {
     return this.httpServiceAdapter.post<string>(`${this.apiUrl}${ApiRoutes.blockTimeRangeAppointment}`, appointment).pipe(
       map((response: ApiResponse<Date, ApiDataErrorResponse>) => {
-        console.log(response);
+        //console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<Date>(response)) {
           return OperationResultService.createSuccess(response.data, response.message);
         }
@@ -63,7 +63,7 @@ export class SchedulerService {
   registerAppointmentAsClient(appointment: any): Observable<OperationResult<Date, ApiDataErrorResponse>> {
     return this.httpServiceAdapter.post<string>(`${this.apiUrl}${ApiRoutes.registerAppointmentAsClient}`, appointment).pipe(
       map((response: ApiResponse<Date, ApiDataErrorResponse>) => {
-        console.log(response);
+        //console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<Date>(response)) {
           return OperationResultService.createSuccess(response.data, response.message);
         }
@@ -87,7 +87,7 @@ export class SchedulerService {
   registerAppointmentAsStaff(appointment: any): Observable<OperationResult<Date, ApiDataErrorResponse>> {
     return this.httpServiceAdapter.post<string>(`${this.apiUrl}${ApiRoutes.registerAppointmentAsStaff}`, appointment).pipe(
       map((response: ApiResponse<Date, ApiDataErrorResponse>) => {
-        console.log(response);
+        //console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<Date>(response)) {
           return OperationResultService.createSuccess(response.data, response.message);
         }
@@ -112,7 +112,7 @@ export class SchedulerService {
 
     return this.httpServiceAdapter.get<AvailabilityTimeSlotDTO[]>(`${this.apiUrl}${ApiRoutes.getAvailabilityTimeSlots}?startDate=${startDate}&endDate=${endDate}`).pipe(
       map((response: ApiResponse<AvailabilityTimeSlotDTO[], ApiDataErrorResponse>) => {
-        console.log(response);
+        //console.log(response);
         if (this.httpServiceAdapter.isSuccessResponse<AvailabilityTimeSlotDTO[]>(response)) {
           const slots: AvailabilityTimeSlot[] = response.data.map(dto => this.parseSlot(dto));
           return OperationResultService.createSuccess(slots, response.message);
